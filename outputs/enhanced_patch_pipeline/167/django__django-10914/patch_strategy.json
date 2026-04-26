@@ -1,0 +1,16 @@
+{
+  "title": "Set default FILE_UPLOAD_PERMISSION",
+  "approach": "Explicitly set FILE_UPLOAD_PERMISSIONS to 0o644 in the global settings to ensure consistent file permissions across different upload handlers.",
+  "edit_targets": [
+    "django/conf/global_settings.py"
+  ],
+  "dependency_files": [
+    "tests/test_utils/tests.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing the global settings file is sufficient to enforce consistent permissions for uploaded files. No additional changes are required in other files.",
+  "risks": [
+    "Potential unintended consequences if other parts of the system rely on the default value of None for FILE_UPLOAD_PERMISSIONS."
+  ]
+}

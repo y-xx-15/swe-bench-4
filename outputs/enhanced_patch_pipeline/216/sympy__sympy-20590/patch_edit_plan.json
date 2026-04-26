@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/_print_helpers.py",
+      "action": "modify_region",
+      "justification": "The `Printable` class is a mixin that affects the behavior of inheriting classes, including `Symbol`. Adding `__slots__` here will prevent the creation of `__dict__` in `Symbol` instances, addressing the immutability issue."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/_print_helpers.py",
+      "target_symbol": "Printable",
+      "replacement_mode": "insert_before_anchor",
+      "covers_obligations": [
+        "test_immutable::core::attribute_assignment"
+      ],
+      "anchor_line_before": "    \"\"\"",
+      "anchor_line_after": "    def __str__(self):",
+      "replacement_block": "    \"\"\"\n\n    __slots__ = ()\n\n    def __str__(self):"
+    }
+  ]
+}

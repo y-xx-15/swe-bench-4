@@ -1,0 +1,32 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "src/flask/blueprints.py",
+      "action": "modify_region",
+      "justification": "Blueprint.__init__ needs a ValueError check for dotted names, and Blueprint.add_url_rule needs assert statements replaced with raise ValueError"
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "src/flask/blueprints.py",
+      "target_symbol": "Blueprint.__init__",
+      "anchor_line_before": "        self.name = name",
+      "anchor_line_after": "        self.url_prefix = url_prefix",
+      "replacement_block": "        if \".\" in name:\n            raise ValueError(\"'name' may not contain a dot '.' character.\")\n        self.name = name\n        self.url_prefix = url_prefix"
+    },
+    {
+      "target_file": "src/flask/blueprints.py",
+      "target_symbol": "Blueprint.add_url_rule__branch",
+      "anchor_line_before": "        if endpoint:",
+      "anchor_line_after": "            assert \".\" not in endpoint, \"Blueprint endpoints should not contain dots\"",
+      "replacement_block": "        if endpoint:\n            if \".\" in endpoint:\n                raise ValueError(\"Blueprint endpoints should not contain dots\")"
+    },
+    {
+      "target_file": "src/flask/blueprints.py",
+      "target_symbol": "Blueprint.add_url_rule__branch_tail",
+      "anchor_line_before": "        if view_func and hasattr(view_func, \"__name__\"):",
+      "anchor_line_after": "            assert (",
+      "replacement_block": "        if view_func and hasattr(view_func, \"__name__\"):\n            if \".\" in view_func.__name__:\n                raise ValueError(\n                    \"Blueprint view function name should not contain dots\"\n                )"
+    }
+  ]
+}

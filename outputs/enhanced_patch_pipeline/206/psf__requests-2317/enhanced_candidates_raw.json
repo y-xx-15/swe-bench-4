@@ -1,0 +1,148 @@
+[
+  {
+    "idea": {
+      "title": "test binary string method handling",
+      "semantic_bucket": "direct_symptom",
+      "goal": "ensure that binary string methods are correctly handled without causing a TypeError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_binary_string_method"
+      ],
+      "covers_original_tests": [
+        "test_HTTP_302_ALLOW_REDIRECT_GET"
+      ],
+      "covers_obligations": [
+        "test_HTTP_302_ALLOW_REDIRECT_GET::core"
+      ],
+      "target_source_symbol": "requests.sessions.Session.request",
+      "target_validation_subject": "method parameter handling",
+      "semantic_alignment_tokens": [
+        "method=",
+        "builtin_str",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "method=",
+        "b'GET'",
+        "builtin_str"
+      ],
+      "rationale": "This test directly targets the handling of binary string methods, which is the root cause of the failure in test_HTTP_302_ALLOW_REDIRECT_GET. Unlike the original test, this explicitly passes a binary string as the method parameter to ensure the bug is exposed and fixed."
+    },
+    "patch": "diff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,10 @@\n+def test_sweb_enhanced_binary_string_method():\n+    \"\"\"\n+    Test to ensure that binary string methods are correctly handled\n+    without causing a TypeError or unexpected behavior.\n+    \"\"\"\n+    session = requests.Session()\n+    try:\n+        session.request(b'GET', httpbin('get'))\n+    except TypeError:\n+        pytest.fail(\"Binary string method caused a TypeError unexpectedly.\")\n",
+    "raw_response": "```diff\ndiff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,10 @@\n+def test_sweb_enhanced_binary_string_method():\n+    \"\"\"\n+    Test to ensure that binary string methods are correctly handled\n+    without causing a TypeError or unexpected behavior.\n+    \"\"\"\n+    session = requests.Session()\n+    try:\n+        session.request(b'GET', httpbin('get'))\n+    except TypeError:\n+        pytest.fail(\"Binary string method caused a TypeError unexpectedly.\")\n```",
+    "identifiers": [
+      "test_sweb_enhanced_binary_string_method"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_binary_string_method"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "binary_method_type_error",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress handling of binary string method values to trigger the type_error",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_binary_method_type_error"
+      ],
+      "covers_original_tests": [
+        "test_POSTBIN_GET_POST_FILES"
+      ],
+      "covers_obligations": [
+        "test_POSTBIN_GET_POST_FILES::core"
+      ],
+      "target_source_symbol": "requests.sessions.Session.request",
+      "target_validation_subject": "method",
+      "semantic_alignment_tokens": [
+        "method=",
+        "builtin_str",
+        "to_native_string"
+      ],
+      "trigger_shape_tokens": [
+        "method=",
+        "b'GET'"
+      ],
+      "rationale": "This test directly reproduces the original failure by passing a binary string as the HTTP method, which triggers the type_error when `builtin_str` converts it incorrectly. It differs from the original observation by isolating the bug to the `method` argument and ensuring the failure is explicitly tied to the type mismatch."
+    },
+    "patch": "diff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,9 @@\n+def test_sweb_enhanced_binary_method_type_error():\n+    \"\"\"\n+    Test that passing a binary string as the HTTP method triggers the expected\n+    TypeError due to incorrect handling in the buggy code.\n+    \"\"\"\n+    with pytest.raises(TypeError, match=\"getresponse\\\\(\\\\) got an unexpected keyword argument 'buffering'\"):\n+        requests.request(b'GET', httpbin('get'))\n+\n+    # This test ensures the bug is exposed and fails on the buggy code.\n",
+    "raw_response": "```diff\ndiff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,9 @@\n+def test_sweb_enhanced_binary_method_type_error():\n+    \"\"\"\n+    Test that passing a binary string as the HTTP method triggers the expected\n+    TypeError due to incorrect handling in the buggy code.\n+    \"\"\"\n+    with pytest.raises(TypeError, match=\"getresponse\\\\(\\\\) got an unexpected keyword argument 'buffering'\"):\n+        requests.request(b'GET', httpbin('get'))\n+\n+    # This test ensures the bug is exposed and fails on the buggy code.\n```",
+    "identifiers": [
+      "test_sweb_enhanced_binary_method_type_error"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_binary_method_type_error"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "binary_string_method_coercion",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior when a binary string is passed as the HTTP method, causing unexpected 404 responses due to incorrect coercion",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "coercion_contract",
+      "target_tests": [
+        "test_sweb_enhanced_binary_string_method_coercion"
+      ],
+      "covers_original_tests": [
+        "test_encoded_methods"
+      ],
+      "covers_obligations": [
+        "test_encoded_methods::core"
+      ],
+      "target_source_symbol": "requests.sessions.Session.request",
+      "target_validation_subject": "method",
+      "semantic_alignment_tokens": [
+        "method=",
+        "builtin_str",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "method=",
+        "builtin_str",
+        "b'GET'"
+      ],
+      "rationale": "This test focuses on the behavioral consequence of passing a binary string as the HTTP method, which leads to a 404 response due to improper coercion. It differs from the original test by explicitly verifying the downstream HTTP response behavior rather than just the immediate exception."
+    },
+    "patch": "diff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,10 @@\n+def test_sweb_enhanced_binary_string_method_coercion():\n+    \"\"\"\n+    Test that passing a binary string as the HTTP method results in a proper\n+    HTTP request and does not lead to a 404 response due to incorrect coercion.\n+    \"\"\"\n+    session = requests.Session()\n+    response = session.request(b'GET', httpbin('get'))\n+    assert response.status_code == 200, (\n+        f\"Expected status code 200, got {response.status_code}. This indicates improper handling of binary string methods.\"\n+    )\n",
+    "raw_response": "```diff\ndiff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,10 @@\n+def test_sweb_enhanced_binary_string_method_coercion():\n+    \"\"\"\n+    Test that passing a binary string as the HTTP method results in a proper\n+    HTTP request and does not lead to a 404 response due to incorrect coercion.\n+    \"\"\"\n+    session = requests.Session()\n+    response = session.request(b'GET', httpbin('get'))\n+    assert response.status_code == 200, (\n+        f\"Expected status code 200, got {response.status_code}. This indicates improper handling of binary string methods.\"\n+    )\n```",
+    "identifiers": [
+      "test_sweb_enhanced_binary_string_method_coercion"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_binary_string_method_coercion"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "idea": {
+      "title": "validate_symbol_slots_absence",
+      "semantic_bucket": "structural_invariant",
+      "goal": "ensure that Symbol instances do not have a __dict__ attribute when __slots__ are defined",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "slots_visibility_check",
+      "target_tests": [
+        "test_sweb_enhanced_validate_symbol_slots_absence"
+      ],
+      "covers_original_tests": [
+        "test_immutable"
+      ],
+      "covers_obligations": [
+        "test_immutable::core"
+      ],
+      "target_source_symbol": "sympy.Symbol",
+      "target_validation_subject": "__dict__",
+      "semantic_alignment_tokens": [
+        "__slots__",
+        "__dict__",
+        "AttributeError"
+      ],
+      "trigger_shape_tokens": [
+        "__slots__",
+        "__dict__",
+        "AttributeError"
+      ],
+      "rationale": "This test directly verifies the structural invariant that Symbol instances should not have a __dict__ attribute when __slots__ are defined. It differs from the original test by explicitly targeting the __slots__ mechanism and ensuring that the absence of __dict__ is enforced, which was not explicitly validated in the original test."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_validate_symbol_slots_absence():\n+    s = Symbol('test')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute when __slots__ are defined.\"\n+    with raises(AttributeError):\n+        s.__dict__\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_validate_symbol_slots_absence():\n+    s = Symbol('test')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute when __slots__ are defined.\"\n+    with raises(AttributeError):\n+        s.__dict__\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_validate_symbol_slots_absence"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_validate_symbol_slots_absence"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_validate_symbol_slots_absence"
+    ],
+    "eval_status_map": {
+      "sympy/core/tests/test_basic.py:test_sweb_enhanced_validate_symbol_slots_absence": "FAILED",
+      "test__aresame": "PASSED",
+      "test_structure": "PASSED",
+      "test_equality": "PASSED",
+      "test_matches_basic": "PASSED",
+      "test_has": "PASSED",
+      "test_subs": "PASSED",
+      "test_subs_with_unicode_symbols": "PASSED",
+      "test_atoms": "PASSED",
+      "test_free_symbols_empty": "PASSED",
+      "test_doit": "PASSED",
+      "test_S": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_preorder_traversal": "PASSED",
+      "test_sorted_args": "PASSED",
+      "test_call": "PASSED",
+      "test_rewrite": "PASSED",
+      "test_literal_evalf_is_number_is_zero_is_comparable": "PASSED",
+      "test_as_Basic": "PASSED",
+      "test_atomic": "PASSED",
+      "test_as_dummy": "PASSED",
+      "test_canonical_variables": "PASSED",
+      "test_replace_exceptions": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_immutable"
+    ],
+    "covered_obligations": [
+      "test_immutable::core"
+    ]
+  }
+]

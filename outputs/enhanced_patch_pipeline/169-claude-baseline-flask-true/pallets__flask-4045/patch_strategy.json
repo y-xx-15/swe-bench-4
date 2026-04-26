@@ -1,0 +1,20 @@
+{
+  "title": "Add ValueError for dotted blueprint names and endpoints",
+  "approach": "Add a validation check at the top of Blueprint.__init__ that raises ValueError if the name contains a dot. Replace the two assert statements in Blueprint.add_url_rule with raise ValueError so the correct exception type is raised for dotted endpoints and view function names.",
+  "edit_targets": [
+    "src/flask/blueprints.py::Blueprint.__init__",
+    "src/flask/blueprints.py::Blueprint.add_url_rule"
+  ],
+  "dependency_files": [
+    "tests/test_blueprints.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "assert_for_validation"
+  ],
+  "sufficiency_assessment": "Editing only Blueprint.__init__ and Blueprint.add_url_rule in src/flask/blueprints.py is sufficient. The two failing tests target exactly these two methods: one expects ValueError from the constructor when a dotted name is passed, and the other expects ValueError from add_url_rule when a dotted endpoint is used. No other files need modification.",
+  "risks": [
+    "Existing code that legitimately passes dotted names to Blueprint() would break, but the problem statement confirms this is intentional since dots are now significant for nested blueprints.",
+    "Changing assert to raise ValueError could theoretically affect code that catches AssertionError, but that would be incorrect usage anyway."
+  ]
+}

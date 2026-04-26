@@ -1,0 +1,13 @@
+diff --git a/src/flask/blueprints.py b/src/flask/blueprints.py
+--- a/src/flask/blueprints.py
++++ b/src/flask/blueprints.py
+@@ -191,5 +191,9 @@
+         )
+         self.name = name
+         self.url_prefix = url_prefix
++        if "." in self.name:
++            raise ValueError(
++                "Blueprint names should not contain dots as they are significant for nesting."
++            )
+         self.subdomain = subdomain
+         self.deferred_functions: t.List[DeferredSetupFunction] = []

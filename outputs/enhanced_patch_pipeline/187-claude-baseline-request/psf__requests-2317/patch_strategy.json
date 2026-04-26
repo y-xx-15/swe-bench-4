@@ -1,0 +1,20 @@
+{
+  "title": "Decode bytes method instead of using builtin_str",
+  "approach": "Replace `method = builtin_str(method)` with a check that decodes bytes to a native string using `.decode('utf-8')` if the method is bytes, otherwise converts it with `builtin_str`. On Python 3, `builtin_str(b'GET')` produces the literal string \"b'GET'\" instead of 'GET'. The fix should detect if method is bytes and decode it properly.",
+  "edit_targets": [
+    "requests/sessions.py::Session.request"
+  ],
+  "dependency_files": [
+    "requests/compat.py",
+    "test_requests.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating"
+  ],
+  "sufficiency_assessment": "Editing only Session.request is sufficient. The bug is isolated to the single line `method = builtin_str(method)` which incorrectly stringifies bytes on Python 3. The `to_native_string` utility already exists in requests/utils.py and handles bytes-to-str conversion correctly, but we can also use a simple isinstance check with .decode(). No other files need modification.",
+  "risks": [
+    "Breaking Python 2 compatibility if the fix doesn't handle both str and unicode types correctly",
+    "If method is neither str nor bytes (e.g. some other type), the fix should still produce a reasonable string"
+  ]
+}

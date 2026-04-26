@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sphinx/ext/autosummary/generate.py",
+      "action": "modify_region",
+      "justification": "The `get_members` function does not properly filter out imported members when `imported_members` is False, which directly causes the bug."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sphinx/ext/autosummary/generate.py",
+      "target_symbol": "get_members",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "exclude_imported_members"
+      ],
+      "anchor_line_before": "                # skip imported members if expected",
+      "anchor_line_after": "                    skipped = skip_member(value, name, documenter.objtype)",
+      "replacement_block": "                # skip imported members if expected\n                if not imported and getattr(value, '__module__', None) != obj.__name__:\n                    continue\n                skipped = skip_member(value, name, documenter.objtype)"
+    }
+  ]
+}

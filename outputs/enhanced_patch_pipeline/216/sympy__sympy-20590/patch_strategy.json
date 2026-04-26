@@ -1,0 +1,18 @@
+{
+  "title": "Restore __slots__ enforcement in Symbol class",
+  "approach": "Reintroduce the `__slots__` attribute in the `Printable` mixin class to ensure that all inheriting classes, including `Symbol`, enforce immutability and prevent the creation of `__dict__`.",
+  "edit_targets": [
+    "sympy/core/_print_helpers.py::Printable"
+  ],
+  "dependency_files": [
+    "sympy/core/tests/test_basic.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating"
+  ],
+  "sufficiency_assessment": "Editing the `Printable` class to include `__slots__` should be sufficient to restore immutability for `Symbol` instances, as this mixin directly affects the behavior of inheriting classes. No additional edits are required in `Symbol` or other classes unless further propagation issues are discovered.",
+  "risks": [
+    "Potential unintended side effects on other classes inheriting from `Printable` that may rely on the presence of `__dict__`."
+  ]
+}

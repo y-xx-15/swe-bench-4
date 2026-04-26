@@ -1,0 +1,45 @@
+{
+  "root_cause": "The `get_members` function in `generate_autosummary_content` does not properly filter out imported members when `imported_members` is set to False.",
+  "affected_components": [
+    {
+      "file": "sphinx/ext/autosummary/generate.py",
+      "symbol": "generate_autosummary_content",
+      "reason": "This function is responsible for generating the `members` variable, which includes imported members when it should not."
+    },
+    {
+      "file": "sphinx/ext/autosummary/generate.py",
+      "symbol": "get_members",
+      "reason": "This helper function is used to retrieve members of a module or class and is directly responsible for filtering based on the `imported_members` flag."
+    }
+  ],
+  "failing_signal": "The `members` variable in the generated template includes imported members (e.g., `os`) even when `autosummary_imported_members` is set to False.",
+  "propagation_path": "The `get_members` function retrieves all members of the object, including imported ones, and passes them to `generate_autosummary_content`, which then populates the `members` variable in the template context. This leads to incorrect output in the generated `.rst` files.",
+  "repair_constraint": "The fix must ensure that imported members are excluded from the `members` variable when `autosummary_imported_members` is False, without breaking the inclusion of imported members when the flag is True.",
+  "suggested_repair_scope": [
+    "sphinx/ext/autosummary/generate.py"
+  ],
+  "suspicious_symbols": [
+    "generate_autosummary_content",
+    "get_members"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_autosummary_generate_content_for_module::core::members variable",
+      "source_symbol": "sphinx.ext.autosummary.generate.generate_autosummary_content",
+      "validation_subject": "members variable",
+      "why_it_matters": "The `members` variable must exclude imported members when `autosummary_imported_members` is False to align with user expectations and configuration."
+    },
+    {
+      "id": "test_autosummary_generate_content_for_module_skipped::core::members variable",
+      "source_symbol": "sphinx.ext.autosummary.generate.generate_autosummary_content",
+      "validation_subject": "members variable",
+      "why_it_matters": "The `members` variable must behave consistently across all test cases, ensuring imported members are excluded when the flag is False."
+    },
+    {
+      "id": "test_autosummary_generate_content_for_module_skipped::core::members variable in autosummary template context",
+      "source_symbol": "sphinx.ext.autosummary.generate.generate_autosummary_content",
+      "validation_subject": "members variable in autosummary template context",
+      "why_it_matters": "The `members` variable in the template context must accurately reflect the configuration to prevent incorrect documentation generation."
+    }
+  ]
+}

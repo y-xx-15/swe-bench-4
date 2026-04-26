@@ -1,0 +1,46 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "src/flask/blueprints.py",
+      "action": "modify_region",
+      "justification": "The Blueprint.__init__ method is responsible for initializing the 'name' attribute, which must be validated to ensure it does not contain dots. This validation is necessary to prevent conflicts with nested blueprints and endpoint naming."
+    },
+    {
+      "target_file": "src/flask/blueprints.py",
+      "action": "modify_region",
+      "justification": "The Blueprint.add_url_rule method handles endpoint and view function name validation. Explicit checks must be added to ensure these names do not contain dots, as this could lead to routing conflicts."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "src/flask/blueprints.py",
+      "target_symbol": "Blueprint.__init__",
+      "covers_obligations": [
+        "test_dotted_name_not_allowed::core"
+      ],
+      "anchor_line_before": "        self.name = name",
+      "anchor_line_after": "        self.url_prefix = url_prefix",
+      "replacement_block": "        self.name = name\n        if '.' in name:\n            raise ValueError(\"Blueprint names must not contain dots.\")\n        self.url_prefix = url_prefix"
+    },
+    {
+      "target_file": "src/flask/blueprints.py",
+      "target_symbol": "Blueprint.add_url_rule__branch",
+      "covers_obligations": [
+        "test_route_decorator_custom_endpoint_with_dots::endpoint"
+      ],
+      "anchor_line_before": "        if endpoint:",
+      "anchor_line_after": "            assert \".\" not in endpoint, \"Blueprint endpoints should not contain dots\"",
+      "replacement_block": "        if endpoint:\n            if '.' in endpoint:\n                raise ValueError(\"Blueprint endpoints must not contain dots.\")"
+    },
+    {
+      "target_file": "src/flask/blueprints.py",
+      "target_symbol": "Blueprint.add_url_rule__branch_tail",
+      "covers_obligations": [
+        "test_route_decorator_custom_endpoint_with_dots::view_func_name"
+      ],
+      "anchor_line_before": "        if view_func and hasattr(view_func, \"__name__\"):",
+      "anchor_line_after": "            assert (",
+      "replacement_block": "        if view_func and hasattr(view_func, \"__name__\"):\n            if '.' in view_func.__name__:\n                raise ValueError(\"Blueprint view function names must not contain dots.\")"
+    }
+  ]
+}

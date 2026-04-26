@@ -1,0 +1,26 @@
+{
+  "root_cause": "FILE_UPLOAD_PERMISSIONS is set to None, causing uploaded files to inherit system defaults, which may result in inconsistent permissions depending on the upload handler used.",
+  "affected_components": [
+    {
+      "file": "django/conf/global_settings.py",
+      "symbol": "FILE_UPLOAD_PERMISSIONS",
+      "reason": "This setting directly controls the permissions of uploaded files."
+    },
+    {
+      "file": "tests/test_utils/tests.py",
+      "symbol": "test_override_file_upload_permissions",
+      "reason": "This test explicitly checks the behavior of FILE_UPLOAD_PERMISSIONS and fails due to the inconsistent permissions."
+    }
+  ],
+  "failing_signal": "The test `test_override_file_upload_permissions` fails because the permissions of uploaded files are not consistent across different upload handlers.",
+  "propagation_path": "The default value of FILE_UPLOAD_PERMISSIONS is None, leading to reliance on system defaults. Temporary files created by `tempfile.NamedTemporaryFile` have restrictive permissions (e.g., 0o600), which are retained after renaming, causing the inconsistency.",
+  "repair_constraint": "Uploaded files must have consistent permissions regardless of the upload handler used, and the default should be secure but broadly accessible (e.g., 0o644).",
+  "suggested_repair_scope": [
+    "django/conf/global_settings.py",
+    "tests/test_utils/tests.py"
+  ],
+  "suspicious_symbols": [
+    "FILE_UPLOAD_PERMISSIONS",
+    "test_override_file_upload_permissions"
+  ]
+}

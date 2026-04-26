@@ -1,0 +1,89 @@
+[
+  {
+    "idea": {
+      "title": "test_file_upload_permission_with_tempfile",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the inconsistency in file permissions when using TemporaryUploadedFile",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_file_upload_permission_with_tempfile"
+      ],
+      "rationale": "This test directly targets the tempfile.NamedTemporaryFile + os.rename sequence, which is the root cause of the permission inconsistency. It differs from the original test by explicitly simulating the TemporaryUploadedFile scenario, ensuring the bug is reproduced in its specific manifestation."
+    },
+    "patch": "diff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,12 @@\n+class EnhancedFileUploadPermissionTests(SimpleTestCase):\n+    def test_sweb_enhanced_file_upload_permission_with_tempfile(self):\n+        \"\"\"\n+        Test file upload permissions when using TemporaryUploadedFile.\n+        This reproduces the issue where tempfile.NamedTemporaryFile + os.rename\n+        results in incorrect file permissions (0o600 instead of 0o644).\n+        \"\"\"\n+        from django.core.files.uploadedfile import TemporaryUploadedFile\n+        temp_file = TemporaryUploadedFile(\"test.txt\", \"text/plain\", 0, \"utf-8\")\n+        temp_file.close()  # Simulate file upload completion\n+        self.assertEqual(os.stat(temp_file.temporary_file_path()).st_mode & 0o777, 0o644)\n+\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,12 @@\n+class EnhancedFileUploadPermissionTests(SimpleTestCase):\n+    def test_sweb_enhanced_file_upload_permission_with_tempfile(self):\n+        \"\"\"\n+        Test file upload permissions when using TemporaryUploadedFile.\n+        This reproduces the issue where tempfile.NamedTemporaryFile + os.rename\n+        results in incorrect file permissions (0o600 instead of 0o644).\n+        \"\"\"\n+        from django.core.files.uploadedfile import TemporaryUploadedFile\n+        temp_file = TemporaryUploadedFile(\"test.txt\", \"text/plain\", 0, \"utf-8\")\n+        temp_file.close()  # Simulate file upload completion\n+        self.assertEqual(os.stat(temp_file.temporary_file_path()).st_mode & 0o777, 0o644)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_file_upload_permission_with_tempfile"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_file_upload_permission_with_tempfile"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null
+  },
+  {
+    "idea": {
+      "title": "test_file_upload_permission_with_memory_file",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the inconsistency in file permissions when using MemoryUploadedFile for temporary storage",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_memory_file_permission"
+      ],
+      "rationale": "This test focuses on the behavioral consequence of the bug when MemoryUploadedFile is used instead of TemporaryUploadedFile, highlighting a different usage path that could lead to permission inconsistencies."
+    },
+    "patch": "diff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,11 @@\n+class EnhancedFileUploadPermissionTests(SimpleTestCase):\n+    def test_sweb_enhanced_memory_file_permission(self):\n+        \"\"\"\n+        Test that FILE_UPLOAD_PERMISSIONS is correctly applied when using\n+        MemoryUploadedFile for temporary storage.\n+        \"\"\"\n+        with self.settings(FILE_UPLOAD_PERMISSIONS=0o644):\n+            uploaded_file = mock.Mock(spec=['temporary_file_path'])\n+            uploaded_file.temporary_file_path = None  # Simulate MemoryUploadedFile\n+            default_storage.save('test_file.txt', uploaded_file)\n+            self.assertEqual(os.stat('test_file.txt').st_mode & 0o777, 0o644)\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,11 @@\n+class EnhancedFileUploadPermissionTests(SimpleTestCase):\n+    def test_sweb_enhanced_memory_file_permission(self):\n+        \"\"\"\n+        Test that FILE_UPLOAD_PERMISSIONS is correctly applied when using\n+        MemoryUploadedFile for temporary storage.\n+        \"\"\"\n+        with self.settings(FILE_UPLOAD_PERMISSIONS=0o644):\n+            uploaded_file = mock.Mock(spec=['temporary_file_path'])\n+            uploaded_file.temporary_file_path = None  # Simulate MemoryUploadedFile\n+            default_storage.save('test_file.txt', uploaded_file)\n+            self.assertEqual(os.stat('test_file.txt').st_mode & 0o777, 0o644)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_memory_file_permission"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_memory_file_permission"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null
+  },
+  {
+    "idea": {
+      "title": "test_file_upload_permission_invariant",
+      "semantic_bucket": "structural_invariant",
+      "goal": "Ensure FILE_UPLOAD_PERMISSIONS is consistently applied across all file upload handlers.",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "state_consistency_check",
+      "target_tests": [
+        "test_sweb_enhanced_file_upload_permission_invariant"
+      ],
+      "rationale": "This test verifies that the FILE_UPLOAD_PERMISSIONS setting enforces a consistent file permission mode across different upload handlers (MemoryUploadedFile and TemporaryUploadedFile). Unlike the original test, which focuses on a specific permission mismatch, this test ensures that the invariant holds for all handlers and highlights systemic inconsistencies."
+    },
+    "patch": "diff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,15 @@\n+class EnhancedFileUploadPermissionTests(SimpleTestCase):\n+    def test_sweb_enhanced_file_upload_permission_invariant(self):\n+        \"\"\"\n+        Ensure FILE_UPLOAD_PERMISSIONS is consistently applied across all file upload handlers.\n+        This test verifies that the FILE_UPLOAD_PERMISSIONS setting enforces a consistent file\n+        permission mode across different upload handlers (MemoryUploadedFile and TemporaryUploadedFile).\n+        \"\"\"\n+        from django.core.files.uploadedfile import TemporaryUploadedFile, MemoryUploadedFile\n+        from django.core.files.storage import default_storage\n+        with self.settings(FILE_UPLOAD_PERMISSIONS=0o644):\n+            temp_file = TemporaryUploadedFile(\"test.txt\", \"text/plain\", 0, \"utf-8\")\n+            memory_file = MemoryUploadedFile(StringIO(\"content\"), \"test.txt\", \"text/plain\", 0, \"utf-8\")\n+            self.assertEqual(default_storage.file_permissions_mode, 0o644)\n+            self.assertEqual(os.stat(temp_file.temporary_file_path()).st_mode & 0o777, 0o644)\n+            self.assertEqual(os.stat(memory_file.file.name).st_mode & 0o777, 0o644)\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,15 @@\n+class EnhancedFileUploadPermissionTests(SimpleTestCase):\n+    def test_sweb_enhanced_file_upload_permission_invariant(self):\n+        \"\"\"\n+        Ensure FILE_UPLOAD_PERMISSIONS is consistently applied across all file upload handlers.\n+        This test verifies that the FILE_UPLOAD_PERMISSIONS setting enforces a consistent file\n+        permission mode across different upload handlers (MemoryUploadedFile and TemporaryUploadedFile).\n+        \"\"\"\n+        from django.core.files.uploadedfile import TemporaryUploadedFile, MemoryUploadedFile\n+        from django.core.files.storage import default_storage\n+        with self.settings(FILE_UPLOAD_PERMISSIONS=0o644):\n+            temp_file = TemporaryUploadedFile(\"test.txt\", \"text/plain\", 0, \"utf-8\")\n+            memory_file = MemoryUploadedFile(StringIO(\"content\"), \"test.txt\", \"text/plain\", 0, \"utf-8\")\n+            self.assertEqual(default_storage.file_permissions_mode, 0o644)\n+            self.assertEqual(os.stat(temp_file.temporary_file_path()).st_mode & 0o777, 0o644)\n+            self.assertEqual(os.stat(memory_file.file.name).st_mode & 0o777, 0o644)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_file_upload_permission_invariant"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_file_upload_permission_invariant"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null
+  }
+]

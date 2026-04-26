@@ -1,0 +1,20 @@
+{
+  "title": "Add __slots__ = () to Printable class",
+  "approach": "Add an empty __slots__ = () definition to the Printable class in sympy/core/_print_helpers.py. This ensures that classes inheriting from Printable (like Symbol) maintain their __slots__ optimization and do not get a __dict__ attribute. When a class in the inheritance chain doesn't define __slots__, Python creates __dict__ for instances even if child classes define __slots__. By adding __slots__ = () to Printable, we preserve the memory efficiency and immutability guarantees throughout the inheritance hierarchy.",
+  "edit_targets": [
+    "sympy/core/_print_helpers.py::Printable"
+  ],
+  "dependency_files": [
+    "sympy/core/symbol.py",
+    "sympy/core/basic.py",
+    "sympy/core/tests/test_basic.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing only the Printable class is sufficient. The Printable class is a mixin that provides printing functionality and is inherited by Symbol and other core SymPy classes. By adding __slots__ = () to Printable, all subclasses that define their own __slots__ will properly maintain the slots optimization. No changes are needed to Symbol or other subclasses because they already define __slots__ correctly; the issue is solely that Printable was missing its __slots__ definition, breaking the optimization chain. The test_immutable test in test_basic.py validates that Symbol instances do not have __dict__, which will pass once Printable has __slots__ = ().",
+  "risks": [
+    "If any code dynamically adds attributes to Printable instances (which would be bad practice), it will break after this change",
+    "Subclasses of Printable that don't define __slots__ will now also lack __dict__, which could break code that relies on dynamic attribute assignment on those subclasses",
+    "However, these risks are acceptable because __slots__ is the intended design for SymPy's core classes to maintain immutability and memory efficiency"
+  ]
+}

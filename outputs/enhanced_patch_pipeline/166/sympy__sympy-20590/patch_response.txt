@@ -1,0 +1,18 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/_print_helpers.py",
+      "action": "modify_region",
+      "justification": "The `Printable` class does not define `__slots__`, which allows derived classes like `Symbol` to inherit a `__dict__` attribute. Adding `__slots__` to `Printable` ensures that no `__dict__` attribute is introduced in the inheritance chain, preserving the intended behavior of `Symbol`."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/_print_helpers.py",
+      "target_symbol": "Printable",
+      "anchor_line_before": "    \"\"\"",
+      "anchor_line_after": "    def __str__(self):",
+      "replacement_block": "    \"\"\"\n\n    __slots__ = ()\n\n    def __str__(self):"
+    }
+  ]
+}

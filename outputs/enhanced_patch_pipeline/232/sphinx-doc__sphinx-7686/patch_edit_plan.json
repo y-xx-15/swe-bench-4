@@ -1,0 +1,29 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sphinx/ext/autosummary/generate.py",
+      "action": "modify_region",
+      "justification": "The `generate_autosummary_content` function directly handles the `members` variable and must be updated to exclude imported members when `autosummary_imported_members` is False."
+    },
+    {
+      "target_file": "sphinx/ext/autosummary/generate.py",
+      "action": "modify_region",
+      "justification": "The `get_members` function is responsible for retrieving members and must implement the filtering logic to exclude imported members based on the `imported_members` flag."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sphinx/ext/autosummary/generate.py",
+      "target_symbol": "get_members",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_autosummary_generate_content_for_module::core::members variable",
+        "test_autosummary_generate_content_for_module_skipped::core::members variable",
+        "test_autosummary_generate_content_for_module_skipped::core::members variable in autosummary template context"
+      ],
+      "anchor_line_before": "                # skip imported members if expected",
+      "anchor_line_after": "                    skipped = skip_member(value, name, documenter.objtype)",
+      "replacement_block": "                # skip imported members if expected\n                if imported or (getattr(value, '__module__', None) == obj.__name__):\n                    skipped = skip_member(value, name, documenter.objtype)"
+    }
+  ]
+}

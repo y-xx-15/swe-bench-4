@@ -1,0 +1,34 @@
+{
+  "root_cause": "The FILE_UPLOAD_PERMISSIONS setting is not explicitly defined, leading to inconsistent file permissions depending on the temporary file handler used during uploads.",
+  "affected_components": [
+    {
+      "file": "django/conf/global_settings.py",
+      "symbol": "FILE_UPLOAD_PERMISSIONS",
+      "reason": "This setting directly controls the permissions of uploaded files and is currently undefined."
+    },
+    {
+      "file": "tests/test_utils/tests.py",
+      "symbol": "test_override_file_upload_permissions",
+      "reason": "This test validates the behavior of FILE_UPLOAD_PERMISSIONS and fails due to the undefined default."
+    }
+  ],
+  "failing_signal": "AssertionError indicating that the expected file permission (420, equivalent to 0o644) does not match the actual permission (None or system-dependent default).",
+  "propagation_path": "The undefined FILE_UPLOAD_PERMISSIONS setting propagates through the file upload process, relying on system defaults or temporary file handlers, which results in inconsistent permissions.",
+  "repair_constraint": "The default file permissions for uploaded files must be explicitly set to 0o644 to ensure consistency across all systems and file handlers.",
+  "suggested_repair_scope": [
+    "django/conf/global_settings.py",
+    "tests/test_utils/tests.py"
+  ],
+  "suspicious_symbols": [
+    "FILE_UPLOAD_PERMISSIONS",
+    "test_override_file_upload_permissions"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core::FILE_UPLOAD_PERMISSIONS",
+      "source_symbol": "django.core.files.storage.FileSystemStorage",
+      "validation_subject": "FILE_UPLOAD_PERMISSIONS",
+      "why_it_matters": "Ensures that uploaded files have consistent and secure permissions across all environments and handlers."
+    }
+  ]
+}

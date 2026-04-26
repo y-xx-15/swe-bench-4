@@ -1,0 +1,176 @@
+{
+  "instance_id": "sympy__sympy-20590",
+  "repo": "sympy/sympy",
+  "model": "gpt-4o",
+  "pipeline_mode": "enhanced_guided",
+  "repair_mode": "baseline_fallback",
+  "original_test_identifiers": [
+    "test_immutable"
+  ],
+  "original_status_counts": {
+    "FAILED": 2,
+    "PASSED": 21
+  },
+  "original_failed_count": 2,
+  "original_passed_count": 21,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_immutable"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_immutable"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/core/tests/test_basic.py:test_immutable",
+      "test_immutable"
+    ],
+    "failure_mode": "attribute_error",
+    "dominant_errors": [
+      "AssertionError"
+    ],
+    "failure_snippets": [
+      "test_immutable F",
+      "________________ sympy/core/tests/test_basic.py:test_immutable _________________",
+      "Traceback (most recent call last):"
+    ],
+    "noise_ratio": 0.006,
+    "target_test_tracebacks": {
+      "test_immutable": "TARGET TEST: test_immutable\n- snippet: test_immutable F\n- snippet: ________________ sympy/core/tests/test_basic.py:test_immutable _________________\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_immutable F\n________________ sympy/core/tests/test_basic.py:test_immutable _________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/core/tests/test_basic.py\", line 38, in test_immutable\nAssertionError\n============= tests finished: 22 passed, 1 failed, in 0.14 seconds ============="
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 3,
+    "keep_top_k": 2,
+    "attempt_budget": 3,
+    "bucket_limit": 3,
+    "template_limit": 3,
+    "failure_mode": "attribute_error",
+    "noise_ratio": 0.006,
+    "difficulty": "low"
+  },
+  "adaptive_num_candidates": 3,
+  "adaptive_keep_top_k": 2,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 3,
+  "kept_enhanced_candidates": 0,
+  "enhanced_candidate_retention_rate": 0.0,
+  "enhanced_generation_attempts_total": 9,
+  "enhanced_generation_attempts_avg": 3.0,
+  "kept_enhanced_test_identifiers": [],
+  "enhanced_failed_test_identifiers": [],
+  "enhanced_failed_count": 0,
+  "generated_patch_nonempty": true,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 5,
+  "generated_patch_accepted": false,
+  "generated_patch_acceptance_reason": "rejected_patch_apply_failed",
+  "generated_patch_feedback": "The previous patch was rejected because it did not satisfy the acceptance gate. Patch apply mode: fuzzy_apply. Baseline passed=21, failed=2. Candidate passed=21, failed=2. Hard failure signal: none. FAIL_TO_PASS tests still failing after patch: test_immutable. Your patch must make ALL of these tests pass, not just improve aggregate counts. Semantic oracle failed identifiers: none. Semantic oracle failure summaries: none.  Target files: unknown. Target symbols: unknown. Generate a new source-only unified diff that is closer to the exact file context and lands inside the target class body.",
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [],
+  "patch_analysis": {
+    "root_cause": "The `Symbol` class in SymPy 1.7 no longer enforces `__slots__`, likely due to a missing `__slots__` definition in a parent class or mixin, allowing `__dict__` to be created.",
+    "affected_components": [
+      {
+        "file": "sympy/core/_print_helpers.py",
+        "symbol": "Printable",
+        "reason": "This mixin is part of the inheritance chain and may influence attribute behavior."
+      },
+      {
+        "file": "sympy/core/tests/test_basic.py",
+        "symbol": "test_immutable",
+        "reason": "This test directly fails due to the unexpected presence of `__dict__` in `Symbol` instances."
+      }
+    ],
+    "failing_signal": "The test `test_immutable` fails with an `AssertionError`, indicating that the `Symbol` class is no longer immutable as expected.",
+    "propagation_path": "The missing `__slots__` definition in a parent class or mixin allows `__dict__` to be created, violating immutability expectations and causing the test to fail.",
+    "repair_constraint": "The `Symbol` class must remain immutable, and the `__slots__` mechanism must be correctly enforced to prevent the creation of `__dict__`.",
+    "suggested_repair_scope": [
+      "sympy/core/_print_helpers.py",
+      "sympy/core/tests/test_basic.py"
+    ],
+    "suspicious_symbols": [
+      "Symbol",
+      "Printable"
+    ],
+    "repair_obligations": [
+      {
+        "id": "ensure_slots_enforcement",
+        "source_symbol": "Symbol",
+        "validation_subject": "test_immutable",
+        "why_it_matters": "The `Symbol` class must enforce `__slots__` to maintain immutability and pass the test."
+      },
+      {
+        "id": "verify_mixin_slots",
+        "source_symbol": "Printable",
+        "validation_subject": "Symbol",
+        "why_it_matters": "The `Printable` mixin may influence attribute behavior in `Symbol` and must correctly define `__slots__` if it is part of the inheritance chain."
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Restore __slots__ enforcement in Symbol class",
+    "approach": "Ensure that all parent classes and mixins in the inheritance chain of the Symbol class define __slots__ explicitly to prevent the creation of __dict__.",
+    "edit_targets": [
+      "sympy/core/symbol.py::Symbol"
+    ],
+    "dependency_files": [
+      "sympy/core/_print_helpers.py",
+      "sympy/core/tests/test_basic.py"
+    ],
+    "structural_rules": [
+      "ensure_slots_enforcement"
+    ],
+    "forbidden_patterns": [
+      "negative_gating"
+    ],
+    "sufficiency_assessment": "Editing the Symbol class alone is sufficient if all parent classes and mixins already define __slots__. If any parent class or mixin lacks __slots__, they must also be updated.",
+    "risks": [
+      "Potential regressions in classes inheriting from Symbol or using Printable mixin, as they may rely on the presence of __dict__."
+    ]
+  },
+  "patch_edit_plan": null,
+  "final_patch_attempted": true,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": true,
+  "final_patch_apply_mode": "fuzzy_apply",
+  "final_patch_cleanly_applied": false,
+  "clean_apply_ratio": 0.0,
+  "resolved": false,
+  "final_resolved": false,
+  "final_status_counts": {
+    "FAILED": 2,
+    "PASSED": 21
+  },
+  "final_failed_count": 2,
+  "final_passed_count": 21,
+  "original_passed_count_improvement": 0,
+  "original_failed_count_reduction": 0,
+  "final_status_map": {
+    "sympy/core/tests/test_basic.py:test_immutable": "FAILED",
+    "test__aresame": "PASSED",
+    "test_structure": "PASSED",
+    "test_immutable": "FAILED",
+    "test_equality": "PASSED",
+    "test_matches_basic": "PASSED",
+    "test_has": "PASSED",
+    "test_subs": "PASSED",
+    "test_subs_with_unicode_symbols": "PASSED",
+    "test_atoms": "PASSED",
+    "test_free_symbols_empty": "PASSED",
+    "test_doit": "PASSED",
+    "test_S": "PASSED",
+    "test_xreplace": "PASSED",
+    "test_preorder_traversal": "PASSED",
+    "test_sorted_args": "PASSED",
+    "test_call": "PASSED",
+    "test_rewrite": "PASSED",
+    "test_literal_evalf_is_number_is_zero_is_comparable": "PASSED",
+    "test_as_Basic": "PASSED",
+    "test_atomic": "PASSED",
+    "test_as_dummy": "PASSED",
+    "test_canonical_variables": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

@@ -1,0 +1,26 @@
+{
+  "original_test_identifiers": [
+    "test_autosummary_generate_content_for_module",
+    "test_autosummary_generate_content_for_module_skipped"
+  ],
+  "active_fail_to_pass_identifiers": [],
+  "inactive_fail_to_pass_identifiers": [
+    "test_autosummary_generate_content_for_module",
+    "test_autosummary_generate_content_for_module_skipped"
+  ],
+  "failing_tests_sample": [],
+  "failure_mode": "import_error",
+  "dominant_errors": [
+    "ModuleNotFoundError",
+    "ImportError",
+    "Error"
+  ],
+  "failure_snippets": [
+    "Traceback (most recent call last):"
+  ],
+  "noise_ratio": 0.0057,
+  "target_test_tracebacks": {
+    "test_autosummary_generate_content_for_module": "TARGET TEST: test_autosummary_generate_content_for_module\n- snippet: Traceback (most recent call last):\n- dominant_errors: ModuleNotFoundError, ImportError, Error\nWEAK TRACEBACK CONTEXT:\nTraceback (most recent call last):\nModuleNotFoundError: No module named 'docutils.utils.roman'\nTraceback (most recent call last):\nModuleNotFoundError: No module named 'roman'\nTraceback (most recent call last):\n    raise ImportError(\nImportError: Error importing plugin \"sphinx.testing.fixtures\": No module named 'roman'\n  evaluation failed :( (0.57 seconds)",
+    "test_autosummary_generate_content_for_module_skipped": "TARGET TEST: test_autosummary_generate_content_for_module_skipped\n- snippet: Traceback (most recent call last):\n- dominant_errors: ModuleNotFoundError, ImportError, Error\nWEAK TRACEBACK CONTEXT:\nTraceback (most recent call last):\nModuleNotFoundError: No module named 'docutils.utils.roman'\nTraceback (most recent call last):\nModuleNotFoundError: No module named 'roman'\nTraceback (most recent call last):\n    raise ImportError(\nImportError: Error importing plugin \"sphinx.testing.fixtures\": No module named 'roman'\n  evaluation failed :( (0.57 seconds)"
+  }
+}

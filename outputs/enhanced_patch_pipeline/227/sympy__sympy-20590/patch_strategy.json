@@ -1,0 +1,22 @@
+{
+  "title": "Restore __slots__ enforcement in Symbol inheritance chain",
+  "approach": "Ensure that all parent classes or mixins in the inheritance chain of `Symbol` explicitly define `__slots__` to prevent the creation of `__dict__` attributes on `Symbol` instances.",
+  "edit_targets": [
+    "sympy/core/_print_helpers.py::Printable"
+  ],
+  "dependency_files": [
+    "sympy/core/tests/test_basic.py",
+    "sympy/core/symbol.py"
+  ],
+  "structural_rules": [
+    "restore_unreachable_existing_branch"
+  ],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing the `Symbol` class alone is insufficient because its immutability depends on the inheritance chain. The `Printable` class, which is part of the chain, must also define `__slots__` explicitly to ensure the immutability of `Symbol` instances. The enhanced tests validate both the absence of `__dict__` and the immutability of `Symbol` instances.",
+  "risks": [
+    "Potential regressions in classes inheriting from `Printable` if they rely on dynamic attributes or `__dict__`."
+  ]
+}

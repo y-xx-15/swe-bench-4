@@ -1,0 +1,191 @@
+[
+  {
+    "instance_id": "sympy__sympy-20590",
+    "repo": "sympy/sympy",
+    "model": "claude-opus-4-6",
+    "pipeline_mode": "baseline_only",
+    "repair_mode": "baseline_fallback",
+    "original_test_identifiers": [
+      "test_immutable"
+    ],
+    "original_status_counts": {
+      "FAILED": 2,
+      "PASSED": 21
+    },
+    "original_failed_count": 2,
+    "original_passed_count": 21,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_immutable"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_immutable"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/core/tests/test_basic.py:test_immutable",
+        "test_immutable"
+      ],
+      "failure_mode": "attribute_error",
+      "dominant_errors": [
+        "AssertionError"
+      ],
+      "failure_snippets": [
+        "test_immutable F",
+        "________________ sympy/core/tests/test_basic.py:test_immutable _________________",
+        "Traceback (most recent call last):"
+      ],
+      "noise_ratio": 0.006,
+      "target_test_tracebacks": {
+        "test_immutable": "TARGET TEST: test_immutable\n- snippet: test_immutable F\n- snippet: ________________ sympy/core/tests/test_basic.py:test_immutable _________________\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_immutable F\n________________ sympy/core/tests/test_basic.py:test_immutable _________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/core/tests/test_basic.py\", line 38, in test_immutable\nAssertionError\n============= tests finished: 22 passed, 1 failed, in 0.42 seconds ============="
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 3,
+      "keep_top_k": 2,
+      "attempt_budget": 3,
+      "bucket_limit": 3,
+      "template_limit": 3,
+      "failure_mode": "attribute_error",
+      "noise_ratio": 0.006,
+      "difficulty": "low"
+    },
+    "adaptive_num_candidates": 3,
+    "adaptive_keep_top_k": 2,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 0,
+    "kept_enhanced_candidates": 0,
+    "enhanced_candidate_retention_rate": 0.0,
+    "enhanced_generation_attempts_total": 0,
+    "enhanced_generation_attempts_avg": 0.0,
+    "kept_enhanced_test_identifiers": [],
+    "enhanced_failed_test_identifiers": [],
+    "enhanced_failed_count": 0,
+    "generated_patch_nonempty": true,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 6,
+    "generated_patch_accepted": true,
+    "generated_patch_acceptance_reason": "accepted_final_validation",
+    "generated_patch_feedback": null,
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The Printable class in sympy/core/_print_helpers.py is missing __slots__ = () definition, causing all subclasses to have __dict__ despite defining __slots__ themselves. When a class in the inheritance chain doesn't define __slots__, Python creates __dict__ for instances even if child classes define __slots__.",
+      "affected_components": [
+        {
+          "file": "sympy/core/_print_helpers.py",
+          "symbol": "Printable",
+          "reason": "This mixin class is missing __slots__ = () which breaks the __slots__ optimization for all classes that inherit from it, including Symbol"
+        },
+        {
+          "file": "sympy/core/tests/test_basic.py",
+          "symbol": "test_immutable",
+          "reason": "This test validates that Symbol instances do not have __dict__ attribute, which fails when Printable lacks __slots__"
+        }
+      ],
+      "failing_signal": "AssertionError in test_immutable indicates that Symbol('s').__dict__ exists when it should not. The test expects AttributeError when accessing __dict__ on Symbol instances that define __slots__.",
+      "propagation_path": "Symbol class defines __slots__ but inherits from Printable (directly or indirectly). Printable class does not define __slots__ = (), so Python's MRO creates __dict__ for instances. Even though Symbol defines __slots__, the missing __slots__ in a parent class causes __dict__ to be created, breaking the memory optimization and immutability guarantees that __slots__ provides.",
+      "repair_constraint": "After the fix, Symbol instances must not have __dict__ attribute. All classes in the inheritance chain that don't need instance dictionaries must define __slots__ = () to maintain the __slots__ optimization throughout the hierarchy.",
+      "suggested_repair_scope": [
+        "sympy/core/_print_helpers.py"
+      ],
+      "suspicious_symbols": [
+        "Printable",
+        "Symbol",
+        "__slots__",
+        "__dict__"
+      ],
+      "repair_obligations": [
+        {
+          "id": "no_dict_on_symbol_instances",
+          "source_symbol": "Symbol",
+          "validation_subject": "Symbol('s').__dict__",
+          "why_it_matters": "Symbol instances must not have __dict__ to maintain memory efficiency and immutability guarantees provided by __slots__. The test_immutable test explicitly validates this by expecting AttributeError when accessing __dict__."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Add __slots__ = () to Printable class",
+      "approach": "Add an empty __slots__ = () definition to the Printable class in sympy/core/_print_helpers.py. This ensures that classes inheriting from Printable (like Symbol) maintain their __slots__ optimization and do not get a __dict__ attribute. When a class in the inheritance chain doesn't define __slots__, Python creates __dict__ for instances even if child classes define __slots__. By adding __slots__ = () to Printable, we preserve the memory efficiency and immutability guarantees throughout the inheritance hierarchy.",
+      "edit_targets": [
+        "sympy/core/_print_helpers.py::Printable"
+      ],
+      "dependency_files": [
+        "sympy/core/symbol.py",
+        "sympy/core/basic.py",
+        "sympy/core/tests/test_basic.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [],
+      "sufficiency_assessment": "Editing only the Printable class is sufficient. The Printable class is a mixin that provides printing functionality and is inherited by Symbol and other core SymPy classes. By adding __slots__ = () to Printable, all subclasses that define their own __slots__ will properly maintain the slots optimization. No changes are needed to Symbol or other subclasses because they already define __slots__ correctly; the issue is solely that Printable was missing its __slots__ definition, breaking the optimization chain. The test_immutable test in test_basic.py validates that Symbol instances do not have __dict__, which will pass once Printable has __slots__ = ().",
+      "risks": [
+        "If any code dynamically adds attributes to Printable instances (which would be bad practice), it will break after this change",
+        "Subclasses of Printable that don't define __slots__ will now also lack __dict__, which could break code that relies on dynamic attribute assignment on those subclasses",
+        "However, these risks are acceptable because __slots__ is the intended design for SymPy's core classes to maintain immutability and memory efficiency"
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/core/_print_helpers.py",
+          "action": "modify_region",
+          "justification": "The Printable class is missing __slots__ = () which causes all subclasses (including Symbol) to have __dict__ despite defining __slots__ themselves. Adding __slots__ = () here fixes the inheritance chain."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "sympy/core/_print_helpers.py",
+          "target_symbol": "Printable",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "no_dict_on_symbol_instances"
+          ],
+          "anchor_line_before": "    \"\"\"",
+          "anchor_line_after": "    def __str__(self):",
+          "replacement_block": "    \"\"\"\n\n    __slots__ = ()\n\n    # Note, we always use the default ordering (lex) in __str__ and __repr__,\n    # regardless of the global setting. See issue 5487.\n    def __str__(self):"
+        }
+      ]
+    },
+    "final_patch_attempted": true,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": true,
+    "final_patch_apply_mode": "clean_apply",
+    "final_patch_cleanly_applied": true,
+    "clean_apply_ratio": 1.0,
+    "resolved": true,
+    "final_resolved": true,
+    "final_status_counts": {
+      "PASSED": 22
+    },
+    "final_failed_count": 0,
+    "final_passed_count": 22,
+    "original_passed_count_improvement": 1,
+    "original_failed_count_reduction": 2,
+    "final_status_map": {
+      "test__aresame": "PASSED",
+      "test_structure": "PASSED",
+      "test_immutable": "PASSED",
+      "test_equality": "PASSED",
+      "test_matches_basic": "PASSED",
+      "test_has": "PASSED",
+      "test_subs": "PASSED",
+      "test_subs_with_unicode_symbols": "PASSED",
+      "test_atoms": "PASSED",
+      "test_free_symbols_empty": "PASSED",
+      "test_doit": "PASSED",
+      "test_S": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_preorder_traversal": "PASSED",
+      "test_sorted_args": "PASSED",
+      "test_call": "PASSED",
+      "test_rewrite": "PASSED",
+      "test_literal_evalf_is_number_is_zero_is_comparable": "PASSED",
+      "test_as_Basic": "PASSED",
+      "test_atomic": "PASSED",
+      "test_as_dummy": "PASSED",
+      "test_canonical_variables": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

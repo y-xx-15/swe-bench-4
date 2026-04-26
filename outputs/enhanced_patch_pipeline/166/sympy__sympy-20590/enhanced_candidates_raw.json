@@ -1,0 +1,89 @@
+[
+  {
+    "idea": {
+      "title": "check_slots_visibility",
+      "semantic_bucket": "structural_invariant",
+      "goal": "verify that the Symbol class respects the __slots__ definition and does not allow __dict__ attribute",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "slots_visibility_check",
+      "target_tests": [
+        "test_sweb_enhanced_slots_visibility"
+      ],
+      "rationale": "The original test checks for the absence of __dict__ but does not explicitly validate the structural invariant of __slots__. This test ensures that the __slots__ mechanism is enforced, providing stronger guidance for repair by focusing on the class-level design flaw."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,7 @@\n+def test_sweb_enhanced_slots_visibility():\n+    s = Symbol('test')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute when __slots__ are defined.\"\n+    assert hasattr(s, '__slots__'), \"Symbol instances should have __slots__ defined.\"\n+    assert '__dict__' not in dir(s), \"Symbol instances should not expose __dict__ in their dir() output.\"\n+    assert s.__slots__ == ('name',), \"Symbol instances should have the correct __slots__ definition.\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,7 @@\n+def test_sweb_enhanced_slots_visibility():\n+    s = Symbol('test')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute when __slots__ are defined.\"\n+    assert hasattr(s, '__slots__'), \"Symbol instances should have __slots__ defined.\"\n+    assert '__dict__' not in dir(s), \"Symbol instances should not expose __dict__ in their dir() output.\"\n+    assert s.__slots__ == ('name',), \"Symbol instances should have the correct __slots__ definition.\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_slots_visibility"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_slots_visibility"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null
+  },
+  {
+    "idea": {
+      "title": "test_forbidden_dict_access",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the absence of '__dict__' attribute in Symbol instances",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "forbidden_attribute_assignment",
+      "target_tests": [
+        "test_sweb_enhanced_forbidden_dict_access"
+      ],
+      "rationale": "This test directly targets the observed failure mode by asserting that accessing '__dict__' on a Symbol instance raises an AttributeError. Unlike the original test, which checks for the presence of '__dict__' using hasattr, this test explicitly attempts to access '__dict__', ensuring the bug is triggered in a more direct manner."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,5 @@\n+def test_sweb_enhanced_forbidden_dict_access():\n+    s = Symbol('s')\n+    with raises(AttributeError):\n+        _ = s.__dict__\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,5 @@\n+def test_sweb_enhanced_forbidden_dict_access():\n+    s = Symbol('s')\n+    with raises(AttributeError):\n+        _ = s.__dict__\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_forbidden_dict_access"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_forbidden_dict_access"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null
+  },
+  {
+    "idea": {
+      "title": "test_forbidden_dict_assignment",
+      "semantic_bucket": "structural_invariant",
+      "goal": "ensure that Symbol instances strictly adhere to the __slots__ mechanism and do not allow dynamic attribute creation via __dict__",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "forbidden_attribute_assignment",
+      "target_tests": [
+        "test_sweb_enhanced_forbidden_dict_assignment"
+      ],
+      "rationale": "This test explicitly checks the structural invariant that Symbol instances should not have a __dict__ attribute, which is distinct from merely observing its presence. It stresses the repair by verifying that the class design enforces the intended memory optimization via __slots__, preventing dynamic attribute creation."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_forbidden_dict_assignment():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.new_attr = 42  # Attempting to dynamically create an attribute should fail\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_forbidden_dict_assignment():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.new_attr = 42  # Attempting to dynamically create an attribute should fail\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_forbidden_dict_assignment"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_forbidden_dict_assignment"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null
+  }
+]

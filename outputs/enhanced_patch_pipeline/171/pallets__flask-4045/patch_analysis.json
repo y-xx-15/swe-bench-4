@@ -1,0 +1,20 @@
+{
+  "root_cause": "The Blueprint constructor does not validate the 'name' parameter to ensure it does not contain dots, which are significant for nested blueprints.",
+  "affected_components": [
+    {
+      "file": "src/flask/blueprints.py",
+      "symbol": "Blueprint.__init__",
+      "reason": "The constructor is responsible for initializing the blueprint and should enforce constraints on the 'name' parameter."
+    }
+  ],
+  "failing_signal": "Tests expecting a ValueError when a blueprint name contains a dot fail because no such error is raised.",
+  "propagation_path": "The lack of validation in the Blueprint constructor allows invalid names to propagate, causing downstream failures when dots are interpreted as nested blueprint delimiters.",
+  "repair_constraint": "Blueprint names must remain unique and valid, and the fix should not break existing functionality for valid names.",
+  "suggested_repair_scope": [
+    "src/flask/blueprints.py"
+  ],
+  "suspicious_symbols": [
+    "Blueprint.__init__",
+    "Blueprint.name"
+  ]
+}

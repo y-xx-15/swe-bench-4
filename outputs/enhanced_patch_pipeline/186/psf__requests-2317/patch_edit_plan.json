@@ -1,0 +1,37 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "requests/sessions.py",
+      "action": "modify_region",
+      "justification": "The `Session.request` method explicitly converts the `method` parameter using `builtin_str`, which causes the issue when the method is a binary string. This file needs an edit to ensure proper handling of binary string methods."
+    },
+    {
+      "target_file": "requests/sessions.py",
+      "action": "modify_region",
+      "justification": "The `SessionRedirectMixin.resolve_redirects` method uses the `method` parameter during redirect handling. It must ensure that the method remains valid when propagated through redirects. This file requires an edit to address the issue."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "requests/sessions.py",
+      "target_symbol": "Session.request",
+      "covers_obligations": [
+        "test_POSTBIN_GET_POST_FILES::core",
+        "test_POSTBIN_GET_POST_FILES_WITH_DATA::core"
+      ],
+      "anchor_line_before": "        params=None,",
+      "anchor_line_after": "        data=None,",
+      "replacement_block": "        params=None,\n        if isinstance(method, bytes):\n            method = method.decode('utf-8')\n        data=None,"
+    },
+    {
+      "target_file": "requests/sessions.py",
+      "target_symbol": "SessionRedirectMixin.resolve_redirects",
+      "covers_obligations": [
+        "test_HTTP_302_ALLOW_REDIRECT_GET::core"
+      ],
+      "anchor_line_before": "            url = resp.headers['location']",
+      "anchor_line_after": "            method = req.method",
+      "replacement_block": "            url = resp.headers['location']\n            if isinstance(req.method, bytes):\n                req.method = req.method.decode('utf-8')\n            method = req.method"
+    }
+  ]
+}

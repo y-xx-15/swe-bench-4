@@ -1,0 +1,10 @@
+{
+  "original_test_identifiers": [
+    "test_autosummary_generate_content_for_module",
+    "test_autosummary_generate_content_for_module_skipped"
+  ],
+  "status_map": {},
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/sphinx-doc__sphinx-7686/test_output.txt",
+  "timed_out": false,
+  "error": null
+}

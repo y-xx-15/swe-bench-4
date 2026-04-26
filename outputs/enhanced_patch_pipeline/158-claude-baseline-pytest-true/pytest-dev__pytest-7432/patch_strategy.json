@@ -1,0 +1,15 @@
+{
+  "title": "Decouple skip-location fix from runxfail elif chain",
+  "approach": "In `pytest_runtest_makereport`, the `elif item.config.option.runxfail: pass` branch short-circuits the entire elif chain, preventing the final `elif` that rewrites `rep.longrepr` for `skipped_by_mark_key` from ever executing when `--runxfail` is active. The fix is to change that final `elif` (the skipped-by-mark location rewrite) into a standalone `if` statement, so it runs independently of the runxfail/xfail elif chain. This way, `--runxfail` still causes xfail-related branches to be skipped, but the skip-location fix always has a chance to execute.",
+  "edit_targets": [
+    "src/_pytest/skipping.py"
+  ],
+  "dependency_files": [
+    "testing/test_skipping.py"
+  ],
+  "sufficiency_assessment": "Editing only `src/_pytest/skipping.py` is sufficient. The bug is entirely contained in the control flow of `pytest_runtest_makereport` — the final `elif` for `skipped_by_mark_key` needs to become an independent `if` so it is not gated by the `runxfail` branch. No other files need modification.",
+  "risks": [
+    "The standalone `if` block could now also fire in xfail-related scenarios where `rep.skipped` is true and `skipped_by_mark_key` is set — but `skipped_by_mark_key` is only set to True when skip/skipif marks trigger, not for xfail, so this is safe.",
+    "Ensure the `elif` → `if` change doesn't accidentally allow both the xfail longrepr rewrite and the skip longrepr rewrite to apply to the same report — the conditions are mutually exclusive (xfail sets wasxfail/changes outcome, skip checks skipped_by_mark_key) so no conflict."
+  ]
+}

@@ -1,0 +1,40 @@
+Looking at the buggy code context, I need to find the exact line numbers for the `pytest_runtest_makereport` function's elif chain.
+
+From the context, the relevant section is around lines 264-282:
+
+```python
+    elif item.config.option.runxfail:
+        pass  # don't interfere
+    elif call.excinfo and isinstance(call.excinfo.value, xfail.Exception):
+        ...
+    elif not rep.skipped and xfailed:
+        ...
+    elif (
+        item._store.get(skipped_by_mark_key, True)
+        and rep.skipped
+        and type(rep.longrepr) is tuple
+    ):
+        # skipped by mark.skipif; change the location of the failure
+        ...
+```
+
+The fix is to change the final `elif` (for `skipped_by_mark_key`) into a standalone `if`. Let me count the lines carefully from the buggy code context.
+
+Looking at the full function, the `elif (` for skipped_by_mark_key appears to be around line 272. Let me count from the `@hookimpl(hookwrapper=True)` for `pytest_runtest_makereport`:
+
+The skipped_by_mark_key elif block starts with `elif (` and the condition spans multiple lines. I need to change `elif (` to `if (`.
+
+```diff
+diff --git a/src/_pytest/skipping.py b/src/_pytest/skipping.py
+--- a/src/_pytest/skipping.py
++++ b/src/_pytest/skipping.py
+@@ -272,7 +272,7 @@ def pytest_runtest_makereport(item: Item, call: CallInfo[None]):
+             else:
+                 rep.outcome = "passed"
+                 rep.wasxfail = xfailed.reason
+-    elif (
++    if (
+         item._store.get(skipped_by_mark_key, True)
+         and rep.skipped
+         and type(rep.longrepr) is tuple
+```

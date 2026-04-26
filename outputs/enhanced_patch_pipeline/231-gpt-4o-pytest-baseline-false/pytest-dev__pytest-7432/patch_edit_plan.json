@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "action": "modify_region",
+      "justification": "The `pytest_runtest_makereport` function contains a branch that becomes unreachable when `--runxfail` is enabled. This branch must be restructured to ensure the correct skip location is reported."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "target_symbol": "pytest_runtest_makereport__branch",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "adjust-skip-location"
+      ],
+      "anchor_line_before": "    if unexpectedsuccess_key in item._store and rep.when == \"call\":",
+      "anchor_line_after": "        reason = item._store[unexpectedsuccess_key]",
+      "replacement_block": "    if unexpectedsuccess_key in item._store and rep.when == \"call\":\n        reason = item._store[unexpectedsuccess_key]\n    if item.config.option.runxfail and rep.skipped and isinstance(rep.longrepr, tuple):\n        # Adjust skip location to point to the test definition\n        filename, lineno, reason = rep.longrepr\n        rep.longrepr = (item.location[0], item.location[1], reason)"
+    }
+  ]
+}

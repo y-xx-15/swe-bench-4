@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "requests/sessions.py",
+      "action": "modify_region",
+      "justification": "The `Session.request` method directly handles the `method` parameter and performs the problematic conversion using `builtin_str`. This file must be edited to ensure the `method` parameter is correctly handled."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "requests/sessions.py",
+      "target_symbol": "Session.request",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_HTTP_302_ALLOW_REDIRECT_GET::core::method parameter handling"
+      ],
+      "anchor_line_before": "        method = builtin_str(method)",
+      "anchor_line_after": "        # Create the Request.",
+      "replacement_block": "        if isinstance(method, bytes):\n            method = method.decode('utf-8')\n        elif not isinstance(method, str):\n            raise ValueError(\"HTTP method must be a string or bytes\")\n        method = method.upper()\n        # Create the Request."
+    }
+  ]
+}

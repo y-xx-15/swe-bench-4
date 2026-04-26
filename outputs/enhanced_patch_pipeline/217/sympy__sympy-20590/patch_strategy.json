@@ -1,0 +1,21 @@
+{
+  "title": "Restore __slots__ enforcement in Symbol class",
+  "approach": "Ensure that all parent classes and mixins in the inheritance chain of the Symbol class define __slots__ explicitly to prevent the creation of __dict__.",
+  "edit_targets": [
+    "sympy/core/symbol.py::Symbol"
+  ],
+  "dependency_files": [
+    "sympy/core/_print_helpers.py",
+    "sympy/core/tests/test_basic.py"
+  ],
+  "structural_rules": [
+    "ensure_slots_enforcement"
+  ],
+  "forbidden_patterns": [
+    "negative_gating"
+  ],
+  "sufficiency_assessment": "Editing the Symbol class alone is sufficient if all parent classes and mixins already define __slots__. If any parent class or mixin lacks __slots__, they must also be updated.",
+  "risks": [
+    "Potential regressions in classes inheriting from Symbol or using Printable mixin, as they may rely on the presence of __dict__."
+  ]
+}

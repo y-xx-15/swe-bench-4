@@ -1,0 +1,116 @@
+[
+  {
+    "idea": {
+      "title": "binary_string_method_redirect_handling",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior of redirect handling when method is a binary string",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_binary_redirect"
+      ],
+      "covers_original_tests": [
+        "test_manual_redirect_with_partial_body_read"
+      ],
+      "covers_obligations": [
+        "test_manual_redirect_with_partial_body_read::core"
+      ],
+      "target_source_symbol": "requests.sessions.SessionRedirectMixin.resolve_redirects",
+      "target_validation_subject": "method",
+      "semantic_alignment_tokens": [
+        "method=",
+        "resolve_redirects",
+        "redirect",
+        "SessionRedirectMixin"
+      ],
+      "trigger_shape_tokens": [
+        "method=",
+        "builtin_str",
+        "redirect"
+      ],
+      "rationale": "This test focuses on the downstream impact of binary string methods during redirect handling, which is distinct from the original test's focus on partial body reads. It exposes how the bug propagates through the redirect resolution logic, providing additional repair guidance for handling binary strings in the method attribute."
+    },
+    "patch": "diff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,13 @@\n+def test_sweb_enhanced_binary_redirect():\n+    \"\"\"\n+    Test handling of binary string method during redirect resolution.\n+    This exposes the bug where `method = builtin_str(method)` incorrectly\n+    converts binary string methods, causing downstream failures.\n+    \"\"\"\n+    session = requests.Session()\n+    response = session.request(b'GET', httpbin('redirect/1'))\n+    assert response.status_code == 200, \"Expected successful redirect resolution.\"\n+    assert response.history[0].status_code == 302, \"Expected initial redirect response.\"\n+    assert response.history[0].is_redirect, \"Expected response to be marked as redirect.\"\n+    assert response.history[0].request.method == 'GET', \"Expected method to be correctly handled as 'GET'.\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,13 @@\n+def test_sweb_enhanced_binary_redirect():\n+    \"\"\"\n+    Test handling of binary string method during redirect resolution.\n+    This exposes the bug where `method = builtin_str(method)` incorrectly\n+    converts binary string methods, causing downstream failures.\n+    \"\"\"\n+    session = requests.Session()\n+    response = session.request(b'GET', httpbin('redirect/1'))\n+    assert response.status_code == 200, \"Expected successful redirect resolution.\"\n+    assert response.history[0].status_code == 302, \"Expected initial redirect response.\"\n+    assert response.history[0].is_redirect, \"Expected response to be marked as redirect.\"\n+    assert response.history[0].request.method == 'GET', \"Expected method to be correctly handled as 'GET'.\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_binary_redirect"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_binary_redirect"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "test patch did not apply to buggy base commit",
+    "failing_identifiers": null,
+    "eval_status_map": {},
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_manual_redirect_with_partial_body_read"
+    ],
+    "covered_obligations": [
+      "test_manual_redirect_with_partial_body_read::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "binary_method_string_conversion",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect conversion of binary method strings to literal strings causing HTTP errors",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_binary_method_string_conversion"
+      ],
+      "covers_original_tests": [
+        "test_POSTBIN_GET_POST_FILES",
+        "test_POSTBIN_GET_POST_FILES_WITH_DATA"
+      ],
+      "covers_obligations": [
+        "test_POSTBIN_GET_POST_FILES::core",
+        "test_POSTBIN_GET_POST_FILES_WITH_DATA::core"
+      ],
+      "target_source_symbol": "requests.sessions.Session.request",
+      "target_validation_subject": "method argument",
+      "semantic_alignment_tokens": [
+        "method=",
+        "builtin_str(",
+        "POST",
+        "b'POST'"
+      ],
+      "trigger_shape_tokens": [
+        "method=",
+        "builtin_str(",
+        "b'POST'"
+      ],
+      "rationale": "This test directly targets the conversion of binary strings in the 'method' argument to literal strings, which is the root cause of the HTTP error. It differs from the original tests by explicitly using a binary string for the method argument, ensuring the bug is reproduced and isolated."
+    },
+    "patch": "diff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,11 @@\n+def test_sweb_enhanced_binary_method_string_conversion():\n+    \"\"\"\n+    Regression test for binary method string conversion issue.\n+    Ensures that passing a binary string as the HTTP method triggers the bug.\n+    \"\"\"\n+    session = requests.Session()\n+    try:\n+        response = session.request(b'POST', httpbin('post'), data={'key': 'value'})\n+    except Exception as e:\n+        assert isinstance(e, requests.exceptions.InvalidSchema), \"Expected InvalidSchema exception due to incorrect method conversion.\"\n+    else:\n+        assert False, \"Bug not triggered: binary method string should cause failure.\"\n",
+    "raw_response": "```diff\ndiff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,11 @@\n+def test_sweb_enhanced_binary_method_string_conversion():\n+    \"\"\"\n+    Regression test for binary method string conversion issue.\n+    Ensures that passing a binary string as the HTTP method triggers the bug.\n+    \"\"\"\n+    session = requests.Session()\n+    try:\n+        response = session.request(b'POST', httpbin('post'), data={'key': 'value'})\n+    except Exception as e:\n+        assert isinstance(e, requests.exceptions.InvalidSchema), \"Expected InvalidSchema exception due to incorrect method conversion.\"\n+    else:\n+        assert False, \"Bug not triggered: binary method string should cause failure.\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_binary_method_string_conversion"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_binary_method_string_conversion"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_requests.py": "ERROR"
+    },
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_POSTBIN_GET_POST_FILES",
+      "test_POSTBIN_GET_POST_FILES_WITH_DATA"
+    ],
+    "covered_obligations": [
+      "test_POSTBIN_GET_POST_FILES::core",
+      "test_POSTBIN_GET_POST_FILES_WITH_DATA::core"
+    ]
+  }
+]

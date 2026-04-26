@@ -1,0 +1,26 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "src/flask/blueprints.py",
+      "action": "modify_region",
+      "justification": "The Blueprint constructor (`Blueprint.__init__`) is responsible for initializing the blueprint name. Validation logic must be added here to ensure that names containing dots raise a ValueError."
+    },
+    {
+      "target_file": "src/flask/blueprints.py",
+      "action": "no_change",
+      "justification": "The `Blueprint.add_url_rule` method already validates endpoint names for dots. No additional changes are required in this method."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "src/flask/blueprints.py",
+      "target_symbol": "Blueprint.__init__",
+      "covers_obligations": [
+        "validate_blueprint_name"
+      ],
+      "anchor_line_before": "        self.name = name",
+      "anchor_line_after": "        self.url_prefix = url_prefix",
+      "replacement_block": "        self.name = name\n        if '.' in name:\n            raise ValueError(\"Blueprint names must not contain dots.\")\n\n        self.url_prefix = url_prefix"
+    }
+  ]
+}

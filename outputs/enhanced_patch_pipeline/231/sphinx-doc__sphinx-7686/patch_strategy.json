@@ -1,0 +1,16 @@
+{
+  "title": "Filter Imported Members in Autosummary",
+  "approach": "Modify the `get_members` function to respect the `imported_members` parameter and exclude imported members when it is set to False.",
+  "edit_targets": [
+    "sphinx/ext/autosummary/generate.py::get_members"
+  ],
+  "dependency_files": [
+    "sphinx/ext/autosummary/generate.py::generate_autosummary_content"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing the `get_members` function is sufficient to fix the issue, as it directly controls the filtering of module members based on the `imported_members` parameter.",
+  "risks": [
+    "Ensure that excluding imported members does not inadvertently remove valid members defined within the module."
+  ]
+}

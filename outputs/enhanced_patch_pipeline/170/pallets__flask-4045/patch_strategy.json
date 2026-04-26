@@ -1,0 +1,19 @@
+{
+  "title": "validate_blueprint_name_no_dots",
+  "approach": "Add a validation check in the Blueprint constructor to ensure the 'name' parameter does not contain dots. Raise a ValueError if the validation fails.",
+  "edit_targets": [
+    "src/flask/blueprints.py::Blueprint.__init__",
+    "src/flask/blueprints.py::Blueprint.add_url_rule"
+  ],
+  "dependency_files": [
+    "src/flask/blueprints.py::Blueprint.add_url_rule"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating"
+  ],
+  "sufficiency_assessment": "Editing only the Blueprint.__init__ method is sufficient because the validation ensures that invalid names are rejected at the point of object creation. This prevents propagation of invalid names to other methods like add_url_rule.",
+  "risks": [
+    "Potential backward compatibility issues if existing code relies on blueprint names containing dots."
+  ]
+}

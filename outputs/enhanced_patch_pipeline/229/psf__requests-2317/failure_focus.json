@@ -1,0 +1,38 @@
+{
+  "original_test_identifiers": [
+    "test_HTTP_302_ALLOW_REDIRECT_GET",
+    "test_POSTBIN_GET_POST_FILES",
+    "test_POSTBIN_GET_POST_FILES_WITH_DATA",
+    "test_basicauth_with_netrc",
+    "test_json_param_post_content_type_works",
+    "test_manual_redirect_with_partial_body_read",
+    "test_requests_history_is_saved",
+    "test_encoded_methods"
+  ],
+  "active_fail_to_pass_identifiers": [],
+  "inactive_fail_to_pass_identifiers": [
+    "test_HTTP_302_ALLOW_REDIRECT_GET",
+    "test_POSTBIN_GET_POST_FILES",
+    "test_POSTBIN_GET_POST_FILES_WITH_DATA",
+    "test_basicauth_with_netrc",
+    "test_json_param_post_content_type_works",
+    "test_manual_redirect_with_partial_body_read",
+    "test_requests_history_is_saved",
+    "test_encoded_methods"
+  ],
+  "failing_tests_sample": [],
+  "failure_mode": "generic_failure",
+  "dominant_errors": [],
+  "failure_snippets": [],
+  "noise_ratio": 0.0034,
+  "target_test_tracebacks": {
+    "test_HTTP_302_ALLOW_REDIRECT_GET": "TARGET TEST: test_HTTP_302_ALLOW_REDIRECT_GET",
+    "test_POSTBIN_GET_POST_FILES": "TARGET TEST: test_POSTBIN_GET_POST_FILES",
+    "test_POSTBIN_GET_POST_FILES_WITH_DATA": "TARGET TEST: test_POSTBIN_GET_POST_FILES_WITH_DATA",
+    "test_basicauth_with_netrc": "TARGET TEST: test_basicauth_with_netrc",
+    "test_json_param_post_content_type_works": "TARGET TEST: test_json_param_post_content_type_works",
+    "test_manual_redirect_with_partial_body_read": "TARGET TEST: test_manual_redirect_with_partial_body_read",
+    "test_requests_history_is_saved": "TARGET TEST: test_requests_history_is_saved",
+    "test_encoded_methods": "TARGET TEST: test_encoded_methods"
+  }
+}

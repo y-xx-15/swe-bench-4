@@ -1,0 +1,29 @@
+{
+  "root_cause": "The `pytest_runtest_makereport` hook does not correctly adjust the location of skipped tests when `--runxfail` is enabled, because the branch that modifies the `rep.longrepr` for skipped tests is bypassed due to the `if item.config.option.runxfail` condition.",
+  "affected_components": [
+    {
+      "file": "src/_pytest/skipping.py",
+      "symbol": "pytest_runtest_makereport",
+      "reason": "This hook is responsible for generating the test report, including the location of skipped tests."
+    }
+  ],
+  "failing_signal": "The reported skip location points to `src/_pytest/skipping.py:238` instead of the test definition location when `--runxfail` is used.",
+  "propagation_path": "When `--runxfail` is enabled, the `if item.config.option.runxfail` condition in `pytest_runtest_makereport` prevents the branch that adjusts the `rep.longrepr` for skipped tests from executing, leading to incorrect location reporting.",
+  "repair_constraint": "The fix must ensure that the correct test definition location is reported for skipped tests, regardless of whether `--runxfail` is enabled.",
+  "suggested_repair_scope": [
+    "src/_pytest/skipping.py"
+  ],
+  "suspicious_symbols": [
+    "pytest_runtest_makereport",
+    "rep.longrepr",
+    "item.config.option.runxfail"
+  ],
+  "repair_obligations": [
+    {
+      "id": "adjust-skip-location",
+      "source_symbol": "pytest_runtest_makereport",
+      "validation_subject": "rep.longrepr",
+      "why_it_matters": "The `rep.longrepr` must point to the test definition location for accurate reporting of skipped tests."
+    }
+  ]
+}

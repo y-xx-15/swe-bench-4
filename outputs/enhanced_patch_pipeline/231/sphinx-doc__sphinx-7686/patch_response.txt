@@ -1,0 +1,15 @@
+```diff
+diff --git a/sphinx/ext/autosummary/generate.py b/sphinx/ext/autosummary/generate.py
+--- a/sphinx/ext/autosummary/generate.py
++++ b/sphinx/ext/autosummary/generate.py
+@@ -267,7 +267,8 @@
+                 # skip imported members if expected
+                 if imported or getattr(value, '__module__', None) == obj.__name__:
+                     skipped = skip_member(value, name, documenter.objtype)
+-                    if skipped is True:
++                    if not imported and getattr(value, '__module__', None) != obj.__name__:
++                        continue
+                     elif skipped is True:
+                         pass
+                     elif skipped is False:
+```

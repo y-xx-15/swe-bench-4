@@ -1,0 +1,20 @@
+{
+  "title": "validate_blueprint_name_dots",
+  "approach": "Add validation logic in the Blueprint constructor to raise a ValueError if the 'name' parameter contains dots.",
+  "edit_targets": [
+    "src/flask/blueprints.py::Blueprint.__init__",
+    "src/flask/blueprints.py::Blueprint.add_url_rule"
+  ],
+  "dependency_files": [
+    "src/flask/scaffold.py",
+    "tests/test_blueprints.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating"
+  ],
+  "sufficiency_assessment": "Editing the Blueprint constructor is sufficient to enforce the validation. No changes are needed in parent classes or helper methods.",
+  "risks": [
+    "Potential regression if existing valid blueprint names are mistakenly flagged as invalid."
+  ]
+}

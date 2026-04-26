@@ -1,0 +1,16 @@
+{
+  "original_test_identifiers": [
+    "test_HTTP_302_ALLOW_REDIRECT_GET",
+    "test_POSTBIN_GET_POST_FILES",
+    "test_POSTBIN_GET_POST_FILES_WITH_DATA",
+    "test_basicauth_with_netrc",
+    "test_json_param_post_content_type_works",
+    "test_manual_redirect_with_partial_body_read",
+    "test_requests_history_is_saved",
+    "test_encoded_methods"
+  ],
+  "status_map": {},
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/psf__requests-2317/test_output.txt",
+  "timed_out": true,
+  "error": "Test patch did not apply or logs could not be parsed"
+}

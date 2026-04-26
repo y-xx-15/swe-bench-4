@@ -1,0 +1,25 @@
+{
+  "root_cause": "The Blueprint.__init__ method does not validate that the `name` parameter contains no dots. Since blueprints can now be nested and dots are used as separators in blueprint names (e.g., 'parent.child'), allowing dots in a blueprint's own name would cause ambiguity. Additionally, Blueprint.add_url_rule uses `assert` to check for dots in endpoint names, but `assert` statements raise AssertionError, while the test expects a ValueError.",
+  "affected_components": [
+    {
+      "file": "src/flask/blueprints.py",
+      "symbol": "Blueprint.__init__",
+      "reason": "Missing validation that the blueprint name does not contain a dot character"
+    },
+    {
+      "file": "src/flask/blueprints.py",
+      "symbol": "Blueprint.add_url_rule",
+      "reason": "Uses `assert` which raises AssertionError instead of raising ValueError for dotted endpoint names"
+    }
+  ],
+  "failing_signal": "test_dotted_name_not_allowed: `flask.Blueprint('app.ui', __name__)` does not raise ValueError — no validation exists in __init__. test_route_decorator_custom_endpoint_with_dots: `bp.route('/', endpoint='a.b')` raises AssertionError instead of the expected ValueError because the check uses `assert` instead of `raise ValueError`.",
+  "propagation_path": "1) Blueprint('app.ui', __name__) is called → __init__ stores the dotted name without any check → no exception raised → test expecting ValueError fails. 2) bp.route('/', endpoint='a.b') calls add_url_rule → `assert '.' not in endpoint` fires an AssertionError → test catches it with `pytest.raises(ValueError)` → mismatch in exception type → test fails.",
+  "repair_constraint": "Blueprint.__init__ must raise ValueError if `name` contains a dot. Blueprint.add_url_rule must raise ValueError (not AssertionError) if the endpoint contains a dot. Existing valid blueprint names (without dots) and endpoints must continue to work normally.",
+  "suggested_repair_scope": [
+    "src/flask/blueprints.py"
+  ],
+  "suspicious_symbols": [
+    "Blueprint.__init__",
+    "Blueprint.add_url_rule"
+  ]
+}

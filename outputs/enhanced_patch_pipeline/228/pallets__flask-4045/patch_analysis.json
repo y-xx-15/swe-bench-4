@@ -1,0 +1,45 @@
+{
+  "root_cause": "The Blueprint class does not validate the 'name' parameter for dots during initialization, and the 'add_url_rule' method only asserts against dots in 'endpoint' and 'view_func_name', missing validation for nested blueprint names.",
+  "affected_components": [
+    {
+      "file": "src/flask/blueprints.py",
+      "symbol": "Blueprint.__init__",
+      "reason": "This is where the 'name' parameter is set, and validation for dots should occur."
+    },
+    {
+      "file": "src/flask/blueprints.py",
+      "symbol": "Blueprint.add_url_rule",
+      "reason": "This method validates 'endpoint' and 'view_func_name' but does not handle nested blueprint names, which propagate through 'self.blueprint.name'."
+    }
+  ],
+  "failing_signal": "Tests fail because ValueError is not raised when blueprint names or endpoints contain dots, indicating missing validation logic.",
+  "propagation_path": "Blueprint.__init__ allows names with dots, which propagate through Blueprint.add_url_rule when constructing endpoint names, causing assertion failures or incorrect behavior.",
+  "repair_constraint": "Blueprint names, endpoints, and view function names must not contain dots, and existing functionality for valid names must remain unaffected.",
+  "suggested_repair_scope": [
+    "src/flask/blueprints.py"
+  ],
+  "suspicious_symbols": [
+    "Blueprint.__init__",
+    "Blueprint.add_url_rule"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_dotted_name_not_allowed::core",
+      "source_symbol": "Blueprint.__init__",
+      "validation_subject": "name",
+      "why_it_matters": "Blueprint names with dots can cause incorrect nesting behavior and must be validated during initialization."
+    },
+    {
+      "id": "test_route_decorator_custom_endpoint_with_dots::endpoint",
+      "source_symbol": "Blueprint.add_url_rule",
+      "validation_subject": "endpoint",
+      "why_it_matters": "Endpoints with dots can cause routing issues and must be validated to ensure correctness."
+    },
+    {
+      "id": "test_route_decorator_custom_endpoint_with_dots::view_func_name",
+      "source_symbol": "Blueprint.add_url_rule",
+      "validation_subject": "view_func_name",
+      "why_it_matters": "View function names with dots can cause incorrect endpoint construction and must be validated."
+    }
+  ]
+}

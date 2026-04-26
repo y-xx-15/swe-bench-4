@@ -1,0 +1,29 @@
+{
+  "original_test_identifiers": [
+    "test_xfail_run_with_skip_mark[test_input1-expected1]"
+  ],
+  "failing_tests_sample": [
+    "test_xfail_run_anyway.py::test_func",
+    "test_xfail_imperative_in_setup_function.py::test_this",
+    "test_xfail_raises.py::test_raises",
+    "test_reportchars.py::test_1",
+    "test_simple.py::test_foo"
+  ],
+  "failure_mode": "type_error",
+  "dominant_errors": [
+    "AssertionError",
+    "TypeError",
+    "AttributeError",
+    "IndexError",
+    "Error"
+  ],
+  "failure_snippets": [
+    "________ TestXFail.test_xfail_run_with_skip_mark[test_input1-expected1] ________",
+    "test_xfail_run_anyway.py:4: AssertionError",
+    "FAILED test_xfail_run_anyway.py::test_func - assert 0"
+  ],
+  "noise_ratio": 0.0023,
+  "target_test_tracebacks": {
+    "test_xfail_run_with_skip_mark[test_input1-expected1]": "________ TestXFail.test_xfail_run_with_skip_mark[test_input1-expected1] ________\n\nself = <test_skipping.TestXFail object at 0x729709533eb0>\ntestdir = <Testdir local('/tmp/pytest-of-root/pytest-0/test_xfail_run_with_skip_mark1')>\ntest_input = ['-rs', '--runxfail']\nexpected = ['SKIPPED [1] test_sample.py:2: unconditional skip', '*1 skipped*']\n\n    @pytest.mark.parametrize(\n        \"test_input,expected\",\n        [\n            (\n                [\"-rs\"],\n                [\"SKIPPED [1] test_sample.py:2: unconditional skip\", \"*1 skipped*\"],\n            ),\n            (\n                [\"-rs\", \"--runxfail\"],\n                [\"SKIPPED [1] test_sample.py:2: unconditional skip\", \"*1 skipped*\"],\n            ),\n        ],\n    )\n    def test_xfail_run_with_skip_mark(self, testdir, test_input, expected):\n        testdir.makepyfile(\n            test_sample=\"\"\"\n            import pytest\n            @pytest.mark.skip\n            def test_skip_location() -> None:\n                assert 0\n        \"\"\"\n        )\n        result = testdir.runpytest(*test_input)\n>       result.stdout.fnmatch_lines(expected)\nE       Failed: nomatch: 'SKIPPED [1] test_sample.py:2: unconditional skip'\nE           and: '============================= test session starts =============================='\nE           and: 'platform linux -- Python 3.9.20, pytest-5.4.1.dev594+g95c0e21dc, py-1.11.0, pluggy-0.13.1'\nE           and: 'rootdir: /tmp/pytest-of-root/pytest-0/test_xfail_run_with_skip_mark1'\nE           and: 'collected 1 item'\nE           and: ''\nE           and: 'test_sample.py s                                                         [100%]'\nE           and: ''\nE           and: '=========================== short test summary info ============================'"
+  }
+}

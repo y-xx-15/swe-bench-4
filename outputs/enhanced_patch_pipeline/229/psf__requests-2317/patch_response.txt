@@ -1,0 +1,14 @@
+```diff
+diff --git a/requests/sessions.py b/requests/sessions.py
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -428,7 +428,9 @@
+         """
+ 
+         if isinstance(method, bytes):
+             method = method.decode('utf-8')
+         method = builtin_str(method)
+ 
+         # Create the Request.
+         req = Request(
+```

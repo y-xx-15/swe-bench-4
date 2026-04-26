@@ -1,0 +1,31 @@
+{
+  "original_test_identifiers": [
+    "test_dotted_name_not_allowed",
+    "test_route_decorator_custom_endpoint_with_dots"
+  ],
+  "failing_tests_sample": [
+    "tests/test_basic.py::test_flashes",
+    "tests/test_basic.py::test_make_response",
+    "tests/test_basic.py::test_make_response_with_response_instance",
+    "tests/test_basic.py::test_jsonify_no_prettyprint",
+    "tests/test_basic.py::test_jsonify_prettyprint"
+  ],
+  "failure_mode": "value_error",
+  "dominant_errors": [
+    "RuntimeError",
+    "ImportError",
+    "TypeError",
+    "ValueError",
+    "AssertionError"
+  ],
+  "failure_snippets": [
+    "E           TypeError: __init__() got an unexpected keyword argument 'as_tuple'",
+    "/opt/miniconda3/envs/testbed/lib/python3.9/site-packages/werkzeug/test.py:1190: TypeError",
+    "with pytest.raises(ValueError):"
+  ],
+  "noise_ratio": 0.0589,
+  "target_test_tracebacks": {
+    "test_dotted_name_not_allowed": "_________________________ test_dotted_name_not_allowed _________________________\n\napp = <Flask 'flask_test'>, client = <FlaskClient <Flask 'flask_test'>>\n\n    def test_dotted_name_not_allowed(app, client):\n        with pytest.raises(ValueError):\n>           flask.Blueprint(\"app.ui\", __name__)\nE           Failed: DID NOT RAISE <class 'ValueError'>\n\ntests/test_blueprints.py:256: Failed",
+    "test_route_decorator_custom_endpoint_with_dots": "________________ test_route_decorator_custom_endpoint_with_dots ________________\n\napp = <Flask 'flask_test'>, client = <FlaskClient <Flask 'flask_test'>>\n\n    def test_route_decorator_custom_endpoint_with_dots(app, client):\n        bp = flask.Blueprint(\"bp\", __name__)\n    \n        with pytest.raises(ValueError):\n>           bp.route(\"/\", endpoint=\"a.b\")(lambda: \"\")\n\ntests/test_blueprints.py:326: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nsrc/flask/scaffold.py:433: in decorator\n    self.add_url_rule(rule, endpoint, f, **options)\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <Blueprint 'bp'>, rule = '/', endpoint = 'a.b'\nview_func = <function test_route_decorator_custom_endpoint_with_dots.<locals>.<lambda> at 0x787260b94280>\noptions = {}\n\n    def add_url_rule(\n        self,\n        rule: str,\n        endpoint: t.Optional[str] = None,\n        view_func: t.Optional[t.Callable] = None,\n        **options: t.Any,\n    ) -> None:\n        \"\"\"Like :meth:`Flask.add_url_rule` but for a blueprint.  The endpoint for\n        the :func:`url_for` function is prefixed with the name of the blueprint.\n        \"\"\"\n        if endpoint:\n>           assert \".\" not in endpoint, \"Blueprint endpoints should not contain dots\"\nE           AssertionError: Blueprint endpoints should not contain dots\n\nsrc/flask/blueprints.py:364: AssertionError"
+  }
+}

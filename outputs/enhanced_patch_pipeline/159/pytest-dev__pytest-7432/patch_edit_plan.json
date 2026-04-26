@@ -1,0 +1,18 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "action": "modify_region",
+      "justification": "The `pytest_runtest_makereport` hook is responsible for modifying the test report, including the location of skipped tests. The bug lies in this function's handling of skipped tests when `--runxfail` is set."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "target_symbol": "pytest_runtest_makereport",
+      "anchor_line_before": "    outcome = yield",
+      "anchor_line_after": "    rep = outcome.get_result()",
+      "replacement_block": "    outcome = yield\n    rep = outcome.get_result()\n\n    if rep.skipped and isinstance(rep.longrepr, tuple):\n        # Ensure the location points to the test item itself, not the skipping logic\n        filename, lineno, reason = rep.longrepr\n        if filename == __file__:\n            rep.longrepr = (item.location[0], item.location[1], reason)"
+    }
+  ]
+}

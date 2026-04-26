@@ -1,0 +1,20 @@
+{
+  "title": "Restore __slots__ enforcement in Symbol class hierarchy",
+  "approach": "Ensure that all parent classes and mixins in the Symbol class hierarchy explicitly define __slots__, including the Printable mixin, to prevent the creation of a __dict__ attribute on Symbol instances.",
+  "edit_targets": [
+    "sympy/core/_print_helpers.py::Printable"
+  ],
+  "dependency_files": [
+    "sympy/core/tests/test_basic.py",
+    "sympy/core/symbol.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing the Printable mixin and the Symbol class to include __slots__ should be sufficient to prevent the creation of a __dict__ attribute. No additional changes to other files or symbols are expected to be necessary.",
+  "risks": [
+    "Introducing __slots__ in the Printable mixin may inadvertently affect other classes that inherit from it, potentially causing regressions if those classes rely on dynamic attributes."
+  ]
+}

@@ -1,0 +1,375 @@
+[
+  {
+    "instance_id": "psf__requests-2317",
+    "repo": "psf/requests",
+    "model": "gpt-4o",
+    "pipeline_mode": "enhanced_guided",
+    "repair_mode": "enhanced_guided",
+    "original_test_identifiers": [
+      "test_HTTP_302_ALLOW_REDIRECT_GET",
+      "test_POSTBIN_GET_POST_FILES",
+      "test_POSTBIN_GET_POST_FILES_WITH_DATA",
+      "test_basicauth_with_netrc",
+      "test_json_param_post_content_type_works",
+      "test_manual_redirect_with_partial_body_read",
+      "test_requests_history_is_saved",
+      "test_encoded_methods"
+    ],
+    "original_status_counts": {
+      "PASSED": 139,
+      "FAILED": 4
+    },
+    "original_failed_count": 4,
+    "original_passed_count": 139,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_HTTP_302_ALLOW_REDIRECT_GET",
+        "test_POSTBIN_GET_POST_FILES",
+        "test_POSTBIN_GET_POST_FILES_WITH_DATA",
+        "test_basicauth_with_netrc",
+        "test_json_param_post_content_type_works",
+        "test_manual_redirect_with_partial_body_read",
+        "test_requests_history_is_saved",
+        "test_encoded_methods"
+      ],
+      "failing_tests_sample": [
+        "test_requests.py::RequestsTestCase::test_DIGESTAUTH_WRONG_HTTP_401_GET",
+        "test_requests.py::RequestsTestCase::test_auth_is_stripped_on_redirect_off_host",
+        "test_requests.py::RequestsTestCase::test_conflicting_post_params",
+        "test_requests.py::TestTimeout::test_encoded_methods"
+      ],
+      "failure_mode": "type_error",
+      "dominant_errors": [
+        "AssertionError",
+        "ReadTimeoutError",
+        "TypeError",
+        "MaxRetryError",
+        "HostChangedError"
+      ],
+      "failure_snippets": [
+        "test_requests.py:381: AssertionError",
+        "E               TypeError: getresponse() got an unexpected keyword argument 'buffering'",
+        "requests/packages/urllib3/connectionpool.py:331: TypeError"
+      ],
+      "noise_ratio": 0.0035,
+      "target_test_tracebacks": {
+        "test_HTTP_302_ALLOW_REDIRECT_GET": "PASSED test_requests.py::RequestsTestCase::test_HTTP_302_ALLOW_REDIRECT_GET\nPASSED test_requests.py::RequestsTestCase::test_POSTBIN_GET_POST_FILES\nPASSED test_requests.py::RequestsTestCase::test_POSTBIN_GET_POST_FILES_WITH_DATA\nPASSED test_requests.py::RequestsTestCase::test_auth_is_retained_for_redirect_on_host\nPASSED test_requests.py::RequestsTestCase::test_autoset_header_values_are_native\nPASSED test_requests.py::RequestsTestCase::test_basic_auth_str_is_always_native\nPASSED test_requests.py::RequestsTestCase::test_basic_building\nPASSED test_requests.py::RequestsTestCase::test_basicauth_with_netrc\nPASSED test_requests.py::RequestsTestCase::test_can_send_nonstring_objects_with_files\nPASSED test_requests.py::RequestsTestCase::test_cannot_send_unprepared_requests\nPASSED test_requests.py::RequestsTestCase::test_connection_error\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_items\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_keeps_items\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_keeps_len\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_keys\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_values\nPASSED test_requests.py::RequestsTestCase::test_cookie_parameters\nPASSED test_requests.py::RequestsTestCase::test_cookie_persists_via_api\nPASSED test_requests.py::RequestsTestCase::test_cookie_quote_wrapped\nPASSED test_requests.py::RequestsTestCase::test_cookie_removed_on_expire\nPASSED test_requests.py::RequestsTestCase::test_cookie_sent_on_redirect\nPASSED test_requests.py::RequestsTestCase::test_custom_content_type\nPASSED test_requests.py::RequestsTestCase::test_decompress_gzip\nPASSED test_requests.py::RequestsTestCase::test_different_encodings_dont_break_post\nPASSED test_requests.py::RequestsTestCase::test_entry_points\nPASSED test_requests.py::RequestsTestCase::test_fixes_1329\nPASSED test_requests.py::RequestsTestCase::test_generic_cookiejar_works\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_encoded_hashes\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_encoded_spaces\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_not_encoded_spaces\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_percent_chars\nPASSED test_requests.py::RequestsTestCase::test_header_keys_are_native\nPASSED test_requests.py::RequestsTestCase::test_header_remove_is_case_insensitive\nPASSED test_requests.py::RequestsTestCase::test_headers_on_session_with_None_are_not_sent\nPASSED test_requests.py::RequestsTestCase::test_history_is_always_a_list\nPASSED test_requests.py::RequestsTestCase::test_hook_receives_request_arguments\nPASSED test_requests.py::RequestsTestCase::test_http_error\nPASSED test_requests.py::RequestsTestCase::test_invalid_url\nPASSED test_requests.py::RequestsTestCase::test_json_param_post_content_type_works",
+        "test_POSTBIN_GET_POST_FILES": "PASSED test_requests.py::RequestsTestCase::test_POSTBIN_GET_POST_FILES\nPASSED test_requests.py::RequestsTestCase::test_POSTBIN_GET_POST_FILES_WITH_DATA\nPASSED test_requests.py::RequestsTestCase::test_auth_is_retained_for_redirect_on_host\nPASSED test_requests.py::RequestsTestCase::test_autoset_header_values_are_native\nPASSED test_requests.py::RequestsTestCase::test_basic_auth_str_is_always_native\nPASSED test_requests.py::RequestsTestCase::test_basic_building\nPASSED test_requests.py::RequestsTestCase::test_basicauth_with_netrc\nPASSED test_requests.py::RequestsTestCase::test_can_send_nonstring_objects_with_files\nPASSED test_requests.py::RequestsTestCase::test_cannot_send_unprepared_requests\nPASSED test_requests.py::RequestsTestCase::test_connection_error\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_items\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_keeps_items\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_keeps_len\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_keys\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_values\nPASSED test_requests.py::RequestsTestCase::test_cookie_parameters\nPASSED test_requests.py::RequestsTestCase::test_cookie_persists_via_api\nPASSED test_requests.py::RequestsTestCase::test_cookie_quote_wrapped\nPASSED test_requests.py::RequestsTestCase::test_cookie_removed_on_expire\nPASSED test_requests.py::RequestsTestCase::test_cookie_sent_on_redirect\nPASSED test_requests.py::RequestsTestCase::test_custom_content_type\nPASSED test_requests.py::RequestsTestCase::test_decompress_gzip\nPASSED test_requests.py::RequestsTestCase::test_different_encodings_dont_break_post\nPASSED test_requests.py::RequestsTestCase::test_entry_points\nPASSED test_requests.py::RequestsTestCase::test_fixes_1329\nPASSED test_requests.py::RequestsTestCase::test_generic_cookiejar_works\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_encoded_hashes\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_encoded_spaces\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_not_encoded_spaces\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_percent_chars\nPASSED test_requests.py::RequestsTestCase::test_header_keys_are_native\nPASSED test_requests.py::RequestsTestCase::test_header_remove_is_case_insensitive\nPASSED test_requests.py::RequestsTestCase::test_headers_on_session_with_None_are_not_sent\nPASSED test_requests.py::RequestsTestCase::test_history_is_always_a_list\nPASSED test_requests.py::RequestsTestCase::test_hook_receives_request_arguments\nPASSED test_requests.py::RequestsTestCase::test_http_error\nPASSED test_requests.py::RequestsTestCase::test_invalid_url\nPASSED test_requests.py::RequestsTestCase::test_json_param_post_content_type_works\nPASSED test_requests.py::RequestsTestCase::test_links",
+        "test_POSTBIN_GET_POST_FILES_WITH_DATA": "PASSED test_requests.py::RequestsTestCase::test_POSTBIN_GET_POST_FILES_WITH_DATA\nPASSED test_requests.py::RequestsTestCase::test_auth_is_retained_for_redirect_on_host\nPASSED test_requests.py::RequestsTestCase::test_autoset_header_values_are_native\nPASSED test_requests.py::RequestsTestCase::test_basic_auth_str_is_always_native\nPASSED test_requests.py::RequestsTestCase::test_basic_building\nPASSED test_requests.py::RequestsTestCase::test_basicauth_with_netrc\nPASSED test_requests.py::RequestsTestCase::test_can_send_nonstring_objects_with_files\nPASSED test_requests.py::RequestsTestCase::test_cannot_send_unprepared_requests\nPASSED test_requests.py::RequestsTestCase::test_connection_error\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_items\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_keeps_items\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_keeps_len\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_keys\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_values\nPASSED test_requests.py::RequestsTestCase::test_cookie_parameters\nPASSED test_requests.py::RequestsTestCase::test_cookie_persists_via_api\nPASSED test_requests.py::RequestsTestCase::test_cookie_quote_wrapped\nPASSED test_requests.py::RequestsTestCase::test_cookie_removed_on_expire\nPASSED test_requests.py::RequestsTestCase::test_cookie_sent_on_redirect\nPASSED test_requests.py::RequestsTestCase::test_custom_content_type\nPASSED test_requests.py::RequestsTestCase::test_decompress_gzip\nPASSED test_requests.py::RequestsTestCase::test_different_encodings_dont_break_post\nPASSED test_requests.py::RequestsTestCase::test_entry_points\nPASSED test_requests.py::RequestsTestCase::test_fixes_1329\nPASSED test_requests.py::RequestsTestCase::test_generic_cookiejar_works\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_encoded_hashes\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_encoded_spaces\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_not_encoded_spaces\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_percent_chars\nPASSED test_requests.py::RequestsTestCase::test_header_keys_are_native\nPASSED test_requests.py::RequestsTestCase::test_header_remove_is_case_insensitive\nPASSED test_requests.py::RequestsTestCase::test_headers_on_session_with_None_are_not_sent\nPASSED test_requests.py::RequestsTestCase::test_history_is_always_a_list\nPASSED test_requests.py::RequestsTestCase::test_hook_receives_request_arguments\nPASSED test_requests.py::RequestsTestCase::test_http_error\nPASSED test_requests.py::RequestsTestCase::test_invalid_url\nPASSED test_requests.py::RequestsTestCase::test_json_param_post_content_type_works\nPASSED test_requests.py::RequestsTestCase::test_links\nPASSED test_requests.py::RequestsTestCase::test_long_authinfo_in_url",
+        "test_basicauth_with_netrc": "PASSED test_requests.py::RequestsTestCase::test_basicauth_with_netrc\nPASSED test_requests.py::RequestsTestCase::test_can_send_nonstring_objects_with_files\nPASSED test_requests.py::RequestsTestCase::test_cannot_send_unprepared_requests\nPASSED test_requests.py::RequestsTestCase::test_connection_error\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_items\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_keeps_items\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_keeps_len\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_keys\nPASSED test_requests.py::RequestsTestCase::test_cookie_as_dict_values\nPASSED test_requests.py::RequestsTestCase::test_cookie_parameters\nPASSED test_requests.py::RequestsTestCase::test_cookie_persists_via_api\nPASSED test_requests.py::RequestsTestCase::test_cookie_quote_wrapped\nPASSED test_requests.py::RequestsTestCase::test_cookie_removed_on_expire\nPASSED test_requests.py::RequestsTestCase::test_cookie_sent_on_redirect\nPASSED test_requests.py::RequestsTestCase::test_custom_content_type\nPASSED test_requests.py::RequestsTestCase::test_decompress_gzip\nPASSED test_requests.py::RequestsTestCase::test_different_encodings_dont_break_post\nPASSED test_requests.py::RequestsTestCase::test_entry_points\nPASSED test_requests.py::RequestsTestCase::test_fixes_1329\nPASSED test_requests.py::RequestsTestCase::test_generic_cookiejar_works\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_encoded_hashes\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_encoded_spaces\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_not_encoded_spaces\nPASSED test_requests.py::RequestsTestCase::test_get_auth_from_url_percent_chars\nPASSED test_requests.py::RequestsTestCase::test_header_keys_are_native\nPASSED test_requests.py::RequestsTestCase::test_header_remove_is_case_insensitive\nPASSED test_requests.py::RequestsTestCase::test_headers_on_session_with_None_are_not_sent\nPASSED test_requests.py::RequestsTestCase::test_history_is_always_a_list\nPASSED test_requests.py::RequestsTestCase::test_hook_receives_request_arguments\nPASSED test_requests.py::RequestsTestCase::test_http_error\nPASSED test_requests.py::RequestsTestCase::test_invalid_url\nPASSED test_requests.py::RequestsTestCase::test_json_param_post_content_type_works\nPASSED test_requests.py::RequestsTestCase::test_links\nPASSED test_requests.py::RequestsTestCase::test_long_authinfo_in_url\nPASSED test_requests.py::RequestsTestCase::test_manual_redirect_with_partial_body_read\nPASSED test_requests.py::RequestsTestCase::test_mixed_case_scheme_acceptable\nPASSED test_requests.py::RequestsTestCase::test_no_content_length\nPASSED test_requests.py::RequestsTestCase::test_nonhttp_schemes_dont_check_URLs\nPASSED test_requests.py::RequestsTestCase::test_param_cookiejar_works",
+        "test_json_param_post_content_type_works": "PASSED test_requests.py::RequestsTestCase::test_json_param_post_content_type_works\nPASSED test_requests.py::RequestsTestCase::test_links\nPASSED test_requests.py::RequestsTestCase::test_long_authinfo_in_url\nPASSED test_requests.py::RequestsTestCase::test_manual_redirect_with_partial_body_read\nPASSED test_requests.py::RequestsTestCase::test_mixed_case_scheme_acceptable\nPASSED test_requests.py::RequestsTestCase::test_no_content_length\nPASSED test_requests.py::RequestsTestCase::test_nonhttp_schemes_dont_check_URLs\nPASSED test_requests.py::RequestsTestCase::test_param_cookiejar_works\nPASSED test_requests.py::RequestsTestCase::test_params_are_added_before_fragment\nPASSED test_requests.py::RequestsTestCase::test_params_are_merged_case_sensitive\nPASSED test_requests.py::RequestsTestCase::test_path_is_not_double_encoded\nPASSED test_requests.py::RequestsTestCase::test_prepare_request_with_bytestring_url\nPASSED test_requests.py::RequestsTestCase::test_prepared_from_session\nPASSED test_requests.py::RequestsTestCase::test_prepared_request_hook\nPASSED test_requests.py::RequestsTestCase::test_pyopenssl_redirect\nPASSED test_requests.py::RequestsTestCase::test_redirect_with_wrong_gzipped_header\nPASSED test_requests.py::RequestsTestCase::test_request_and_response_are_pickleable\nPASSED test_requests.py::RequestsTestCase::test_request_cookie_overrides_session_cookie\nPASSED test_requests.py::RequestsTestCase::test_request_cookies_not_persisted\nPASSED test_requests.py::RequestsTestCase::test_request_ok_set\nPASSED test_requests.py::RequestsTestCase::test_requests_history_is_saved\nPASSED test_requests.py::RequestsTestCase::test_requests_in_history_are_not_overridden\nPASSED test_requests.py::RequestsTestCase::test_response_decode_unicode\nPASSED test_requests.py::RequestsTestCase::test_response_is_iterable\nPASSED test_requests.py::RequestsTestCase::test_session_hooks_are_overriden_by_request_hooks\nPASSED test_requests.py::RequestsTestCase::test_session_hooks_are_used_with_no_request_hooks\nPASSED test_requests.py::RequestsTestCase::test_session_pickling\nPASSED test_requests.py::RequestsTestCase::test_set_cookie_on_301\nPASSED test_requests.py::RequestsTestCase::test_status_raising\nPASSED test_requests.py::RequestsTestCase::test_time_elapsed_blank\nPASSED test_requests.py::RequestsTestCase::test_transport_adapter_ordering\nPASSED test_requests.py::RequestsTestCase::test_unicode_get\nPASSED test_requests.py::RequestsTestCase::test_unicode_header_name\nPASSED test_requests.py::RequestsTestCase::test_unicode_method_name\nPASSED test_requests.py::RequestsTestCase::test_unicode_multipart_post\nPASSED test_requests.py::RequestsTestCase::test_unicode_multipart_post_fieldnames\nPASSED test_requests.py::RequestsTestCase::test_uppercase_scheme_redirect\nPASSED test_requests.py::RequestsTestCase::test_urlencoded_get_query_multivalued_param\nPASSED test_requests.py::RequestsTestCase::test_user_agent_transfers\nPASSED test_requests.py::TestContentEncodingDetection::test_html4_pragma",
+        "test_manual_redirect_with_partial_body_read": "PASSED test_requests.py::RequestsTestCase::test_manual_redirect_with_partial_body_read\nPASSED test_requests.py::RequestsTestCase::test_mixed_case_scheme_acceptable\nPASSED test_requests.py::RequestsTestCase::test_no_content_length\nPASSED test_requests.py::RequestsTestCase::test_nonhttp_schemes_dont_check_URLs\nPASSED test_requests.py::RequestsTestCase::test_param_cookiejar_works\nPASSED test_requests.py::RequestsTestCase::test_params_are_added_before_fragment\nPASSED test_requests.py::RequestsTestCase::test_params_are_merged_case_sensitive\nPASSED test_requests.py::RequestsTestCase::test_path_is_not_double_encoded\nPASSED test_requests.py::RequestsTestCase::test_prepare_request_with_bytestring_url\nPASSED test_requests.py::RequestsTestCase::test_prepared_from_session\nPASSED test_requests.py::RequestsTestCase::test_prepared_request_hook\nPASSED test_requests.py::RequestsTestCase::test_pyopenssl_redirect\nPASSED test_requests.py::RequestsTestCase::test_redirect_with_wrong_gzipped_header\nPASSED test_requests.py::RequestsTestCase::test_request_and_response_are_pickleable\nPASSED test_requests.py::RequestsTestCase::test_request_cookie_overrides_session_cookie\nPASSED test_requests.py::RequestsTestCase::test_request_cookies_not_persisted\nPASSED test_requests.py::RequestsTestCase::test_request_ok_set\nPASSED test_requests.py::RequestsTestCase::test_requests_history_is_saved\nPASSED test_requests.py::RequestsTestCase::test_requests_in_history_are_not_overridden\nPASSED test_requests.py::RequestsTestCase::test_response_decode_unicode\nPASSED test_requests.py::RequestsTestCase::test_response_is_iterable\nPASSED test_requests.py::RequestsTestCase::test_session_hooks_are_overriden_by_request_hooks\nPASSED test_requests.py::RequestsTestCase::test_session_hooks_are_used_with_no_request_hooks\nPASSED test_requests.py::RequestsTestCase::test_session_pickling\nPASSED test_requests.py::RequestsTestCase::test_set_cookie_on_301\nPASSED test_requests.py::RequestsTestCase::test_status_raising\nPASSED test_requests.py::RequestsTestCase::test_time_elapsed_blank\nPASSED test_requests.py::RequestsTestCase::test_transport_adapter_ordering\nPASSED test_requests.py::RequestsTestCase::test_unicode_get\nPASSED test_requests.py::RequestsTestCase::test_unicode_header_name\nPASSED test_requests.py::RequestsTestCase::test_unicode_method_name\nPASSED test_requests.py::RequestsTestCase::test_unicode_multipart_post\nPASSED test_requests.py::RequestsTestCase::test_unicode_multipart_post_fieldnames\nPASSED test_requests.py::RequestsTestCase::test_uppercase_scheme_redirect\nPASSED test_requests.py::RequestsTestCase::test_urlencoded_get_query_multivalued_param\nPASSED test_requests.py::RequestsTestCase::test_user_agent_transfers\nPASSED test_requests.py::TestContentEncodingDetection::test_html4_pragma\nPASSED test_requests.py::TestContentEncodingDetection::test_html_charset\nPASSED test_requests.py::TestContentEncodingDetection::test_none\nPASSED test_requests.py::TestContentEncodingDetection::test_precedence",
+        "test_requests_history_is_saved": "PASSED test_requests.py::RequestsTestCase::test_requests_history_is_saved\nPASSED test_requests.py::RequestsTestCase::test_requests_in_history_are_not_overridden\nPASSED test_requests.py::RequestsTestCase::test_response_decode_unicode\nPASSED test_requests.py::RequestsTestCase::test_response_is_iterable\nPASSED test_requests.py::RequestsTestCase::test_session_hooks_are_overriden_by_request_hooks\nPASSED test_requests.py::RequestsTestCase::test_session_hooks_are_used_with_no_request_hooks\nPASSED test_requests.py::RequestsTestCase::test_session_pickling\nPASSED test_requests.py::RequestsTestCase::test_set_cookie_on_301\nPASSED test_requests.py::RequestsTestCase::test_status_raising\nPASSED test_requests.py::RequestsTestCase::test_time_elapsed_blank\nPASSED test_requests.py::RequestsTestCase::test_transport_adapter_ordering\nPASSED test_requests.py::RequestsTestCase::test_unicode_get\nPASSED test_requests.py::RequestsTestCase::test_unicode_header_name\nPASSED test_requests.py::RequestsTestCase::test_unicode_method_name\nPASSED test_requests.py::RequestsTestCase::test_unicode_multipart_post\nPASSED test_requests.py::RequestsTestCase::test_unicode_multipart_post_fieldnames\nPASSED test_requests.py::RequestsTestCase::test_uppercase_scheme_redirect\nPASSED test_requests.py::RequestsTestCase::test_urlencoded_get_query_multivalued_param\nPASSED test_requests.py::RequestsTestCase::test_user_agent_transfers\nPASSED test_requests.py::TestContentEncodingDetection::test_html4_pragma\nPASSED test_requests.py::TestContentEncodingDetection::test_html_charset\nPASSED test_requests.py::TestContentEncodingDetection::test_none\nPASSED test_requests.py::TestContentEncodingDetection::test_precedence\nPASSED test_requests.py::TestContentEncodingDetection::test_xhtml_pragma\nPASSED test_requests.py::TestContentEncodingDetection::test_xml\nPASSED test_requests.py::TestCaseInsensitiveDict::test_contains\nPASSED test_requests.py::TestCaseInsensitiveDict::test_delitem\nPASSED test_requests.py::TestCaseInsensitiveDict::test_docstring_example\nPASSED test_requests.py::TestCaseInsensitiveDict::test_equality\nPASSED test_requests.py::TestCaseInsensitiveDict::test_fixes_649\nPASSED test_requests.py::TestCaseInsensitiveDict::test_get\nPASSED test_requests.py::TestCaseInsensitiveDict::test_getitem\nPASSED test_requests.py::TestCaseInsensitiveDict::test_iter\nPASSED test_requests.py::TestCaseInsensitiveDict::test_iterable_init\nPASSED test_requests.py::TestCaseInsensitiveDict::test_kwargs_init\nPASSED test_requests.py::TestCaseInsensitiveDict::test_len\nPASSED test_requests.py::TestCaseInsensitiveDict::test_lower_items\nPASSED test_requests.py::TestCaseInsensitiveDict::test_mapping_init\nPASSED test_requests.py::TestCaseInsensitiveDict::test_preserve_key_case\nPASSED test_requests.py::TestCaseInsensitiveDict::test_preserve_last_key_case",
+        "test_encoded_methods": "_______________________ TestTimeout.test_encoded_methods _______________________\n\nself = <test_requests.TestTimeout object at 0x70486322b550>\n\n    def test_encoded_methods(self):\n        \"\"\"See: https://github.com/kennethreitz/requests/issues/2316\"\"\"\n        r = requests.request(b'GET', httpbin('get'))\n>       assert r.ok\nE       assert False\nE        +  where False = <Response [400]>.ok\n\ntest_requests.py:1395: AssertionError\n=============================== warnings summary ===============================\nrequests/packages/urllib3/_collections.py:1\nrequests/packages/urllib3/_collections.py:1\n  /testbed/requests/packages/urllib3/_collections.py:1: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.10 it will stop working\n    from collections import Mapping, MutableMapping\n\ntest_requests.py::RequestsTestCase::test_BASICAUTH_TUPLE_HTTP_200_OK_GET\n  /testbed/requests/models.py:169: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.10 it will stop working\n    if isinstance(hook, collections.Callable):\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n==================================== PASSES ====================================\n=========================== short test summary info ============================\nPASSED test_requests.py::RequestsTestCase::test_BASICAUTH_TUPLE_HTTP_200_OK_GET\nPASSED test_requests.py::RequestsTestCase::test_DIGESTAUTH_QUOTES_QOP_VALUE\nPASSED test_requests.py::RequestsTestCase::test_DIGEST_AUTH_RETURNS_COOKIE\nPASSED test_requests.py::RequestsTestCase::test_DIGEST_AUTH_SETS_SESSION_COOKIES\nPASSED test_requests.py::RequestsTestCase::test_DIGEST_HTTP_200_OK_GET\nPASSED test_requests.py::RequestsTestCase::test_DIGEST_STREAM\nPASSED test_requests.py::RequestsTestCase::test_HTTP_200_OK_GET_ALTERNATIVE\nPASSED test_requests.py::RequestsTestCase::test_HTTP_200_OK_GET_WITH_MIXED_PARAMS\nPASSED test_requests.py::RequestsTestCase::test_HTTP_200_OK_GET_WITH_PARAMS\nPASSED test_requests.py::RequestsTestCase::test_HTTP_200_OK_HEAD\nPASSED test_requests.py::RequestsTestCase::test_HTTP_200_OK_PUT\nPASSED test_requests.py::RequestsTestCase::test_HTTP_302_ALLOW_REDIRECT_GET\nPASSED test_requests.py::RequestsTestCase::test_POSTBIN_GET_POST_FILES\nPASSED test_requests.py::RequestsTestCase::test_POSTBIN_GET_POST_FILES_WITH_DATA\nPASSED test_requests.py::RequestsTestCase::test_auth_is_retained_for_redirect_on_host"
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 5,
+      "keep_top_k": 3,
+      "attempt_budget": 3,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "type_error",
+      "noise_ratio": 0.0035,
+      "difficulty": "medium"
+    },
+    "adaptive_num_candidates": 5,
+    "adaptive_keep_top_k": 3,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 5,
+    "kept_enhanced_candidates": 3,
+    "enhanced_candidate_retention_rate": 0.6,
+    "enhanced_generation_attempts_total": 15,
+    "enhanced_generation_attempts_avg": 3.0,
+    "kept_enhanced_test_identifiers": [
+      "test_sweb_enhanced_redirect_binary_method",
+      "test_sweb_enhanced_binary_method_type_handling",
+      "test_sweb_enhanced_binary_string_method"
+    ],
+    "enhanced_failed_test_identifiers": [
+      "test_sweb_enhanced_redirect_binary_method",
+      "test_sweb_enhanced_binary_method_type_handling",
+      "test_sweb_enhanced_binary_string_method"
+    ],
+    "enhanced_failed_count": 3,
+    "generated_patch_nonempty": false,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 11,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_patch_apply_failed",
+    "generated_patch_feedback": "The previous patch was rejected because it did not satisfy the acceptance gate. Patch apply mode: apply_failed. Baseline passed=139, failed=4. Candidate passed=0, failed=0. Hard failure signal: none. FAIL_TO_PASS tests still failing after patch: test_HTTP_302_ALLOW_REDIRECT_GET, test_POSTBIN_GET_POST_FILES, test_POSTBIN_GET_POST_FILES_WITH_DATA, test_basicauth_with_netrc, test_json_param_post_content_type_works, test_manual_redirect_with_partial_body_read, test_requests_history_is_saved, test_encoded_methods. Your patch must make ALL of these tests pass, not just improve aggregate counts. Semantic oracle failed identifiers: test_sweb_enhanced_redirect_binary_method, test_sweb_enhanced_binary_method_type_handling, test_sweb_enhanced_binary_string_method. Semantic oracle failure summaries: test_sweb_enhanced_redirect_binary_method: FAILED at 428.\n1 out of 1 hunk FAILED -- saving rejects to file requests/sessions.py.rej\n test_sweb_enhanced_binary_method_type_handling: FAILED at 428.\n1 out of 1 hunk FAILED -- saving rejects to file requests/sessions.py.rej\n test_sweb_enhanced_binary_string_method: FAILED at 428.\n1 out of 1 hunk FAILED -- saving rejects to file requests/sessions.py.rej\n.  Target files: requests/sessions.py, requests/sessions.py. Target symbols: Session.request, SessionRedirectMixin.resolve_redirects. Generate a new source-only unified diff that is closer to the exact file context and lands inside the target class body.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [
+      "test_sweb_enhanced_redirect_binary_method",
+      "test_sweb_enhanced_binary_method_type_handling",
+      "test_sweb_enhanced_binary_string_method"
+    ],
+    "patch_analysis": {
+      "root_cause": "The method parameter is being converted to a native string using builtin_str, which in Python 3 converts binary strings (e.g., b'GET') into their string representation (e.g., \"b'GET'\"). This causes the HTTP method to be invalid when used in requests, leading to a 400 Bad Request response.",
+      "affected_components": [
+        {
+          "file": "requests/sessions.py",
+          "symbol": "Session.request",
+          "reason": "This function is responsible for preparing and sending HTTP requests, and it explicitly converts the method parameter using builtin_str, which is the source of the issue."
+        },
+        {
+          "file": "requests/sessions.py",
+          "symbol": "SessionRedirectMixin.resolve_redirects",
+          "reason": "This function handles HTTP redirects and uses the method parameter, potentially propagating the invalid method value."
+        }
+      ],
+      "failing_signal": "The test `test_encoded_methods` fails with an assertion error because the HTTP request made with a binary string method (e.g., b'GET') results in a 400 Bad Request response.",
+      "propagation_path": "The method parameter is converted to a native string using builtin_str in Session.request. If the method is a binary string, this conversion results in an invalid string representation (e.g., \"b'GET'\"). This invalid method is then used in the HTTP request, causing the server to reject it with a 400 Bad Request response.",
+      "repair_constraint": "The fix must ensure that the method parameter can handle both binary strings and native strings correctly without altering the intended HTTP method. Additionally, the fix must not break existing functionality or introduce regressions in other parts of the library.",
+      "suggested_repair_scope": [
+        "requests/sessions.py"
+      ],
+      "suspicious_symbols": [
+        "Session.request",
+        "SessionRedirectMixin.resolve_redirects",
+        "builtin_str"
+      ],
+      "repair_obligations": [
+        {
+          "id": "test_HTTP_302_ALLOW_REDIRECT_GET::core",
+          "source_symbol": "requests.sessions.SessionRedirectMixin.resolve_redirects",
+          "validation_subject": "method",
+          "why_it_matters": "The method parameter is used during redirect handling, and its correctness is critical to ensure proper HTTP behavior during redirects."
+        },
+        {
+          "id": "test_POSTBIN_GET_POST_FILES::core",
+          "source_symbol": "requests.sessions.Session.request",
+          "validation_subject": "method parameter",
+          "why_it_matters": "The method parameter is directly used to construct and send HTTP requests, and its correctness is essential for the library's core functionality."
+        },
+        {
+          "id": "test_POSTBIN_GET_POST_FILES_WITH_DATA::core",
+          "source_symbol": "requests.sessions.Session.request",
+          "validation_subject": "method",
+          "why_it_matters": "The method parameter is used in requests with data payloads, and its correctness ensures that the server interprets the request as intended."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Handle binary string methods in HTTP requests",
+      "approach": "Modify the `Session.request` method to check if the `method` parameter is a binary string. If it is, decode it to a native string before proceeding. Additionally, ensure that the `SessionRedirectMixin.resolve_redirects` method handles binary string methods correctly during redirects.",
+      "edit_targets": [
+        "requests/sessions.py::Session.request",
+        "requests/sessions.py::SessionRedirectMixin.resolve_redirects"
+      ],
+      "dependency_files": [
+        "requests/models.py",
+        "requests/utils.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [
+        "negative_gating",
+        "top_of_function_side_path"
+      ],
+      "sufficiency_assessment": "Editing both `Session.request` and `SessionRedirectMixin.resolve_redirects` is necessary to fully address the issue. The `Session.request` method must handle binary string methods at the entry point, while `SessionRedirectMixin.resolve_redirects` must ensure that the method remains valid during redirects. Without changes to both locations, the issue may persist in certain scenarios, such as redirects.",
+      "risks": [
+        "Potential regressions in handling of valid string methods if the type-checking logic is too permissive or restrictive.",
+        "Unintended side effects in downstream libraries or applications relying on the current behavior of `Session.request` or `SessionRedirectMixin.resolve_redirects`."
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "requests/sessions.py",
+          "action": "modify_region",
+          "justification": "The `Session.request` method explicitly converts the `method` parameter using `builtin_str`, which causes the issue when the method is a binary string. This file needs an edit to ensure proper handling of binary string methods."
+        },
+        {
+          "target_file": "requests/sessions.py",
+          "action": "modify_region",
+          "justification": "The `SessionRedirectMixin.resolve_redirects` method uses the `method` parameter during redirect handling. It must ensure that the method remains valid when propagated through redirects. This file requires an edit to address the issue."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "requests/sessions.py",
+          "target_symbol": "Session.request",
+          "covers_obligations": [
+            "test_POSTBIN_GET_POST_FILES::core",
+            "test_POSTBIN_GET_POST_FILES_WITH_DATA::core"
+          ],
+          "anchor_line_before": "        params=None,",
+          "anchor_line_after": "        data=None,",
+          "replacement_block": "        params=None,\n        if isinstance(method, bytes):\n            method = method.decode('utf-8')\n        data=None,"
+        },
+        {
+          "target_file": "requests/sessions.py",
+          "target_symbol": "SessionRedirectMixin.resolve_redirects",
+          "covers_obligations": [
+            "test_HTTP_302_ALLOW_REDIRECT_GET::core"
+          ],
+          "anchor_line_before": "            url = resp.headers['location']",
+          "anchor_line_after": "            method = req.method",
+          "replacement_block": "            url = resp.headers['location']\n            if isinstance(req.method, bytes):\n                req.method = req.method.decode('utf-8')\n            method = req.method"
+        }
+      ]
+    },
+    "final_patch_attempted": false,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": false,
+    "final_patch_apply_mode": "no_patch",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "final_resolved": false,
+    "final_status_counts": {
+      "PASSED": 140,
+      "FAILED": 3
+    },
+    "final_failed_count": 3,
+    "final_passed_count": 140,
+    "original_passed_count_improvement": 1,
+    "original_failed_count_reduction": 1,
+    "final_status_map": {
+      "test_requests.py::RequestsTestCase::test_BASICAUTH_TUPLE_HTTP_200_OK_GET": "PASSED",
+      "test_requests.py::RequestsTestCase::test_DIGESTAUTH_QUOTES_QOP_VALUE": "PASSED",
+      "test_requests.py::RequestsTestCase::test_DIGESTAUTH_WRONG_HTTP_401_GET": "PASSED",
+      "test_requests.py::RequestsTestCase::test_DIGEST_AUTH_RETURNS_COOKIE": "PASSED",
+      "test_requests.py::RequestsTestCase::test_DIGEST_AUTH_SETS_SESSION_COOKIES": "PASSED",
+      "test_requests.py::RequestsTestCase::test_DIGEST_HTTP_200_OK_GET": "PASSED",
+      "test_requests.py::RequestsTestCase::test_DIGEST_STREAM": "PASSED",
+      "test_requests.py::RequestsTestCase::test_HTTP_200_OK_GET_ALTERNATIVE": "PASSED",
+      "test_requests.py::RequestsTestCase::test_HTTP_200_OK_GET_WITH_MIXED_PARAMS": "PASSED",
+      "test_requests.py::RequestsTestCase::test_HTTP_200_OK_GET_WITH_PARAMS": "PASSED",
+      "test_requests.py::RequestsTestCase::test_HTTP_200_OK_HEAD": "PASSED",
+      "test_requests.py::RequestsTestCase::test_HTTP_200_OK_PUT": "PASSED",
+      "test_requests.py::RequestsTestCase::test_HTTP_302_ALLOW_REDIRECT_GET": "PASSED",
+      "test_requests.py::RequestsTestCase::test_POSTBIN_GET_POST_FILES": "PASSED",
+      "test_requests.py::RequestsTestCase::test_POSTBIN_GET_POST_FILES_WITH_DATA": "PASSED",
+      "test_requests.py::RequestsTestCase::test_auth_is_retained_for_redirect_on_host": "PASSED",
+      "test_requests.py::RequestsTestCase::test_autoset_header_values_are_native": "PASSED",
+      "test_requests.py::RequestsTestCase::test_basic_auth_str_is_always_native": "PASSED",
+      "test_requests.py::RequestsTestCase::test_basic_building": "PASSED",
+      "test_requests.py::RequestsTestCase::test_basicauth_with_netrc": "PASSED",
+      "test_requests.py::RequestsTestCase::test_can_send_nonstring_objects_with_files": "PASSED",
+      "test_requests.py::RequestsTestCase::test_cannot_send_unprepared_requests": "PASSED",
+      "test_requests.py::RequestsTestCase::test_connection_error": "PASSED",
+      "test_requests.py::RequestsTestCase::test_cookie_as_dict_items": "PASSED",
+      "test_requests.py::RequestsTestCase::test_cookie_as_dict_keeps_items": "PASSED",
+      "test_requests.py::RequestsTestCase::test_cookie_as_dict_keeps_len": "PASSED",
+      "test_requests.py::RequestsTestCase::test_cookie_as_dict_keys": "PASSED",
+      "test_requests.py::RequestsTestCase::test_cookie_as_dict_values": "PASSED",
+      "test_requests.py::RequestsTestCase::test_cookie_parameters": "PASSED",
+      "test_requests.py::RequestsTestCase::test_cookie_persists_via_api": "PASSED",
+      "test_requests.py::RequestsTestCase::test_cookie_quote_wrapped": "PASSED",
+      "test_requests.py::RequestsTestCase::test_cookie_removed_on_expire": "PASSED",
+      "test_requests.py::RequestsTestCase::test_cookie_sent_on_redirect": "PASSED",
+      "test_requests.py::RequestsTestCase::test_custom_content_type": "PASSED",
+      "test_requests.py::RequestsTestCase::test_decompress_gzip": "PASSED",
+      "test_requests.py::RequestsTestCase::test_different_encodings_dont_break_post": "PASSED",
+      "test_requests.py::RequestsTestCase::test_entry_points": "PASSED",
+      "test_requests.py::RequestsTestCase::test_fixes_1329": "PASSED",
+      "test_requests.py::RequestsTestCase::test_generic_cookiejar_works": "PASSED",
+      "test_requests.py::RequestsTestCase::test_get_auth_from_url": "PASSED",
+      "test_requests.py::RequestsTestCase::test_get_auth_from_url_encoded_hashes": "PASSED",
+      "test_requests.py::RequestsTestCase::test_get_auth_from_url_encoded_spaces": "PASSED",
+      "test_requests.py::RequestsTestCase::test_get_auth_from_url_not_encoded_spaces": "PASSED",
+      "test_requests.py::RequestsTestCase::test_get_auth_from_url_percent_chars": "PASSED",
+      "test_requests.py::RequestsTestCase::test_header_keys_are_native": "PASSED",
+      "test_requests.py::RequestsTestCase::test_header_remove_is_case_insensitive": "PASSED",
+      "test_requests.py::RequestsTestCase::test_headers_on_session_with_None_are_not_sent": "PASSED",
+      "test_requests.py::RequestsTestCase::test_history_is_always_a_list": "PASSED",
+      "test_requests.py::RequestsTestCase::test_hook_receives_request_arguments": "PASSED",
+      "test_requests.py::RequestsTestCase::test_http_error": "PASSED",
+      "test_requests.py::RequestsTestCase::test_invalid_url": "PASSED",
+      "test_requests.py::RequestsTestCase::test_json_param_post_content_type_works": "PASSED",
+      "test_requests.py::RequestsTestCase::test_links": "PASSED",
+      "test_requests.py::RequestsTestCase::test_long_authinfo_in_url": "PASSED",
+      "test_requests.py::RequestsTestCase::test_manual_redirect_with_partial_body_read": "PASSED",
+      "test_requests.py::RequestsTestCase::test_mixed_case_scheme_acceptable": "PASSED",
+      "test_requests.py::RequestsTestCase::test_no_content_length": "PASSED",
+      "test_requests.py::RequestsTestCase::test_nonhttp_schemes_dont_check_URLs": "PASSED",
+      "test_requests.py::RequestsTestCase::test_param_cookiejar_works": "PASSED",
+      "test_requests.py::RequestsTestCase::test_params_are_added_before_fragment": "PASSED",
+      "test_requests.py::RequestsTestCase::test_params_are_merged_case_sensitive": "PASSED",
+      "test_requests.py::RequestsTestCase::test_path_is_not_double_encoded": "PASSED",
+      "test_requests.py::RequestsTestCase::test_prepare_request_with_bytestring_url": "PASSED",
+      "test_requests.py::RequestsTestCase::test_prepared_from_session": "PASSED",
+      "test_requests.py::RequestsTestCase::test_prepared_request_hook": "PASSED",
+      "test_requests.py::RequestsTestCase::test_pyopenssl_redirect": "PASSED",
+      "test_requests.py::RequestsTestCase::test_redirect_with_wrong_gzipped_header": "PASSED",
+      "test_requests.py::RequestsTestCase::test_request_and_response_are_pickleable": "PASSED",
+      "test_requests.py::RequestsTestCase::test_request_cookie_overrides_session_cookie": "PASSED",
+      "test_requests.py::RequestsTestCase::test_request_cookies_not_persisted": "PASSED",
+      "test_requests.py::RequestsTestCase::test_request_ok_set": "PASSED",
+      "test_requests.py::RequestsTestCase::test_requests_history_is_saved": "PASSED",
+      "test_requests.py::RequestsTestCase::test_requests_in_history_are_not_overridden": "PASSED",
+      "test_requests.py::RequestsTestCase::test_response_decode_unicode": "PASSED",
+      "test_requests.py::RequestsTestCase::test_response_is_iterable": "PASSED",
+      "test_requests.py::RequestsTestCase::test_session_hooks_are_overriden_by_request_hooks": "PASSED",
+      "test_requests.py::RequestsTestCase::test_session_hooks_are_used_with_no_request_hooks": "PASSED",
+      "test_requests.py::RequestsTestCase::test_session_pickling": "PASSED",
+      "test_requests.py::RequestsTestCase::test_set_cookie_on_301": "PASSED",
+      "test_requests.py::RequestsTestCase::test_status_raising": "PASSED",
+      "test_requests.py::RequestsTestCase::test_time_elapsed_blank": "PASSED",
+      "test_requests.py::RequestsTestCase::test_transport_adapter_ordering": "PASSED",
+      "test_requests.py::RequestsTestCase::test_unicode_get": "PASSED",
+      "test_requests.py::RequestsTestCase::test_unicode_header_name": "PASSED",
+      "test_requests.py::RequestsTestCase::test_unicode_method_name": "PASSED",
+      "test_requests.py::RequestsTestCase::test_unicode_multipart_post": "PASSED",
+      "test_requests.py::RequestsTestCase::test_unicode_multipart_post_fieldnames": "PASSED",
+      "test_requests.py::RequestsTestCase::test_uppercase_scheme_redirect": "PASSED",
+      "test_requests.py::RequestsTestCase::test_urlencoded_get_query_multivalued_param": "PASSED",
+      "test_requests.py::RequestsTestCase::test_user_agent_transfers": "PASSED",
+      "test_requests.py::TestContentEncodingDetection::test_html4_pragma": "PASSED",
+      "test_requests.py::TestContentEncodingDetection::test_html_charset": "PASSED",
+      "test_requests.py::TestContentEncodingDetection::test_none": "PASSED",
+      "test_requests.py::TestContentEncodingDetection::test_precedence": "PASSED",
+      "test_requests.py::TestContentEncodingDetection::test_xhtml_pragma": "PASSED",
+      "test_requests.py::TestContentEncodingDetection::test_xml": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_contains": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_delitem": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_docstring_example": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_equality": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_fixes_649": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_get": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_getitem": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_iter": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_iterable_init": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_kwargs_init": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_len": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_lower_items": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_mapping_init": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_preserve_key_case": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_preserve_last_key_case": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_setdefault": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_update": "PASSED",
+      "test_requests.py::TestCaseInsensitiveDict::test_update_retains_unchanged": "PASSED",
+      "test_requests.py::UtilsTestCase::test_address_in_network": "PASSED",
+      "test_requests.py::UtilsTestCase::test_dotted_netmask": "PASSED",
+      "test_requests.py::UtilsTestCase::test_get_auth_from_url": "PASSED",
+      "test_requests.py::UtilsTestCase::test_get_environ_proxies": "PASSED",
+      "test_requests.py::UtilsTestCase::test_get_environ_proxies_ip_ranges": "PASSED",
+      "test_requests.py::UtilsTestCase::test_is_ipv4_address": "PASSED",
+      "test_requests.py::UtilsTestCase::test_is_valid_cidr": "PASSED",
+      "test_requests.py::UtilsTestCase::test_super_len_io_streams": "PASSED",
+      "test_requests.py::TestMorselToCookieExpires::test_expires_invalid_int": "PASSED",
+      "test_requests.py::TestMorselToCookieExpires::test_expires_invalid_str": "PASSED",
+      "test_requests.py::TestMorselToCookieExpires::test_expires_none": "PASSED",
+      "test_requests.py::TestMorselToCookieExpires::test_expires_valid_str": "PASSED",
+      "test_requests.py::TestMorselToCookieMaxAge::test_max_age_invalid_str": "PASSED",
+      "test_requests.py::TestMorselToCookieMaxAge::test_max_age_valid_int": "PASSED",
+      "test_requests.py::TestTimeout::test_stream_timeout": "PASSED",
+      "test_requests.py::TestTimeout::test_invalid_timeout": "PASSED",
+      "test_requests.py::TestTimeout::test_none_timeout": "PASSED",
+      "test_requests.py::TestTimeout::test_read_timeout": "PASSED",
+      "test_requests.py::TestTimeout::test_connect_timeout": "PASSED",
+      "test_requests.py::TestTimeout::test_total_timeout_connect": "PASSED",
+      "test_requests.py::TestRedirects::test_requests_are_updated_each_time": "PASSED",
+      "test_requests.py::test_data_argument_accepts_tuples": "PASSED",
+      "test_requests.py::test_prepared_request_empty_copy": "PASSED",
+      "test_requests.py::test_prepared_request_no_cookies_copy": "PASSED",
+      "test_requests.py::test_prepared_request_complete_copy": "PASSED",
+      "test_requests.py::test_prepare_unicode_url": "PASSED",
+      "test_requests.py::RequestsTestCase::test_auth_is_stripped_on_redirect_off_host": "FAILED",
+      "test_requests.py::RequestsTestCase::test_conflicting_post_params": "FAILED",
+      "test_requests.py::TestTimeout::test_encoded_methods": "FAILED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

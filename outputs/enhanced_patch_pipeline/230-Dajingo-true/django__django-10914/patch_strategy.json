@@ -1,0 +1,16 @@
+{
+  "title": "Set default FILE_UPLOAD_PERMISSIONS to 0o644",
+  "approach": "Explicitly define FILE_UPLOAD_PERMISSIONS in django/conf/global_settings.py to 0o644, ensuring consistent file permissions for uploaded files across all systems and handlers. This will override system-dependent defaults and address the inconsistency caused by tempfile.NamedTemporaryFile + os.rename.",
+  "edit_targets": [
+    "django/conf/global_settings.py::FILE_UPLOAD_PERMISSIONS"
+  ],
+  "dependency_files": [
+    "tests/test_utils/tests.py::test_override_file_upload_permissions"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing django/conf/global_settings.py to set FILE_UPLOAD_PERMISSIONS to 0o644 is sufficient to address the inconsistency. However, tests in tests/test_utils/tests.py should be inspected to ensure they validate the new default behavior.",
+  "risks": [
+    "Potential unintended side effects if other parts of the system rely on the previous default of None for FILE_UPLOAD_PERMISSIONS."
+  ]
+}

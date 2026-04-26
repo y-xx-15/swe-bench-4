@@ -1,0 +1,123 @@
+[
+  {
+    "idea": {
+      "title": "validate_imported_members_exclusion",
+      "semantic_bucket": "structural_invariant",
+      "goal": "ensure that imported members are excluded from the 'members' variable when autosummary_imported_members is False",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "module_alias_check",
+      "target_tests": [
+        "test_sweb_enhanced_imported_members_exclusion"
+      ],
+      "covers_original_tests": [
+        "test_autosummary_generate_content_for_module",
+        "test_autosummary_generate_content_for_module_skipped"
+      ],
+      "covers_obligations": [
+        "test_autosummary_generate_content_for_module::core",
+        "test_autosummary_generate_content_for_module_skipped::core"
+      ],
+      "target_source_symbol": "sphinx.ext.autosummary.generate.generate_autosummary_content",
+      "target_validation_subject": "members variable",
+      "semantic_alignment_tokens": [
+        "autosummary_imported_members",
+        "members",
+        "import_by_name",
+        "dir(obj)"
+      ],
+      "trigger_shape_tokens": [
+        "autosummary_imported_members=False",
+        "dir(obj)",
+        "get_documenter"
+      ],
+      "rationale": "This test directly validates the structural invariant that the 'members' variable should exclude imported members when autosummary_imported_members is False, which is distinct from the original tests that indirectly observe the bug through generated RST content. By targeting the 'members' variable directly, it provides more precise repair guidance for the root cause."
+    },
+    "patch": "diff --git a/tests/test_ext_autosummary.py b/tests/test_ext_autosummary.py\n--- a/tests/test_ext_autosummary.py\n+++ b/tests/test_ext_autosummary.py\n@@ -249,0 +249,20 @@\n+@pytest.mark.sphinx(testroot='ext-autosummary')\n+def test_sweb_enhanced_imported_members_exclusion(app):\n+    import autosummary_dummy_module\n+    template = Mock()\n+\n+    # Generate content with autosummary_imported_members set to False\n+    generate_autosummary_content(\n+        'autosummary_dummy_module',\n+        autosummary_dummy_module,\n+        None,\n+        template,\n+        None,\n+        False,  # autosummary_imported_members=False\n+        app,\n+        False,\n+        {}\n+    )\n+    context = template.render.call_args[0][1]\n+    assert 'os' not in context['members'], \"Imported member 'os' should not be in 'members' when autosummary_imported_members is False\"\n+    assert '__file__' in context['members'], \"Expected module-level attributes to remain in 'members'\"\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_ext_autosummary.py b/tests/test_ext_autosummary.py\n--- a/tests/test_ext_autosummary.py\n+++ b/tests/test_ext_autosummary.py\n@@ -249,0 +249,20 @@\n+@pytest.mark.sphinx(testroot='ext-autosummary')\n+def test_sweb_enhanced_imported_members_exclusion(app):\n+    import autosummary_dummy_module\n+    template = Mock()\n+\n+    # Generate content with autosummary_imported_members set to False\n+    generate_autosummary_content(\n+        'autosummary_dummy_module',\n+        autosummary_dummy_module,\n+        None,\n+        template,\n+        None,\n+        False,  # autosummary_imported_members=False\n+        app,\n+        False,\n+        {}\n+    )\n+    context = template.render.call_args[0][1]\n+    assert 'os' not in context['members'], \"Imported member 'os' should not be in 'members' when autosummary_imported_members is False\"\n+    assert '__file__' in context['members'], \"Expected module-level attributes to remain in 'members'\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_imported_members_exclusion"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_imported_members_exclusion"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "retained under import-error weak keep: evaluation produced an empty status_map, but the log shows the same import-error environment block as the original failure",
+    "failing_identifiers": null,
+    "eval_status_map": {},
+    "generation_attempts": 4,
+    "quality_score": 0.05,
+    "quality_breakdown": {
+      "bug_reproduction": 0.0,
+      "path_alignment": 0.25,
+      "signal_strength": 0.0,
+      "environment_blocked_import_error": 1.0
+    },
+    "covered_original_tests": [
+      "test_autosummary_generate_content_for_module",
+      "test_autosummary_generate_content_for_module_skipped"
+    ],
+    "covered_obligations": [
+      "test_autosummary_generate_content_for_module::core",
+      "test_autosummary_generate_content_for_module_skipped::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test_autosummary_imported_members_behavior",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior when autosummary_imported_members is False and imported members are incorrectly included in the output",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "public_api_resolution",
+      "target_tests": [
+        "test_sweb_enhanced_imported_members_exclusion"
+      ],
+      "covers_original_tests": [
+        "test_autosummary_generate_content_for_module_skipped"
+      ],
+      "covers_obligations": [
+        "test_autosummary_generate_content_for_module_skipped::core"
+      ],
+      "target_source_symbol": "sphinx.ext.autosummary.generate.generate_autosummary_content",
+      "target_validation_subject": "members variable in autosummary template context",
+      "semantic_alignment_tokens": [
+        "autosummary_imported_members",
+        "members",
+        "imported"
+      ],
+      "trigger_shape_tokens": [
+        "imported_members=False",
+        "dir(obj)",
+        "getattr(value, '__module__')"
+      ],
+      "rationale": "This test focuses on the downstream behavioral consequence of the bug by verifying that the members variable excludes imported members when autosummary_imported_members is False. Unlike the original tests, which primarily observe the direct symptom of the ImportError, this test validates the correctness of the generated output, ensuring that the repaired code aligns with the intended configuration behavior."
+    },
+    "patch": "diff --git a/tests/test_ext_autosummary.py b/tests/test_ext_autosummary.py\n--- a/tests/test_ext_autosummary.py\n+++ b/tests/test_ext_autosummary.py\n@@ -249,0 +249,24 @@\n+@pytest.mark.sphinx(testroot='ext-autosummary')\n+def test_sweb_enhanced_imported_members_exclusion(app):\n+    \"\"\"\n+    Test that the 'members' variable in the autosummary template context\n+    excludes imported members when 'autosummary_imported_members' is False.\n+    \"\"\"\n+    import autosummary_dummy_module\n+    template = Mock()\n+\n+    # Generate autosummary content with autosummary_imported_members=False\n+    generate_autosummary_content(\n+        'autosummary_dummy_module',\n+        autosummary_dummy_module,\n+        None,\n+        template,\n+        None,\n+        imported_members=False,\n+        app=app,\n+        recursive=False,\n+        context={}\n+    )\n+\n+    # Validate that imported members (e.g., 'os') are excluded from 'members'\n+    context = template.render.call_args[0][1]\n+    assert 'os' not in context['members'], \"'os' should not be in members when autosummary_imported_members is False.\"\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_ext_autosummary.py b/tests/test_ext_autosummary.py\n--- a/tests/test_ext_autosummary.py\n+++ b/tests/test_ext_autosummary.py\n@@ -249,0 +249,24 @@\n+@pytest.mark.sphinx(testroot='ext-autosummary')\n+def test_sweb_enhanced_imported_members_exclusion(app):\n+    \"\"\"\n+    Test that the 'members' variable in the autosummary template context\n+    excludes imported members when 'autosummary_imported_members' is False.\n+    \"\"\"\n+    import autosummary_dummy_module\n+    template = Mock()\n+\n+    # Generate autosummary content with autosummary_imported_members=False\n+    generate_autosummary_content(\n+        'autosummary_dummy_module',\n+        autosummary_dummy_module,\n+        None,\n+        template,\n+        None,\n+        imported_members=False,\n+        app=app,\n+        recursive=False,\n+        context={}\n+    )\n+\n+    # Validate that imported members (e.g., 'os') are excluded from 'members'\n+    context = template.render.call_args[0][1]\n+    assert 'os' not in context['members'], \"'os' should not be in members when autosummary_imported_members is False.\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_imported_members_exclusion"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_imported_members_exclusion"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "retained under import-error weak keep: evaluation produced an empty status_map, but the log shows the same import-error environment block as the original failure",
+    "failing_identifiers": null,
+    "eval_status_map": {},
+    "generation_attempts": 2,
+    "quality_score": 0.05,
+    "quality_breakdown": {
+      "bug_reproduction": 0.0,
+      "path_alignment": 0.25,
+      "signal_strength": 0.0,
+      "environment_blocked_import_error": 1.0
+    },
+    "covered_original_tests": [
+      "test_autosummary_generate_content_for_module_skipped"
+    ],
+    "covered_obligations": [
+      "test_autosummary_generate_content_for_module_skipped::core"
+    ]
+  }
+]

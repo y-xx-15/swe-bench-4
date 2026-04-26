@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "requests/sessions.py",
+      "action": "modify_region",
+      "justification": "The `Session.request` method contains the `builtin_str` conversion that incorrectly handles binary strings for the HTTP method. This needs to be fixed to ensure proper decoding of binary strings to valid string representations."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "requests/sessions.py",
+      "target_symbol": "Session.request",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_HTTP_302_ALLOW_REDIRECT_GET::core::method"
+      ],
+      "anchor_line_before": "        method = builtin_str(method)",
+      "anchor_line_after": "        # Create the Request.",
+      "replacement_block": "        if isinstance(method, bytes):\n            method = method.decode('utf-8')\n        else:\n            method = str(method)\n\n        # Create the Request."
+    }
+  ]
+}

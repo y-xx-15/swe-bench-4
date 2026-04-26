@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "requests/sessions.py",
+      "action": "modify_region",
+      "justification": "The method argument in the `Session.request` method is being improperly converted using `builtin_str`, which causes binary strings to become invalid HTTP methods. This requires modification to handle binary strings correctly."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "requests/sessions.py",
+      "target_symbol": "Session.request",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "preserve_method_validity"
+      ],
+      "anchor_line_before": "        method = builtin_str(method)",
+      "anchor_line_after": "        # Create the Request.",
+      "replacement_block": "        if isinstance(method, bytes):\n            method = method.decode('utf-8')\n        method = builtin_str(method)\n\n        # Create the Request."
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+```diff
+diff --git a/src/flask/blueprints.py b/src/flask/blueprints.py
+--- a/src/flask/blueprints.py
++++ b/src/flask/blueprints.py
+@@ -191,6 +191,10 @@ class Blueprint(Scaffold):
+         )
+         self.name = name
+         self.url_prefix = url_prefix
++        if "." in name:
++            raise ValueError(
++                "Blueprint name should not contain dots, as dots are reserved for nesting."
++            )
+         self.subdomain = subdomain
+         self.deferred_functions: t.List[DeferredSetupFunction] = []
+ 
+```

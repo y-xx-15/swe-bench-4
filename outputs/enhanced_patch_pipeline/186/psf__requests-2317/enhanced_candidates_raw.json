@@ -1,0 +1,248 @@
+[
+  {
+    "idea": {
+      "title": "binary_method_type_error",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the behavior when a binary string is passed as the HTTP method",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "coercion_contract",
+      "target_tests": [
+        "test_sweb_enhanced_binary_method_type_error"
+      ],
+      "covers_original_tests": [
+        "test_encoded_methods"
+      ],
+      "covers_obligations": [
+        "test_encoded_methods::core"
+      ],
+      "target_source_symbol": "requests.sessions.Session.request",
+      "target_validation_subject": "method",
+      "semantic_alignment_tokens": [
+        "method=",
+        "builtin_str",
+        "TypeError"
+      ],
+      "trigger_shape_tokens": [
+        "method=",
+        "b'GET'",
+        "builtin_str"
+      ],
+      "rationale": "This test directly exercises the failure path where a binary string is passed as the HTTP method, triggering the observed TypeError in the buggy implementation. It differs from the original test by explicitly focusing on the coercion of binary strings to native strings, ensuring the bug is exposed and fixed."
+    },
+    "patch": "diff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,10 @@\n+def test_sweb_enhanced_binary_method_type_error():\n+    \"\"\"\n+    Test that passing a binary string as the HTTP method raises a TypeError\n+    or is properly handled.\n+    \"\"\"\n+    with pytest.raises(TypeError):\n+        # This should fail on the buggy code because `builtin_str(method)`\n+        # converts b'GET' to \"b'GET'\", which is invalid as an HTTP method.\n+        requests.request(b'GET', httpbin('get'))\n+\n",
+    "raw_response": "```diff\ndiff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,10 @@\n+def test_sweb_enhanced_binary_method_type_error():\n+    \"\"\"\n+    Test that passing a binary string as the HTTP method raises a TypeError\n+    or is properly handled.\n+    \"\"\"\n+    with pytest.raises(TypeError):\n+        # This should fail on the buggy code because `builtin_str(method)`\n+        # converts b'GET' to \"b'GET'\", which is invalid as an HTTP method.\n+        requests.request(b'GET', httpbin('get'))\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_binary_method_type_error"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_binary_method_type_error"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_redirect_with_binary_method",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the behavior when a binary string method is used in a redirect scenario",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_redirect_binary_method"
+      ],
+      "covers_original_tests": [
+        "test_HTTP_302_ALLOW_REDIRECT_GET"
+      ],
+      "covers_obligations": [
+        "test_HTTP_302_ALLOW_REDIRECT_GET::core"
+      ],
+      "target_source_symbol": "requests.sessions.SessionRedirectMixin.resolve_redirects",
+      "target_validation_subject": "method",
+      "semantic_alignment_tokens": [
+        "method",
+        "redirect",
+        "GET",
+        "builtin_str"
+      ],
+      "trigger_shape_tokens": [
+        "method",
+        "builtin_str",
+        "redirect"
+      ],
+      "rationale": "This test directly targets the failure mode where a binary string method (e.g., b'GET') is improperly converted during a redirect. It differs from the original test by explicitly using a binary string method to expose the type error, which was not covered in the original test."
+    },
+    "patch": "diff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,11 @@\n+def test_sweb_enhanced_redirect_binary_method():\n+    \"\"\"Test behavior when a binary string method is used in a redirect scenario.\"\"\"\n+    session = requests.Session()\n+    url = httpbin('redirect-to?url=' + httpbin('get'))\n+    try:\n+        response = session.request(b'GET', url)\n+    except Exception as e:\n+        pytest.fail(f\"Unexpected exception occurred: {e}\")\n+    assert response.status_code == 200, f\"Expected 200, got {response.status_code}\"\n+    assert response.url == httpbin('get'), f\"Expected final URL to be {httpbin('get')}, got {response.url}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,11 @@\n+def test_sweb_enhanced_redirect_binary_method():\n+    \"\"\"Test behavior when a binary string method is used in a redirect scenario.\"\"\"\n+    session = requests.Session()\n+    url = httpbin('redirect-to?url=' + httpbin('get'))\n+    try:\n+        response = session.request(b'GET', url)\n+    except Exception as e:\n+        pytest.fail(f\"Unexpected exception occurred: {e}\")\n+    assert response.status_code == 200, f\"Expected 200, got {response.status_code}\"\n+    assert response.url == httpbin('get'), f\"Expected final URL to be {httpbin('get')}, got {response.url}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_redirect_binary_method"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_redirect_binary_method"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "binary_method_type_handling",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior when a binary string method is passed, leading to incorrect HTTP responses",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "mixed_operand_type",
+      "target_tests": [
+        "test_sweb_enhanced_binary_method_type_handling"
+      ],
+      "covers_original_tests": [
+        "test_POSTBIN_GET_POST_FILES"
+      ],
+      "covers_obligations": [
+        "test_POSTBIN_GET_POST_FILES::core"
+      ],
+      "target_source_symbol": "requests.sessions.Session.request",
+      "target_validation_subject": "method parameter",
+      "semantic_alignment_tokens": [
+        "method=",
+        "builtin_str",
+        "Session.request"
+      ],
+      "trigger_shape_tokens": [
+        "method=",
+        "b'GET'",
+        "builtin_str"
+      ],
+      "rationale": "This test differs from the original failure observation by explicitly passing a binary string as the HTTP method, which is not directly tested in the original test. It highlights the behavioral consequence of the type conversion issue, leading to incorrect HTTP responses."
+    },
+    "patch": "diff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,9 @@\n+def test_sweb_enhanced_binary_method_type_handling():\n+    \"\"\"\n+    Test that passing a binary string as the HTTP method results in a valid HTTP request.\n+    This exposes the bug where the method is incorrectly converted to a literal string.\n+    \"\"\"\n+    session = requests.Session()\n+    response = session.request(b'GET', httpbin('get'))\n+    assert response.status_code == 200, f\"Expected 200, got {response.status_code}\"\n+    assert response.ok, \"Response should be OK for a valid GET request\"\n",
+    "raw_response": "```diff\ndiff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,9 @@\n+def test_sweb_enhanced_binary_method_type_handling():\n+    \"\"\"\n+    Test that passing a binary string as the HTTP method results in a valid HTTP request.\n+    This exposes the bug where the method is incorrectly converted to a literal string.\n+    \"\"\"\n+    session = requests.Session()\n+    response = session.request(b'GET', httpbin('get'))\n+    assert response.status_code == 200, f\"Expected 200, got {response.status_code}\"\n+    assert response.ok, \"Response should be OK for a valid GET request\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_binary_method_type_handling"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_binary_method_type_handling"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "binary_string_method_type_error",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the behavior when the HTTP method is passed as a binary string, which should trigger a TypeError in the buggy implementation",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_binary_string_method"
+      ],
+      "covers_original_tests": [
+        "test_POSTBIN_GET_POST_FILES_WITH_DATA"
+      ],
+      "covers_obligations": [
+        "test_POSTBIN_GET_POST_FILES_WITH_DATA::core"
+      ],
+      "target_source_symbol": "requests.sessions.Session.request",
+      "target_validation_subject": "method",
+      "semantic_alignment_tokens": [
+        "method=",
+        "builtin_str",
+        "TypeError"
+      ],
+      "trigger_shape_tokens": [
+        "method=",
+        "b'GET'",
+        "builtin_str"
+      ],
+      "rationale": "This test directly targets the failure mode where the HTTP method is passed as a binary string (e.g., b'GET'), which is incorrectly converted to a literal string representation (e.g., \"b'GET'\") in the buggy implementation. This is distinct from the original tests because it explicitly exercises the type mismatch issue in the 'method' parameter, which is not covered by the existing tests."
+    },
+    "patch": "diff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,10 @@\n+def test_sweb_enhanced_binary_string_method():\n+    \"\"\"\n+    Test that passing a binary string as the HTTP method triggers the expected\n+    behavior. This test reproduces the bug where the method is incorrectly\n+    converted to a literal string representation.\n+    \"\"\"\n+    with pytest.raises(TypeError):\n+        # Attempt to make a request with a binary string method\n+        requests.request(b'GET', httpbin('get'))\n+\n",
+    "raw_response": "```diff\ndiff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,10 @@\n+def test_sweb_enhanced_binary_string_method():\n+    \"\"\"\n+    Test that passing a binary string as the HTTP method triggers the expected\n+    behavior. This test reproduces the bug where the method is incorrectly\n+    converted to a literal string representation.\n+    \"\"\"\n+    with pytest.raises(TypeError):\n+        # Attempt to make a request with a binary string method\n+        requests.request(b'GET', httpbin('get'))\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_binary_string_method"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_binary_string_method"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test binary string method handling",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the handling of binary string methods and ensure they are correctly converted to native strings",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "coercion_contract",
+      "target_tests": [
+        "test_sweb_enhanced_binary_string_method"
+      ],
+      "covers_original_tests": [
+        "test_basicauth_with_netrc"
+      ],
+      "covers_obligations": [
+        "test_basicauth_with_netrc::core"
+      ],
+      "target_source_symbol": "requests.sessions.Session.request",
+      "target_validation_subject": "method",
+      "semantic_alignment_tokens": [
+        "builtin_str",
+        "method",
+        "Session.request"
+      ],
+      "trigger_shape_tokens": [
+        "builtin_str",
+        "method",
+        "Session.request"
+      ],
+      "rationale": "This test directly targets the conversion of binary string methods to native strings, which is the root cause of the bug. It differs from the original test by explicitly passing a binary string as the method argument to ensure the coercion logic is exercised and validated."
+    },
+    "patch": "diff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,11 @@\n+def test_sweb_enhanced_binary_string_redirect():\n+    \"\"\"\n+    Ensure that binary string methods are correctly handled during redirects.\n+    This test targets the conversion of binary string methods to native strings\n+    and validates that redirects function as expected.\n+    \"\"\"\n+    session = requests.Session()\n+    response = session.request(b'GET', httpbin('redirect/1'))\n+    assert response.status_code == 200\n+    assert response.history[0].status_code == 302\n+    assert response.history[0].is_redirect\n",
+    "raw_response": "```diff\ndiff --git a/test_requests.py b/test_requests.py\n--- a/test_requests.py\n+++ b/test_requests.py\n@@ -246,0 +246,11 @@\n+def test_sweb_enhanced_binary_string_redirect():\n+    \"\"\"\n+    Ensure that binary string methods are correctly handled during redirects.\n+    This test targets the conversion of binary string methods to native strings\n+    and validates that redirects function as expected.\n+    \"\"\"\n+    session = requests.Session()\n+    response = session.request(b'GET', httpbin('redirect/1'))\n+    assert response.status_code == 200\n+    assert response.history[0].status_code == 302\n+    assert response.history[0].is_redirect\n```",
+    "identifiers": [
+      "test_sweb_enhanced_binary_string_redirect"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_binary_string_redirect"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "title": "Handle binary string method in requests",
+  "approach": "Modify the `Session.request` method to check if the `method` argument is a binary string and decode it to a standard string before using it.",
+  "edit_targets": [
+    "requests/sessions.py::Session.request"
+  ],
+  "dependency_files": [
+    "requests/compat.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing `Session.request` is sufficient because the issue originates from the conversion of the `method` argument using `builtin_str`. No changes are needed in other files or functions.",
+  "risks": [
+    "Potential regression if the `method` argument is passed as a non-binary string and inadvertently altered."
+  ]
+}

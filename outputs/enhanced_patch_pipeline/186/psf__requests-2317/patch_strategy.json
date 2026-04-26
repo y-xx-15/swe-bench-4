@@ -1,0 +1,22 @@
+{
+  "title": "Handle binary string methods in HTTP requests",
+  "approach": "Modify the `Session.request` method to check if the `method` parameter is a binary string. If it is, decode it to a native string before proceeding. Additionally, ensure that the `SessionRedirectMixin.resolve_redirects` method handles binary string methods correctly during redirects.",
+  "edit_targets": [
+    "requests/sessions.py::Session.request",
+    "requests/sessions.py::SessionRedirectMixin.resolve_redirects"
+  ],
+  "dependency_files": [
+    "requests/models.py",
+    "requests/utils.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing both `Session.request` and `SessionRedirectMixin.resolve_redirects` is necessary to fully address the issue. The `Session.request` method must handle binary string methods at the entry point, while `SessionRedirectMixin.resolve_redirects` must ensure that the method remains valid during redirects. Without changes to both locations, the issue may persist in certain scenarios, such as redirects.",
+  "risks": [
+    "Potential regressions in handling of valid string methods if the type-checking logic is too permissive or restrictive.",
+    "Unintended side effects in downstream libraries or applications relying on the current behavior of `Session.request` or `SessionRedirectMixin.resolve_redirects`."
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "root_cause": "In `pytest_runtest_makereport`, when `--runxfail` is active the hook does `pass` (don't interfere) for the xfail branch, but the subsequent `elif` branch that fixes the skip location for `@pytest.mark.skip`/`skipif` is never reached because the `elif item.config.option.runxfail: pass` consumes the condition chain. The location-fix branch is an `elif` chained off the `runxfail` branch, so it is skipped entirely when `--runxfail` is set, leaving the skip location pointing to inside pytest's skipping.py instead of the test file.",
+  "affected_components": [
+    {
+      "file": "src/_pytest/skipping.py",
+      "symbol": "pytest_runtest_makereport",
+      "reason": "The elif-chain structure means the `skipped_by_mark_key` location-fix block is an elif of the `runxfail` branch. When `--runxfail` is active the `pass` short-circuits the chain and the location fix is never applied."
+    }
+  ],
+  "failing_signal": "The test asserts 'SKIPPED [1] test_sample.py:2: unconditional skip' but when --runxfail is passed the output shows 'SKIPPED [1] src/_pytest/skipping.py:238: unconditional skip', meaning the longrepr tuple was not rewritten to point at the test item.",
+  "propagation_path": "1. Test is decorated with @pytest.mark.skip. 2. pytest_runtest_setup calls skip(), raising Skipped; skipped_by_mark_key is set to True. 3. In pytest_runtest_makereport the elif-chain is: unexpectedsuccess → runxfail (pass) → xfail.Exception → not skipped+xfailed → skipped_by_mark_key fix. Because `item.config.option.runxfail` is True the second branch matches and executes `pass`, exiting the chain before the final elif that would rewrite rep.longrepr to the item's location.",
+  "repair_constraint": "The fix must ensure that when --runxfail is active, xfail-related processing is skipped but the skip-location rewrite for @pytest.mark.skip/skipif still runs. The runxfail `pass` branch must not block the skipped_by_mark_key location fix.",
+  "suggested_repair_scope": [
+    "src/_pytest/skipping.py"
+  ],
+  "suspicious_symbols": [
+    "pytest_runtest_makereport",
+    "skipped_by_mark_key",
+    "xfailed_key",
+    "evaluate_skip_marks",
+    "evaluate_xfail_marks"
+  ]
+}

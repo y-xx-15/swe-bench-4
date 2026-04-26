@@ -1,0 +1,19 @@
+{
+  "title": "Decode binary HTTP methods",
+  "approach": "Modify the `Session.request` method to check if the `method` parameter is a binary string and decode it to a valid string representation before proceeding. This ensures compatibility with both binary and string inputs.",
+  "edit_targets": [
+    "requests/sessions.py::Session.request"
+  ],
+  "dependency_files": [
+    "requests/compat.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing only the `Session.request` method is sufficient because the issue is isolated to the incorrect handling of the `method` parameter within this function. No other parts of the codebase directly depend on or modify the `method` parameter in a way that would conflict with this fix.",
+  "risks": [
+    "Potential misinterpretation of non-binary inputs if additional validation is not performed."
+  ]
+}

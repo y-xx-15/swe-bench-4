@@ -1,0 +1,150 @@
+[
+  {
+    "idea": {
+      "title": "validate immutability of Symbol instances",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress immutability by verifying absence of __dict__ attribute",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "attribute_absence_check",
+      "target_tests": [
+        "test_sweb_enhanced_immutable"
+      ],
+      "covers_original_tests": [
+        "test_immutable"
+      ],
+      "covers_obligations": [
+        "test_immutable::core"
+      ],
+      "target_source_symbol": "sympy.Symbol",
+      "target_validation_subject": "__dict__",
+      "semantic_alignment_tokens": [
+        "Symbol(",
+        "__dict__",
+        "__slots__",
+        "AttributeError"
+      ],
+      "trigger_shape_tokens": [
+        "Symbol(",
+        "__dict__",
+        "__slots__"
+      ],
+      "rationale": "This test directly reproduces the original failure by verifying the absence of the __dict__ attribute on Symbol instances, which aligns with the immutability expectation. It differs from the original test by explicitly targeting the attribute absence rather than general immutability behavior."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_immutable():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.__dict__\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_immutable():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.__dict__\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_immutable"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_immutable"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test Symbol immutability via attribute absence",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the absence of __dict__ attribute in Symbol instances to reproduce the AttributeError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "attribute_absence_check",
+      "target_tests": [
+        "test_sweb_enhanced_symbol_attribute_absence"
+      ],
+      "covers_original_tests": [
+        "test_immutable"
+      ],
+      "covers_obligations": [
+        "test_immutable::core"
+      ],
+      "target_source_symbol": "sympy.core.symbol.Symbol",
+      "target_validation_subject": "__dict__ attribute",
+      "semantic_alignment_tokens": [
+        "Symbol(",
+        "__slots__",
+        "__dict__",
+        "AttributeError"
+      ],
+      "trigger_shape_tokens": [
+        "Symbol(",
+        "__slots__",
+        "__dict__"
+      ],
+      "rationale": "This test directly reproduces the original failure by verifying the absence of the __dict__ attribute in Symbol instances, which aligns with the original test's immutability focus and AttributeError traceback."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_symbol_attribute_absence():\n+    s = Symbol('test_symbol')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.new_attribute = 42  # Attempting to set an attribute should raise AttributeError\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_symbol_attribute_absence():\n+    s = Symbol('test_symbol')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.new_attribute = 42  # Attempting to set an attribute should raise AttributeError\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_symbol_attribute_absence"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_symbol_attribute_absence"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Test absence of __dict__ in Symbol instances",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Stress the absence of __dict__ attribute in Symbol instances to reproduce the AttributeError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "attribute_absence_check",
+      "target_tests": [
+        "test_sweb_enhanced_no_dict_in_symbol"
+      ],
+      "covers_original_tests": [
+        "test_immutable"
+      ],
+      "covers_obligations": [
+        "test_immutable::core"
+      ],
+      "target_source_symbol": "sympy.Symbol",
+      "target_validation_subject": "__dict__ attribute",
+      "semantic_alignment_tokens": [
+        "Symbol(",
+        "__dict__",
+        "__slots__"
+      ],
+      "trigger_shape_tokens": [
+        "Symbol(",
+        "__dict__"
+      ],
+      "rationale": "This test directly reproduces the AttributeError observed in the original failure by explicitly checking for the absence of the __dict__ attribute in Symbol instances. It differs from the original test by isolating the specific attribute absence validation rather than relying on broader immutability checks."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_no_dict_in_symbol():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.__dict__\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_no_dict_in_symbol():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.__dict__\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_no_dict_in_symbol"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_no_dict_in_symbol"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

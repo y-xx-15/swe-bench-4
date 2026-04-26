@@ -1,0 +1,178 @@
+[
+  {
+    "instance_id": "psf__requests-2317",
+    "repo": "psf/requests",
+    "model": "gpt-4o",
+    "pipeline_mode": "enhanced_guided",
+    "repair_mode": "enhanced_guided",
+    "original_test_identifiers": [
+      "test_HTTP_302_ALLOW_REDIRECT_GET",
+      "test_POSTBIN_GET_POST_FILES",
+      "test_POSTBIN_GET_POST_FILES_WITH_DATA",
+      "test_basicauth_with_netrc",
+      "test_json_param_post_content_type_works",
+      "test_manual_redirect_with_partial_body_read",
+      "test_requests_history_is_saved",
+      "test_encoded_methods"
+    ],
+    "original_status_counts": {},
+    "original_failed_count": 0,
+    "original_passed_count": 0,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_HTTP_302_ALLOW_REDIRECT_GET",
+        "test_POSTBIN_GET_POST_FILES",
+        "test_POSTBIN_GET_POST_FILES_WITH_DATA",
+        "test_basicauth_with_netrc",
+        "test_json_param_post_content_type_works",
+        "test_manual_redirect_with_partial_body_read",
+        "test_requests_history_is_saved",
+        "test_encoded_methods"
+      ],
+      "active_fail_to_pass_identifiers": [],
+      "inactive_fail_to_pass_identifiers": [
+        "test_HTTP_302_ALLOW_REDIRECT_GET",
+        "test_POSTBIN_GET_POST_FILES",
+        "test_POSTBIN_GET_POST_FILES_WITH_DATA",
+        "test_basicauth_with_netrc",
+        "test_json_param_post_content_type_works",
+        "test_manual_redirect_with_partial_body_read",
+        "test_requests_history_is_saved",
+        "test_encoded_methods"
+      ],
+      "failing_tests_sample": [],
+      "failure_mode": "generic_failure",
+      "dominant_errors": [],
+      "failure_snippets": [],
+      "noise_ratio": 0.0034,
+      "target_test_tracebacks": {
+        "test_HTTP_302_ALLOW_REDIRECT_GET": "TARGET TEST: test_HTTP_302_ALLOW_REDIRECT_GET",
+        "test_POSTBIN_GET_POST_FILES": "TARGET TEST: test_POSTBIN_GET_POST_FILES",
+        "test_POSTBIN_GET_POST_FILES_WITH_DATA": "TARGET TEST: test_POSTBIN_GET_POST_FILES_WITH_DATA",
+        "test_basicauth_with_netrc": "TARGET TEST: test_basicauth_with_netrc",
+        "test_json_param_post_content_type_works": "TARGET TEST: test_json_param_post_content_type_works",
+        "test_manual_redirect_with_partial_body_read": "TARGET TEST: test_manual_redirect_with_partial_body_read",
+        "test_requests_history_is_saved": "TARGET TEST: test_requests_history_is_saved",
+        "test_encoded_methods": "TARGET TEST: test_encoded_methods"
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 3,
+      "keep_top_k": 2,
+      "attempt_budget": 3,
+      "bucket_limit": 3,
+      "template_limit": 3,
+      "failure_mode": "generic_failure",
+      "noise_ratio": 0.0034,
+      "difficulty": "low"
+    },
+    "adaptive_num_candidates": 3,
+    "adaptive_keep_top_k": 2,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 3,
+    "kept_enhanced_candidates": 1,
+    "enhanced_candidate_retention_rate": 0.3333333333333333,
+    "enhanced_generation_attempts_total": 6,
+    "enhanced_generation_attempts_avg": 2.0,
+    "kept_enhanced_test_identifiers": [
+      "test_sweb_enhanced_binary_method_string"
+    ],
+    "enhanced_failed_test_identifiers": [],
+    "enhanced_failed_count": 0,
+    "generated_patch_nonempty": false,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 9,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_patch_apply_failed",
+    "generated_patch_feedback": "The previous patch was rejected because it did not satisfy the acceptance gate. Patch apply mode: apply_failed. Baseline passed=0, failed=0. Candidate passed=0, failed=0. Hard failure signal: none. FAIL_TO_PASS tests still failing after patch: test_HTTP_302_ALLOW_REDIRECT_GET, test_POSTBIN_GET_POST_FILES, test_POSTBIN_GET_POST_FILES_WITH_DATA, test_basicauth_with_netrc, test_json_param_post_content_type_works, test_manual_redirect_with_partial_body_read, test_requests_history_is_saved, test_encoded_methods. Your patch must make ALL of these tests pass, not just improve aggregate counts. Semantic oracle failed identifiers: test_sweb_enhanced_binary_method_string. Semantic oracle failure summaries: test_sweb_enhanced_binary_method_string: patching file requests/sessions.py\npatch: **** malformed patch at line 12:          req = Request(\n\n.  Target files: requests/sessions.py. Target symbols: Session.request. Generate a new source-only unified diff that is closer to the exact file context and lands inside the target class body.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [
+      "test_sweb_enhanced_binary_method_string"
+    ],
+    "patch_analysis": {
+      "root_cause": "The `builtin_str` conversion in `Session.request` converts a binary string (e.g., b'GET') into a literal string representation (e.g., \"b'GET'\") instead of properly decoding it to a valid string (e.g., 'GET'). This results in invalid HTTP methods being sent, causing server-side errors like 404 responses.",
+      "affected_components": [
+        {
+          "file": "requests/sessions.py",
+          "symbol": "Session.request",
+          "reason": "The `builtin_str` conversion directly modifies the HTTP method, which is critical for forming valid HTTP requests."
+        }
+      ],
+      "failing_signal": "Tests fail with 404 Not Found responses due to invalid HTTP methods being sent (e.g., \"b'GET'\").",
+      "propagation_path": "The `method` parameter is passed to `Session.request`, where it is incorrectly converted using `builtin_str`. This malformed method propagates through the request preparation and sending process, ultimately causing server-side errors.",
+      "repair_constraint": "The fix must ensure that binary strings (e.g., b'GET') are properly decoded to valid string representations (e.g., 'GET') without altering valid string inputs.",
+      "suggested_repair_scope": [
+        "requests/sessions.py"
+      ],
+      "suspicious_symbols": [
+        "builtin_str",
+        "Session.request"
+      ],
+      "repair_obligations": [
+        {
+          "id": "test_HTTP_302_ALLOW_REDIRECT_GET::core::method",
+          "source_symbol": "requests.sessions.Session.request",
+          "validation_subject": "method",
+          "why_it_matters": "The HTTP method must be valid to ensure proper redirection behavior during 302 responses."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Decode binary HTTP methods",
+      "approach": "Modify the `Session.request` method to check if the `method` parameter is a binary string and decode it to a valid string representation before proceeding. This ensures compatibility with both binary and string inputs.",
+      "edit_targets": [
+        "requests/sessions.py::Session.request"
+      ],
+      "dependency_files": [
+        "requests/compat.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [
+        "negative_gating",
+        "top_of_function_side_path"
+      ],
+      "sufficiency_assessment": "Editing only the `Session.request` method is sufficient because the issue is isolated to the incorrect handling of the `method` parameter within this function. No other parts of the codebase directly depend on or modify the `method` parameter in a way that would conflict with this fix.",
+      "risks": [
+        "Potential misinterpretation of non-binary inputs if additional validation is not performed."
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "requests/sessions.py",
+          "action": "modify_region",
+          "justification": "The `Session.request` method contains the `builtin_str` conversion that incorrectly handles binary strings for the HTTP method. This needs to be fixed to ensure proper decoding of binary strings to valid string representations."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "requests/sessions.py",
+          "target_symbol": "Session.request",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "test_HTTP_302_ALLOW_REDIRECT_GET::core::method"
+          ],
+          "anchor_line_before": "        method = builtin_str(method)",
+          "anchor_line_after": "        # Create the Request.",
+          "replacement_block": "        if isinstance(method, bytes):\n            method = method.decode('utf-8')\n        else:\n            method = str(method)\n\n        # Create the Request."
+        }
+      ]
+    },
+    "final_patch_attempted": false,
+    "final_patch_applied": false,
+    "final_patch_effective_applied": false,
+    "final_patch_apply_mode": "no_patch",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {},
+    "final_failed_count": 0,
+    "final_passed_count": 0,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {},
+    "final_timed_out": true,
+    "final_error": "Test patch did not apply or logs could not be parsed"
+  }
+]

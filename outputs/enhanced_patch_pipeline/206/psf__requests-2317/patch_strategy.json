@@ -1,0 +1,19 @@
+{
+  "title": "Preserve valid HTTP method string",
+  "approach": "Update the `Session.request` method to ensure that the `method` parameter is correctly converted to a valid string representation, avoiding the use of `builtin_str` for binary strings. Instead, decode binary strings to native strings using the appropriate encoding (e.g., UTF-8).",
+  "edit_targets": [
+    "requests/sessions.py::Session.request"
+  ],
+  "dependency_files": [
+    "requests/compat.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing `Session.request` in `requests/sessions.py` is sufficient because the issue is localized to the conversion of the `method` parameter. No changes are required in `requests/compat.py` since the fix avoids using `builtin_str` for binary strings.",
+  "risks": [
+    "Potential regressions if the `method` parameter is passed in unexpected formats, such as non-binary and non-string types."
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "title": "Restore skip location reporting with --runxfail",
+  "approach": "Modify the `pytest_runtest_makereport` hook to ensure that the `longrepr` location for skipped tests is always adjusted to point to the test item location, even when `--runxfail` is enabled. This will involve converting the existing `elif` branch for `item.config.option.runxfail` into a standalone `if` statement to ensure the subsequent correction logic for `longrepr` is not bypassed.",
+  "edit_targets": [
+    "src/_pytest/skipping.py::pytest_runtest_makereport"
+  ],
+  "dependency_files": [
+    "testing/test_skipping.py"
+  ],
+  "structural_rules": [
+    "restore_unreachable_existing_branch"
+  ],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing the `pytest_runtest_makereport` function is sufficient because the root cause lies in the control-flow structure of this function. The existing correction logic for `longrepr` is already present but unreachable when `--runxfail` is enabled. No other files or symbols need modification.",
+  "risks": [
+    "Ensure that the change does not interfere with other `--runxfail` behaviors, such as handling xfail tests correctly."
+  ]
+}

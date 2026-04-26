@@ -1,0 +1,33 @@
+{
+  "original_test_identifiers": [
+    "test_xfail_run_with_skip_mark[test_input1-expected1]"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_xfail_run_with_skip_mark[test_input1-expected1]"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "test_xfail_run_anyway.py::test_func",
+    "test_xfail_imperative_in_setup_function.py::test_this",
+    "test_xfail_raises.py::test_raises",
+    "test_reportchars.py::test_1",
+    "test_simple.py::test_foo"
+  ],
+  "failure_mode": "type_error",
+  "dominant_errors": [
+    "AssertionError",
+    "TypeError",
+    "AttributeError",
+    "IndexError",
+    "Error"
+  ],
+  "failure_snippets": [
+    "________ TestXFail.test_xfail_run_with_skip_mark[test_input1-expected1] ________",
+    "test_xfail_run_anyway.py:4: AssertionError",
+    "FAILED test_xfail_run_anyway.py::test_func - assert 0"
+  ],
+  "noise_ratio": 0.0023,
+  "target_test_tracebacks": {
+    "test_xfail_run_with_skip_mark[test_input1-expected1]": "FAILED testing/test_skipping.py::TestXFail::test_xfail_run_with_skip_mark[test_input1-expected1]\n========================= 1 failed, 78 passed in 1.86s =========================\n+ echo '>>>>> End Test Output'\n+ git checkout e6e300e729dd33956e5448d8be9a0b1540b4e53a testing/test_skipping.py\n>>>>> End Test Output\nUpdated 1 path from 877d43379"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "title": "Fix skip location reporting with --runxfail",
+  "approach": "Modify the `pytest_runtest_makereport` hook to ensure that the location of skipped tests is correctly reported, regardless of whether `--runxfail` is set.",
+  "edit_targets": [
+    "src/_pytest/skipping.py"
+  ],
+  "dependency_files": [
+    "testing/test_skipping.py"
+  ],
+  "sufficiency_assessment": "Editing `src/_pytest/skipping.py` should be sufficient as the issue lies in the `pytest_runtest_makereport` hook. No changes to other files or symbols are expected.",
+  "risks": [
+    "Potential regression in xfail handling or skipped test reporting if the logic is not carefully adjusted."
+  ]
+}

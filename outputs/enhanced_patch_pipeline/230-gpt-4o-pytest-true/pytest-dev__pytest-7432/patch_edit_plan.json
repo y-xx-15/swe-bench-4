@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "action": "modify_region",
+      "justification": "The `pytest_runtest_makereport` function contains the incorrect control-flow logic that causes the skip location to be reported incorrectly when `--runxfail` is enabled. This function must be edited to ensure the `longrepr` location is adjusted properly."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "target_symbol": "pytest_runtest_makereport",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip_location_reporting",
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip location reporting"
+      ],
+      "anchor_line_before": "    if unexpectedsuccess_key in item._store and rep.when == \"call\":",
+      "anchor_line_after": "        reason = item._store[unexpectedsuccess_key]",
+      "replacement_block": "    if unexpectedsuccess_key in item._store and rep.when == \"call\":\n        reason = item._store[unexpectedsuccess_key]\n    if item.config.option.runxfail and rep.skipped and isinstance(rep.longrepr, tuple):\n        # Adjust the longrepr to point to the test item location\n        filename, lineno, _ = item.reportinfo()\n        rep.longrepr = (filename, lineno, rep.longrepr[2])"
+    }
+  ]
+}

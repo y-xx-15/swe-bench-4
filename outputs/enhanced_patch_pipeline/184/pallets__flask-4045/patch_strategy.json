@@ -1,0 +1,19 @@
+{
+  "title": "Validate blueprint name and endpoint for dots",
+  "approach": "Add explicit validation checks in the Blueprint constructor and the add_url_rule method to ensure that blueprint names and endpoints do not contain dots. Replace assertion-based validation with explicit ValueError exceptions for better error handling.",
+  "edit_targets": [
+    "src/flask/blueprints.py::Blueprint.__init__",
+    "src/flask/blueprints.py::Blueprint.add_url_rule"
+  ],
+  "dependency_files": [
+    "tests/test_blueprints.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "assert_instead_of_explicit_exception"
+  ],
+  "sufficiency_assessment": "Editing both Blueprint.__init__ and Blueprint.add_url_rule is necessary to cover all validation subjects. The constructor handles blueprint name validation, while add_url_rule validates endpoints and view function names.",
+  "risks": [
+    "Potential regressions in existing code that relies on blueprint names or endpoints containing dots. Ensure thorough testing to avoid breaking valid use cases."
+  ]
+}

@@ -1,0 +1,17 @@
+```diff
+diff --git a/requests/sessions.py b/requests/sessions.py
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -428,7 +428,10 @@
+         """
+ 
+         if isinstance(method, bytes):
+-            method = builtin_str(method)
++            try:
++                method = method.decode('ascii')
++            except UnicodeDecodeError:
++                raise ValueError("HTTP method must be a valid ASCII string.")
+ 
+         # Create the Request.
+         req = Request(
+```

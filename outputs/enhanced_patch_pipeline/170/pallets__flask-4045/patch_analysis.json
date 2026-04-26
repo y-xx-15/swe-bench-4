@@ -1,0 +1,25 @@
+{
+  "root_cause": "The Blueprint constructor does not validate the 'name' parameter to ensure it does not contain dots, which are significant for nested blueprints and endpoint resolution.",
+  "affected_components": [
+    {
+      "file": "src/flask/blueprints.py",
+      "symbol": "Blueprint.__init__",
+      "reason": "The 'name' parameter is directly assigned without validation, allowing invalid names with dots."
+    },
+    {
+      "file": "src/flask/blueprints.py",
+      "symbol": "Blueprint.add_url_rule",
+      "reason": "This method relies on the 'name' parameter for endpoint construction, which fails when the name contains dots."
+    }
+  ],
+  "failing_signal": "Tests expecting a ValueError for dotted blueprint names fail because no validation is performed, and invalid names are accepted.",
+  "propagation_path": "The invalid 'name' parameter propagates through Blueprint initialization and is used in endpoint construction, leading to assertion failures during URL rule addition.",
+  "repair_constraint": "Blueprint names must remain unique and valid, without dots, to ensure proper nesting and endpoint resolution.",
+  "suggested_repair_scope": [
+    "src/flask/blueprints.py"
+  ],
+  "suspicious_symbols": [
+    "Blueprint.__init__",
+    "Blueprint.add_url_rule"
+  ]
+}

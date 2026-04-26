@@ -36,6 +36,15 @@ def test_failed(case: str, sm: dict[str, str]) -> bool:
 
 
 # MARK: Evaluation report functions
+def extract_test_output_blocks(content: str) -> list[str]:
+    blocks = []
+    for tail in content.split(START_TEST_OUTPUT)[1:]:
+        if END_TEST_OUTPUT not in tail:
+            continue
+        blocks.append(tail.split(END_TEST_OUTPUT, 1)[0])
+    return blocks
+
+
 def get_logs_eval(test_spec: TestSpec, log_fp: str) -> tuple[dict[str, str], bool]:
     """
     Retrieve evaluation results for a task instance from its corresponding log file
@@ -75,17 +84,15 @@ def get_logs_eval(test_spec: TestSpec, log_fp: str) -> tuple[dict[str, str], boo
             # Test patch did not apply (should not happen at all)
             return {}, False
 
-        # Get status map of evaluation results
-        test_content = content.split(START_TEST_OUTPUT)[1].split(END_TEST_OUTPUT)[0]
+        status_map = {}
+        for block in extract_test_output_blocks(content):
+            candidate_status_map = log_parser(block, test_spec)
+            if len(candidate_status_map) >= len(status_map):
+                status_map = candidate_status_map
 
-        # Try parsing the content between markers first
-        status_map = log_parser(test_content, test_spec)
-
-        # If no test results found between markers (common in Modal environment),
-        # try parsing the entire log content as fallback
+        # If no test results found in any marker block (common in stderr-heavy runs),
+        # fall back to parsing the entire log content.
         if not status_map:
-            # Look for pytest output patterns in the entire log content
-            # This handles cases where pytest output goes to stderr and isn't captured between markers
             status_map = log_parser(content, test_spec)
 
         return status_map, True

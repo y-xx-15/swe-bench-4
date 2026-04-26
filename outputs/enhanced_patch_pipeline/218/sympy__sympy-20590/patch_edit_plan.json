@@ -1,0 +1,38 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/_print_helpers.py",
+      "action": "modify_region",
+      "justification": "The `Printable` class is part of the inheritance hierarchy for `Symbol`. It does not define `__slots__`, which allows the `__dict__` attribute to be added to instances of `Symbol`. Adding `__slots__` to `Printable` is necessary to enforce immutability."
+    },
+    {
+      "target_file": "sympy/core/symbol.py",
+      "action": "modify_region",
+      "justification": "The `Symbol` class must explicitly define `__slots__` to prevent the addition of `__dict__` to its instances. This is critical to ensure immutability and fix the failing test."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/_print_helpers.py",
+      "target_symbol": "Printable",
+      "replacement_mode": "insert_before_anchor",
+      "covers_obligations": [
+        "test_immutable::core::__dict__ attribute"
+      ],
+      "anchor_line_before": "    \"\"\"",
+      "anchor_line_after": "    def __str__(self):",
+      "replacement_block": "    \"\"\"\n\n    __slots__ = ()\n\n    \"\"\"\n    def __str__(self):"
+    },
+    {
+      "target_file": "sympy/core/symbol.py",
+      "target_symbol": "Symbol",
+      "replacement_mode": "insert_before_anchor",
+      "covers_obligations": [
+        "test_immutable::core::__dict__ attribute"
+      ],
+      "anchor_line_before": "class Symbol(AtomicExpr, Expr):",
+      "anchor_line_after": "    __slots__ = ('name',)",
+      "replacement_block": "class Symbol(AtomicExpr, Expr):\n    __slots__ = ('name',)"
+    }
+  ]
+}

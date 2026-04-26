@@ -1,0 +1,28 @@
+{
+  "root_cause": "In Session.request(), `method = builtin_str(method)` converts a bytes value like b'GET' to the literal string \"b'GET'\" on Python 3, because builtin_str is str and str(b'GET') produces \"b'GET'\" rather than decoding the bytes. This malformed method string is then sent as the HTTP verb, causing servers to reject the request.",
+  "affected_components": [
+    {
+      "file": "requests/sessions.py",
+      "symbol": "Session.request",
+      "reason": "Contains the line `method = builtin_str(method)` which incorrectly converts bytes method names to their repr string on Python 3 instead of decoding them"
+    }
+  ],
+  "failing_signal": "test_encoded_methods sends `requests.request(b'GET', ...)` and expects a 200/ok response, but gets a 400 because the method becomes the literal string \"b'GET'\". Other tests (test_HTTP_302_ALLOW_REDIRECT_GET, test_POSTBIN_GET_POST_FILES) fail with 502 likely due to environment/proxy issues but the primary targeted test is test_encoded_methods.",
+  "propagation_path": "b'GET' is passed as method to Session.request() -> builtin_str(b'GET') produces \"b'GET'\" on Python 3 -> this string is set as req.method -> PreparedRequest sends HTTP request with verb \"b'GET'\" -> server doesn't recognize the method -> returns 400/404/502",
+  "repair_constraint": "When method is bytes, it must be decoded to a native string (e.g. via .decode('utf-8')), not converted via str() which produces the repr. When method is already a str, it should pass through unchanged. The fix must not break Python 2 compatibility.",
+  "suggested_repair_scope": [
+    "requests/sessions.py"
+  ],
+  "suspicious_symbols": [
+    "Session.request",
+    "builtin_str"
+  ],
+  "repair_obligations": [
+    {
+      "id": "fix-bytes-method-conversion",
+      "source_symbol": "Session.request",
+      "validation_subject": "method = builtin_str(method)",
+      "why_it_matters": "This line must properly decode bytes to a native string on Python 3 rather than producing the repr of the bytes object, so that HTTP methods like b'GET' become 'GET' not \"b'GET'\""
+    }
+  ]
+}

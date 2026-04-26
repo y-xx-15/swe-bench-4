@@ -1,0 +1,256 @@
+{
+  "instance_id": "django__django-10914",
+  "repo": "django/django",
+  "model": "gpt-4o",
+  "pipeline_mode": "enhanced_guided",
+  "repair_mode": "enhanced_guided",
+  "original_test_identifiers": [
+    "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+  ],
+  "original_status_counts": {
+    "PASSED": 98,
+    "SKIPPED": 1,
+    "FAILED": 2
+  },
+  "original_failed_count": 2,
+  "original_passed_count": 98,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+    ],
+    "failing_tests_sample": [
+      "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)",
+      "test_override_file_upload_permissions"
+    ],
+    "failure_mode": "assertion_error",
+    "dominant_errors": [
+      "AssertionError"
+    ],
+    "failure_snippets": [
+      "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests) ... FAIL",
+      "FAIL: test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)",
+      "Traceback (most recent call last):"
+    ],
+    "noise_ratio": 0.0023,
+    "target_test_tracebacks": {
+      "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)": "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests) ... FAIL\ntest_override_media_root (test_utils.tests.OverrideSettingsTests) ... ok\ntest_override_media_url (test_utils.tests.OverrideSettingsTests) ... ok\ntest_override_static_root (test_utils.tests.OverrideSettingsTests) ... ok\ntest_override_static_url (test_utils.tests.OverrideSettingsTests) ... ok\ntest_override_staticfiles_dirs (test_utils.tests.OverrideSettingsTests) ... ok\ntest_override_staticfiles_finders (test_utils.tests.OverrideSettingsTests) ... ok\ntest_override_staticfiles_storage (test_utils.tests.OverrideSettingsTests) ... ok\ntest_urlconf_cache (test_utils.tests.OverrideSettingsTests) ... ok\ntest_urlconf_first (test_utils.tests.OverrideSettingsTests) ... ok\ntest_urlconf_second (test_utils.tests.OverrideSettingsTests) ... ok\ntest_allowed_hosts (test_utils.tests.SetupTestEnvironmentTests) ... ok\ntest_setup_test_environment_calling_more_than_once (test_utils.tests.SetupTestEnvironmentTests) ... ok\ntest_skip_if_db_feature (test_utils.tests.SkippingTestCase) ... ok\ntest_skip_unless_db_feature (test_utils.tests.SkippingTestCase) ... ok\ntest_exception_in_setup (test_utils.tests.TestContextDecoratorTests)\nAn exception is setUp() is reraised after disable() is called. ... ok\ntest_comment_root (test_utils.tests.XMLEqualTests) ... ok\ntest_parsing_errors (test_utils.tests.XMLEqualTests) ... ok\ntest_simple_equal (test_utils.tests.XMLEqualTests) ... ok\ntest_simple_equal_raise (test_utils.tests.XMLEqualTests) ... ok\ntest_simple_equal_raises_message (test_utils.tests.XMLEqualTests) ... ok\ntest_simple_equal_unordered (test_utils.tests.XMLEqualTests) ... ok\ntest_simple_equal_with_leading_or_trailing_whitespace (test_utils.tests.XMLEqualTests) ... ok\ntest_simple_not_equal (test_utils.tests.XMLEqualTests) ... ok\ntest_simple_not_equal_raise (test_utils.tests.XMLEqualTests) ... ok\ntest_simple_not_equal_with_whitespace_in_the_middle (test_utils.tests.XMLEqualTests) ... ok\n\n======================================================================\nFAIL: test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/testbed/tests/test_utils/tests.py\", line 1102, in test_override_file_upload_permissions\n    self.assertEqual(default_storage.file_permissions_mode, 0o644)\nAssertionError: None != 420\n\n----------------------------------------------------------------------\nRan 100 tests in 0.074s\n\nFAILED (failures=1, skipped=1)"
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 3,
+    "keep_top_k": 2,
+    "attempt_budget": 3,
+    "bucket_limit": 3,
+    "template_limit": 3,
+    "failure_mode": "assertion_error",
+    "noise_ratio": 0.0023,
+    "difficulty": "low"
+  },
+  "adaptive_num_candidates": 3,
+  "adaptive_keep_top_k": 2,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 3,
+  "kept_enhanced_candidates": 2,
+  "enhanced_candidate_retention_rate": 0.6666666666666666,
+  "enhanced_generation_attempts_total": 6,
+  "enhanced_generation_attempts_avg": 2.0,
+  "kept_enhanced_test_identifiers": [
+    "test_sweb_enhanced_memory_file_permission",
+    "test_sweb_enhanced_file_upload_permission_with_tempfile"
+  ],
+  "enhanced_failed_test_identifiers": [
+    "test_sweb_enhanced_memory_file_permission",
+    "test_sweb_enhanced_file_upload_permission_with_tempfile"
+  ],
+  "enhanced_failed_count": 2,
+  "generated_patch_nonempty": true,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 5,
+  "generated_patch_accepted": true,
+  "generated_patch_acceptance_reason": "accepted_clean_apply_with_improvement_oracle_partial",
+  "generated_patch_feedback": null,
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [
+    "test_sweb_enhanced_memory_file_permission",
+    "test_sweb_enhanced_file_upload_permission_with_tempfile"
+  ],
+  "patch_analysis": {
+    "root_cause": "FILE_UPLOAD_PERMISSIONS is set to None, causing uploaded files to inherit system defaults, which may result in inconsistent permissions depending on the upload handler used.",
+    "affected_components": [
+      {
+        "file": "django/conf/global_settings.py",
+        "symbol": "FILE_UPLOAD_PERMISSIONS",
+        "reason": "This setting directly controls the permissions of uploaded files."
+      },
+      {
+        "file": "tests/test_utils/tests.py",
+        "symbol": "test_override_file_upload_permissions",
+        "reason": "This test explicitly checks the behavior of FILE_UPLOAD_PERMISSIONS and fails due to the inconsistent permissions."
+      }
+    ],
+    "failing_signal": "The test `test_override_file_upload_permissions` fails because the permissions of uploaded files are not consistent across different upload handlers.",
+    "propagation_path": "The default value of FILE_UPLOAD_PERMISSIONS is None, leading to reliance on system defaults. Temporary files created by `tempfile.NamedTemporaryFile` have restrictive permissions (e.g., 0o600), which are retained after renaming, causing the inconsistency.",
+    "repair_constraint": "Uploaded files must have consistent permissions regardless of the upload handler used, and the default should be secure but broadly accessible (e.g., 0o644).",
+    "suggested_repair_scope": [
+      "django/conf/global_settings.py",
+      "tests/test_utils/tests.py"
+    ],
+    "suspicious_symbols": [
+      "FILE_UPLOAD_PERMISSIONS",
+      "test_override_file_upload_permissions"
+    ]
+  },
+  "patch_strategy": {
+    "title": "Set default FILE_UPLOAD_PERMISSION",
+    "approach": "Explicitly set FILE_UPLOAD_PERMISSIONS to 0o644 in the global settings to ensure consistent file permissions across different upload handlers.",
+    "edit_targets": [
+      "django/conf/global_settings.py"
+    ],
+    "dependency_files": [
+      "tests/test_utils/tests.py"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [],
+    "sufficiency_assessment": "Editing the global settings file is sufficient to enforce consistent permissions for uploaded files. No additional changes are required in other files.",
+    "risks": [
+      "Potential unintended consequences if other parts of the system rely on the default value of None for FILE_UPLOAD_PERMISSIONS."
+    ]
+  },
+  "patch_edit_plan": {
+    "coverage_check": [
+      {
+        "target_file": "django/conf/global_settings.py",
+        "action": "modify_region",
+        "justification": "The FILE_UPLOAD_PERMISSIONS setting directly controls the permissions of uploaded files. Setting it to 0o644 ensures consistent and secure default permissions across different upload handlers."
+      }
+    ],
+    "edits": [
+      {
+        "target_file": "django/conf/global_settings.py",
+        "target_symbol": "FILE_UPLOAD_PERMISSIONS",
+        "anchor_line_before": "FILE_UPLOAD_TEMP_DIR = None",
+        "anchor_line_after": "# The numeric mode to assign to newly-created directories, when uploading files.",
+        "replacement_block": "FILE_UPLOAD_TEMP_DIR = None\n\n# The numeric mode to set newly-uploaded files to. The value should be a mode\n# you'd pass directly to os.chmod; see https://docs.python.org/library/os.html#files-and-directories.\nFILE_UPLOAD_PERMISSIONS = 0o644\n\n# The numeric mode to assign to newly-created directories, when uploading files."
+      }
+    ]
+  },
+  "final_patch_attempted": true,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": true,
+  "final_patch_apply_mode": "clean_apply",
+  "final_patch_cleanly_applied": true,
+  "clean_apply_ratio": 1.0,
+  "final_resolved": true,
+  "final_status_counts": {
+    "PASSED": 99,
+    "SKIPPED": 1
+  },
+  "final_failed_count": 0,
+  "final_passed_count": 99,
+  "original_passed_count_improvement": 1,
+  "original_failed_count_reduction": 2,
+  "final_status_map": {
+    "test_failure (test_utils.tests.AssertNumQueriesContextManagerTests)": "PASSED",
+    "test_simple (test_utils.tests.AssertNumQueriesContextManagerTests)": "PASSED",
+    "test_with_client (test_utils.tests.AssertNumQueriesContextManagerTests)": "PASSED",
+    "test_assert_num_queries (test_utils.tests.AssertNumQueriesTests)": "PASSED",
+    "test_assert_num_queries_with_client (test_utils.tests.AssertNumQueriesTests)": "PASSED",
+    "test_ordered (test_utils.tests.AssertQuerysetEqualTests)": "PASSED",
+    "test_repeated_values (test_utils.tests.AssertQuerysetEqualTests)": "PASSED",
+    "test_transform (test_utils.tests.AssertQuerysetEqualTests)": "PASSED",
+    "test_undefined_order (test_utils.tests.AssertQuerysetEqualTests)": "PASSED",
+    "test_unordered (test_utils.tests.AssertQuerysetEqualTests)": "PASSED",
+    "test_failure (test_utils.tests.CaptureQueriesContextManagerTests)": "PASSED",
+    "test_nested (test_utils.tests.CaptureQueriesContextManagerTests)": "PASSED",
+    "test_simple (test_utils.tests.CaptureQueriesContextManagerTests)": "PASSED",
+    "test_with_client (test_utils.tests.CaptureQueriesContextManagerTests)": "PASSED",
+    "test_within (test_utils.tests.CaptureQueriesContextManagerTests)": "PASSED",
+    "test_missing_default_databases (test_utils.tests.SkippingClassTestCase)": "PASSED",
+    "test_skip_class_unless_db_feature (test_utils.tests.SkippingClassTestCase)": "PASSED",
+    "test_fixtures_are_skipped (test_utils.tests.SkippingExtraTests)": "SKIPPED",
+    "test_failure_in_setUpTestData_should_rollback_transaction (test_utils.tests.TestBadSetUpTestData)": "PASSED",
+    "test_allowed_database_chunked_cursor_queries (test_utils.tests.AllowedDatabaseQueriesTests)": "PASSED",
+    "test_allowed_database_queries (test_utils.tests.AllowedDatabaseQueriesTests)": "PASSED",
+    "test_assert_field_output (test_utils.tests.AssertFieldOutputTests)": "PASSED",
+    "test_custom_required_message (test_utils.tests.AssertFieldOutputTests)": "PASSED",
+    "test_ignores_connection_configuration_queries (test_utils.tests.AssertNumQueriesUponConnectionTests)": "PASSED",
+    "test_assert_raises_message (test_utils.tests.AssertRaisesMsgTest)": "PASSED",
+    "assertRaisesMessage shouldn't interpret RE special chars.": "PASSED",
+    "test_assert_used_on_http_response (test_utils.tests.AssertTemplateUsedContextManagerTests)": "PASSED",
+    "test_error_message (test_utils.tests.AssertTemplateUsedContextManagerTests)": "PASSED",
+    "test_failure (test_utils.tests.AssertTemplateUsedContextManagerTests)": "PASSED",
+    "test_nested_usage (test_utils.tests.AssertTemplateUsedContextManagerTests)": "PASSED",
+    "test_not_used (test_utils.tests.AssertTemplateUsedContextManagerTests)": "PASSED",
+    "test_usage (test_utils.tests.AssertTemplateUsedContextManagerTests)": "PASSED",
+    "test_equal (test_utils.tests.AssertURLEqualTests)": "PASSED",
+    "test_message (test_utils.tests.AssertURLEqualTests)": "PASSED",
+    "test_msg_prefix (test_utils.tests.AssertURLEqualTests)": "PASSED",
+    "test_not_equal (test_utils.tests.AssertURLEqualTests)": "PASSED",
+    "test_callable (test_utils.tests.AssertWarnsMessageTests)": "PASSED",
+    "test_context_manager (test_utils.tests.AssertWarnsMessageTests)": "PASSED",
+    "test_context_manager_failure (test_utils.tests.AssertWarnsMessageTests)": "PASSED",
+    "test_special_re_chars (test_utils.tests.AssertWarnsMessageTests)": "PASSED",
+    "test_all (test_utils.tests.DatabaseAliasTests)": "PASSED",
+    "test_close_match (test_utils.tests.DatabaseAliasTests)": "PASSED",
+    "test_match (test_utils.tests.DatabaseAliasTests)": "PASSED",
+    "test_no_close_match (test_utils.tests.DatabaseAliasTests)": "PASSED",
+    "test_disallowed_database_chunked_cursor_queries (test_utils.tests.DisallowedDatabaseQueriesTests)": "PASSED",
+    "test_disallowed_database_connections (test_utils.tests.DisallowedDatabaseQueriesTests)": "PASSED",
+    "test_disallowed_database_queries (test_utils.tests.DisallowedDatabaseQueriesTests)": "PASSED",
+    "test_attributes (test_utils.tests.HTMLEqualTests)": "PASSED",
+    "test_complex_examples (test_utils.tests.HTMLEqualTests)": "PASSED",
+    "test_contains_html (test_utils.tests.HTMLEqualTests)": "PASSED",
+    "test_count (test_utils.tests.HTMLEqualTests)": "PASSED",
+    "test_html_contain (test_utils.tests.HTMLEqualTests)": "PASSED",
+    "test_html_parser (test_utils.tests.HTMLEqualTests)": "PASSED",
+    "test_ignore_comments (test_utils.tests.HTMLEqualTests)": "PASSED",
+    "test_parse_html_in_script (test_utils.tests.HTMLEqualTests)": "PASSED",
+    "test_parsing_errors (test_utils.tests.HTMLEqualTests)": "PASSED",
+    "test_self_closing_tags (test_utils.tests.HTMLEqualTests)": "PASSED",
+    "test_simple_equal_html (test_utils.tests.HTMLEqualTests)": "PASSED",
+    "test_unequal_html (test_utils.tests.HTMLEqualTests)": "PASSED",
+    "test_unicode_handling (test_utils.tests.HTMLEqualTests)": "PASSED",
+    "test_class_decoration (test_utils.tests.IsolatedAppsTests)": "PASSED",
+    "test_context_manager (test_utils.tests.IsolatedAppsTests)": "PASSED",
+    "test_installed_apps (test_utils.tests.IsolatedAppsTests)": "PASSED",
+    "test_method_decoration (test_utils.tests.IsolatedAppsTests)": "PASSED",
+    "test_nested (test_utils.tests.IsolatedAppsTests)": "PASSED",
+    "test_equal_parsing_errors (test_utils.tests.JSONEqualTests)": "PASSED",
+    "test_not_equal_parsing_errors (test_utils.tests.JSONEqualTests)": "PASSED",
+    "test_simple_equal (test_utils.tests.JSONEqualTests)": "PASSED",
+    "test_simple_equal_raise (test_utils.tests.JSONEqualTests)": "PASSED",
+    "test_simple_equal_unordered (test_utils.tests.JSONEqualTests)": "PASSED",
+    "test_simple_not_equal (test_utils.tests.JSONEqualTests)": "PASSED",
+    "test_simple_not_equal_raise (test_utils.tests.JSONEqualTests)": "PASSED",
+    "test_override_database_routers (test_utils.tests.OverrideSettingsTests)": "PASSED",
+    "test_override_file_upload_directory_permissions (test_utils.tests.OverrideSettingsTests)": "PASSED",
+    "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)": "PASSED",
+    "test_override_media_root (test_utils.tests.OverrideSettingsTests)": "PASSED",
+    "test_override_media_url (test_utils.tests.OverrideSettingsTests)": "PASSED",
+    "test_override_static_root (test_utils.tests.OverrideSettingsTests)": "PASSED",
+    "test_override_static_url (test_utils.tests.OverrideSettingsTests)": "PASSED",
+    "test_override_staticfiles_dirs (test_utils.tests.OverrideSettingsTests)": "PASSED",
+    "test_override_staticfiles_finders (test_utils.tests.OverrideSettingsTests)": "PASSED",
+    "test_override_staticfiles_storage (test_utils.tests.OverrideSettingsTests)": "PASSED",
+    "test_urlconf_cache (test_utils.tests.OverrideSettingsTests)": "PASSED",
+    "test_urlconf_first (test_utils.tests.OverrideSettingsTests)": "PASSED",
+    "test_urlconf_second (test_utils.tests.OverrideSettingsTests)": "PASSED",
+    "test_allowed_hosts (test_utils.tests.SetupTestEnvironmentTests)": "PASSED",
+    "test_setup_test_environment_calling_more_than_once (test_utils.tests.SetupTestEnvironmentTests)": "PASSED",
+    "test_skip_if_db_feature (test_utils.tests.SkippingTestCase)": "PASSED",
+    "test_skip_unless_db_feature (test_utils.tests.SkippingTestCase)": "PASSED",
+    "An exception is setUp() is reraised after disable() is called.": "PASSED",
+    "test_comment_root (test_utils.tests.XMLEqualTests)": "PASSED",
+    "test_parsing_errors (test_utils.tests.XMLEqualTests)": "PASSED",
+    "test_simple_equal (test_utils.tests.XMLEqualTests)": "PASSED",
+    "test_simple_equal_raise (test_utils.tests.XMLEqualTests)": "PASSED",
+    "test_simple_equal_raises_message (test_utils.tests.XMLEqualTests)": "PASSED",
+    "test_simple_equal_unordered (test_utils.tests.XMLEqualTests)": "PASSED",
+    "test_simple_equal_with_leading_or_trailing_whitespace (test_utils.tests.XMLEqualTests)": "PASSED",
+    "test_simple_not_equal (test_utils.tests.XMLEqualTests)": "PASSED",
+    "test_simple_not_equal_raise (test_utils.tests.XMLEqualTests)": "PASSED",
+    "test_simple_not_equal_with_whitespace_in_the_middle (test_utils.tests.XMLEqualTests)": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

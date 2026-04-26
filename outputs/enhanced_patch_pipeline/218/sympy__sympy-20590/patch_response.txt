@@ -1,0 +1,14 @@
+```diff
+diff --git a/sympy/core/_print_helpers.py b/sympy/core/_print_helpers.py
+--- a/sympy/core/_print_helpers.py
++++ b/sympy/core/_print_helpers.py
+@@ -8,6 +8,8 @@ class Printable:
+     """
+     The default implementation of printing for SymPy classes.
+ 
++    __slots__ = ()
++
+     This implements a hack that allows us to print elements of built-in
+     Python containers in a readable way. Natively Python uses ``repr()``
+     even if ``str()`` was explicitly requested. Mix in this trait into
+```
