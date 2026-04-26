@@ -51,6 +51,7 @@ jobs:
       - name: Uninstall any installed swebench package
         run: |
           pip uninstall -y swebench || true
+          pip install -e .
       - name: Run pytest
         uses: sjvrijn/pytest-last-failed@v2
         with:
