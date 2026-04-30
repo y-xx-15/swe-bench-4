@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "action": "modify_region",
+      "justification": "The `pytest_runtest_makereport` function contains a conditional branch that bypasses the correction logic for skipped test locations when `--runxfail` is enabled. This branch must be rewritten to ensure the correction logic executes regardless of the flag."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "target_symbol": "pytest_runtest_makereport__branch",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "adjust_skip_location_on_runxfail"
+      ],
+      "anchor_line_before": "    if unexpectedsuccess_key in item._store and rep.when == \"call\":",
+      "anchor_line_after": "        reason = item._store[unexpectedsuccess_key]",
+      "replacement_block": "    if unexpectedsuccess_key in item._store and rep.when == \"call\":\n        reason = item._store[unexpectedsuccess_key]\n        if reason:\n            rep.longrepr = \"Unexpected success: {}\".format(reason)\n        else:\n            rep.longrepr = \"Unexpected success\"\n        rep.outcome = \"failed\"\n    if item.config.option.runxfail:\n        xfailed = item._store.get(xfailed_key, None)\n        if xfailed:\n            rep.outcome = \"skipped\"\n            rep.longrepr = \"Skipped: {}\".format(xfailed.reason)\n    elif skipped_by_mark_key in item._store:\n        rep.outcome = \"skipped\"\n        rep.longrepr = \"Skipped: {}\".format(item._store[skipped_by_mark_key])"
+    }
+  ]
+}

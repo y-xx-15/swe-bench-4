@@ -1,0 +1,35 @@
+{
+  "root_cause": "The default value of FILE_UPLOAD_PERMISSIONS is set to None, which causes the permissions of uploaded files to depend on the underlying system's temporary file handling. This leads to inconsistent permissions, such as 0o600, when using TemporaryUploadedFile.",
+  "affected_components": [
+    {
+      "file": "django/conf/global_settings.py",
+      "symbol": "FILE_UPLOAD_PERMISSIONS",
+      "reason": "This setting directly controls the permissions of uploaded files and is currently set to None, leading to inconsistent behavior."
+    },
+    {
+      "file": "tests/test_utils/tests.py",
+      "symbol": "test_override_file_upload_permissions",
+      "reason": "This test validates the behavior of FILE_UPLOAD_PERMISSIONS and fails due to the inconsistent permissions caused by the default value of None."
+    }
+  ],
+  "failing_signal": "The test `test_override_file_upload_permissions` fails with an AssertionError because the expected file permission (0o644) does not match the actual permission (0o600).",
+  "propagation_path": "The default value of FILE_UPLOAD_PERMISSIONS is None, which causes Django to rely on the operating system's default permissions for temporary files. When TemporaryUploadedFile is used, the tempfile.NamedTemporaryFile + os.rename sequence results in files being created with restrictive permissions (0o600). This propagates to the test, which asserts for 0o644 and fails.",
+  "repair_constraint": "The fix must ensure that uploaded files consistently have the expected permissions (0o644) regardless of the underlying temporary file handling mechanism.",
+  "suggested_repair_scope": [
+    "django/conf/global_settings.py",
+    "tests/test_utils/tests.py"
+  ],
+  "suspicious_symbols": [
+    "FILE_UPLOAD_PERMISSIONS",
+    "TemporaryUploadedFile",
+    "os.chmod"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core::uploaded_file_permissions",
+      "source_symbol": "FILE_UPLOAD_PERMISSIONS",
+      "validation_subject": "uploaded_file_permissions",
+      "why_it_matters": "The test explicitly validates that uploaded files have the expected permissions. Ensuring consistent permissions is critical for security and usability."
+    }
+  ]
+}

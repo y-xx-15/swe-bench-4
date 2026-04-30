@@ -1,0 +1,21 @@
+{
+  "title": "Fix skip location reporting with runxfail",
+  "approach": "Change the existing 'elif item.config.option.runxfail:' to a standalone 'if' statement in the 'pytest_runtest_makereport' function to ensure that the skip location correction block is executed regardless of the runxfail flag.",
+  "edit_targets": [
+    "src/_pytest/skipping.py"
+  ],
+  "dependency_files": [
+    "testing/test_skipping.py"
+  ],
+  "structural_rules": [
+    "restore_unreachable_existing_branch"
+  ],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing only the primary target is sufficient as it directly addresses the control flow issue causing the incorrect skip location reporting.",
+  "risks": [
+    "Potential regressions in skip handling if the control flow is not correctly restored."
+  ]
+}

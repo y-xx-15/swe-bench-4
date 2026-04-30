@@ -1,0 +1,26 @@
+{
+  "original_test_identifiers": [
+    "test_immutable"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_immutable"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/core/tests/test_basic.py:test_immutable",
+    "test_immutable"
+  ],
+  "failure_mode": "attribute_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "failure_snippets": [
+    "test_immutable F",
+    "________________ sympy/core/tests/test_basic.py:test_immutable _________________",
+    "Traceback (most recent call last):"
+  ],
+  "noise_ratio": 0.006,
+  "target_test_tracebacks": {
+    "test_immutable": "TARGET TEST: test_immutable\n- snippet: test_immutable F\n- snippet: ________________ sympy/core/tests/test_basic.py:test_immutable _________________\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_immutable F\n________________ sympy/core/tests/test_basic.py:test_immutable _________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/core/tests/test_basic.py\", line 38, in test_immutable\nAssertionError\n============= tests finished: 22 passed, 1 failed, in 0.22 seconds ============="
+  }
+}

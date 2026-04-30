@@ -1,0 +1,174 @@
+{
+  "instance_id": "sympy__sympy-20590",
+  "repo": "sympy/sympy",
+  "model": "gpt-4o",
+  "pipeline_mode": "baseline_only",
+  "hide_original_test_patch_in_repair": true,
+  "repair_mode": "baseline_fallback",
+  "original_test_identifiers": [
+    "test_immutable"
+  ],
+  "original_status_counts": {
+    "FAILED": 2,
+    "PASSED": 21
+  },
+  "original_failed_count": 2,
+  "original_passed_count": 21,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_immutable"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_immutable"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/core/tests/test_basic.py:test_immutable",
+      "test_immutable"
+    ],
+    "failure_mode": "attribute_error",
+    "dominant_errors": [
+      "AssertionError"
+    ],
+    "failure_snippets": [
+      "test_immutable F",
+      "________________ sympy/core/tests/test_basic.py:test_immutable _________________",
+      "Traceback (most recent call last):"
+    ],
+    "noise_ratio": 0.006,
+    "target_test_tracebacks": {
+      "test_immutable": "TARGET TEST: test_immutable\n- snippet: test_immutable F\n- snippet: ________________ sympy/core/tests/test_basic.py:test_immutable _________________\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_immutable F\n________________ sympy/core/tests/test_basic.py:test_immutable _________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/core/tests/test_basic.py\", line 38, in test_immutable\nAssertionError\n============= tests finished: 22 passed, 1 failed, in 0.22 seconds ============="
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 3,
+    "keep_top_k": 2,
+    "attempt_budget": 3,
+    "bucket_limit": 3,
+    "template_limit": 3,
+    "failure_mode": "attribute_error",
+    "noise_ratio": 0.006,
+    "difficulty": "low"
+  },
+  "adaptive_num_candidates": 3,
+  "adaptive_keep_top_k": 2,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 0,
+  "kept_enhanced_candidates": 0,
+  "enhanced_candidate_retention_rate": 0.0,
+  "enhanced_generation_attempts_total": 0,
+  "enhanced_generation_attempts_avg": 0.0,
+  "kept_enhanced_test_identifiers": [],
+  "enhanced_failed_test_identifiers": [],
+  "enhanced_failed_count": 0,
+  "generated_patch_nonempty": false,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 4,
+  "generated_patch_accepted": false,
+  "generated_patch_acceptance_reason": "rejected_not_generated",
+  "generated_patch_feedback": null,
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [],
+  "patch_analysis": {
+    "root_cause": "The `Symbol` class in SymPy 1.7 no longer defines `__slots__`, which allows instances to have a `__dict__` attribute. This breaks immutability assumptions in tests like `test_immutable`.",
+    "affected_components": [
+      {
+        "file": "sympy/core/symbol.py",
+        "symbol": "Symbol",
+        "reason": "The `Symbol` class is directly responsible for the immutability of its instances and previously relied on `__slots__` to enforce this."
+      },
+      {
+        "file": "sympy/core/basic.py",
+        "symbol": "Basic",
+        "reason": "The `Basic` class is the parent class of `Symbol` and defines core behaviors, including immutability constraints."
+      }
+    ],
+    "failing_signal": "The `test_immutable` test fails with an `AssertionError`, indicating that the immutability assumption for `Symbol` instances is violated.",
+    "propagation_path": "The removal of `__slots__` in `Symbol` allows instances to have a `__dict__`, which breaks immutability assumptions. This propagates to tests that rely on immutability, such as `test_immutable`.",
+    "repair_constraint": "The `Symbol` class must remain immutable, and its instances should not have a `__dict__` attribute. Any fix must preserve compatibility with other parts of the codebase that rely on `Symbol`'s immutability.",
+    "suggested_repair_scope": [
+      "sympy/core/symbol.py",
+      "sympy/core/basic.py"
+    ],
+    "suspicious_symbols": [
+      "Symbol",
+      "Basic"
+    ],
+    "repair_obligations": [
+      {
+        "id": "ensure_slots_in_symbol",
+        "source_symbol": "Symbol",
+        "validation_subject": "test_immutable",
+        "why_it_matters": "Defining `__slots__` in `Symbol` ensures immutability by preventing the creation of a `__dict__` attribute, which is critical for passing `test_immutable`."
+      },
+      {
+        "id": "verify_basic_compatibility",
+        "source_symbol": "Basic",
+        "validation_subject": "Symbol",
+        "why_it_matters": "The `Basic` class must remain compatible with the `Symbol` class's immutability constraints, as `Symbol` inherits from `Basic`."
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Restore __slots__ in Symbol",
+    "approach": "Reintroduce the `__slots__` attribute in the `Symbol` class to prevent instances from having a `__dict__` attribute, ensuring immutability. Verify that the parent class `Basic` does not interfere with this behavior.",
+    "edit_targets": [
+      "sympy/core/symbol.py::Symbol"
+    ],
+    "dependency_files": [
+      "sympy/core/basic.py"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [
+      "allow_instance_dict"
+    ],
+    "sufficiency_assessment": "Editing the `Symbol` class to reintroduce `__slots__` should be sufficient to fix the issue, but the parent class `Basic` must be inspected to ensure it does not override or conflict with the immutability constraints.",
+    "risks": [
+      "Potential compatibility issues if other parts of the codebase rely on the presence of `__dict__` in `Symbol` instances."
+    ]
+  },
+  "patch_edit_plan": null,
+  "final_patch_attempted": false,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": false,
+  "final_patch_apply_mode": "no_patch",
+  "final_patch_cleanly_applied": false,
+  "clean_apply_ratio": 0.0,
+  "resolved": false,
+  "final_resolved": false,
+  "final_status_counts": {
+    "FAILED": 2,
+    "PASSED": 21
+  },
+  "final_failed_count": 2,
+  "final_passed_count": 21,
+  "original_passed_count_improvement": 0,
+  "original_failed_count_reduction": 0,
+  "final_status_map": {
+    "sympy/core/tests/test_basic.py:test_immutable": "FAILED",
+    "test__aresame": "PASSED",
+    "test_structure": "PASSED",
+    "test_immutable": "FAILED",
+    "test_equality": "PASSED",
+    "test_matches_basic": "PASSED",
+    "test_has": "PASSED",
+    "test_subs": "PASSED",
+    "test_subs_with_unicode_symbols": "PASSED",
+    "test_atoms": "PASSED",
+    "test_free_symbols_empty": "PASSED",
+    "test_doit": "PASSED",
+    "test_S": "PASSED",
+    "test_xreplace": "PASSED",
+    "test_preorder_traversal": "PASSED",
+    "test_sorted_args": "PASSED",
+    "test_call": "PASSED",
+    "test_rewrite": "PASSED",
+    "test_literal_evalf_is_number_is_zero_is_comparable": "PASSED",
+    "test_as_Basic": "PASSED",
+    "test_atomic": "PASSED",
+    "test_as_dummy": "PASSED",
+    "test_canonical_variables": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

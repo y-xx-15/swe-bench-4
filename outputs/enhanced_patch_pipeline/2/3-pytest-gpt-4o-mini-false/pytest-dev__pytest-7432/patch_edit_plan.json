@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "action": "modify_region",
+      "justification": "The function pytest_runtest_makereport is responsible for generating the test report, including the location of skips and failures. It needs to be modified to ensure correct skip location reporting."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "target_symbol": "pytest_runtest_makereport",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "obligation_1"
+      ],
+      "anchor_line_before": "    outcome = yield",
+      "anchor_line_after": "    rep = outcome.get_result()",
+      "replacement_block": "def pytest_runtest_makereport(item: Item, call: CallInfo[None]):\n    outcome = yield\n    rep = outcome.get_result()\n    xfailed = item._store.get(xfailed_key, None)\n    # unittest special case, see setting of unexpectedsuccess_key\n    if unexpectedsuccess_key in item._store and rep.when == \"call\":\n        reason = item._store[unexpectedsuccess_key]\n        if reason:\n            rep.longrepr = \"Unexpected success: {}\".format(reason)\n        else:\n            rep.longrepr = \"Unexpected success\"\n        rep.outcome = \"failed\"\n    if item.config.option.runxfail:\n        # Ensure skip location is reported correctly\n        if item.get_closest_marker(\"skip\"):\n            rep.location = (item.nodeid, item.location[1], item.location[2])"
+    }
+  ]
+}

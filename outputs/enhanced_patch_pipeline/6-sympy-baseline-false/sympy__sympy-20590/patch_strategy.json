@@ -1,0 +1,18 @@
+{
+  "title": "Restore __slots__ in Symbol",
+  "approach": "Reintroduce the `__slots__` attribute in the `Symbol` class to prevent instances from having a `__dict__` attribute, ensuring immutability. Verify that the parent class `Basic` does not interfere with this behavior.",
+  "edit_targets": [
+    "sympy/core/symbol.py::Symbol"
+  ],
+  "dependency_files": [
+    "sympy/core/basic.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "allow_instance_dict"
+  ],
+  "sufficiency_assessment": "Editing the `Symbol` class to reintroduce `__slots__` should be sufficient to fix the issue, but the parent class `Basic` must be inspected to ensure it does not override or conflict with the immutability constraints.",
+  "risks": [
+    "Potential compatibility issues if other parts of the codebase rely on the presence of `__dict__` in `Symbol` instances."
+  ]
+}

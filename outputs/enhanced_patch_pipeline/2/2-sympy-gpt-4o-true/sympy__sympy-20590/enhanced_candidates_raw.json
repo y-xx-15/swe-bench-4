@@ -1,0 +1,93 @@
+[
+  {
+    "idea": {
+      "title": "verify immutability of Symbol instances",
+      "semantic_bucket": "direct_symptom",
+      "goal": "ensure that Symbol instances do not have a mutable __dict__ attribute, preserving their immutability",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "slots_visibility_check",
+      "target_tests": [
+        "test_sweb_enhanced_immutable"
+      ],
+      "covers_original_tests": [
+        "test_immutable"
+      ],
+      "covers_obligations": [
+        "test_immutable::core"
+      ],
+      "target_source_symbol": "sympy.Symbol",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "Symbol",
+        "__slots__"
+      ],
+      "trigger_shape_tokens": [
+        "assertionerror",
+        "__slots__",
+        "Symbol"
+      ],
+      "rationale": "This test directly verifies the immutability of Symbol instances by ensuring that they do not have a __dict__ attribute, which aligns with the original failure mode. Unlike the original test, which may have indirectly observed the issue, this test explicitly checks the presence of __dict__, providing a more focused signal for the bug."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,5 @@\n+def test_sweb_enhanced_immutable():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    assert s.__slots__ == ('name',), \"Symbol instances should use __slots__ for immutability\"\n+    raises(AttributeError, lambda: setattr(s, 'x', 1))\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,5 @@\n+def test_sweb_enhanced_immutable():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    assert s.__slots__ == ('name',), \"Symbol instances should use __slots__ for immutability\"\n+    raises(AttributeError, lambda: setattr(s, 'x', 1))\n```",
+    "identifiers": [
+      "test_sweb_enhanced_immutable"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_immutable"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": null,
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_2():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.new_attr = 42  # Attempting to assign a new attribute should raise an AttributeError\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_2():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.new_attr = 42  # Attempting to assign a new attribute should raise an AttributeError\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_2"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_2"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": null,
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_3():\n+    s = Symbol('test')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    assert hasattr(s, '__slots__'), \"Symbol instances should have __slots__ defined\"\n+    assert s.__slots__ == ('name',), \"Expected __slots__ to be ('name',)\"\n+    raises(AttributeError, lambda: setattr(s, 'x', 1))\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_3():\n+    s = Symbol('test')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    assert hasattr(s, '__slots__'), \"Symbol instances should have __slots__ defined\"\n+    assert s.__slots__ == ('name',), \"Expected __slots__ to be ('name',)\"\n+    raises(AttributeError, lambda: setattr(s, 'x', 1))\n```",
+    "identifiers": [
+      "test_sweb_enhanced_3"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_3"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

@@ -1,0 +1,335 @@
+[
+  {
+    "idea": {
+      "title": "Test Skip with Invalid Boolean Condition",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Trigger a TypeError when evaluating a skip condition that raises an exception.",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "mixed_operand_type",
+      "target_tests": [
+        "test_sweb_enhanced_invalid_boolean_condition"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "evaluate_skip_marks",
+      "target_validation_subject": "skipif condition evaluation",
+      "semantic_alignment_tokens": [
+        "@pytest.mark.skipif",
+        "condition",
+        "reason"
+      ],
+      "trigger_shape_tokens": [
+        "@pytest.mark.skipif(False)",
+        "InvalidBool()"
+      ],
+      "rationale": "This test specifically targets the skip condition evaluation in the pytest framework, which is expected to raise a TypeError when the condition is an instance of a class that raises an exception during boolean evaluation. This is distinct from the original tests as it focuses on the skip condition's behavior, which was not previously covered."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,6 @@\n+    def test_sweb_enhanced_invalid_boolean_condition(self, testdir) -> None:\n+        class InvalidBool:\n+            def __bool__(self):\n+                raise TypeError(\"INVALID\")\n+\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+            @pytest.mark.skipif(InvalidBool(), reason=\"xxx\")\n+            def test_func():\n+                pass\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert \"Error evaluating 'skipif' condition as a boolean\" in excinfo.value.msg\n+        assert \"INVALID\" in excinfo.value.msg\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,6 @@\n+    def test_sweb_enhanced_invalid_boolean_condition(self, testdir) -> None:\n+        class InvalidBool:\n+            def __bool__(self):\n+                raise TypeError(\"INVALID\")\n+\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+            @pytest.mark.skipif(InvalidBool(), reason=\"xxx\")\n+            def test_func():\n+                pass\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert \"Error evaluating 'skipif' condition as a boolean\" in excinfo.value.msg\n+        assert \"INVALID\" in excinfo.value.msg\n```",
+    "identifiers": [
+      "test_sweb_enhanced_invalid_boolean_condition",
+      "test_func"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_invalid_boolean_condition"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Test Skip Condition Evaluation with TypeError",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "to reproduce a TypeError when evaluating a skip condition with an invalid boolean expression",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "coercion_contract",
+      "target_tests": [
+        "test_sweb_enhanced_skip_condition"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "evaluate_skip_marks",
+      "target_validation_subject": "skipif condition evaluation",
+      "semantic_alignment_tokens": [
+        "@pytest.mark.skipif",
+        "evaluate_skip_marks"
+      ],
+      "trigger_shape_tokens": [
+        "@pytest.mark.skipif(False)",
+        "evaluate_skip_marks(item)"
+      ],
+      "rationale": "This test specifically targets the evaluation of skip conditions that lead to a TypeError, which is a distinct failure behavior not covered by the original tests. It ensures that the skip condition is evaluated correctly and exposes the TypeError that occurs when an invalid boolean expression is used."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,6 @@\n+    def test_sweb_enhanced_skip_condition(self, testdir):\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+            @pytest.mark.skipif(False)\n+            def test_func():\n+                assert 0\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert \"you need to specify reason=STRING when using booleans as conditions.\" in str(excinfo.value)\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,6 @@\n+    def test_sweb_enhanced_skip_condition(self, testdir):\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+            @pytest.mark.skipif(False)\n+            def test_func():\n+                assert 0\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert \"you need to specify reason=STRING when using booleans as conditions.\" in str(excinfo.value)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_skip_condition",
+      "test_func"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_skip_condition"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Test Skip with Invalid Boolean Condition",
+      "semantic_bucket": "structural_invariant",
+      "goal": "Ensure that the test correctly raises a TypeError when an invalid boolean condition is used in a skipif marker.",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "mixed_operand_type",
+      "target_tests": [
+        "test_sweb_enhanced_invalid_boolean_condition"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "evaluate_skip_marks",
+      "target_validation_subject": "skipif condition evaluation",
+      "semantic_alignment_tokens": [
+        "@pytest.mark.skipif",
+        "condition",
+        "reason"
+      ],
+      "trigger_shape_tokens": [
+        "@pytest.mark.skipif(InvalidBool(), reason='Invalid condition')"
+      ],
+      "rationale": "This test specifically targets the evaluation of a skipif condition that raises a TypeError due to an invalid boolean condition, which is a distinct obligation not covered by the original tests. It ensures that the skipif marker behaves correctly when faced with invalid input, thereby reinforcing the structural invariant that skip conditions must be valid."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,12 @@\n+    def test_sweb_enhanced_invalid_boolean_condition(self, testdir) -> None:\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+\n+            class InvalidBool:\n+                def __bool__(self):\n+                    raise TypeError(\"INVALID\")\n+\n+            @pytest.mark.skipif(InvalidBool(), reason=\"Invalid condition\")\n+            def test_func():\n+                pass\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert \"Error evaluating 'skipif' condition as a boolean\" in str(excinfo.value)\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,12 @@\n+    def test_sweb_enhanced_invalid_boolean_condition(self, testdir) -> None:\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+\n+            class InvalidBool:\n+                def __bool__(self):\n+                    raise TypeError(\"INVALID\")\n+\n+            @pytest.mark.skipif(InvalidBool(), reason=\"Invalid condition\")\n+            def test_func():\n+                pass\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert \"Error evaluating 'skipif' condition as a boolean\" in str(excinfo.value)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_invalid_boolean_condition",
+      "test_func"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_invalid_boolean_condition"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Test Skip with Invalid Boolean Condition",
+      "semantic_bucket": "structural_invariant",
+      "goal": "To verify that the system correctly raises a TypeError when an invalid boolean condition is evaluated in a skipif marker.",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "mixed_operand_type",
+      "target_tests": [
+        "test_sweb_enhanced_skip_invalid_boolean"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "evaluate_skip_marks",
+      "target_validation_subject": "skipif condition evaluation",
+      "semantic_alignment_tokens": [
+        "@pytest.mark.skipif",
+        "condition="
+      ],
+      "trigger_shape_tokens": [
+        "@pytest.mark.skipif(InvalidBool(), reason='Invalid boolean')"
+      ],
+      "rationale": "This test specifically targets the evaluation of a skipif condition that raises a TypeError due to an invalid boolean, which is a direct manifestation of the bug. Unlike the original tests, which may not focus on the specific behavior of skipif with invalid conditions, this test isolates that scenario to ensure it is correctly handled."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,6 @@\n+    def test_sweb_enhanced_skip_invalid_boolean(self, testdir):\n+        class InvalidBool:\n+            def __bool__(self):\n+                raise TypeError(\"INVALID\")\n+\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+            @pytest.mark.skipif(InvalidBool(), reason=\"Invalid boolean\")\n+            def test_func():\n+                pass\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert \"Error evaluating 'skipif' condition as a boolean\" in str(excinfo.value)\n+        assert \"INVALID\" in str(excinfo.value)\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,6 @@\n+    def test_sweb_enhanced_skip_invalid_boolean(self, testdir):\n+        class InvalidBool:\n+            def __bool__(self):\n+                raise TypeError(\"INVALID\")\n+\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+            @pytest.mark.skipif(InvalidBool(), reason=\"Invalid boolean\")\n+            def test_func():\n+                pass\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert \"Error evaluating 'skipif' condition as a boolean\" in str(excinfo.value)\n+        assert \"INVALID\" in str(excinfo.value)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_skip_invalid_boolean",
+      "test_func"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_skip_invalid_boolean"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Test Skip Behavior with Invalid Boolean Condition",
+      "semantic_bucket": "structural_invariant",
+      "goal": "Ensure that the skip condition evaluates correctly and raises a TypeError when an invalid boolean condition is provided.",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "mixed_operand_type",
+      "target_tests": [
+        "test_sweb_enhanced_invalid_boolean_condition"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "evaluate_skip_marks",
+      "target_validation_subject": "skipif condition evaluation",
+      "semantic_alignment_tokens": [
+        "@pytest.mark.skipif",
+        "evaluate_skip_marks"
+      ],
+      "trigger_shape_tokens": [
+        "@pytest.mark.skipif(InvalidBool(), reason='Invalid boolean condition')"
+      ],
+      "rationale": "This test specifically targets the evaluation of skip conditions with invalid boolean types, which is a distinct obligation not covered by the original test. It ensures that the TypeError is raised correctly when an invalid boolean condition is encountered, thereby providing clearer guidance on the expected behavior of the skip mechanism."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,11 @@\n+    def test_sweb_enhanced_invalid_boolean_condition(self, testdir) -> None:\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+\n+            class InvalidBool:\n+                def __bool__(self):\n+                    raise TypeError(\"INVALID\")\n+\n+            @pytest.mark.skipif(InvalidBool(), reason=\"Invalid boolean condition\")\n+            def test_func():\n+                pass\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert excinfo.value.msg is not None\n+        assert \"Error evaluating 'skipif' condition as a boolean\" in excinfo.value.msg\n+        assert \"INVALID\" in excinfo.value.msg\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,11 @@\n+    def test_sweb_enhanced_invalid_boolean_condition(self, testdir) -> None:\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+\n+            class InvalidBool:\n+                def __bool__(self):\n+                    raise TypeError(\"INVALID\")\n+\n+            @pytest.mark.skipif(InvalidBool(), reason=\"Invalid boolean condition\")\n+            def test_func():\n+                pass\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert excinfo.value.msg is not None\n+        assert \"Error evaluating 'skipif' condition as a boolean\" in excinfo.value.msg\n+        assert \"INVALID\" in excinfo.value.msg\n```",
+    "identifiers": [
+      "test_sweb_enhanced_invalid_boolean_condition",
+      "test_func"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_invalid_boolean_condition"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Test Skip with Invalid Boolean Condition",
+      "semantic_bucket": "structural_invariant",
+      "goal": "Ensure that the system correctly handles invalid boolean conditions in skip markers, triggering a TypeError.",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_invalid_boolean_condition"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "evaluate_skip_marks",
+      "target_validation_subject": "skipif condition evaluation",
+      "semantic_alignment_tokens": [
+        "@pytest.mark.skipif",
+        "evaluate_skip_marks"
+      ],
+      "trigger_shape_tokens": [
+        "@pytest.mark.skipif(False)"
+      ],
+      "rationale": "This test specifically targets the handling of invalid boolean conditions in skip markers, which is a distinct obligation not fully covered by the original tests. It aims to reproduce the TypeError seen in the failure log, providing clearer guidance on the bug's nature."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,12 @@\n+    def test_sweb_enhanced_invalid_boolean_condition(self, testdir) -> None:\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+\n+            class InvalidBool:\n+                def __bool__(self):\n+                    raise TypeError(\"INVALID\")\n+\n+            @pytest.mark.skipif(InvalidBool(), reason=\"xxx\")\n+            def test_func():\n+                pass\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert \"Error evaluating 'skipif' condition as a boolean\" in str(excinfo.value)\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,12 @@\n+    def test_sweb_enhanced_invalid_boolean_condition(self, testdir) -> None:\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+\n+            class InvalidBool:\n+                def __bool__(self):\n+                    raise TypeError(\"INVALID\")\n+\n+            @pytest.mark.skipif(InvalidBool(), reason=\"xxx\")\n+            def test_func():\n+                pass\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert \"Error evaluating 'skipif' condition as a boolean\" in str(excinfo.value)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_invalid_boolean_condition",
+      "test_func"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_invalid_boolean_condition"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Test Skip Condition Evaluation with TypeError",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "to verify that a TypeError is raised when evaluating a skip condition with an invalid boolean expression",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "mixed_operand_type",
+      "target_tests": [
+        "test_sweb_enhanced_skip_condition"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "evaluate_skip_marks",
+      "target_validation_subject": "skipif condition evaluation",
+      "semantic_alignment_tokens": [
+        "@pytest.mark.skipif",
+        "evaluate_skip_marks"
+      ],
+      "trigger_shape_tokens": [
+        "@pytest.mark.skipif(False)"
+      ],
+      "rationale": "This test specifically targets the evaluation of skip conditions that lead to a TypeError, which is a distinct behavior from the original tests that do not focus on this aspect. It aims to reproduce the bug by using an invalid boolean expression, thus providing clearer guidance on the specific failure mode."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,12 @@\n+    def test_sweb_enhanced_skip_condition(self, testdir):\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+            class InvalidBool:\n+                def __bool__(self):\n+                    raise TypeError(\"INVALID\")\n+\n+            @pytest.mark.skipif(InvalidBool(), reason=\"xxx\")\n+            def test_func():\n+                pass\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert \"Error evaluating 'skipif' condition as a boolean\" in excinfo.value.msg\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,12 @@\n+    def test_sweb_enhanced_skip_condition(self, testdir):\n+        item = testdir.getitem(\n+            \"\"\"\n+            import pytest\n+            class InvalidBool:\n+                def __bool__(self):\n+                    raise TypeError(\"INVALID\")\n+\n+            @pytest.mark.skipif(InvalidBool(), reason=\"xxx\")\n+            def test_func():\n+                pass\n+            \"\"\"\n+        )\n+        with pytest.raises(pytest.fail.Exception) as excinfo:\n+            evaluate_skip_marks(item)\n+        assert \"Error evaluating 'skipif' condition as a boolean\" in excinfo.value.msg\n```",
+    "identifiers": [
+      "test_sweb_enhanced_skip_condition",
+      "test_func"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_skip_condition"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

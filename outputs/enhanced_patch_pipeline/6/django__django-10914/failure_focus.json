@@ -1,0 +1,26 @@
+{
+  "original_test_identifiers": [
+    "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)",
+    "test_override_file_upload_permissions"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "failure_snippets": [
+    "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests) ... FAIL",
+    "FAIL: test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)",
+    "Traceback (most recent call last):"
+  ],
+  "noise_ratio": 0.0023,
+  "target_test_tracebacks": {
+    "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)": "TARGET TEST: test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)\n- snippet: test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests) ... FAIL\n- snippet: FAIL: test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_error_message (test_utils.tests.AssertTemplateUsedContextManagerTests) ... ok\ntest_parsing_errors (test_utils.tests.HTMLEqualTests) ... ok\ntest_equal_parsing_errors (test_utils.tests.JSONEqualTests) ... ok\ntest_not_equal_parsing_errors (test_utils.tests.JSONEqualTests) ... ok\ntest_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests) ... FAIL\ntest_parsing_errors (test_utils.tests.XMLEqualTests) ... ok\nFAIL: test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)\nTraceback (most recent call last):\nAssertionError: None != 420\nFAILED (failures=1, skipped=1)"
+  }
+}

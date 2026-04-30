@@ -1,0 +1,38 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "src/flask/blueprints.py",
+      "action": "modify_region",
+      "justification": "The Blueprint.__init__ method accepts the 'name' parameter without validating it for dots, which is the root cause of the issue."
+    },
+    {
+      "target_file": "src/flask/blueprints.py",
+      "action": "modify_region",
+      "justification": "The Blueprint.add_url_rule method assumes the 'name' parameter is valid and uses it to prefix endpoints, potentially propagating invalid names."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "src/flask/blueprints.py",
+      "target_symbol": "Blueprint.__init__",
+      "replacement_mode": "insert_before_anchor",
+      "covers_obligations": [
+        "validate_blueprint_name_no_dots"
+      ],
+      "anchor_line_before": "        self.name = name",
+      "anchor_line_after": "        self.url_prefix = url_prefix",
+      "replacement_block": "        if '.' in name:\n            raise ValueError(\"Blueprint names must not contain dots.\")\n        self.name = name\n        self.url_prefix = url_prefix"
+    },
+    {
+      "target_file": "src/flask/blueprints.py",
+      "target_symbol": "Blueprint.add_url_rule__branch",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "ensure_endpoint_prefix_validity"
+      ],
+      "anchor_line_before": "        if endpoint:",
+      "anchor_line_after": "            assert \".\" not in endpoint, \"Blueprint endpoints should not contain dots\"",
+      "replacement_block": "        if endpoint:\n            if '.' in endpoint:\n                raise ValueError(\"Blueprint endpoints must not contain dots.\")"
+    }
+  ]
+}

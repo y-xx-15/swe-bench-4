@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "django/conf/global_settings.py",
+      "action": "modify_region",
+      "justification": "The default value of FILE_UPLOAD_PERMISSIONS is set to None, which causes inconsistent file permissions for uploaded files. Modifying this file is necessary to set a consistent default value of 0o644."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "django/conf/global_settings.py",
+      "target_symbol": "FILE_UPLOAD_PERMISSIONS",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core::uploaded_file_permissions"
+      ],
+      "anchor_line_before": "FILE_UPLOAD_TEMP_DIR = None",
+      "anchor_line_after": "# The numeric mode to assign to newly-created directories, when uploading files.",
+      "replacement_block": "FILE_UPLOAD_TEMP_DIR = None\n\n# The numeric mode to set newly-uploaded files to. The value should be a mode\n# you'd pass directly to os.chmod; see https://docs.python.org/library/os.html#files-and-directories.\nFILE_UPLOAD_PERMISSIONS = 0o644\n\n# The numeric mode to assign to newly-created directories, when uploading files.\n# The value should be a mode as you'd pass to os.chmod;\n# see https://docs.python.org/library/os.html#files-and-directories.\nFILE_UPLOAD_DIRECTORY_PERMISSIONS = None"
+    }
+  ]
+}

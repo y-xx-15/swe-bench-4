@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "action": "modify_region",
+      "justification": "The bug is caused by unreachable correction logic for skip location reporting in the `pytest_runtest_makereport` function. This file must be edited to restore the correct branch execution."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "target_symbol": "pytest_runtest_makereport__branch",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "obligation-1"
+      ],
+      "anchor_line_before": "    if unexpectedsuccess_key in item._store and rep.when == \"call\":",
+      "anchor_line_after": "        reason = item._store[unexpectedsuccess_key]",
+      "replacement_block": "    if unexpectedsuccess_key in item._store and rep.when == \"call\":\n        reason = item._store[unexpectedsuccess_key]\n        if reason:\n            rep.longrepr = \"Unexpected success: {}\".format(reason)\n        else:\n            rep.longrepr = \"Unexpected success\"\n        rep.outcome = \"failed\"\n    if skipped_by_mark_key in item._store:\n        rep.location = item.location\n        rep.longrepr = \"Skipped: {}\".format(item._store[skipped_by_mark_key])"
+    }
+  ]
+}

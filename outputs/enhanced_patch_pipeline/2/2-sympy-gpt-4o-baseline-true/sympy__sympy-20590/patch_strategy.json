@@ -1,0 +1,19 @@
+{
+  "title": "restore_slots_in_symbol_hierarchy",
+  "approach": "Ensure that all parent classes of `Symbol` enforce `__slots__` to prevent the creation of `__dict__` attributes in `Symbol` instances.",
+  "edit_targets": [
+    "sympy/core/_print_helpers.py::Printable"
+  ],
+  "dependency_files": [
+    "sympy/core/symbol.py",
+    "sympy/core/tests/test_basic.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating"
+  ],
+  "sufficiency_assessment": "Editing `Printable` to enforce `__slots__` should be sufficient, as it is the likely root cause of the issue. However, verifying the behavior in `Symbol` and related tests is necessary to confirm the fix.",
+  "risks": [
+    "Potential regressions in other classes that inherit from `Printable` if they rely on dynamic attributes."
+  ]
+}

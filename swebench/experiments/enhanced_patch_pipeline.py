@@ -671,6 +671,28 @@ def _build_weak_target_traceback_fallback(
     return "\n".join(collected)
 
 
+def extract_assertion_value_mismatches(original_failure_log: str) -> list[dict[str, str]]:
+    mismatches: list[dict[str, str]] = []
+    for raw_line in original_failure_log.splitlines():
+        line = raw_line.strip()
+        match = re.search(
+            r"AssertionError:\s+(.{1,120}?)\s+(!=|==|is not|is)\s+(.{1,120})$",
+            line,
+        )
+        if not match:
+            continue
+        left, operator, right = (part.strip() for part in match.groups())
+        mismatches.append(
+            {
+                "raw": line,
+                "left_value": left,
+                "operator": operator,
+                "right_value": right,
+            }
+        )
+    return mismatches[:5]
+
+
 def extract_failure_focus(
     instance: dict[str, Any],
     status_map: dict[str, str],
@@ -732,6 +754,7 @@ def extract_failure_focus(
         "failing_tests_sample": failing_tests[:5],
         "failure_mode": classify_failure_mode(original_failure_log),
         "dominant_errors": dominant_errors,
+        "assertion_value_mismatches": extract_assertion_value_mismatches(original_failure_log),
         "failure_snippets": related_lines[:max_snippets],
         "noise_ratio": round(compute_log_noise_ratio(original_failure_log), 4),
         "target_test_tracebacks": target_test_tracebacks,
@@ -754,6 +777,12 @@ def format_failure_focus(failure_focus: dict[str, Any] | None) -> str:
         f"Log noise ratio: {failure_focus.get('noise_ratio', 0.0)}\n"
         f"Focused failure snippets:\n{snippet_text}"
     )
+    assertion_mismatches = failure_focus.get("assertion_value_mismatches") or []
+    if assertion_mismatches:
+        mismatch_text = "\n".join(
+            f"- {item.get('raw')}" for item in assertion_mismatches[:3]
+        )
+        result += f"\nDirect assertion value mismatches:\n{mismatch_text}"
     # P1: Surface per-target-test tracebacks as primary repair signal.
     target_tracebacks = failure_focus.get("target_test_tracebacks") or {}
     if target_tracebacks:
@@ -762,6 +791,87 @@ def format_failure_focus(failure_focus: dict[str, Any] | None) -> str:
         for test_id, tb in target_tracebacks.items():
             result += f"\n--- {test_id} ---\n{tb}\n"
     return result
+
+
+DIRECT_ASSERTION_DRIFT_TOKENS = {
+    "handler",
+    "uploadhandler",
+    "uploadedfile",
+    "temporar",
+    "tempfile",
+    "rename",
+    "os.rename",
+    "os.stat",
+    "stat(",
+    "storage.save",
+    "default_storage.save",
+    "filesystem",
+    "file system",
+}
+
+
+def build_direct_assertion_enhanced_test_guidance(
+    failure_focus: dict[str, Any] | None,
+) -> str:
+    if not failure_focus:
+        return ""
+    if str(failure_focus.get("failure_mode") or "") != "assertion_error":
+        return ""
+    mismatches = failure_focus.get("assertion_value_mismatches") or []
+    if not mismatches:
+        return ""
+    lines = [
+        "\nDIRECT ASSERTION-MISMATCH RULE:",
+        "The original FAIL_TO_PASS signal is a direct assertion value mismatch, not merely a broad downstream behavior.",
+        "Generate enhanced tests that directly assert the corrected invariant behind this mismatch.",
+        "Do NOT assert the buggy observed value, and do NOT broaden into storage/handler/filesystem side effects unless the original traceback itself names that downstream API.",
+        "For each mismatch below, infer the intended correct side from the original test body/log context and assert that corrected value/invariant, not the value already produced by the buggy code:",
+    ]
+    for item in mismatches[:3]:
+        lines.append(
+            f"- {item.get('raw')} (left side: {item.get('left_value')}; operator: {item.get('operator')}; right side: {item.get('right_value')})"
+        )
+    lines.append(
+        "Put the raw mismatch tokens and the direct setting/attribute/function that produces the value into semantic_alignment_tokens and trigger_shape_tokens.\n"
+    )
+    return "\n".join(lines)
+
+
+def build_direct_assertion_idea_drift_feedback(
+    idea: dict[str, Any],
+    failure_focus: dict[str, Any] | None,
+) -> str | None:
+    guidance = build_direct_assertion_enhanced_test_guidance(failure_focus)
+    if not guidance:
+        return None
+    target_text = " ".join(
+        str(part)
+        for part in [
+            idea.get("target_source_symbol", ""),
+            idea.get("target_validation_subject", ""),
+            " ".join(str(token) for token in (idea.get("semantic_alignment_tokens") or [])),
+            " ".join(str(token) for token in (idea.get("trigger_shape_tokens") or [])),
+            idea.get("goal", ""),
+            idea.get("rationale", ""),
+        ]
+    ).lower()
+    traceback_text = " ".join(
+        str(tb)
+        for tb in (failure_focus or {}).get("target_test_tracebacks", {}).values()
+    ).lower()
+    drifting_tokens = sorted(
+        token
+        for token in DIRECT_ASSERTION_DRIFT_TOKENS
+        if token in target_text and token not in traceback_text
+    )
+    if drifting_tokens:
+        return (
+            "This idea drifts from a direct assertion value mismatch into downstream behavior "
+            f"({', '.join(drifting_tokens[:5])}). For this failure, propose a near-path test that "
+            "directly asserts the corrected value/invariant from the original AssertionError instead "
+            "of testing storage, handler, tempfile, rename, stat, or filesystem propagation."
+        )
+    return None
 
 
 def _extract_test_function_snippet(content: str, test_name: str) -> str:
@@ -3223,6 +3333,9 @@ def build_idea_feedback(
     )
     if not obligation_ids:
         return "The JSON idea must include covers_obligations naming at least one concrete repair obligation for the covered path."
+    direct_assertion_feedback = build_direct_assertion_idea_drift_feedback(idea, failure_focus)
+    if direct_assertion_feedback:
+        return direct_assertion_feedback
     required_uncovered_obligations = [
         str(name) for name in (required_uncovered_obligations or []) if str(name).strip()
     ]
@@ -3486,6 +3599,7 @@ def build_test_idea_prompt(
         "buggy code, and PASS when run on fixed code. The failing assertion is the proof that the bug exists. "
         "Design the test so that the exact error type shown in the failure log is triggered.\n"
         "The rationale must explain how this idea differs from the original failure observation and why it adds new repair guidance.\n"
+        f"{build_direct_assertion_enhanced_test_guidance(failure_focus)}"
         "\nTRACEBACK-TO-OBLIGATION REFINEMENT RULES:\n"
         "LAYER 1 — PATH LOCALIZATION:\n"
         "1. Start from the original traceback, not from a guessed root cause. Identify the landed source symbol, the "
@@ -3583,6 +3697,7 @@ def build_diff_from_idea_prompt(
         "  - Assert the CORRECT expected behavior (which the buggy code violates)\n"
         "  - The assertion failure proves the bug is present\n"
         "Do NOT write a test that already passes on the buggy code.\n"
+        f"{build_direct_assertion_enhanced_test_guidance(failure_focus)}"
     )
     # If the idea specifies a concrete trigger shape (attribute access, specific argument),
     # add an explicit reminder so the model cannot silently substitute a simpler variant.
@@ -3624,10 +3739,18 @@ def build_patch_prompt(
     original_failure_log: str,
     filtered_candidates: list[CandidatePatch],
     failure_focus: dict[str, Any] | None = None,
+    hide_original_test_patch: bool = False,
 ) -> str:
     context_text = format_code_context(code_context)
     enhanced_summary = format_candidate_summary(filtered_candidates)
     repair_mode = get_repair_mode(filtered_candidates)
+    original_test_patch_section = (
+        "Original SWE-bench test patch: hidden by --hide_original_test_patch_in_repair. "
+        "Do not infer the fix from the official test diff; rely on the failure log, code context, "
+        "and retained enhanced tests only.\n\n"
+        if hide_original_test_patch
+        else f"Original SWE-bench test patch:\n```diff\n{normalize_patch(instance['test_patch'])}\n```\n\n"
+    )
     prompt = (
         "Task: generate a source-code patch that fixes the bug.\n"
         "Requirements:\n"
@@ -3645,7 +3768,7 @@ def build_patch_prompt(
         f"Instance ID: {instance['instance_id']}\n"
         f"Repository: {instance['repo']}\n\n"
         f"Problem statement:\n{instance['problem_statement']}\n\n"
-        f"Original SWE-bench test patch:\n```diff\n{normalize_patch(instance['test_patch'])}\n```\n\n"
+        f"{original_test_patch_section}"
         f"Original test failure log:\n```text\n{truncate_text(original_failure_log, 12000)}\n```\n\n"
         f"Retained enhanced test patches:\n{enhanced_summary}\n\n"
         f"Buggy code context:\n{context_text}\n"
@@ -3667,7 +3790,7 @@ def build_patch_prompt(
     else:
         prompt += (
             "\nBaseline-fallback repair mode: no enhanced tests were retained. "
-            "Rely on the original failure log, original tests, and buggy code context. Prefer a minimally invasive repair unless the failure evidence clearly indicates cross-file propagation.\n"
+            "Rely on the original failure log, original test identifiers, and buggy code context. Prefer a minimally invasive repair unless the failure evidence clearly indicates cross-file propagation.\n"
         )
     return prompt
 
@@ -5217,6 +5340,7 @@ def build_diff_from_strategy_prompt(
     strategy: dict[str, Any] | None,
     feedback: str | None = None,
     failure_focus: dict[str, Any] | None = None,
+    hide_original_test_patch: bool = False,
 ) -> str:
     edit_targets = list(dict.fromkeys(
         t.split("::")[0] for t in (strategy or {}).get("edit_targets", [])
@@ -5239,6 +5363,7 @@ def build_diff_from_strategy_prompt(
         original_failure_log=original_failure_log,
         filtered_candidates=filtered_candidates,
         failure_focus=failure_focus,
+        hide_original_test_patch=hide_original_test_patch,
     )
     anchor_ctx = build_anchor_context(code_context, (analysis or {}).get('suspicious_symbols', []), edit_targets, max_chars=3200)
     prompt += (
@@ -7793,6 +7918,7 @@ def generate_patch_with_strategy(
     timeout: int,
     max_chars_per_file: int,
     failure_focus: dict[str, Any] | None = None,
+    hide_original_test_patch_in_repair: bool = False,
 ) -> PatchGenerationResult:
     analysis, analysis_attempts = generate_patch_analysis(
         responder=responder,
@@ -8121,6 +8247,7 @@ def generate_patch_with_strategy(
                     strategy=strategy,
                     feedback=feedback,
                     failure_focus=failure_focus,
+                    hide_original_test_patch=hide_original_test_patch_in_repair,
                 )
             )
             sanitized_patch, patch_error = sanitize_unified_diff(patch)
@@ -8596,6 +8723,7 @@ def run_instance_pipeline(
     timeout: int,
     max_candidate_attempts: int,
     baseline_only: bool = False,
+    hide_original_test_patch_in_repair: bool = False,
 ) -> dict[str, Any]:
     instance_dir = output_dir / instance["instance_id"]
     instance_dir.mkdir(parents=True, exist_ok=True)
@@ -8697,6 +8825,7 @@ def run_instance_pipeline(
         timeout=timeout,
         max_chars_per_file=max_chars_per_file,
         failure_focus=failure_focus,
+        hide_original_test_patch_in_repair=hide_original_test_patch_in_repair,
     )
     evaluated_patch = (
         patch_result.patch
@@ -8767,6 +8896,7 @@ def run_instance_pipeline(
         "repo": instance["repo"],
         "model": responder.model,
         "pipeline_mode": "baseline_only" if baseline_only else "enhanced_guided",
+        "hide_original_test_patch_in_repair": hide_original_test_patch_in_repair,
         "repair_mode": get_repair_mode(kept_candidates),
         "original_test_identifiers": get_original_test_identifiers(instance),
         "original_status_counts": original_status_counts,
@@ -8852,6 +8982,14 @@ def build_parser() -> ArgumentParser:
         help=(
             "Baseline mode: skip enhanced test generation and patch directly from original "
             "failure info only. Used for thesis control-group comparison."
+        ),
+    )
+    parser.add_argument(
+        "--hide_original_test_patch_in_repair",
+        action="store_true",
+        help=(
+            "Hide the official SWE-bench test patch from source-code repair prompts. "
+            "Final validation still uses the original test patch."
         ),
     )
     parser.add_argument(
@@ -9122,6 +9260,7 @@ def main() -> None:
             timeout=args.timeout,
             max_candidate_attempts=args.max_candidate_attempts,
             baseline_only=args.baseline_only,
+            hide_original_test_patch_in_repair=args.hide_original_test_patch_in_repair,
         )
         summaries.append(summary)
         print(

@@ -1,0 +1,21 @@
+{
+  "title": "Restore skip location correction with --runxfail",
+  "approach": "Convert the `elif` branch handling `skipped_by_mark_key` in `pytest_runtest_makereport` to a standalone `if` statement to ensure the skip location correction logic is executed even when `--runxfail` is enabled.",
+  "edit_targets": [
+    "src/_pytest/skipping.py"
+  ],
+  "dependency_files": [
+    "testing/test_skipping.py"
+  ],
+  "structural_rules": [
+    "restore_unreachable_existing_branch"
+  ],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing `pytest_runtest_makereport` in `src/_pytest/skipping.py` is sufficient because the issue is isolated to the unreachable correction logic for skip location reporting. No other files or symbols need modification.",
+  "risks": [
+    "Ensure that the fix does not interfere with xfail handling or introduce regressions in other test statuses."
+  ]
+}

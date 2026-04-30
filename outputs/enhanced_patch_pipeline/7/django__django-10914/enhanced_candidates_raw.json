@@ -1,0 +1,149 @@
+[
+  {
+    "idea": {
+      "title": "assert default FILE_UPLOAD_PERMISSIONS is applied correctly",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the assertion mismatch caused by incorrect file permissions during upload",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_file_upload_permissions"
+      ],
+      "covers_original_tests": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+      ],
+      "covers_obligations": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core"
+      ],
+      "target_source_symbol": "FILE_UPLOAD_PERMISSIONS",
+      "target_validation_subject": "uploaded_file_permissions",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "FILE_UPLOAD_PERMISSIONS",
+        "os.chmod"
+      ],
+      "trigger_shape_tokens": [
+        "assertionerror",
+        "os.chmod",
+        "TemporaryUploadedFile"
+      ],
+      "rationale": "This test directly asserts the corrected invariant for FILE_UPLOAD_PERMISSIONS, ensuring that uploaded files have the expected permissions (0o644). It differs from the original test by explicitly verifying the permissions applied to TemporaryUploadedFile instances, which were the root cause of the mismatch. This provides more precise repair guidance by isolating the permission-setting logic."
+    },
+    "patch": "diff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,13 @@\n+class EnhancedFileUploadPermissionsTests(SimpleTestCase):\n+    def test_sweb_enhanced_file_upload_permissions(self):\n+        \"\"\"\n+        Ensure that FILE_UPLOAD_PERMISSIONS is correctly applied to TemporaryUploadedFile instances.\n+        \"\"\"\n+        from django.core.files.uploadedfile import TemporaryUploadedFile\n+        from tempfile import NamedTemporaryFile\n+\n+        with self.settings(FILE_UPLOAD_PERMISSIONS=0o644):\n+            temp_file = TemporaryUploadedFile('test.txt', 'text/plain', 0, 'utf-8')\n+            temp_file.file = NamedTemporaryFile(delete=True)\n+            self.assertEqual(os.stat(temp_file.file.name).st_mode & 0o777, 0o644)\n+\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,13 @@\n+class EnhancedFileUploadPermissionsTests(SimpleTestCase):\n+    def test_sweb_enhanced_file_upload_permissions(self):\n+        \"\"\"\n+        Ensure that FILE_UPLOAD_PERMISSIONS is correctly applied to TemporaryUploadedFile instances.\n+        \"\"\"\n+        from django.core.files.uploadedfile import TemporaryUploadedFile\n+        from tempfile import NamedTemporaryFile\n+\n+        with self.settings(FILE_UPLOAD_PERMISSIONS=0o644):\n+            temp_file = TemporaryUploadedFile('test.txt', 'text/plain', 0, 'utf-8')\n+            temp_file.file = NamedTemporaryFile(delete=True)\n+            self.assertEqual(os.stat(temp_file.file.name).st_mode & 0o777, 0o644)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_file_upload_permissions"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_file_upload_permissions"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "assert default file upload permissions are applied correctly",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the assertion mismatch caused by incorrect default file upload permissions",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_file_upload_permissions"
+      ],
+      "covers_original_tests": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+      ],
+      "covers_obligations": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core"
+      ],
+      "target_source_symbol": "FILE_UPLOAD_PERMISSIONS",
+      "target_validation_subject": "default file upload permissions",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "FILE_UPLOAD_PERMISSIONS",
+        "os.chmod",
+        "420",
+        "0o644"
+      ],
+      "trigger_shape_tokens": [
+        "assertionerror",
+        "FILE_UPLOAD_PERMISSIONS",
+        "os.chmod"
+      ],
+      "rationale": "This test directly asserts the corrected invariant for default file upload permissions, ensuring that the mismatch between None and 420 is resolved. It differs from the original test by explicitly verifying the default permission value (0o644) applied to uploaded files, which was not directly asserted in the original test."
+    },
+    "patch": "diff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,11 @@\n+    def test_sweb_enhanced_file_upload_permissions_default(self):\n+        \"\"\"\n+        Verify that the default FILE_UPLOAD_PERMISSIONS is applied correctly\n+        when no explicit setting is provided.\n+        \"\"\"\n+        uploaded_file_path = default_storage.save('testfile.txt', StringIO('content'))\n+        try:\n+            self.assertEqual(os.stat(uploaded_file_path).st_mode & 0o777, 0o644)\n+        finally:\n+            default_storage.delete(uploaded_file_path)\n+\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,11 @@\n+    def test_sweb_enhanced_file_upload_permissions_default(self):\n+        \"\"\"\n+        Verify that the default FILE_UPLOAD_PERMISSIONS is applied correctly\n+        when no explicit setting is provided.\n+        \"\"\"\n+        uploaded_file_path = default_storage.save('testfile.txt', StringIO('content'))\n+        try:\n+            self.assertEqual(os.stat(uploaded_file_path).st_mode & 0o777, 0o644)\n+        finally:\n+            default_storage.delete(uploaded_file_path)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_file_upload_permissions_default"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_file_upload_permissions_default"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "assert default file upload permissions invariant",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the invariant that FILE_UPLOAD_PERMISSIONS must default to 0o644 and trigger the AssertionError mismatch",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_file_upload_permissions"
+      ],
+      "covers_original_tests": [
+        "test_override_file_upload_permissions"
+      ],
+      "covers_obligations": [
+        "test_override_file_upload_permissions::core"
+      ],
+      "target_source_symbol": "django.conf.global_settings.FILE_UPLOAD_PERMISSIONS",
+      "target_validation_subject": "FILE_UPLOAD_PERMISSIONS",
+      "semantic_alignment_tokens": [
+        "FILE_UPLOAD_PERMISSIONS",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "FILE_UPLOAD_PERMISSIONS",
+        "assertionerror"
+      ],
+      "rationale": "This test directly asserts the corrected invariant that FILE_UPLOAD_PERMISSIONS defaults to 0o644, reproducing the original AssertionError mismatch (None != 420) and providing precise repair guidance for the default permission setting."
+    },
+    "patch": "diff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,8 @@\n+class EnhancedFileUploadPermissionsTests(SimpleTestCase):\n+    def test_sweb_enhanced_file_upload_permissions(self):\n+        \"\"\"\n+        Assert that FILE_UPLOAD_PERMISSIONS defaults to 0o644.\n+        This test reproduces the original bug by asserting the corrected invariant.\n+        \"\"\"\n+        self.assertEqual(settings.FILE_UPLOAD_PERMISSIONS, 0o644)\n+\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,8 @@\n+class EnhancedFileUploadPermissionsTests(SimpleTestCase):\n+    def test_sweb_enhanced_file_upload_permissions(self):\n+        \"\"\"\n+        Assert that FILE_UPLOAD_PERMISSIONS defaults to 0o644.\n+        This test reproduces the original bug by asserting the corrected invariant.\n+        \"\"\"\n+        self.assertEqual(settings.FILE_UPLOAD_PERMISSIONS, 0o644)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_file_upload_permissions"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_file_upload_permissions"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

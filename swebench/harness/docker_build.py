@@ -3,6 +3,7 @@ from __future__ import annotations
 import docker
 import docker.errors
 import logging
+import os
 import sys
 import traceback
 
@@ -73,6 +74,29 @@ def close_logger(logger):
         logger.removeHandler(handler)
 
 
+def _get_docker_build_proxy_options() -> dict:
+    proxy_keys = (
+        "HTTP_PROXY",
+        "HTTPS_PROXY",
+        "ALL_PROXY",
+        "NO_PROXY",
+        "http_proxy",
+        "https_proxy",
+        "all_proxy",
+        "no_proxy",
+    )
+    buildargs = {key: os.environ[key] for key in proxy_keys if os.environ.get(key)}
+    options = {}
+    if buildargs:
+        options["buildargs"] = buildargs
+        if any(
+            "127.0.0.1" in value or "localhost" in value
+            for value in buildargs.values()
+        ):
+            options["network_mode"] = "host"
+    return options
+
+
 def build_image(
     image_name: str,
     setup_scripts: dict,
@@ -124,6 +148,12 @@ def build_image(
         logger.info(
             f"Building docker image {image_name} in {build_dir} with platform {platform}"
         )
+        build_options = _get_docker_build_proxy_options()
+        if build_options:
+            logged_options = dict(build_options)
+            if "buildargs" in logged_options:
+                logged_options["buildargs"] = sorted(logged_options["buildargs"])
+            logger.info(f"Using Docker build network/proxy options: {logged_options}")
         response = client.api.build(
             path=str(build_dir),
             tag=image_name,
@@ -132,6 +162,7 @@ def build_image(
             decode=True,
             platform=platform,
             nocache=nocache,
+            **build_options,
         )
 
         # Log the build process continuously

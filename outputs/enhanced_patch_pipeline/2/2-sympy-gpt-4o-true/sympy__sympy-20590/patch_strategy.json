@@ -1,0 +1,21 @@
+{
+  "title": "Restore __slots__ in Symbol class",
+  "approach": "Reintroduce the `__slots__` attribute in the `Symbol` class and ensure that all parent classes in the MRO also define `__slots__` to prevent the creation of a `__dict__` attribute in `Symbol` instances.",
+  "edit_targets": [
+    "sympy/core/_print_helpers.py::Printable"
+  ],
+  "dependency_files": [
+    "sympy/core/_print_helpers.py",
+    "sympy/core/basic.py",
+    "sympy/core/symbol.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing the `Symbol` class to explicitly define `__slots__` is necessary but not sufficient. All parent classes in the MRO, such as `Printable` and `Basic`, must also define `__slots__` to ensure the immutability of `Symbol` instances. Dependency files like `_print_helpers.py` and `basic.py` must be inspected for potential changes.",
+  "risks": [
+    "Potential regressions in other classes that inherit from `Basic` or `Printable` if they rely on the presence of `__dict__`."
+  ]
+}

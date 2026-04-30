@@ -1,0 +1,45 @@
+{
+  "root_cause": "The Blueprint class does not validate the 'name' parameter for dots, and the 'add_url_rule' method does not enforce the absence of dots in 'endpoint' and 'view_func_name' consistently.",
+  "affected_components": [
+    {
+      "file": "src/flask/blueprints.py",
+      "symbol": "Blueprint.__init__",
+      "reason": "The 'name' parameter is not validated for dots during initialization, which is required to prevent nested blueprint name conflicts."
+    },
+    {
+      "file": "src/flask/blueprints.py",
+      "symbol": "Blueprint.add_url_rule",
+      "reason": "The 'endpoint' and 'view_func_name' parameters are not consistently validated for dots, leading to assertion errors or unexpected behavior."
+    }
+  ],
+  "failing_signal": "Tests expecting ValueError for dotted names or endpoints fail because the validation is missing.",
+  "propagation_path": "Blueprint.__init__ allows names with dots, which propagate into endpoint names during URL rule addition in Blueprint.add_url_rule, causing assertion errors or silent failures.",
+  "repair_constraint": "Blueprint names, endpoints, and view function names must not contain dots to ensure compatibility with nested blueprints and consistent URL generation.",
+  "suggested_repair_scope": [
+    "src/flask/blueprints.py"
+  ],
+  "suspicious_symbols": [
+    "Blueprint.__init__",
+    "Blueprint.add_url_rule"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_dotted_name_not_allowed::core",
+      "source_symbol": "Blueprint.__init__",
+      "validation_subject": "name",
+      "why_it_matters": "Blueprint names with dots can cause nested blueprint conflicts and incorrect endpoint resolution."
+    },
+    {
+      "id": "test_route_decorator_custom_endpoint_with_dots::view_func_name",
+      "source_symbol": "Blueprint.add_url_rule",
+      "validation_subject": "view_func_name",
+      "why_it_matters": "View function names with dots can lead to assertion errors and inconsistent behavior in URL rule registration."
+    },
+    {
+      "id": "test_route_decorator_custom_endpoint_with_dots::endpoint",
+      "source_symbol": "Blueprint.add_url_rule",
+      "validation_subject": "endpoint",
+      "why_it_matters": "Endpoints with dots can cause assertion errors and issues in URL generation and routing."
+    }
+  ]
+}

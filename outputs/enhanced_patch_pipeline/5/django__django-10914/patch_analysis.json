@@ -1,0 +1,40 @@
+{
+  "root_cause": "FILE_UPLOAD_PERMISSIONS is set to None by default, causing inconsistent file permissions for uploaded files depending on the underlying temporary file handling mechanism.",
+  "affected_components": [
+    {
+      "file": "django/conf/global_settings.py",
+      "symbol": "FILE_UPLOAD_PERMISSIONS",
+      "reason": "This setting determines the default permissions for uploaded files, and its absence leads to inconsistent behavior."
+    },
+    {
+      "file": "tests/test_utils/tests.py",
+      "symbol": "test_override_file_upload_permissions",
+      "reason": "This test explicitly checks the behavior of FILE_UPLOAD_PERMISSIONS and fails due to the default value being None."
+    }
+  ],
+  "failing_signal": "The test `test_override_file_upload_permissions` fails with an AssertionError because the expected file permission (420, equivalent to 0o644) does not match the actual permission (None).",
+  "propagation_path": "The default value of FILE_UPLOAD_PERMISSIONS is None, which propagates to file uploads handled by FileSystemStorage. Depending on the temporary file handling mechanism, the resulting file permissions may default to 0o600 or other system-specific values, causing the test to fail.",
+  "repair_constraint": "The default FILE_UPLOAD_PERMISSIONS must be set to a consistent and secure value (e.g., 0o644) without introducing security vulnerabilities or breaking existing functionality.",
+  "suggested_repair_scope": [
+    "django/conf/global_settings.py",
+    "tests/test_utils/tests.py"
+  ],
+  "suspicious_symbols": [
+    "FILE_UPLOAD_PERMISSIONS",
+    "test_override_file_upload_permissions"
+  ],
+  "repair_obligations": [
+    {
+      "id": "set_default_permissions",
+      "source_symbol": "FILE_UPLOAD_PERMISSIONS",
+      "validation_subject": "uploaded file permissions",
+      "why_it_matters": "Ensures consistent and predictable file permissions for uploaded files across different systems and temporary file handling mechanisms."
+    },
+    {
+      "id": "validate_test_expectations",
+      "source_symbol": "test_override_file_upload_permissions",
+      "validation_subject": "test assertions",
+      "why_it_matters": "Ensures the test correctly validates the expected behavior of FILE_UPLOAD_PERMISSIONS after the fix."
+    }
+  ]
+}

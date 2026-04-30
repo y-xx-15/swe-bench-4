@@ -1,0 +1,40 @@
+{
+  "root_cause": "The Blueprint class does not validate the presence of dots in its name, which is required to prevent ambiguity in nested blueprints.",
+  "affected_components": [
+    {
+      "file": "src/flask/blueprints.py",
+      "symbol": "Blueprint.__init__",
+      "reason": "The constructor of the Blueprint class is responsible for initializing the blueprint name, which should be validated to ensure it does not contain dots."
+    },
+    {
+      "file": "src/flask/blueprints.py",
+      "symbol": "Blueprint.add_url_rule",
+      "reason": "This method already asserts that endpoint names should not contain dots, but it does not enforce the same for blueprint names."
+    }
+  ],
+  "failing_signal": "The test 'test_dotted_name_not_allowed' fails because the Blueprint constructor does not raise a ValueError when the name contains a dot.",
+  "propagation_path": "The lack of validation in the Blueprint constructor allows blueprints with dotted names to be created. This leads to ambiguity in endpoint resolution and causes downstream failures when adding URL rules or resolving endpoints.",
+  "repair_constraint": "Blueprint names must not contain dots, and this constraint must be enforced without breaking existing functionality for valid blueprint names.",
+  "suggested_repair_scope": [
+    "src/flask/blueprints.py",
+    "tests/test_blueprints.py"
+  ],
+  "suspicious_symbols": [
+    "Blueprint.__init__",
+    "Blueprint.add_url_rule"
+  ],
+  "repair_obligations": [
+    {
+      "id": "validate_blueprint_name",
+      "source_symbol": "Blueprint.__init__",
+      "validation_subject": "name",
+      "why_it_matters": "Blueprint names must not contain dots to avoid ambiguity in nested blueprint resolution."
+    },
+    {
+      "id": "validate_blueprint_name_in_add_url_rule",
+      "source_symbol": "Blueprint.add_url_rule",
+      "validation_subject": "self.name",
+      "why_it_matters": "Blueprint names with dots can cause endpoint resolution issues, so this validation must be enforced consistently."
+    }
+  ]
+}

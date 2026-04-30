@@ -1,0 +1,152 @@
+[
+  {
+    "idea": {
+      "title": "test file upload permissions assertion",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the assertion error caused by mismatched file permissions when uploading files",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_file_upload_permissions"
+      ],
+      "covers_original_tests": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+      ],
+      "covers_obligations": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core"
+      ],
+      "target_source_symbol": "django.conf.global_settings.FILE_UPLOAD_PERMISSIONS",
+      "target_validation_subject": "FILE_UPLOAD_PERMISSIONS",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "FILE_UPLOAD_PERMISSIONS",
+        "os.chmod"
+      ],
+      "trigger_shape_tokens": [
+        "assertionerror",
+        "FILE_UPLOAD_PERMISSIONS",
+        "os.chmod"
+      ],
+      "rationale": "This test directly reproduces the assertion error caused by the mismatch in file permissions during file uploads, aligning with the original failure path. It ensures that the default FILE_UPLOAD_PERMISSIONS setting is correctly applied and validated, which was not explicitly tested in the original case."
+    },
+    "patch": "diff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,14 @@\n+class EnhancedFileUploadPermissionsTests(TestCase):\n+\n+    def test_sweb_enhanced_file_upload_permissions(self):\n+        \"\"\"\n+        Ensure that FILE_UPLOAD_PERMISSIONS is correctly applied when uploading\n+        a file, and verify that the default permissions are consistent.\n+        \"\"\"\n+        temp_file_path = default_storage.save('test_file.txt', StringIO('content'))\n+        try:\n+            file_permissions = os.stat(temp_file_path).st_mode & 0o777\n+            self.assertEqual(file_permissions, 0o644, \"Default file permissions should be 0o644\")\n+        finally:\n+            default_storage.delete('test_file.txt')\n+\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,14 @@\n+class EnhancedFileUploadPermissionsTests(TestCase):\n+\n+    def test_sweb_enhanced_file_upload_permissions(self):\n+        \"\"\"\n+        Ensure that FILE_UPLOAD_PERMISSIONS is correctly applied when uploading\n+        a file, and verify that the default permissions are consistent.\n+        \"\"\"\n+        temp_file_path = default_storage.save('test_file.txt', StringIO('content'))\n+        try:\n+            file_permissions = os.stat(temp_file_path).st_mode & 0o777\n+            self.assertEqual(file_permissions, 0o644, \"Default file permissions should be 0o644\")\n+        finally:\n+            default_storage.delete('test_file.txt')\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_file_upload_permissions"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_file_upload_permissions"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test file upload permission propagation",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream file permission consistency when FILE_UPLOAD_PERMISSIONS is unset",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "state_consistency_check",
+      "target_tests": [
+        "test_sweb_enhanced_file_permission_propagation"
+      ],
+      "covers_original_tests": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+      ],
+      "covers_obligations": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core"
+      ],
+      "target_source_symbol": "django.core.files.uploadhandler.TemporaryFileUploadHandler",
+      "target_validation_subject": "uploaded_file_permission",
+      "semantic_alignment_tokens": [
+        "TemporaryFileUploadHandler",
+        "os.rename",
+        "NamedTemporaryFile",
+        "FILE_UPLOAD_PERMISSIONS"
+      ],
+      "trigger_shape_tokens": [
+        "TemporaryFileUploadHandler",
+        "NamedTemporaryFile",
+        "os.rename"
+      ],
+      "rationale": "This test exercises the downstream consequence of the bug by verifying that files uploaded via TemporaryFileUploadHandler retain consistent permissions. Unlike the original test, which directly asserts the FILE_UPLOAD_PERMISSIONS setting, this test focuses on the propagated effect of unset permissions during file renaming operations."
+    },
+    "patch": "diff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,15 @@\n+    def test_sweb_enhanced_file_permission_propagation(self):\n+        \"\"\"\n+        Test that files uploaded via TemporaryFileUploadHandler retain consistent\n+        permissions when FILE_UPLOAD_PERMISSIONS is unset.\n+        \"\"\"\n+        from django.core.files.uploadhandler import TemporaryFileUploadHandler\n+        import tempfile\n+        import os\n+\n+        handler = TemporaryFileUploadHandler()\n+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:\n+            temp_file.write(b\"test content\")\n+        uploaded_file_path = temp_file.name\n+        os.rename(uploaded_file_path, uploaded_file_path + \"_renamed\")\n+        self.assertEqual(oct(os.stat(uploaded_file_path + \"_renamed\").st_mode & 0o777), '0o644')\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,15 @@\n+    def test_sweb_enhanced_file_permission_propagation(self):\n+        \"\"\"\n+        Test that files uploaded via TemporaryFileUploadHandler retain consistent\n+        permissions when FILE_UPLOAD_PERMISSIONS is unset.\n+        \"\"\"\n+        from django.core.files.uploadhandler import TemporaryFileUploadHandler\n+        import tempfile\n+        import os\n+\n+        handler = TemporaryFileUploadHandler()\n+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:\n+            temp_file.write(b\"test content\")\n+        uploaded_file_path = temp_file.name\n+        os.rename(uploaded_file_path, uploaded_file_path + \"_renamed\")\n+        self.assertEqual(oct(os.stat(uploaded_file_path + \"_renamed\").st_mode & 0o777), '0o644')\n```",
+    "identifiers": [
+      "test_sweb_enhanced_file_permission_propagation"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_file_permission_propagation"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test file upload permissions behavioral consequence",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "verify that uploaded files have consistent permissions regardless of the temporary storage mechanism used",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "state_consistency_check",
+      "target_tests": [
+        "test_sweb_enhanced_file_upload_permissions"
+      ],
+      "covers_original_tests": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+      ],
+      "covers_obligations": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core"
+      ],
+      "target_source_symbol": "django.core.files.storage.FileSystemStorage.save",
+      "target_validation_subject": "uploaded_file_permissions",
+      "semantic_alignment_tokens": [
+        "FILE_UPLOAD_PERMISSIONS",
+        "os.chmod",
+        "TemporaryUploadedFile",
+        "MemoryUploadedFile"
+      ],
+      "trigger_shape_tokens": [
+        "TemporaryUploadedFile",
+        "MemoryUploadedFile",
+        "os.rename",
+        "os.chmod"
+      ],
+      "rationale": "This test explores the downstream behavioral consequence of inconsistent file permissions by verifying that the permissions of uploaded files are uniform regardless of the temporary storage mechanism (MemoryUploadedFile or TemporaryUploadedFile). It differs from the original test by focusing on the resulting file state rather than the direct assertion failure, providing additional repair guidance on the broader impact of the bug."
+    },
+    "patch": "diff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,16 @@\n+    def test_sweb_enhanced_file_upload_permissions_tempfile(self):\n+        \"\"\"\n+        Verify that uploaded files have consistent permissions when using\n+        TemporaryUploadedFile for temporary storage.\n+        \"\"\"\n+        from django.core.files.uploadedfile import TemporaryUploadedFile\n+        import tempfile\n+        import os\n+\n+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:\n+            temp_file.write(b\"test content\")\n+            temp_file.flush()\n+            temp_file.close()\n+            os.rename(temp_file.name, temp_file.name + \"_renamed\")\n+            self.assertEqual(oct(os.stat(temp_file.name + \"_renamed\").st_mode & 0o777), '0o644')\n+            os.remove(temp_file.name + \"_renamed\")\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,16 @@\n+    def test_sweb_enhanced_file_upload_permissions_tempfile(self):\n+        \"\"\"\n+        Verify that uploaded files have consistent permissions when using\n+        TemporaryUploadedFile for temporary storage.\n+        \"\"\"\n+        from django.core.files.uploadedfile import TemporaryUploadedFile\n+        import tempfile\n+        import os\n+\n+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:\n+            temp_file.write(b\"test content\")\n+            temp_file.flush()\n+            temp_file.close()\n+            os.rename(temp_file.name, temp_file.name + \"_renamed\")\n+            self.assertEqual(oct(os.stat(temp_file.name + \"_renamed\").st_mode & 0o777), '0o644')\n+            os.remove(temp_file.name + \"_renamed\")\n```",
+    "identifiers": [
+      "test_sweb_enhanced_file_upload_permissions_tempfile"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_file_upload_permissions_tempfile"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

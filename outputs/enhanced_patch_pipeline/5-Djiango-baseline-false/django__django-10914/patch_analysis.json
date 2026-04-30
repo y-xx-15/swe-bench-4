@@ -1,0 +1,41 @@
+{
+  "root_cause": "FILE_UPLOAD_PERMISSIONS is set to None by default, which causes inconsistent file permissions depending on the upload handler used. TemporaryUploadedFile creates files with restrictive permissions (0o600) due to Python's tempfile module behavior.",
+  "affected_components": [
+    {
+      "file": "django/conf/global_settings.py",
+      "symbol": "FILE_UPLOAD_PERMISSIONS",
+      "reason": "This setting directly controls the permissions of uploaded files and is currently undefined, leading to inconsistent behavior."
+    },
+    {
+      "file": "tests/test_utils/tests.py",
+      "symbol": "test_override_file_upload_permissions",
+      "reason": "This test fails because it expects FILE_UPLOAD_PERMISSIONS to be explicitly set to 0o644, but the default behavior results in 0o600 permissions."
+    }
+  ],
+  "failing_signal": "The test `test_override_file_upload_permissions` fails with an AssertionError, indicating that the file permissions are not set to the expected value (0o644).",
+  "propagation_path": "The absence of a default value for FILE_UPLOAD_PERMISSIONS propagates to file uploads handled by TemporaryUploadedFile, which inherits restrictive permissions (0o600) from Python's tempfile module. This causes the test to fail when it checks for 0o644 permissions.",
+  "repair_constraint": "The fix must ensure that FILE_UPLOAD_PERMISSIONS defaults to 0o644 without breaking existing functionality or introducing security risks.",
+  "suggested_repair_scope": [
+    "django/conf/global_settings.py",
+    "tests/test_utils/tests.py"
+  ],
+  "suspicious_symbols": [
+    "FILE_UPLOAD_PERMISSIONS",
+    "TemporaryUploadedFile",
+    "test_override_file_upload_permissions"
+  ],
+  "repair_obligations": [
+    {
+      "id": "set_default_permissions",
+      "source_symbol": "FILE_UPLOAD_PERMISSIONS",
+      "validation_subject": "uploaded files",
+      "why_it_matters": "Setting a default value ensures consistent and predictable file permissions across all upload handlers."
+    },
+    {
+      "id": "test_consistency",
+      "source_symbol": "test_override_file_upload_permissions",
+      "validation_subject": "test expectations",
+      "why_it_matters": "The test must validate that FILE_UPLOAD_PERMISSIONS is correctly applied to uploaded files."
+    }
+  ]
+}

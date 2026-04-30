@@ -1,0 +1,36 @@
+{
+  "root_cause": "The `pytest_runtest_makereport` hook does not correctly adjust the `rep.longrepr` location when the `--runxfail` flag is enabled. A preceding `elif` branch for `item.config.option.runxfail` bypasses the logic that updates the skip location to point to the test item definition.",
+  "affected_components": [
+    {
+      "file": "src/_pytest/skipping.py",
+      "symbol": "pytest_runtest_makereport",
+      "reason": "This hook is responsible for generating the test report, including the skip location and longrepr adjustments."
+    }
+  ],
+  "failing_signal": "When `--runxfail` is enabled, the skip location is incorrectly reported as `src/_pytest/skipping.py:238` instead of the test item definition location (e.g., `test_it.py:3`). This is evident in the failure log and the test output.",
+  "propagation_path": "The `--runxfail` flag activates a bypass in `pytest_runtest_makereport`, where an `elif` branch prevents the logic for adjusting the skip location (`rep.longrepr`) from executing. This results in the skip location defaulting to the internal pytest implementation location instead of the test item definition.",
+  "repair_constraint": "The fix must ensure that the skip location is correctly reported as the test item definition location, even when `--runxfail` is enabled. It must not interfere with other `--runxfail` behaviors, such as handling xfail conditions.",
+  "suggested_repair_scope": [
+    "src/_pytest/skipping.py"
+  ],
+  "suspicious_symbols": [
+    "pytest_runtest_makereport",
+    "rep.longrepr",
+    "item.reportinfo",
+    "skipped_by_mark_key"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip location reporting",
+      "source_symbol": "src/_pytest/skipping.py::pytest_runtest_makereport",
+      "validation_subject": "skip location reporting",
+      "why_it_matters": "The skip location must point to the test item definition for accurate reporting, as required by the test."
+    },
+    {
+      "id": "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip marker location reporting",
+      "source_symbol": "src/_pytest/skipping.py::pytest_runtest_makereport",
+      "validation_subject": "skip marker location reporting",
+      "why_it_matters": "The skip marker location must be correctly adjusted to reflect the test item definition, ensuring accurate diagnostics and reporting."
+    }
+  ]
+}

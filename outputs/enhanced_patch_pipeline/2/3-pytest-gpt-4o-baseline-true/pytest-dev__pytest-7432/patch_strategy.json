@@ -1,0 +1,21 @@
+{
+  "title": "restore_skip_location_reporting",
+  "approach": "Convert the `elif item.config.option.runxfail` branch in `pytest_runtest_makereport` to a standalone `if` statement to ensure the correction logic for skipped test locations runs regardless of the `--runxfail` flag.",
+  "edit_targets": [
+    "src/_pytest/skipping.py"
+  ],
+  "dependency_files": [
+    "testing/test_skipping.py"
+  ],
+  "structural_rules": [
+    "restore_unreachable_existing_branch"
+  ],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing only `pytest_runtest_makereport` in `src/_pytest/skipping.py` is sufficient because the correction logic for skipped test locations is already implemented but becomes unreachable due to the flag-specific branch.",
+  "risks": [
+    "Ensure the change does not interfere with xfail test reporting, as the `--runxfail` flag is intended to modify xfail behavior."
+  ]
+}

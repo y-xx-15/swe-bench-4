@@ -1,0 +1,21 @@
+--- a/src/flask/blueprints.py
++++ b/src/flask/blueprints.py
+@@ -188,6 +188,8 @@
+             template_folder=template_folder,
+             root_path=root_path,
+         )
++        if '.' in name:
++            raise ValueError("Blueprint names must not contain dots.")
+         self.name = name
+         self.url_prefix = url_prefix
+         self.subdomain = subdomain
+@@ -361,7 +363,8 @@
+         the :func:`url_for` function is prefixed with the name of the blueprint.
+         """
+         if endpoint:
+-            assert "." not in endpoint, "Blueprint endpoints should not contain dots"
++            if '.' in endpoint:
++                raise ValueError("Blueprint endpoints must not contain dots.")
+         if view_func and hasattr(view_func, "__name__"):
+             assert (
+                 "." not in view_func.__name__

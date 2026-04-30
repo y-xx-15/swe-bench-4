@@ -1,0 +1,28 @@
+{
+  "root_cause": "The `--runxfail` flag causes the `pytest_runtest_makereport` hook to skip the correction block that adjusts the location of skipped tests to point to the item definition, leaving the location as the internal pytest skipping mechanism's source.",
+  "affected_components": [
+    {
+      "file": "src/_pytest/skipping.py",
+      "symbol": "pytest_runtest_makereport",
+      "reason": "This hook is responsible for generating the test report, including the location of skipped tests."
+    }
+  ],
+  "failing_signal": "The location of skipped tests is incorrectly reported as `src/_pytest/skipping.py:238` instead of the test item definition location.",
+  "propagation_path": "When `--runxfail` is enabled, the `pytest_runtest_makereport` hook contains a conditional branch (`elif item.config.option.runxfail`) that bypasses the correction logic for skipped tests, causing the location to remain unadjusted.",
+  "repair_constraint": "The fix must ensure that the location of skipped tests is correctly reported regardless of the `--runxfail` flag, without altering the behavior of xfail tests.",
+  "suggested_repair_scope": [
+    "src/_pytest/skipping.py"
+  ],
+  "suspicious_symbols": [
+    "pytest_runtest_makereport",
+    "skipped_by_mark_key"
+  ],
+  "repair_obligations": [
+    {
+      "id": "adjust_skip_location_on_runxfail",
+      "source_symbol": "pytest_runtest_makereport",
+      "validation_subject": "skipped test location reporting",
+      "why_it_matters": "The location of skipped tests must accurately reflect the test item definition for proper debugging and reporting."
+    }
+  ]
+}
