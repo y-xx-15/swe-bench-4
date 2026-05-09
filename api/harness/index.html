@@ -16966,7 +16966,7 @@
   </span>
 
 </h5>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">REPO_BASE_COMMIT_BRANCH</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'sympy/sympy'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'cffd4e0f86fefd4802349a9f9b19ed70934ea354'</span><span class="p">:</span> <span class="s1">'1.7'</span><span class="p">,</span> <span class="s1">'70381f282f2d9d039da860e391fe51649df2779d'</span><span class="p">:</span> <span class="s1">'sympy-1.5.1'</span><span class="p">},</span> <span class="s1">'pytest-dev/pytest'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'8aba863a634f40560e25055d179220f0eefabe9a'</span><span class="p">:</span> <span class="s1">'4.6.x'</span><span class="p">}}</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">REPO_BASE_COMMIT_BRANCH</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'sympy/sympy'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'70381f282f2d9d039da860e391fe51649df2779d'</span><span class="p">:</span> <span class="s1">'sympy-1.5.1'</span><span class="p">},</span> <span class="s1">'pytest-dev/pytest'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'8aba863a634f40560e25055d179220f0eefabe9a'</span><span class="p">:</span> <span class="s1">'4.6.x'</span><span class="p">}}</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -37181,7 +37181,23 @@ This is the setup script for the instance image.</p>
 <span class="normal">314</span>
 <span class="normal">315</span>
 <span class="normal">316</span>
-<span class="normal">317</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_repo_script_list_py</span><span class="p">(</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_repo_script_list_py</span><span class="p">(</span>
     <span class="n">specs</span><span class="p">,</span> <span class="n">repo</span><span class="p">,</span> <span class="n">repo_directory</span><span class="p">,</span> <span class="n">base_commit</span><span class="p">,</span> <span class="n">env_name</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
@@ -37190,11 +37206,27 @@ This is the setup script for the instance image.</p>
 <span class="sd">    """</span>
     <span class="n">branch</span> <span class="o">=</span> <span class="n">REPO_BASE_COMMIT_BRANCH</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">base_commit</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
     <span class="n">branch</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"--branch </span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">branch</span> <span class="k">else</span> <span class="s2">""</span>
-    <span class="n">setup_commands</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="sa">f</span><span class="s2">"git clone -o origin </span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2"> --single-branch https://github.com/</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">repo_directory</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-        <span class="sa">f</span><span class="s2">"chmod -R 777 </span><span class="si">{</span><span class="n">repo_directory</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>  <span class="c1"># So nonroot user can run tests</span>
-        <span class="sa">f</span><span class="s2">"cd </span><span class="si">{</span><span class="n">repo_directory</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-        <span class="sa">f</span><span class="s2">"git reset --hard </span><span class="si">{</span><span class="n">base_commit</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="k">if</span> <span class="n">repo</span> <span class="o">==</span> <span class="s2">"sympy/sympy"</span><span class="p">:</span>
+        <span class="n">setup_commands</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">"git config --global http.version HTTP/1.1"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"mkdir -p </span><span class="si">{</span><span class="n">repo_directory</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"cd </span><span class="si">{</span><span class="n">repo_directory</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="s2">"git init"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"git remote add origin https://github.com/</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s1">'for attempt in 1 2 3 4 5; do git fetch --filter=blob:none --depth=1 origin </span><span class="si">{</span><span class="n">base_commit</span><span class="si">}</span><span class="s1"> &amp;&amp; break; if [ "$attempt" = 5 ]; then exit 1; fi; sleep $((attempt * 10)); done'</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"git checkout --detach </span><span class="si">{</span><span class="n">base_commit</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"chmod -R 777 </span><span class="si">{</span><span class="n">repo_directory</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>  <span class="c1"># So nonroot user can run tests</span>
+            <span class="sa">f</span><span class="s2">"git reset --hard </span><span class="si">{</span><span class="n">base_commit</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">setup_commands</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">"git config --global http.version HTTP/1.1"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"git clone -o origin </span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2"> --single-branch --filter=blob:none --no-checkout https://github.com/</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">repo_directory</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"chmod -R 777 </span><span class="si">{</span><span class="n">repo_directory</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>  <span class="c1"># So nonroot user can run tests</span>
+            <span class="sa">f</span><span class="s2">"cd </span><span class="si">{</span><span class="n">repo_directory</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"git reset --hard </span><span class="si">{</span><span class="n">base_commit</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="n">setup_commands</span> <span class="o">+=</span> <span class="p">[</span>
         <span class="c1"># Remove the remote and tags so the agent won't see newer commits.</span>
         <span class="s2">"git remote remove origin"</span><span class="p">,</span>
         <span class="c1"># Remove only tags pointing to commits after target timestamp</span>
@@ -37257,17 +37289,17 @@ This is the setup script for the instance image.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>swebench/harness/test_spec/python.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">320</span>
-<span class="normal">321</span>
-<span class="normal">322</span>
-<span class="normal">323</span>
-<span class="normal">324</span>
-<span class="normal">325</span>
-<span class="normal">326</span>
-<span class="normal">327</span>
-<span class="normal">328</span>
-<span class="normal">329</span>
-<span class="normal">330</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_env_script_list_py_from_conda</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_env_script_list_py_from_conda</span><span class="p">(</span>
     <span class="n">instance</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">env_name</span><span class="p">,</span> <span class="n">cached_environment_yml</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
     <span class="n">HEREDOC_DELIMITER</span> <span class="o">=</span> <span class="s2">"EOF_59812759871"</span>
@@ -37303,23 +37335,7 @@ This is the setup script for the environment image.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>swebench/harness/test_spec/python.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">333</span>
-<span class="normal">334</span>
-<span class="normal">335</span>
-<span class="normal">336</span>
-<span class="normal">337</span>
-<span class="normal">338</span>
-<span class="normal">339</span>
-<span class="normal">340</span>
-<span class="normal">341</span>
-<span class="normal">342</span>
-<span class="normal">343</span>
-<span class="normal">344</span>
-<span class="normal">345</span>
-<span class="normal">346</span>
-<span class="normal">347</span>
-<span class="normal">348</span>
-<span class="normal">349</span>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">349</span>
 <span class="normal">350</span>
 <span class="normal">351</span>
 <span class="normal">352</span>
@@ -37372,7 +37388,23 @@ This is the setup script for the environment image.</p>
 <span class="normal">399</span>
 <span class="normal">400</span>
 <span class="normal">401</span>
-<span class="normal">402</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_env_script_list_py</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">env_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_env_script_list_py</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">env_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Creates the list of commands to set up the conda environment for testing.</span>
 <span class="sd">    This is the setup script for the environment image.</span>
@@ -37466,23 +37498,7 @@ This is the setup script for the environment image.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>swebench/harness/test_spec/python.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span>
-<span class="normal">412</span>
-<span class="normal">413</span>
-<span class="normal">414</span>
-<span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">421</span>
 <span class="normal">422</span>
 <span class="normal">423</span>
 <span class="normal">424</span>
@@ -37523,7 +37539,23 @@ This is the setup script for the environment image.</p>
 <span class="normal">459</span>
 <span class="normal">460</span>
 <span class="normal">461</span>
-<span class="normal">462</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_eval_script_list_py</span><span class="p">(</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span>
+<span class="normal">470</span>
+<span class="normal">471</span>
+<span class="normal">472</span>
+<span class="normal">473</span>
+<span class="normal">474</span>
+<span class="normal">475</span>
+<span class="normal">476</span>
+<span class="normal">477</span>
+<span class="normal">478</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_eval_script_list_py</span><span class="p">(</span>
     <span class="n">instance</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">env_name</span><span class="p">,</span> <span class="n">repo_directory</span><span class="p">,</span> <span class="n">base_commit</span><span class="p">,</span> <span class="n">test_patch</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
