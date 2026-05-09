@@ -1,0 +1,40 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/polys/partfrac.py",
+      "action": "modify_region",
+      "justification": "The `apart` function is directly responsible for the incorrect handling of symbolic coefficients, as evidenced by the failing tests. It requires modification to ensure correct behavior."
+    },
+    {
+      "target_file": "sympy/polys/domains/polynomialring.py",
+      "action": "modify_region",
+      "justification": "The `PolynomialRing.from_PolynomialRing` method is involved in converting polynomials and symbolic coefficients, which impacts the behavior of the `apart` function. It must be updated to handle symbolic coefficients robustly."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/polys/partfrac.py",
+      "target_symbol": "apart",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "obligation_1",
+        "obligation_2"
+      ],
+      "anchor_line_before": "    if not expr.is_Add:",
+      "anchor_line_after": "    return _apart(expr, x, **options)",
+      "replacement_block": "    if not expr.is_Add:\n        # Ensure symbolic coefficients are handled correctly\n        if expr.has(Symbol):\n            expr = expr.expand()\n    return _apart(expr, x, **options)"
+    },
+    {
+      "target_file": "sympy/polys/domains/polynomialring.py",
+      "target_symbol": "PolynomialRing.from_PolynomialRing",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "obligation_3",
+        "obligation_4"
+      ],
+      "anchor_line_before": "        try:",
+      "anchor_line_after": "            return a.set_ring(K1.ring)",
+      "replacement_block": "        try:\n            # Handle symbolic coefficients during conversion\n            if a.has(Symbol):\n                a = a.expand()\n            return a.set_ring(K1.ring)"
+    }
+  ]
+}

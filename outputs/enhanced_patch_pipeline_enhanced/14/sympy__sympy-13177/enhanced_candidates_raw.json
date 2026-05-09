@@ -1,0 +1,248 @@
+[
+  {
+    "idea": {
+      "title": "Mod with non-integer base triggers incorrect modulo result",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect behavior of Mod when the base is non-integer, causing assertion_error",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_mod_non_integer_base"
+      ],
+      "covers_original_tests": [
+        "test_mod"
+      ],
+      "covers_obligations": [
+        "test_mod::core"
+      ],
+      "target_source_symbol": "Mod.eval",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Mod(",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "Mod(",
+        "non_integer_base"
+      ],
+      "rationale": "The original test_mod does not explicitly test the behavior of Mod when the base is non-integer, which is the root cause of the bug. This test directly targets the buggy validation logic in Mod.eval, ensuring the bug is exposed and fixed."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -231,0 +231,7 @@\n+def test_sweb_enhanced_mod_non_integer_base():\n+    from sympy import Mod, Float\n+    x = Float(1.5)\n+    result = Mod(x**2, x)\n+    expected = Float(0)  # Mod(x**2, x) should be 0 for any x\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -231,0 +231,7 @@\n+def test_sweb_enhanced_mod_non_integer_base():\n+    from sympy import Mod, Float\n+    x = Float(1.5)\n+    result = Mod(x**2, x)\n+    expected = Float(0)  # Mod(x**2, x) should be 0 for any x\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_mod_non_integer_base"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_mod_non_integer_base"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_mod_inverse_behavioral_consequence",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream behavior when Mod is used with non-integer bases, ensuring correct handling of Rational and Float inputs",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_mod_inverse_behavior"
+      ],
+      "covers_original_tests": [
+        "test_mod_inverse"
+      ],
+      "covers_obligations": [
+        "test_mod_inverse::core"
+      ],
+      "target_source_symbol": "comparison",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Mod(",
+        "Rational(",
+        "Float(",
+        "comparison"
+      ],
+      "trigger_shape_tokens": [
+        "Mod(",
+        "Rational(",
+        "Float(",
+        "comparison"
+      ],
+      "rationale": "This test explores the downstream consequences of incorrect Mod behavior when used with Rational and Float inputs, which were not explicitly tested in the original test_mod_inverse. It ensures that the bug is exposed through a different usage path, highlighting the broader impact of the faulty implementation."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -231,0 +231,8 @@\n+def test_sweb_enhanced_mod_inverse_behavior():\n+    from sympy import Mod, Rational, Float\n+\n+    # Test Mod with Rational base and divisor\n+    assert Mod(Rational(3, 2) ** 2, Rational(3, 2)) == 0\n+\n+    # Test Mod with Float base and divisor\n+    assert Mod(Float(1.5) ** 2, Float(1.5)) == 0\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -231,0 +231,8 @@\n+def test_sweb_enhanced_mod_inverse_behavior():\n+    from sympy import Mod, Rational, Float\n+\n+    # Test Mod with Rational base and divisor\n+    assert Mod(Rational(3, 2) ** 2, Rational(3, 2)) == 0\n+\n+    # Test Mod with Float base and divisor\n+    assert Mod(Float(1.5) ** 2, Float(1.5)) == 0\n```",
+    "identifiers": [
+      "test_sweb_enhanced_mod_inverse_behavior"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_mod_inverse_behavior"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_mod_fractional_base_assertion",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the assertion error caused by incorrect handling of fractional bases in Mod.eval",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_mod_fractional_base"
+      ],
+      "covers_original_tests": [
+        "test_mod"
+      ],
+      "covers_obligations": [
+        "test_mod::core"
+      ],
+      "target_source_symbol": "Mod.eval",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Mod(",
+        "eval(",
+        "fractional base",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "Mod(",
+        "fractional base",
+        "assertionerror"
+      ],
+      "rationale": "This test directly reproduces the original failure by using a fractional base in the Mod operation, which triggers the assertion error observed in the original test_mod failure. It differs from the original test by explicitly isolating the fractional base scenario and verifying the assertion error signal."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -231,0 +231,7 @@\n+def test_sweb_enhanced_mod_fractional_base():\n+    from sympy import Mod, Rational\n+    fractional_base = Rational(3, 2)\n+    result = Mod(fractional_base**2, fractional_base)\n+    expected = Rational(3, 4)  # Correct remainder when base is fractional\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -231,0 +231,7 @@\n+def test_sweb_enhanced_mod_fractional_base():\n+    from sympy import Mod, Rational\n+    fractional_base = Rational(3, 2)\n+    result = Mod(fractional_base**2, fractional_base)\n+    expected = Rational(3, 4)  # Correct remainder when base is fractional\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_mod_fractional_base"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_mod_fractional_base"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_mod_non_integer_base",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the behavior of Mod when the base is non-integer, exposing incorrect modulo results",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_mod_non_integer_base"
+      ],
+      "covers_original_tests": [
+        "test_mod"
+      ],
+      "covers_obligations": [
+        "test_mod::core"
+      ],
+      "target_source_symbol": "Mod.eval",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Mod(",
+        "p.is_integer",
+        "q.is_integer"
+      ],
+      "trigger_shape_tokens": [
+        "Mod(",
+        "p.is_integer",
+        "q.is_integer"
+      ],
+      "rationale": "This test specifically targets the behavior of Mod when the base is non-integer, which is distinct from the original test_mod that primarily focuses on integer and rational inputs. It adds repair guidance by demonstrating the need for explicit validation of integer bases in the Mod.eval logic."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -231,0 +231,9 @@\n+def test_sweb_enhanced_mod_symbolic_non_integer():\n+    x = Symbol('x', real=True)  # Symbolic variable, not explicitly integer\n+    result = Mod(x**2, x)\n+    assert result == 0, f\"Expected Mod(x**2, x) to be 0, but got {result}\"\n+\n+    y = Symbol('y', real=True, positive=True)  # Positive real variable\n+    result = Mod(y**2, y)\n+    assert result == 0, f\"Expected Mod(y**2, y) to be 0, but got {result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -231,0 +231,9 @@\n+def test_sweb_enhanced_mod_symbolic_non_integer():\n+    x = Symbol('x', real=True)  # Symbolic variable, not explicitly integer\n+    result = Mod(x**2, x)\n+    assert result == 0, f\"Expected Mod(x**2, x) to be 0, but got {result}\"\n+\n+    y = Symbol('y', real=True, positive=True)  # Positive real variable\n+    result = Mod(y**2, y)\n+    assert result == 0, f\"Expected Mod(y**2, y) to be 0, but got {result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_mod_symbolic_non_integer"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_mod_symbolic_non_integer"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_mod_non_integer_base",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the behavior of Mod when the base is a non-integer, which leads to incorrect modulo results",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_mod_non_integer_base"
+      ],
+      "covers_original_tests": [
+        "test_mod"
+      ],
+      "covers_obligations": [
+        "test_mod::core"
+      ],
+      "target_source_symbol": "Mod.eval",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Mod(",
+        "p.is_integer",
+        "q.is_integer"
+      ],
+      "trigger_shape_tokens": [
+        "Mod(",
+        "x**2",
+        "x"
+      ],
+      "rationale": "This test introduces a non-integer base to Mod, which is distinct from the original tests that primarily focus on integer or rational inputs. It highlights a downstream consequence of the bug by showing incorrect modulo results for non-integer bases, which were not explicitly covered in the original tests."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -231,0 +231,6 @@\n+def test_sweb_enhanced_mod_negative_non_integer_base():\n+    x = Float(-1.5)\n+    result = Mod(x**2, x)\n+    expected = Float(0.75)\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -231,0 +231,6 @@\n+def test_sweb_enhanced_mod_negative_non_integer_base():\n+    x = Float(-1.5)\n+    result = Mod(x**2, x)\n+    expected = Float(0.75)\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_mod_negative_non_integer_base"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_mod_negative_non_integer_base"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

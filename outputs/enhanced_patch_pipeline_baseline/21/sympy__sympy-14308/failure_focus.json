@@ -1,0 +1,34 @@
+{
+  "original_test_identifiers": [
+    "test_issue_12675",
+    "test_pretty_print_unicode"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_issue_12675",
+    "test_pretty_print_unicode"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/printing/pretty/tests/test_pretty.py:test_pretty_geometry",
+    "sympy/printing/pretty/tests/test_pretty.py:test_issue_8292",
+    "sympy/printing/pretty/tests/test_pretty.py:test_issue_8344",
+    "sympy/printing/pretty/tests/test_pretty.py:test_issue_12675",
+    "sympy/vector/tests/test_printing.py:test_pretty_print_unicode"
+  ],
+  "failure_mode": "value_error",
+  "dominant_errors": [
+    "ValueError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_issue_12675 F",
+    "test_pretty_print_unicode F",
+    "_______ sympy/printing/pretty/tests/test_pretty.py:test_pretty_geometry ________"
+  ],
+  "noise_ratio": 0.0207,
+  "target_test_tracebacks": {
+    "test_issue_12675": "TARGET TEST: test_issue_12675\n- snippet: test_issue_12675 F\n- snippet: test_pretty_print_unicode F\n- snippet: _______ sympy/printing/pretty/tests/test_pretty.py:test_pretty_geometry ________\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_issue_12675 F\nValueError: Name node can't be used with 'False' constant\nValueError: Name node can't be used with 'False' constant\n_________ sympy/printing/pretty/tests/test_pretty.py:test_issue_12675 __________\n  File \"/testbed/sympy/printing/pretty/tests/test_pretty.py\", line 6104, in test_issue_12675\nAssertionError\nAssertionError\n tests finished: 115 passed, 2 failed, 1 expected to fail, ",
+    "test_pretty_print_unicode": "TARGET TEST: test_pretty_print_unicode\n- snippet: test_issue_12675 F\n- snippet: test_pretty_print_unicode F\n- snippet: _______ sympy/printing/pretty/tests/test_pretty.py:test_pretty_geometry ________\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_pretty_print_unicode F\nValueError: Name node can't be used with 'False' constant\nValueError: Name node can't be used with 'False' constant\nAssertionError\n________ sympy/vector/tests/test_printing.py:test_pretty_print_unicode _________\n  File \"/testbed/sympy/vector/tests/test_printing.py\", line 135, in test_pretty_print_unicode\nAssertionError\n tests finished: 115 passed, 2 failed, 1 expected to fail, "
+  }
+}

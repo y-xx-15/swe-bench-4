@@ -1,0 +1,35 @@
+{
+  "root_cause": "The default value of FILE_UPLOAD_PERMISSIONS is set to None, which causes inconsistent file permissions when files are uploaded using TemporaryFileUploadHandler. This handler relies on tempfile.NamedTemporaryFile, which defaults to restrictive permissions (0o600) for security reasons.",
+  "affected_components": [
+    {
+      "file": "django/conf/global_settings.py",
+      "symbol": "FILE_UPLOAD_PERMISSIONS",
+      "reason": "This setting directly controls the permissions applied to uploaded files."
+    },
+    {
+      "file": "tests/test_utils/tests.py",
+      "symbol": "test_override_file_upload_permissions",
+      "reason": "This test validates the behavior of FILE_UPLOAD_PERMISSIONS and fails due to the default value being None."
+    }
+  ],
+  "failing_signal": "The test_override_file_upload_permissions test fails with an AssertionError because the file permissions are None instead of the expected 0o644.",
+  "propagation_path": "The absence of a default value for FILE_UPLOAD_PERMISSIONS propagates to TemporaryFileUploadHandler, which uses tempfile.NamedTemporaryFile with restrictive permissions. This results in uploaded files having inconsistent permissions, causing the test to fail.",
+  "repair_constraint": "The default FILE_UPLOAD_PERMISSIONS must be set to a value that ensures consistent and secure file permissions across all upload handlers.",
+  "suggested_repair_scope": [
+    "django/conf/global_settings.py",
+    "tests/test_utils/tests.py"
+  ],
+  "suspicious_symbols": [
+    "FILE_UPLOAD_PERMISSIONS",
+    "TemporaryFileUploadHandler",
+    "NamedTemporaryFile"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core::FILE_UPLOAD_PERMISSIONS",
+      "source_symbol": "django.conf.global_settings.FILE_UPLOAD_PERMISSIONS",
+      "validation_subject": "FILE_UPLOAD_PERMISSIONS",
+      "why_it_matters": "The test explicitly checks that FILE_UPLOAD_PERMISSIONS is set to 0o644, which ensures consistent and expected file permissions for uploaded files."
+    }
+  ]
+}

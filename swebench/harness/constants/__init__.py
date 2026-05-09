@@ -171,7 +171,6 @@ USE_X86 = USE_X86_PY
 
 REPO_BASE_COMMIT_BRANCH = {
     "sympy/sympy": {
-        "cffd4e0f86fefd4802349a9f9b19ed70934ea354": "1.7",
         "70381f282f2d9d039da860e391fe51649df2779d": "sympy-1.5.1",
     },
     "pytest-dev/pytest": {

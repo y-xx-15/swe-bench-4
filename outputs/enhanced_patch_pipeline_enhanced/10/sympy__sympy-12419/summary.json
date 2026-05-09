@@ -1,0 +1,194 @@
+{
+  "instance_id": "sympy__sympy-12419",
+  "repo": "sympy/sympy",
+  "model": "gpt-4o",
+  "pipeline_mode": "enhanced_guided",
+  "hide_original_test_patch_in_repair": false,
+  "disable_semantic_bucket_guidance": false,
+  "disable_enhanced_test_filtering": false,
+  "repair_mode": "enhanced_guided",
+  "original_test_identifiers": [
+    "test_Identity"
+  ],
+  "original_status_counts": {
+    "FAILED": 2,
+    "PASSED": 25
+  },
+  "original_failed_count": 2,
+  "original_passed_count": 25,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_Identity"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_Identity"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/matrices/expressions/tests/test_matexpr.py:test_Identity",
+      "test_Identity"
+    ],
+    "failure_mode": "assertion_error",
+    "dominant_errors": [
+      "AssertionError"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "test_Identity F",
+      "test_Identity_doit ok",
+      "test_identity_powers ok"
+    ],
+    "noise_ratio": 0.0175,
+    "target_test_tracebacks": {
+      "test_Identity": "TARGET TEST: test_Identity\n- snippet: test_Identity F\n- snippet: test_Identity_doit ok\n- snippet: test_identity_powers ok\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_Identity F\ntest_Identity_doit ok\ntest_identity_powers ok\n________ sympy/matrices/expressions/tests/test_matexpr.py:test_Identity ________\n  File \"/testbed/sympy/matrices/expressions/tests/test_matexpr.py\", line 90, in test_Identity\nAssertionError\n============= tests finished: 26 passed, 1 failed, in 1.67 seconds ============="
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 3,
+    "keep_top_k": 2,
+    "attempt_budget": 3,
+    "bucket_limit": 3,
+    "template_limit": 3,
+    "failure_mode": "assertion_error",
+    "noise_ratio": 0.0175,
+    "difficulty": "low"
+  },
+  "adaptive_num_candidates": 3,
+  "adaptive_keep_top_k": 2,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 3,
+  "kept_enhanced_candidates": 1,
+  "enhanced_candidate_retention_rate": 0.3333333333333333,
+  "enhanced_generation_attempts_total": 8,
+  "enhanced_generation_attempts_avg": 2.6666666666666665,
+  "kept_enhanced_test_identifiers": [
+    "test_sweb_enhanced_validate_total_sum_identity_matrix"
+  ],
+  "enhanced_failed_test_identifiers": [
+    "test_sweb_enhanced_validate_total_sum_identity_matrix"
+  ],
+  "enhanced_failed_count": 1,
+  "generated_patch_nonempty": true,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 11,
+  "generated_patch_accepted": false,
+  "generated_patch_acceptance_reason": "rejected_patch_apply_failed",
+  "generated_patch_feedback": "The previous patch was rejected because it did not satisfy the acceptance gate. Patch apply mode: fuzzy_apply. Baseline passed=25, failed=2. Candidate passed=25, failed=2. Hard failure signal: none. FAIL_TO_PASS tests still failing after patch: test_Identity. Your patch must make ALL of these tests pass, not just improve aggregate counts. Semantic oracle failed identifiers: test_sweb_enhanced_validate_total_sum_identity_matrix. Semantic oracle failure summaries: test_sweb_enhanced_validate_total_sum_identity_matrix: + source /opt/miniconda3/bin/activate\n++ _CONDA_ROOT=/opt/miniconda3\n++ . /opt/miniconda3/etc/profile.d/conda.sh\n+++ export CONDA_EXE=/opt/miniconda3/bin/conda\n+++ CONDA_EXE=/opt/miniconda3/bin/conda\n+++ export _CE_M=\n+++ _CE_M=\n+++ export _CE_CONDA=\n+++ _CE_CONDA=\n+++ export CONDA_PYTHON_EXE=/opt/miniconda3/bin/python\n+++ CONDA_PYTHON_EXE=/opt/miniconda3/bin/python\n+++ '[' -z '' ']'\n+++ export CO\n\n...[truncated 105877 chars]....  Target files: sympy/matrices/expressions/matexpr.py. Target symbols: Identity. Generate a new source-only unified diff that is closer to the exact file context and lands inside the target class body.",
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [
+    "test_sweb_enhanced_validate_total_sum_identity_matrix"
+  ],
+  "patch_analysis": {
+    "root_cause": "The summation logic for the total elements of the identity matrix does not account for the off-diagonal elements being zero, leading to an incorrect result of 0 instead of 'n'.",
+    "affected_components": [
+      {
+        "file": "sympy/matrices/expressions/matexpr.py",
+        "symbol": "Identity",
+        "reason": "The Identity class defines the behavior of identity matrices, including element access and summation."
+      }
+    ],
+    "failing_signal": "The total sum of the elements of an identity matrix is computed as 0 instead of 'n', indicating incorrect handling of off-diagonal elements.",
+    "propagation_path": "The Identity class's `_entry` method correctly returns 1 for diagonal elements and 0 for off-diagonal elements, but the summation logic does not properly aggregate these values when calculating the total sum.",
+    "repair_constraint": "The fix must ensure that the total sum of the elements of an identity matrix is correctly computed as 'n', while preserving the correct behavior of diagonal and off-diagonal elements.",
+    "suggested_repair_scope": [
+      "sympy/matrices/expressions/matexpr.py"
+    ],
+    "suspicious_symbols": [
+      "Identity",
+      "_entry"
+    ],
+    "repair_obligations": [
+      {
+        "id": "test_Identity::core",
+        "source_symbol": "test_Identity",
+        "validation_subject": "core",
+        "why_it_matters": "The test explicitly validates the total sum of the elements of an identity matrix, which is a fundamental property of the Identity class."
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Fix Identity matrix total sum computation",
+    "approach": "Modify the Identity class to include a method that explicitly computes the total sum of all elements in the matrix, accounting for the diagonal and off-diagonal elements.",
+    "edit_targets": [
+      "sympy/matrices/expressions/matexpr.py::Identity"
+    ],
+    "dependency_files": [
+      "sympy/matrices/expressions/tests/test_matexpr.py"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [],
+    "sufficiency_assessment": "Editing the Identity class in sympy/matrices/expressions/matexpr.py is sufficient because the bug originates from the lack of a method to compute the total sum of elements correctly. The existing tests in sympy/matrices/expressions/tests/test_matexpr.py validate the fix.",
+    "risks": [
+      "Ensure that the fix does not interfere with other methods of the Identity class, such as _entry or _eval_trace, which rely on the same matrix structure."
+    ]
+  },
+  "patch_edit_plan": {
+    "coverage_check": [
+      {
+        "target_file": "sympy/matrices/expressions/matexpr.py",
+        "action": "modify_region",
+        "justification": "The Identity class needs to be modified to correctly compute the total sum of all elements in the matrix, addressing the bug where the sum is incorrectly calculated as 0 instead of 'n'."
+      }
+    ],
+    "edits": [
+      {
+        "target_file": "sympy/matrices/expressions/matexpr.py",
+        "target_symbol": "Identity",
+        "replacement_mode": "insert_after_anchor",
+        "covers_obligations": [
+          "test_Identity::core"
+        ],
+        "anchor_line_before": "    def _eval_trace(self):",
+        "anchor_line_after": "    def _eval_inverse(self):",
+        "replacement_block": "    def _eval_total_sum(self):\n        \"\"\"Compute the total sum of all elements in the identity matrix.\"\"\"\n        return self.rows\n\n    def _eval_inverse(self):"
+      }
+    ]
+  },
+  "final_patch_attempted": true,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": true,
+  "final_patch_apply_mode": "fuzzy_apply",
+  "final_patch_cleanly_applied": false,
+  "clean_apply_ratio": 0.0,
+  "resolved": false,
+  "final_resolved": false,
+  "final_status_counts": {
+    "FAILED": 2,
+    "PASSED": 25
+  },
+  "final_failed_count": 2,
+  "final_passed_count": 25,
+  "original_passed_count_improvement": 0,
+  "original_failed_count_reduction": 0,
+  "final_status_map": {
+    "sympy/matrices/expressions/tests/test_matexpr.py:test_Identity": "FAILED",
+    "test_shape": "PASSED",
+    "test_matexpr": "PASSED",
+    "test_subs": "PASSED",
+    "test_ZeroMatrix": "PASSED",
+    "test_ZeroMatrix_doit": "PASSED",
+    "test_Identity": "FAILED",
+    "test_Identity_doit": "PASSED",
+    "test_addition": "PASSED",
+    "test_multiplication": "PASSED",
+    "test_MatPow": "PASSED",
+    "test_MatrixSymbol": "PASSED",
+    "test_dense_conversion": "PASSED",
+    "test_free_symbols": "PASSED",
+    "test_zero_matmul": "PASSED",
+    "test_matadd_simplify": "PASSED",
+    "test_matmul_simplify": "PASSED",
+    "test_invariants": "PASSED",
+    "test_indexing": "PASSED",
+    "test_single_indexing": "PASSED",
+    "test_MatrixElement_commutative": "PASSED",
+    "test_MatrixSymbol_determinant": "PASSED",
+    "test_MatrixElement_diff": "PASSED",
+    "test_MatrixElement_doit": "PASSED",
+    "test_identity_powers": "PASSED",
+    "test_Zero_power": "PASSED",
+    "test_matrixelement_diff": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

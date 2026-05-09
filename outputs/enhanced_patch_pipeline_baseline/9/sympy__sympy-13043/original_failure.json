@@ -1,0 +1,15 @@
+{
+  "original_test_identifiers": [
+    "test_decompose"
+  ],
+  "status_map": {
+    "sympy/integrals/tests/test_intpoly.py:test_polytope_integrate": "FAILED",
+    "sympy/integrals/tests/test_intpoly.py:test_decompose": "FAILED",
+    "test_decompose": "FAILED",
+    "test_best_origin": "PASSED",
+    "test_polytope_integrate": "ERROR"
+  },
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/sympy__sympy-13043/test_output.txt",
+  "timed_out": false,
+  "error": null
+}

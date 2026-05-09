@@ -1,0 +1,21 @@
+{
+  "title": "Restore unreachable skip location correction branch",
+  "approach": "Convert the `elif` branch for `item._store.get(skipped_by_mark_key, True)` in `pytest_runtest_makereport` to a standalone `if` statement to ensure the skip location correction logic executes regardless of the `--runxfail` flag. This structural change restores reachability for the correction logic without interfering with xfail reporting.",
+  "edit_targets": [
+    "src/_pytest/skipping.py::pytest_runtest_makereport"
+  ],
+  "dependency_files": [
+    "testing/test_skipping.py"
+  ],
+  "structural_rules": [
+    "restore_unreachable_existing_branch"
+  ],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing `pytest_runtest_makereport` alone is sufficient because the unreachable correction branch already contains the necessary logic for skip location reporting. No changes are needed in other functions or files.",
+  "risks": [
+    "Ensure the change does not inadvertently alter xfail reporting behavior or introduce regressions in other test reporting logic."
+  ]
+}

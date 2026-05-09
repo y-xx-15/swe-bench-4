@@ -1,0 +1,17 @@
+{
+  "title": "Fix column insertion logic",
+  "approach": "Update the `_eval_col_insert` method to correctly calculate matrix entries during column insertion, ensuring the original matrix structure is preserved.",
+  "edit_targets": [
+    "sympy/matrices/common.py::MatrixShaping._eval_col_insert"
+  ],
+  "dependency_files": [
+    "sympy/matrices/common.py::MatrixShaping.col_insert",
+    "sympy/matrices/tests/test_commonmatrix.py::test_col_insert"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing `_eval_col_insert` should be sufficient to fix the bug, as it directly handles the logic for column insertion. However, verifying the fix through `test_col_insert` is necessary to ensure correctness.",
+  "risks": [
+    "Potential regressions in other matrix operations that rely on `_eval_col_insert`."
+  ]
+}

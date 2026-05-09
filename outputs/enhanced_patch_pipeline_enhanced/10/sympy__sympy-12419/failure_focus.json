@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_Identity"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_Identity"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/matrices/expressions/tests/test_matexpr.py:test_Identity",
+    "test_Identity"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_Identity F",
+    "test_Identity_doit ok",
+    "test_identity_powers ok"
+  ],
+  "noise_ratio": 0.0175,
+  "target_test_tracebacks": {
+    "test_Identity": "TARGET TEST: test_Identity\n- snippet: test_Identity F\n- snippet: test_Identity_doit ok\n- snippet: test_identity_powers ok\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_Identity F\ntest_Identity_doit ok\ntest_identity_powers ok\n________ sympy/matrices/expressions/tests/test_matexpr.py:test_Identity ________\n  File \"/testbed/sympy/matrices/expressions/tests/test_matexpr.py\", line 90, in test_Identity\nAssertionError\n============= tests finished: 26 passed, 1 failed, in 1.67 seconds ============="
+  }
+}

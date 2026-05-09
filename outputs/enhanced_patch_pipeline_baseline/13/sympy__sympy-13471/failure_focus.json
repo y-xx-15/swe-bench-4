@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_Float_from_tuple"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_Float_from_tuple"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/core/tests/test_numbers.py:test_Float_from_tuple",
+    "test_Float_from_tuple"
+  ],
+  "failure_mode": "value_error",
+  "dominant_errors": [
+    "ValueError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_Float_from_tuple E",
+    "____________ sympy/core/tests/test_numbers.py:test_Float_from_tuple ____________",
+    "File \"/testbed/sympy/core/tests/test_numbers.py\", line 586, in test_Float_from_tuple"
+  ],
+  "noise_ratio": 0.0191,
+  "target_test_tracebacks": {
+    "test_Float_from_tuple": "TARGET TEST: test_Float_from_tuple\n- snippet: test_Float_from_tuple E\n- snippet: ____________ sympy/core/tests/test_numbers.py:test_Float_from_tuple ____________\n- snippet: File \"/testbed/sympy/core/tests/test_numbers.py\", line 586, in test_Float_from_tuple\n- dominant_errors: ValueError\nWEAK TRACEBACK CONTEXT:\ntest_Float_from_tuple E\n____________ sympy/core/tests/test_numbers.py:test_Float_from_tuple ____________\n  File \"/testbed/sympy/core/tests/test_numbers.py\", line 586, in test_Float_from_tuple\nValueError: invalid literal for int() with base 16: '1L'"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "original_test_identifiers": [
+    "test_immutable"
+  ],
+  "status_map": {
+    "sympy/core/tests/test_basic.py:test_immutable": "FAILED",
+    "test__aresame": "PASSED",
+    "test_structure": "PASSED",
+    "test_immutable": "FAILED",
+    "test_equality": "PASSED",
+    "test_matches_basic": "PASSED",
+    "test_has": "PASSED",
+    "test_subs": "PASSED",
+    "test_subs_with_unicode_symbols": "PASSED",
+    "test_atoms": "PASSED",
+    "test_free_symbols_empty": "PASSED",
+    "test_doit": "PASSED",
+    "test_S": "PASSED",
+    "test_xreplace": "PASSED",
+    "test_preorder_traversal": "PASSED",
+    "test_sorted_args": "PASSED",
+    "test_call": "PASSED",
+    "test_rewrite": "PASSED",
+    "test_literal_evalf_is_number_is_zero_is_comparable": "PASSED",
+    "test_as_Basic": "PASSED",
+    "test_atomic": "PASSED",
+    "test_as_dummy": "PASSED",
+    "test_canonical_variables": "PASSED"
+  },
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/sympy__sympy-20590/test_output.txt",
+  "timed_out": false,
+  "error": null
+}

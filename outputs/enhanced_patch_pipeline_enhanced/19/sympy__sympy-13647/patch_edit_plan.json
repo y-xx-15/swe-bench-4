@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/matrices/common.py",
+      "action": "modify_region",
+      "justification": "The `_eval_col_insert` method contains the logic responsible for column insertion, which is directly causing the misalignment issue. This file must be edited to correct the index calculations."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/matrices/common.py",
+      "target_symbol": "MatrixShaping._eval_col_insert",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_col_insert::core"
+      ],
+      "anchor_line_before": "        cols = self.cols",
+      "anchor_line_after": "        def entry(i, j):",
+      "replacement_block": "        cols = self.cols\n\n        def entry(i, j):\n            if j < pos:\n                return self[i, j]\n            elif pos <= j < pos + other.cols:\n                return other[i, j - pos]\n            else:\n                return self[i, j - other.cols]\n\n        return self._new(self.rows, self.cols + other.cols,\n                         lambda i, j: entry(i, j))"
+    }
+  ]
+}

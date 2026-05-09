@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_bell"
+  ],
+  "status_map": {
+    "sympy/functions/combinatorial/tests/test_comb_numbers.py:test_bell": "FAILED",
+    "test_bernoulli": "PASSED",
+    "test_fibonacci": "PASSED",
+    "test_bell": "FAILED",
+    "test_harmonic": "PASSED",
+    "test_harmonic_rational": "PASSED",
+    "test_harmonic_evalf": "PASSED",
+    "test_harmonic_rewrite_polygamma": "PASSED",
+    "test_harmonic_rewrite_sum": "PASSED",
+    "test_euler": "PASSED",
+    "test_euler_odd": "PASSED",
+    "test_euler_polynomials": "PASSED",
+    "test_euler_polynomial_rewrite": "PASSED",
+    "test_catalan": "PASSED",
+    "test_genocchi": "PASSED",
+    "test_nC_nP_nT": "PASSED",
+    "test_issue_8496": "PASSED"
+  },
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/sympy__sympy-13437/test_output.txt",
+  "timed_out": false,
+  "error": null
+}

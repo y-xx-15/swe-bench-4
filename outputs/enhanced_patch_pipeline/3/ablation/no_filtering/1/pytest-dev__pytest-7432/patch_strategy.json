@@ -1,0 +1,21 @@
+{
+  "title": "restore_skip_location_reporting_with_runxfail",
+  "approach": "Convert the `elif item.config.option.runxfail` branch in `pytest_runtest_makereport` to a standalone `if` statement to ensure the correction logic for `rep.longrepr` (adjusting skip location to the item definition) executes regardless of the flag.",
+  "edit_targets": [
+    "src/_pytest/skipping.py::pytest_runtest_makereport"
+  ],
+  "dependency_files": [
+    "testing/test_skipping.py"
+  ],
+  "structural_rules": [
+    "restore_unreachable_existing_branch"
+  ],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing `pytest_runtest_makereport` alone is sufficient because the correction logic for `rep.longrepr` is already present but unreachable due to the flag-induced short-circuit. No additional changes to other functions or files are needed.",
+  "risks": [
+    "Ensure the `--runxfail` flag continues to handle xfail-specific behavior without introducing unintended interference with other test reporting logic."
+  ]
+}

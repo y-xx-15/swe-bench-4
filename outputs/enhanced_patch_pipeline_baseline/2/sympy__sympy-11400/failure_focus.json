@@ -1,0 +1,32 @@
+{
+  "original_test_identifiers": [
+    "test_ccode_Relational",
+    "test_ccode_sinc"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_ccode_Relational",
+    "test_ccode_sinc"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/printing/tests/test_ccode.py:test_ccode_Relational",
+    "sympy/printing/tests/test_ccode.py:test_ccode_sinc",
+    "test_ccode_Relational",
+    "test_ccode_sinc"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_ccode_Relational F",
+    "test_ccode_sinc F",
+    "___________ sympy/printing/tests/test_ccode.py:test_ccode_Relational ___________"
+  ],
+  "noise_ratio": 0.0166,
+  "target_test_tracebacks": {
+    "test_ccode_Relational": "TARGET TEST: test_ccode_Relational\n- snippet: test_ccode_Relational F\n- snippet: test_ccode_sinc F\n- snippet: ___________ sympy/printing/tests/test_ccode.py:test_ccode_Relational ___________\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_ccode_Relational F\n___________ sympy/printing/tests/test_ccode.py:test_ccode_Relational ___________\n  File \"/testbed/sympy/printing/tests/test_ccode.py\", line 125, in test_ccode_Relational\nAssertionError\nAssertionError\n============= tests finished: 30 passed, 2 failed, in 0.15 seconds =============",
+    "test_ccode_sinc": "TARGET TEST: test_ccode_sinc\n- snippet: test_ccode_Relational F\n- snippet: test_ccode_sinc F\n- snippet: ___________ sympy/printing/tests/test_ccode.py:test_ccode_Relational ___________\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_ccode_sinc F\nAssertionError\n______________ sympy/printing/tests/test_ccode.py:test_ccode_sinc ______________\n  File \"/testbed/sympy/printing/tests/test_ccode.py\", line 178, in test_ccode_sinc\nAssertionError\n============= tests finished: 30 passed, 2 failed, in 0.15 seconds ============="
+  }
+}

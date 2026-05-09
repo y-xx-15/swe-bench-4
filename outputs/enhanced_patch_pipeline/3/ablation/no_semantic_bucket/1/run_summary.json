@@ -1,0 +1,1187 @@
+[
+  {
+    "instance_id": "django__django-10914",
+    "repo": "django/django",
+    "model": "gpt-4o",
+    "pipeline_mode": "enhanced_guided",
+    "hide_original_test_patch_in_repair": false,
+    "disable_semantic_bucket_guidance": true,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "enhanced_guided",
+    "original_test_identifiers": [
+      "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+    ],
+    "original_status_counts": {
+      "PASSED": 98,
+      "SKIPPED": 1,
+      "FAILED": 2
+    },
+    "original_failed_count": 2,
+    "original_passed_count": 98,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)",
+        "test_override_file_upload_permissions"
+      ],
+      "failure_mode": "assertion_error",
+      "dominant_errors": [
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [
+        {
+          "raw": "AssertionError: None != 420",
+          "left_value": "None",
+          "operator": "!=",
+          "right_value": "420"
+        }
+      ],
+      "failure_snippets": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests) ... FAIL",
+        "FAIL: test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)",
+        "Traceback (most recent call last):"
+      ],
+      "noise_ratio": 0.0023,
+      "target_test_tracebacks": {
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)": "TARGET TEST: test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)\n- snippet: test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests) ... FAIL\n- snippet: FAIL: test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_error_message (test_utils.tests.AssertTemplateUsedContextManagerTests) ... ok\ntest_parsing_errors (test_utils.tests.HTMLEqualTests) ... ok\ntest_equal_parsing_errors (test_utils.tests.JSONEqualTests) ... ok\ntest_not_equal_parsing_errors (test_utils.tests.JSONEqualTests) ... ok\ntest_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests) ... FAIL\ntest_parsing_errors (test_utils.tests.XMLEqualTests) ... ok\nFAIL: test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)\nTraceback (most recent call last):\nAssertionError: None != 420\nFAILED (failures=1, skipped=1)"
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 3,
+      "keep_top_k": 2,
+      "attempt_budget": 3,
+      "bucket_limit": 3,
+      "template_limit": 3,
+      "failure_mode": "assertion_error",
+      "noise_ratio": 0.0023,
+      "difficulty": "low"
+    },
+    "adaptive_num_candidates": 3,
+    "adaptive_keep_top_k": 2,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 3,
+    "kept_enhanced_candidates": 1,
+    "enhanced_candidate_retention_rate": 0.3333333333333333,
+    "enhanced_generation_attempts_total": 10,
+    "enhanced_generation_attempts_avg": 3.3333333333333335,
+    "kept_enhanced_test_identifiers": [
+      "test_sweb_enhanced_file_upload_permissions_default"
+    ],
+    "enhanced_failed_test_identifiers": [
+      "test_sweb_enhanced_file_upload_permissions_default"
+    ],
+    "enhanced_failed_count": 1,
+    "generated_patch_nonempty": true,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 7,
+    "generated_patch_accepted": true,
+    "generated_patch_acceptance_reason": "accepted_final_validation",
+    "generated_patch_feedback": null,
+    "semantic_oracle_passed": true,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The default value of FILE_UPLOAD_PERMISSIONS is set to None in django/conf/global_settings.py. This causes inconsistencies in file permissions for uploaded files, as the tempfile.NamedTemporaryFile + os.rename sequence defaults to 0o600 permissions on some systems.",
+      "affected_components": [
+        {
+          "file": "django/conf/global_settings.py",
+          "symbol": "FILE_UPLOAD_PERMISSIONS",
+          "reason": "This setting determines the default file permissions for uploaded files. Its current value of None leads to inconsistent behavior across systems."
+        },
+        {
+          "file": "tests/test_utils/tests.py",
+          "symbol": "test_override_file_upload_permissions",
+          "reason": "This test explicitly checks the behavior of FILE_UPLOAD_PERMISSIONS and fails due to the default value being None."
+        }
+      ],
+      "failing_signal": "The test_override_file_upload_permissions test fails with an AssertionError because the expected file permission (0o644) does not match the actual permission (0o600).",
+      "propagation_path": "The FILE_UPLOAD_PERMISSIONS setting is None by default, which causes the tempfile module to apply its default permissions (0o600) when creating temporary files. This behavior propagates to the final uploaded file permissions, leading to the test failure.",
+      "repair_constraint": "The default value of FILE_UPLOAD_PERMISSIONS must ensure consistent and secure file permissions across all systems, while maintaining backward compatibility for existing configurations.",
+      "suggested_repair_scope": [
+        "django/conf/global_settings.py",
+        "tests/test_utils/tests.py"
+      ],
+      "suspicious_symbols": [
+        "FILE_UPLOAD_PERMISSIONS",
+        "test_override_file_upload_permissions"
+      ],
+      "repair_obligations": [
+        {
+          "id": "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core::FILE_UPLOAD_PERMISSIONS",
+          "source_symbol": "FILE_UPLOAD_PERMISSIONS",
+          "validation_subject": "FILE_UPLOAD_PERMISSIONS",
+          "why_it_matters": "This obligation ensures that the default file permissions for uploaded files are consistent and meet the expectations of the test case."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Set default FILE_UPLOAD_PERMISSIONS to 0o644",
+      "approach": "Modify the default value of FILE_UPLOAD_PERMISSIONS in django/conf/global_settings.py to 0o644 to ensure consistent file permissions for uploaded files across systems.",
+      "edit_targets": [
+        "django/conf/global_settings.py::FILE_UPLOAD_PERMISSIONS"
+      ],
+      "dependency_files": [
+        "tests/test_utils/tests.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [],
+      "sufficiency_assessment": "Editing django/conf/global_settings.py to set FILE_UPLOAD_PERMISSIONS to 0o644 is sufficient to resolve the issue. No other files or symbols need modification, but tests in tests/test_utils/tests.py should verify the change.",
+      "risks": [
+        "Potential backward compatibility issues for users relying on the default None value for FILE_UPLOAD_PERMISSIONS."
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "django/conf/global_settings.py",
+          "action": "modify_region",
+          "justification": "The default value of FILE_UPLOAD_PERMISSIONS is None, which leads to inconsistent file permissions for uploaded files. Modifying this file to set FILE_UPLOAD_PERMISSIONS to 0o644 ensures consistent behavior across systems."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "django/conf/global_settings.py",
+          "target_symbol": "FILE_UPLOAD_PERMISSIONS",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core::FILE_UPLOAD_PERMISSIONS"
+          ],
+          "anchor_line_before": "FILE_UPLOAD_TEMP_DIR = None",
+          "anchor_line_after": "# The numeric mode to assign to newly-created directories, when uploading files.",
+          "replacement_block": "FILE_UPLOAD_TEMP_DIR = None\n\n# The numeric mode to set newly-uploaded files to. The value should be a mode\n# you'd pass directly to os.chmod; see https://docs.python.org/library/os.html#files-and-directories.\nFILE_UPLOAD_PERMISSIONS = 0o644\n\n# The numeric mode to assign to newly-created directories, when uploading files.\n# The value should be a mode as you'd pass to os.chmod;\n# see https://docs.python.org/library/os.html#files-and-directories.\nFILE_UPLOAD_DIRECTORY_PERMISSIONS = None"
+        }
+      ]
+    },
+    "final_patch_attempted": true,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": true,
+    "final_patch_apply_mode": "clean_apply",
+    "final_patch_cleanly_applied": true,
+    "clean_apply_ratio": 1.0,
+    "resolved": true,
+    "final_resolved": true,
+    "final_status_counts": {
+      "PASSED": 99,
+      "SKIPPED": 1
+    },
+    "final_failed_count": 0,
+    "final_passed_count": 99,
+    "original_passed_count_improvement": 1,
+    "original_failed_count_reduction": 2,
+    "final_status_map": {
+      "test_failure (test_utils.tests.AssertNumQueriesContextManagerTests)": "PASSED",
+      "test_simple (test_utils.tests.AssertNumQueriesContextManagerTests)": "PASSED",
+      "test_with_client (test_utils.tests.AssertNumQueriesContextManagerTests)": "PASSED",
+      "test_assert_num_queries (test_utils.tests.AssertNumQueriesTests)": "PASSED",
+      "test_assert_num_queries_with_client (test_utils.tests.AssertNumQueriesTests)": "PASSED",
+      "test_ordered (test_utils.tests.AssertQuerysetEqualTests)": "PASSED",
+      "test_repeated_values (test_utils.tests.AssertQuerysetEqualTests)": "PASSED",
+      "test_transform (test_utils.tests.AssertQuerysetEqualTests)": "PASSED",
+      "test_undefined_order (test_utils.tests.AssertQuerysetEqualTests)": "PASSED",
+      "test_unordered (test_utils.tests.AssertQuerysetEqualTests)": "PASSED",
+      "test_failure (test_utils.tests.CaptureQueriesContextManagerTests)": "PASSED",
+      "test_nested (test_utils.tests.CaptureQueriesContextManagerTests)": "PASSED",
+      "test_simple (test_utils.tests.CaptureQueriesContextManagerTests)": "PASSED",
+      "test_with_client (test_utils.tests.CaptureQueriesContextManagerTests)": "PASSED",
+      "test_within (test_utils.tests.CaptureQueriesContextManagerTests)": "PASSED",
+      "test_missing_default_databases (test_utils.tests.SkippingClassTestCase)": "PASSED",
+      "test_skip_class_unless_db_feature (test_utils.tests.SkippingClassTestCase)": "PASSED",
+      "test_fixtures_are_skipped (test_utils.tests.SkippingExtraTests)": "SKIPPED",
+      "test_failure_in_setUpTestData_should_rollback_transaction (test_utils.tests.TestBadSetUpTestData)": "PASSED",
+      "test_allowed_database_chunked_cursor_queries (test_utils.tests.AllowedDatabaseQueriesTests)": "PASSED",
+      "test_allowed_database_queries (test_utils.tests.AllowedDatabaseQueriesTests)": "PASSED",
+      "test_assert_field_output (test_utils.tests.AssertFieldOutputTests)": "PASSED",
+      "test_custom_required_message (test_utils.tests.AssertFieldOutputTests)": "PASSED",
+      "test_ignores_connection_configuration_queries (test_utils.tests.AssertNumQueriesUponConnectionTests)": "PASSED",
+      "test_assert_raises_message (test_utils.tests.AssertRaisesMsgTest)": "PASSED",
+      "assertRaisesMessage shouldn't interpret RE special chars.": "PASSED",
+      "test_assert_used_on_http_response (test_utils.tests.AssertTemplateUsedContextManagerTests)": "PASSED",
+      "test_error_message (test_utils.tests.AssertTemplateUsedContextManagerTests)": "PASSED",
+      "test_failure (test_utils.tests.AssertTemplateUsedContextManagerTests)": "PASSED",
+      "test_nested_usage (test_utils.tests.AssertTemplateUsedContextManagerTests)": "PASSED",
+      "test_not_used (test_utils.tests.AssertTemplateUsedContextManagerTests)": "PASSED",
+      "test_usage (test_utils.tests.AssertTemplateUsedContextManagerTests)": "PASSED",
+      "test_equal (test_utils.tests.AssertURLEqualTests)": "PASSED",
+      "test_message (test_utils.tests.AssertURLEqualTests)": "PASSED",
+      "test_msg_prefix (test_utils.tests.AssertURLEqualTests)": "PASSED",
+      "test_not_equal (test_utils.tests.AssertURLEqualTests)": "PASSED",
+      "test_callable (test_utils.tests.AssertWarnsMessageTests)": "PASSED",
+      "test_context_manager (test_utils.tests.AssertWarnsMessageTests)": "PASSED",
+      "test_context_manager_failure (test_utils.tests.AssertWarnsMessageTests)": "PASSED",
+      "test_special_re_chars (test_utils.tests.AssertWarnsMessageTests)": "PASSED",
+      "test_all (test_utils.tests.DatabaseAliasTests)": "PASSED",
+      "test_close_match (test_utils.tests.DatabaseAliasTests)": "PASSED",
+      "test_match (test_utils.tests.DatabaseAliasTests)": "PASSED",
+      "test_no_close_match (test_utils.tests.DatabaseAliasTests)": "PASSED",
+      "test_disallowed_database_chunked_cursor_queries (test_utils.tests.DisallowedDatabaseQueriesTests)": "PASSED",
+      "test_disallowed_database_connections (test_utils.tests.DisallowedDatabaseQueriesTests)": "PASSED",
+      "test_disallowed_database_queries (test_utils.tests.DisallowedDatabaseQueriesTests)": "PASSED",
+      "test_attributes (test_utils.tests.HTMLEqualTests)": "PASSED",
+      "test_complex_examples (test_utils.tests.HTMLEqualTests)": "PASSED",
+      "test_contains_html (test_utils.tests.HTMLEqualTests)": "PASSED",
+      "test_count (test_utils.tests.HTMLEqualTests)": "PASSED",
+      "test_html_contain (test_utils.tests.HTMLEqualTests)": "PASSED",
+      "test_html_parser (test_utils.tests.HTMLEqualTests)": "PASSED",
+      "test_ignore_comments (test_utils.tests.HTMLEqualTests)": "PASSED",
+      "test_parse_html_in_script (test_utils.tests.HTMLEqualTests)": "PASSED",
+      "test_parsing_errors (test_utils.tests.HTMLEqualTests)": "PASSED",
+      "test_self_closing_tags (test_utils.tests.HTMLEqualTests)": "PASSED",
+      "test_simple_equal_html (test_utils.tests.HTMLEqualTests)": "PASSED",
+      "test_unequal_html (test_utils.tests.HTMLEqualTests)": "PASSED",
+      "test_unicode_handling (test_utils.tests.HTMLEqualTests)": "PASSED",
+      "test_class_decoration (test_utils.tests.IsolatedAppsTests)": "PASSED",
+      "test_context_manager (test_utils.tests.IsolatedAppsTests)": "PASSED",
+      "test_installed_apps (test_utils.tests.IsolatedAppsTests)": "PASSED",
+      "test_method_decoration (test_utils.tests.IsolatedAppsTests)": "PASSED",
+      "test_nested (test_utils.tests.IsolatedAppsTests)": "PASSED",
+      "test_equal_parsing_errors (test_utils.tests.JSONEqualTests)": "PASSED",
+      "test_not_equal_parsing_errors (test_utils.tests.JSONEqualTests)": "PASSED",
+      "test_simple_equal (test_utils.tests.JSONEqualTests)": "PASSED",
+      "test_simple_equal_raise (test_utils.tests.JSONEqualTests)": "PASSED",
+      "test_simple_equal_unordered (test_utils.tests.JSONEqualTests)": "PASSED",
+      "test_simple_not_equal (test_utils.tests.JSONEqualTests)": "PASSED",
+      "test_simple_not_equal_raise (test_utils.tests.JSONEqualTests)": "PASSED",
+      "test_override_database_routers (test_utils.tests.OverrideSettingsTests)": "PASSED",
+      "test_override_file_upload_directory_permissions (test_utils.tests.OverrideSettingsTests)": "PASSED",
+      "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)": "PASSED",
+      "test_override_media_root (test_utils.tests.OverrideSettingsTests)": "PASSED",
+      "test_override_media_url (test_utils.tests.OverrideSettingsTests)": "PASSED",
+      "test_override_static_root (test_utils.tests.OverrideSettingsTests)": "PASSED",
+      "test_override_static_url (test_utils.tests.OverrideSettingsTests)": "PASSED",
+      "test_override_staticfiles_dirs (test_utils.tests.OverrideSettingsTests)": "PASSED",
+      "test_override_staticfiles_finders (test_utils.tests.OverrideSettingsTests)": "PASSED",
+      "test_override_staticfiles_storage (test_utils.tests.OverrideSettingsTests)": "PASSED",
+      "test_urlconf_cache (test_utils.tests.OverrideSettingsTests)": "PASSED",
+      "test_urlconf_first (test_utils.tests.OverrideSettingsTests)": "PASSED",
+      "test_urlconf_second (test_utils.tests.OverrideSettingsTests)": "PASSED",
+      "test_allowed_hosts (test_utils.tests.SetupTestEnvironmentTests)": "PASSED",
+      "test_setup_test_environment_calling_more_than_once (test_utils.tests.SetupTestEnvironmentTests)": "PASSED",
+      "test_skip_if_db_feature (test_utils.tests.SkippingTestCase)": "PASSED",
+      "test_skip_unless_db_feature (test_utils.tests.SkippingTestCase)": "PASSED",
+      "An exception is setUp() is reraised after disable() is called.": "PASSED",
+      "test_comment_root (test_utils.tests.XMLEqualTests)": "PASSED",
+      "test_parsing_errors (test_utils.tests.XMLEqualTests)": "PASSED",
+      "test_simple_equal (test_utils.tests.XMLEqualTests)": "PASSED",
+      "test_simple_equal_raise (test_utils.tests.XMLEqualTests)": "PASSED",
+      "test_simple_equal_raises_message (test_utils.tests.XMLEqualTests)": "PASSED",
+      "test_simple_equal_unordered (test_utils.tests.XMLEqualTests)": "PASSED",
+      "test_simple_equal_with_leading_or_trailing_whitespace (test_utils.tests.XMLEqualTests)": "PASSED",
+      "test_simple_not_equal (test_utils.tests.XMLEqualTests)": "PASSED",
+      "test_simple_not_equal_raise (test_utils.tests.XMLEqualTests)": "PASSED",
+      "test_simple_not_equal_with_whitespace_in_the_middle (test_utils.tests.XMLEqualTests)": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  },
+  {
+    "instance_id": "pallets__flask-4045",
+    "repo": "pallets/flask",
+    "model": "gpt-4o",
+    "pipeline_mode": "enhanced_guided",
+    "hide_original_test_patch_in_repair": false,
+    "disable_semantic_bucket_guidance": true,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "enhanced_guided",
+    "original_test_identifiers": [
+      "test_dotted_name_not_allowed",
+      "test_route_decorator_custom_endpoint_with_dots"
+    ],
+    "original_status_counts": {
+      "PASSED": 50,
+      "ERROR": 11,
+      "FAILED": 118
+    },
+    "original_failed_count": 129,
+    "original_passed_count": 50,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_dotted_name_not_allowed",
+        "test_route_decorator_custom_endpoint_with_dots"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_dotted_name_not_allowed",
+        "test_route_decorator_custom_endpoint_with_dots"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "tests/test_basic.py::test_flashes",
+        "tests/test_basic.py::test_make_response",
+        "tests/test_basic.py::test_make_response_with_response_instance",
+        "tests/test_basic.py::test_jsonify_no_prettyprint",
+        "tests/test_basic.py::test_jsonify_prettyprint"
+      ],
+      "failure_mode": "value_error",
+      "dominant_errors": [
+        "RuntimeError",
+        "ImportError",
+        "TypeError",
+        "ValueError",
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "E           TypeError: __init__() got an unexpected keyword argument 'as_tuple'",
+        "/opt/miniconda3/envs/testbed/lib/python3.9/site-packages/werkzeug/test.py:1190: TypeError",
+        "with pytest.raises(ValueError):"
+      ],
+      "noise_ratio": 0.0589,
+      "target_test_tracebacks": {
+        "test_dotted_name_not_allowed": "_________________________ test_dotted_name_not_allowed _________________________\n\napp = <Flask 'flask_test'>, client = <FlaskClient <Flask 'flask_test'>>\n\n    def test_dotted_name_not_allowed(app, client):\n        with pytest.raises(ValueError):\n>           flask.Blueprint(\"app.ui\", __name__)\nE           Failed: DID NOT RAISE <class 'ValueError'>\n\ntests/test_blueprints.py:256: Failed",
+        "test_route_decorator_custom_endpoint_with_dots": "________________ test_route_decorator_custom_endpoint_with_dots ________________\n\napp = <Flask 'flask_test'>, client = <FlaskClient <Flask 'flask_test'>>\n\n    def test_route_decorator_custom_endpoint_with_dots(app, client):\n        bp = flask.Blueprint(\"bp\", __name__)\n    \n        with pytest.raises(ValueError):\n>           bp.route(\"/\", endpoint=\"a.b\")(lambda: \"\")\n\ntests/test_blueprints.py:326: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nsrc/flask/scaffold.py:433: in decorator\n    self.add_url_rule(rule, endpoint, f, **options)\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <Blueprint 'bp'>, rule = '/', endpoint = 'a.b'\nview_func = <function test_route_decorator_custom_endpoint_with_dots.<locals>.<lambda> at 0x7e82d74f9280>\noptions = {}\n\n    def add_url_rule(\n        self,\n        rule: str,\n        endpoint: t.Optional[str] = None,\n        view_func: t.Optional[t.Callable] = None,\n        **options: t.Any,\n    ) -> None:\n        \"\"\"Like :meth:`Flask.add_url_rule` but for a blueprint.  The endpoint for\n        the :func:`url_for` function is prefixed with the name of the blueprint.\n        \"\"\"\n        if endpoint:\n>           assert \".\" not in endpoint, \"Blueprint endpoints should not contain dots\"\nE           AssertionError: Blueprint endpoints should not contain dots\n\nsrc/flask/blueprints.py:364: AssertionError"
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 10,
+      "keep_top_k": 5,
+      "attempt_budget": 4,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "value_error",
+      "noise_ratio": 0.0589,
+      "difficulty": "very_high"
+    },
+    "adaptive_num_candidates": 10,
+    "adaptive_keep_top_k": 5,
+    "adaptive_attempt_budget": 4,
+    "enhanced_candidates_total": 10,
+    "kept_enhanced_candidates": 5,
+    "enhanced_candidate_retention_rate": 0.5,
+    "enhanced_generation_attempts_total": 18,
+    "enhanced_generation_attempts_avg": 1.8,
+    "kept_enhanced_test_identifiers": [
+      "test_sweb_enhanced_blueprint_name_with_dots",
+      "test_sweb_enhanced_reject_blueprint_endpoint_with_dots",
+      "test_sweb_enhanced_view_func_name_dots",
+      "test_sweb_enhanced_reject_blueprint_name_with_dot",
+      "test_sweb_enhanced_custom_endpoint_with_dot"
+    ],
+    "enhanced_failed_test_identifiers": [
+      "test_sweb_enhanced_blueprint_name_with_dots",
+      "test_sweb_enhanced_reject_blueprint_endpoint_with_dots",
+      "test_sweb_enhanced_view_func_name_dots",
+      "test_sweb_enhanced_reject_blueprint_name_with_dot",
+      "test_sweb_enhanced_custom_endpoint_with_dot"
+    ],
+    "enhanced_failed_count": 5,
+    "generated_patch_nonempty": true,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 8,
+    "generated_patch_accepted": true,
+    "generated_patch_acceptance_reason": "accepted_final_validation",
+    "generated_patch_feedback": null,
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [
+      "test_sweb_enhanced_blueprint_name_with_dots",
+      "test_sweb_enhanced_view_func_name_dots"
+    ],
+    "patch_analysis": {
+      "root_cause": "The Blueprint class does not validate the 'name' parameter for dots, and the 'add_url_rule' method does not enforce the absence of dots in the 'endpoint' and 'view_func_name' parameters consistently.",
+      "affected_components": [
+        {
+          "file": "src/flask/blueprints.py",
+          "symbol": "Blueprint.__init__",
+          "reason": "The 'name' parameter is not validated to ensure it does not contain dots, which is required for nested blueprints."
+        },
+        {
+          "file": "src/flask/blueprints.py",
+          "symbol": "Blueprint.add_url_rule",
+          "reason": "The 'endpoint' and 'view_func_name' parameters are not consistently validated to ensure they do not contain dots, which is required for proper routing."
+        }
+      ],
+      "failing_signal": "The tests expect a ValueError to be raised when a blueprint name or endpoint contains dots, but no such error is raised. Additionally, an assertion failure occurs when an endpoint with dots is used.",
+      "propagation_path": "The lack of validation in Blueprint.__init__ allows invalid names to propagate into the application. Similarly, the lack of validation in Blueprint.add_url_rule allows invalid endpoints to propagate, causing assertion failures during routing.",
+      "repair_constraint": "The fix must ensure that blueprint names, endpoints, and view function names do not contain dots, while maintaining backward compatibility for valid inputs.",
+      "suggested_repair_scope": [
+        "src/flask/blueprints.py"
+      ],
+      "suspicious_symbols": [
+        "Blueprint.__init__",
+        "Blueprint.add_url_rule"
+      ],
+      "repair_obligations": [
+        {
+          "id": "test_dotted_name_not_allowed::core",
+          "source_symbol": "Blueprint.__init__",
+          "validation_subject": "name",
+          "why_it_matters": "Blueprint names with dots can cause routing conflicts and are not supported for nested blueprints."
+        },
+        {
+          "id": "test_route_decorator_custom_endpoint_with_dots::endpoint",
+          "source_symbol": "Blueprint.add_url_rule",
+          "validation_subject": "endpoint",
+          "why_it_matters": "Endpoints with dots can cause routing conflicts and are not supported for nested blueprints."
+        },
+        {
+          "id": "test_route_decorator_custom_endpoint_with_dots::view_func_name",
+          "source_symbol": "Blueprint.add_url_rule",
+          "validation_subject": "view_func_name",
+          "why_it_matters": "View function names with dots can cause routing conflicts and are not supported for nested blueprints."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Validate Blueprint names and endpoints for dots",
+      "approach": "Add explicit validation in the Blueprint.__init__ and Blueprint.add_url_rule methods to ensure that blueprint names, endpoints, and view function names do not contain dots. Replace assertion-based validation with explicit ValueError exceptions to meet the expected behavior.",
+      "edit_targets": [
+        "src/flask/blueprints.py::Blueprint.__init__",
+        "src/flask/blueprints.py::Blueprint.add_url_rule"
+      ],
+      "dependency_files": [
+        "tests/test_blueprints.py",
+        "tests/test_basic.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [
+        "assert_in_validation"
+      ],
+      "sufficiency_assessment": "Editing both Blueprint.__init__ and Blueprint.add_url_rule is necessary to fully address the issue. Blueprint.__init__ must validate the 'name' parameter, while Blueprint.add_url_rule must validate both the 'endpoint' and 'view_func_name' parameters. These changes ensure that all obligations are met and that the expected ValueError exceptions are raised.",
+      "risks": [
+        "Backward compatibility issues if existing applications rely on blueprint names or endpoints containing dots.",
+        "Potential performance impact due to additional validation checks."
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "src/flask/blueprints.py",
+          "action": "modify_region",
+          "justification": "The Blueprint.__init__ method must validate the 'name' parameter to ensure it does not contain dots, as this is required for nested blueprints and to prevent routing conflicts."
+        },
+        {
+          "target_file": "src/flask/blueprints.py",
+          "action": "modify_region",
+          "justification": "The Blueprint.add_url_rule method must validate the 'endpoint' and 'view_func_name' parameters to ensure they do not contain dots, as this is required for proper routing and to prevent assertion failures."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "src/flask/blueprints.py",
+          "target_symbol": "Blueprint.__init__",
+          "replacement_mode": "insert_before_anchor",
+          "covers_obligations": [
+            "test_dotted_name_not_allowed::core"
+          ],
+          "anchor_line_before": "        self.name = name",
+          "anchor_line_after": "        self.url_prefix = url_prefix",
+          "replacement_block": "        if '.' in name:\n            raise ValueError(\"Blueprint names should not contain dots: '{}'\".format(name))\n        self.name = name\n        self.url_prefix = url_prefix"
+        },
+        {
+          "target_file": "src/flask/blueprints.py",
+          "target_symbol": "Blueprint.add_url_rule__branch",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "test_route_decorator_custom_endpoint_with_dots::endpoint",
+            "test_route_decorator_custom_endpoint_with_dots::view_func_name"
+          ],
+          "anchor_line_before": "        if endpoint:",
+          "anchor_line_after": "            assert \".\" not in endpoint, \"Blueprint endpoints should not contain dots\"",
+          "replacement_block": "        if endpoint:\n            if '.' in endpoint:\n                raise ValueError(\"Blueprint endpoints should not contain dots: '{}'\".format(endpoint))\n        if view_func and hasattr(view_func, \"__name__\"):\n            if '.' in view_func.__name__:\n                raise ValueError(\"Blueprint view function names should not contain dots: '{}'\".format(view_func.__name__))"
+        }
+      ]
+    },
+    "final_patch_attempted": true,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": true,
+    "final_patch_apply_mode": "clean_apply",
+    "final_patch_cleanly_applied": true,
+    "clean_apply_ratio": 1.0,
+    "resolved": true,
+    "final_resolved": true,
+    "final_status_counts": {
+      "PASSED": 52,
+      "ERROR": 11,
+      "FAILED": 116
+    },
+    "final_failed_count": 127,
+    "final_passed_count": 52,
+    "original_passed_count_improvement": 2,
+    "original_failed_count_reduction": 2,
+    "final_status_map": {
+      "tests/test_basic.py::test_method_route_no_methods": "PASSED",
+      "tests/test_basic.py::test_disallow_string_for_allowed_methods": "PASSED",
+      "tests/test_basic.py::test_error_handler_unknown_code": "PASSED",
+      "tests/test_basic.py::test_request_locals": "PASSED",
+      "tests/test_basic.py::test_exception_propagation": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[None-True-True-True]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[None-True-True-False]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[None-True-False-True]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[None-True-False-False]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[None-False-True-True]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[None-False-True-False]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[None-False-False-True]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[None-False-False-False]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[True-True-True-True]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[True-True-True-False]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[True-True-False-True]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[True-True-False-False]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[True-False-True-True]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[True-False-True-False]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[True-False-False-True]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[True-False-False-False]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[False-True-True-True]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[False-True-True-False]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[False-True-False-True]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[False-True-False-False]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[False-False-True-True]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[False-False-True-False]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[False-False-False-True]": "PASSED",
+      "tests/test_basic.py::test_werkzeug_passthrough_errors[False-False-False-False]": "PASSED",
+      "tests/test_basic.py::test_get_method_on_g": "PASSED",
+      "tests/test_basic.py::test_g_iteration_protocol": "PASSED",
+      "tests/test_basic.py::test_run_defaults": "PASSED",
+      "tests/test_basic.py::test_run_server_port": "PASSED",
+      "tests/test_basic.py::test_run_from_config[None-None-pocoo.org:8080-pocoo.org-8080]": "PASSED",
+      "tests/test_basic.py::test_run_from_config[localhost-None-pocoo.org:8080-localhost-8080]": "PASSED",
+      "tests/test_basic.py::test_run_from_config[None-80-pocoo.org:8080-pocoo.org-80]": "PASSED",
+      "tests/test_basic.py::test_run_from_config[localhost-80-pocoo.org:8080-localhost-80]": "PASSED",
+      "tests/test_basic.py::test_run_from_config[localhost-0-localhost:8080-localhost-0]": "PASSED",
+      "tests/test_basic.py::test_run_from_config[None-None-localhost:8080-localhost-8080]": "PASSED",
+      "tests/test_basic.py::test_run_from_config[None-None-localhost:0-localhost-0]": "PASSED",
+      "tests/test_basic.py::test_app_freed_on_zero_refcount": "PASSED",
+      "tests/test_blueprints.py::test_dotted_name_not_allowed": "PASSED",
+      "tests/test_blueprints.py::test_route_decorator_custom_endpoint_with_dots": "PASSED",
+      "tests/test_blueprints.py::test_template_filter": "PASSED",
+      "tests/test_blueprints.py::test_add_template_filter": "PASSED",
+      "tests/test_blueprints.py::test_template_filter_with_name": "PASSED",
+      "tests/test_blueprints.py::test_add_template_filter_with_name": "PASSED",
+      "tests/test_blueprints.py::test_template_test": "PASSED",
+      "tests/test_blueprints.py::test_add_template_test": "PASSED",
+      "tests/test_blueprints.py::test_template_test_with_name": "PASSED",
+      "tests/test_blueprints.py::test_add_template_test_with_name": "PASSED",
+      "tests/test_blueprints.py::test_template_global": "PASSED",
+      "tests/test_basic.py::test_flashes": "ERROR",
+      "tests/test_basic.py::test_make_response": "ERROR",
+      "tests/test_basic.py::test_make_response_with_response_instance": "ERROR",
+      "tests/test_basic.py::test_jsonify_no_prettyprint": "ERROR",
+      "tests/test_basic.py::test_jsonify_prettyprint": "ERROR",
+      "tests/test_basic.py::test_jsonify_mimetype": "ERROR",
+      "tests/test_basic.py::test_json_dump_dataclass": "ERROR",
+      "tests/test_basic.py::test_jsonify_args_and_kwargs_check": "ERROR",
+      "tests/test_basic.py::test_url_generation": "ERROR",
+      "tests/test_blueprints.py::test_templates_and_static": "ERROR",
+      "tests/test_blueprints.py::test_templates_list": "ERROR",
+      "tests/test_basic.py::test_options_work": "FAILED",
+      "tests/test_basic.py::test_options_on_multiple_rules": "FAILED",
+      "tests/test_basic.py::test_method_route[get]": "FAILED",
+      "tests/test_basic.py::test_method_route[post]": "FAILED",
+      "tests/test_basic.py::test_method_route[put]": "FAILED",
+      "tests/test_basic.py::test_method_route[delete]": "FAILED",
+      "tests/test_basic.py::test_method_route[patch]": "FAILED",
+      "tests/test_basic.py::test_provide_automatic_options_attr": "FAILED",
+      "tests/test_basic.py::test_provide_automatic_options_kwarg": "FAILED",
+      "tests/test_basic.py::test_request_dispatching": "FAILED",
+      "tests/test_basic.py::test_url_mapping": "FAILED",
+      "tests/test_basic.py::test_werkzeug_routing": "FAILED",
+      "tests/test_basic.py::test_endpoint_decorator": "FAILED",
+      "tests/test_basic.py::test_session": "FAILED",
+      "tests/test_basic.py::test_session_using_server_name": "FAILED",
+      "tests/test_basic.py::test_session_using_server_name_and_port": "FAILED",
+      "tests/test_basic.py::test_session_using_server_name_port_and_path": "FAILED",
+      "tests/test_basic.py::test_session_using_application_root": "FAILED",
+      "tests/test_basic.py::test_session_using_session_settings": "FAILED",
+      "tests/test_basic.py::test_session_using_samesite_attribute": "FAILED",
+      "tests/test_basic.py::test_session_localhost_warning": "FAILED",
+      "tests/test_basic.py::test_session_ip_warning": "FAILED",
+      "tests/test_basic.py::test_missing_session": "FAILED",
+      "tests/test_basic.py::test_session_expiration": "FAILED",
+      "tests/test_basic.py::test_session_stored_last": "FAILED",
+      "tests/test_basic.py::test_session_special_types": "FAILED",
+      "tests/test_basic.py::test_session_cookie_setting": "FAILED",
+      "tests/test_basic.py::test_session_vary_cookie": "FAILED",
+      "tests/test_basic.py::test_extended_flashing": "FAILED",
+      "tests/test_basic.py::test_request_processing": "FAILED",
+      "tests/test_basic.py::test_request_preprocessing_early_return": "FAILED",
+      "tests/test_basic.py::test_after_request_processing": "FAILED",
+      "tests/test_basic.py::test_teardown_request_handler": "FAILED",
+      "tests/test_basic.py::test_teardown_request_handler_debug_mode": "FAILED",
+      "tests/test_basic.py::test_teardown_request_handler_error": "FAILED",
+      "tests/test_basic.py::test_before_after_request_order": "FAILED",
+      "tests/test_basic.py::test_error_handling": "FAILED",
+      "tests/test_basic.py::test_error_handling_processing": "FAILED",
+      "tests/test_basic.py::test_baseexception_error_handling": "FAILED",
+      "tests/test_basic.py::test_before_request_and_routing_errors": "FAILED",
+      "tests/test_basic.py::test_user_error_handling": "FAILED",
+      "tests/test_basic.py::test_http_error_subclass_handling": "FAILED",
+      "tests/test_basic.py::test_errorhandler_precedence": "FAILED",
+      "tests/test_basic.py::test_trapping_of_bad_request_key_errors": "FAILED",
+      "tests/test_basic.py::test_trapping_of_all_http_exceptions": "FAILED",
+      "tests/test_basic.py::test_error_handler_after_processor_error": "FAILED",
+      "tests/test_basic.py::test_enctype_debug_helper": "FAILED",
+      "tests/test_basic.py::test_response_types": "FAILED",
+      "tests/test_basic.py::test_response_type_errors": "FAILED",
+      "tests/test_basic.py::test_build_error_handler": "FAILED",
+      "tests/test_basic.py::test_build_error_handler_reraise": "FAILED",
+      "tests/test_basic.py::test_url_for_passes_special_values_to_build_error_handler": "FAILED",
+      "tests/test_basic.py::test_static_files": "FAILED",
+      "tests/test_basic.py::test_static_url_path": "FAILED",
+      "tests/test_basic.py::test_static_url_path_with_ending_slash": "FAILED",
+      "tests/test_basic.py::test_static_url_empty_path": "FAILED",
+      "tests/test_basic.py::test_static_url_empty_path_default": "FAILED",
+      "tests/test_basic.py::test_static_folder_with_pathlib_path": "FAILED",
+      "tests/test_basic.py::test_static_folder_with_ending_slash": "FAILED",
+      "tests/test_basic.py::test_static_route_with_host_matching": "FAILED",
+      "tests/test_basic.py::test_server_name_subdomain": "FAILED",
+      "tests/test_basic.py::test_max_content_length": "FAILED",
+      "tests/test_basic.py::test_url_processors": "FAILED",
+      "tests/test_basic.py::test_inject_blueprint_url_defaults": "FAILED",
+      "tests/test_basic.py::test_nonascii_pathinfo": "FAILED",
+      "tests/test_basic.py::test_debug_mode_complains_after_first_request": "FAILED",
+      "tests/test_basic.py::test_before_first_request_functions": "FAILED",
+      "tests/test_basic.py::test_before_first_request_functions_concurrent": "FAILED",
+      "tests/test_basic.py::test_routing_redirect_debugging": "FAILED",
+      "tests/test_basic.py::test_route_decorator_custom_endpoint": "FAILED",
+      "tests/test_basic.py::test_preserve_only_once": "FAILED",
+      "tests/test_basic.py::test_preserve_remembers_exception": "FAILED",
+      "tests/test_basic.py::test_subdomain_basic_support": "FAILED",
+      "tests/test_basic.py::test_subdomain_matching": "FAILED",
+      "tests/test_basic.py::test_subdomain_matching_with_ports": "FAILED",
+      "tests/test_basic.py::test_subdomain_matching_other_name[False]": "FAILED",
+      "tests/test_basic.py::test_subdomain_matching_other_name[True]": "FAILED",
+      "tests/test_basic.py::test_multi_route_rules": "FAILED",
+      "tests/test_basic.py::test_multi_route_class_views": "FAILED",
+      "tests/test_basic.py::test_max_cookie_size": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_specific_error_handling": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_specific_user_error_handling": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_app_error_handling": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_prefix_slash[-/-/]": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_prefix_slash[/--/]": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_prefix_slash[/-/-/]": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_prefix_slash[/foo--/foo]": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_prefix_slash[/foo/--/foo/]": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_prefix_slash[-/bar-/bar]": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_prefix_slash[/foo/-/bar-/foo/bar]": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_prefix_slash[/foo/-bar-/foo/bar]": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_prefix_slash[/foo-/bar-/foo/bar]": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_prefix_slash[/foo/-//bar-/foo/bar]": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_prefix_slash[/foo//-/bar-/foo/bar]": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_url_defaults": "FAILED",
+      "tests/test_blueprints.py::test_blueprint_url_processors": "FAILED",
+      "tests/test_blueprints.py::test_default_static_max_age": "FAILED",
+      "tests/test_blueprints.py::test_dotted_names_from_app": "FAILED",
+      "tests/test_blueprints.py::test_empty_url_defaults": "FAILED",
+      "tests/test_blueprints.py::test_route_decorator_custom_endpoint": "FAILED",
+      "tests/test_blueprints.py::test_endpoint_decorator": "FAILED",
+      "tests/test_blueprints.py::test_template_filter_with_template": "FAILED",
+      "tests/test_blueprints.py::test_template_filter_after_route_with_template": "FAILED",
+      "tests/test_blueprints.py::test_add_template_filter_with_template": "FAILED",
+      "tests/test_blueprints.py::test_template_filter_with_name_and_template": "FAILED",
+      "tests/test_blueprints.py::test_add_template_filter_with_name_and_template": "FAILED",
+      "tests/test_blueprints.py::test_template_test_with_template": "FAILED",
+      "tests/test_blueprints.py::test_template_test_after_route_with_template": "FAILED",
+      "tests/test_blueprints.py::test_add_template_test_with_template": "FAILED",
+      "tests/test_blueprints.py::test_template_test_with_name_and_template": "FAILED",
+      "tests/test_blueprints.py::test_add_template_test_with_name_and_template": "FAILED",
+      "tests/test_blueprints.py::test_context_processing": "FAILED",
+      "tests/test_blueprints.py::test_request_processing": "FAILED",
+      "tests/test_blueprints.py::test_app_request_processing": "FAILED",
+      "tests/test_blueprints.py::test_app_url_processors": "FAILED",
+      "tests/test_blueprints.py::test_nested_blueprint": "FAILED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  },
+  {
+    "instance_id": "pytest-dev__pytest-7432",
+    "repo": "pytest-dev/pytest",
+    "model": "gpt-4o",
+    "pipeline_mode": "enhanced_guided",
+    "hide_original_test_patch_in_repair": false,
+    "disable_semantic_bucket_guidance": true,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "enhanced_guided",
+    "original_test_identifiers": [
+      "test_xfail_run_with_skip_mark[test_input1-expected1]"
+    ],
+    "original_status_counts": {
+      "SKIPPED": 2,
+      "FAILED": 7,
+      "XFAIL": 9,
+      "ERROR": 6,
+      "PASSED": 77
+    },
+    "original_failed_count": 13,
+    "original_passed_count": 86,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "test_xfail_run_anyway.py::test_func",
+        "test_xfail_imperative_in_setup_function.py::test_this",
+        "test_xfail_raises.py::test_raises",
+        "test_reportchars.py::test_1",
+        "test_simple.py::test_foo"
+      ],
+      "failure_mode": "type_error",
+      "dominant_errors": [
+        "AssertionError",
+        "TypeError",
+        "AttributeError",
+        "IndexError",
+        "Error"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "________ TestXFail.test_xfail_run_with_skip_mark[test_input1-expected1] ________",
+        "test_xfail_run_anyway.py:4: AssertionError",
+        "FAILED test_xfail_run_anyway.py::test_func - assert 0"
+      ],
+      "noise_ratio": 0.0023,
+      "target_test_tracebacks": {
+        "test_xfail_run_with_skip_mark[test_input1-expected1]": "FAILED testing/test_skipping.py::TestXFail::test_xfail_run_with_skip_mark[test_input1-expected1]\n========================= 1 failed, 78 passed in 4.39s =========================\n+ echo '>>>>> End Test Output'\n+ git checkout e6e300e729dd33956e5448d8be9a0b1540b4e53a testing/test_skipping.py\n>>>>> End Test Output\nUpdated 1 path from 877d43379"
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 7,
+      "keep_top_k": 4,
+      "attempt_budget": 3,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "type_error",
+      "noise_ratio": 0.0023,
+      "difficulty": "high"
+    },
+    "adaptive_num_candidates": 7,
+    "adaptive_keep_top_k": 4,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 7,
+    "kept_enhanced_candidates": 4,
+    "enhanced_candidate_retention_rate": 0.5714285714285714,
+    "enhanced_generation_attempts_total": 13,
+    "enhanced_generation_attempts_avg": 1.8571428571428572,
+    "kept_enhanced_test_identifiers": [
+      "test_sweb_enhanced_skip_location_with_unexpected_xfail",
+      "test_sweb_enhanced_skip_location_with_multiple_marks",
+      "test_sweb_enhanced_verify_skip_location_with_runxfail",
+      "test_sweb_enhanced_skip_location_with_runxfail"
+    ],
+    "enhanced_failed_test_identifiers": [
+      "test_sweb_enhanced_skip_location_with_unexpected_xfail",
+      "test_sweb_enhanced_skip_location_with_multiple_marks",
+      "test_sweb_enhanced_verify_skip_location_with_runxfail",
+      "test_sweb_enhanced_skip_location_with_runxfail"
+    ],
+    "enhanced_failed_count": 4,
+    "generated_patch_nonempty": true,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 10,
+    "generated_patch_accepted": true,
+    "generated_patch_acceptance_reason": "accepted_final_validation",
+    "generated_patch_feedback": null,
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [
+      "test_sweb_enhanced_skip_location_with_unexpected_xfail",
+      "test_sweb_enhanced_skip_location_with_multiple_marks"
+    ],
+    "patch_analysis": {
+      "root_cause": "The `pytest_runtest_makereport` hook has a conditional branch for `--runxfail` that prevents the correction logic for skip location reporting from executing. Specifically, the `elif` branch for `item._store.get(skipped_by_mark_key, True)` becomes unreachable when `--runxfail` is enabled, as the earlier `elif item.config.option.runxfail` short-circuits the control flow.",
+      "affected_components": [
+        {
+          "file": "src/_pytest/skipping.py",
+          "symbol": "pytest_runtest_makereport",
+          "reason": "This hook is responsible for generating test reports, including skip location reporting. The bug lies in its conditional logic."
+        }
+      ],
+      "failing_signal": "When `--runxfail` is enabled, the skip location in the test report incorrectly points to `src/_pytest/skipping.py:238` instead of the test item definition, as evidenced by the test failure logs.",
+      "propagation_path": "The `--runxfail` flag triggers the `elif item.config.option.runxfail` branch in `pytest_runtest_makereport`, which prevents the subsequent correction logic for skip location reporting from executing. This results in the wrong location being reported in the test output.",
+      "repair_constraint": "The fix must ensure that skip location reporting works correctly regardless of whether `--runxfail` is enabled, without altering the behavior of xfail reporting.",
+      "suggested_repair_scope": [
+        "src/_pytest/skipping.py"
+      ],
+      "suspicious_symbols": [
+        "pytest_runtest_makereport",
+        "skipped_by_mark_key",
+        "item.reportinfo"
+      ],
+      "repair_obligations": [
+        {
+          "id": "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip_location_reporting",
+          "source_symbol": "src/_pytest/skipping.py::pytest_runtest_makereport",
+          "validation_subject": "skip_location_reporting",
+          "why_it_matters": "This obligation ensures that the skip location in test reports points to the test item definition, which is critical for accurate reporting."
+        },
+        {
+          "id": "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip location reporting",
+          "source_symbol": "src/_pytest/skipping.py::pytest_runtest_makereport",
+          "validation_subject": "skip location reporting",
+          "why_it_matters": "This obligation ensures that the skip location reporting logic correctly handles cases where `--runxfail` is enabled, maintaining consistency in test output."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Restore unreachable skip location correction branch",
+      "approach": "Convert the `elif` branch for `item._store.get(skipped_by_mark_key, True)` in `pytest_runtest_makereport` to a standalone `if` statement to ensure the skip location correction logic executes regardless of the `--runxfail` flag. This structural change restores reachability for the correction logic without interfering with xfail reporting.",
+      "edit_targets": [
+        "src/_pytest/skipping.py::pytest_runtest_makereport"
+      ],
+      "dependency_files": [
+        "testing/test_skipping.py"
+      ],
+      "structural_rules": [
+        "restore_unreachable_existing_branch"
+      ],
+      "forbidden_patterns": [
+        "negative_gating",
+        "top_of_function_side_path"
+      ],
+      "sufficiency_assessment": "Editing `pytest_runtest_makereport` alone is sufficient because the unreachable correction branch already contains the necessary logic for skip location reporting. No changes are needed in other functions or files.",
+      "risks": [
+        "Ensure the change does not inadvertently alter xfail reporting behavior or introduce regressions in other test reporting logic."
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "src/_pytest/skipping.py",
+          "action": "modify_region",
+          "justification": "The `pytest_runtest_makereport` function contains the conditional logic responsible for skip location reporting. The bug lies in its unreachable branch for `item._store.get(skipped_by_mark_key, True)` when `--runxfail` is enabled, requiring a structural fix."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "src/_pytest/skipping.py",
+          "target_symbol": "pytest_runtest_makereport",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip_location_reporting",
+            "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip location reporting"
+          ],
+          "anchor_line_before": "    elif item.config.option.runxfail:",
+          "anchor_line_after": "    elif item._store.get(skipped_by_mark_key, True):",
+          "replacement_block": "    elif item.config.option.runxfail:\n        rep.outcome = \"skipped\"\n        rep.wasxfail = \"runxfail\"\n\n    if item._store.get(skipped_by_mark_key, True):\n        rep.outcome = \"skipped\"\n        rep.longrepr = item.reportinfo() + (\"unconditional skip\",)"
+        }
+      ]
+    },
+    "final_patch_attempted": true,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": true,
+    "final_patch_apply_mode": "clean_apply",
+    "final_patch_cleanly_applied": true,
+    "clean_apply_ratio": 1.0,
+    "resolved": true,
+    "final_resolved": true,
+    "final_status_counts": {
+      "FAILED": 6,
+      "SKIPPED": 2,
+      "XFAIL": 9,
+      "ERROR": 6,
+      "PASSED": 78
+    },
+    "final_failed_count": 12,
+    "final_passed_count": 87,
+    "original_passed_count_improvement": 1,
+    "original_failed_count_reduction": 1,
+    "final_status_map": {
+      "test_xfail_run_anyway.py::test_func": "FAILED",
+      "[1]": "SKIPPED",
+      "test_one.py::test_this": "XFAIL",
+      "test_one.py::test_this_true": "XFAIL",
+      "test_xfail_imperative.py::test_this": "XFAIL",
+      "test_xfail_imperative_in_setup_function.py::test_this": "FAILED",
+      "test_dynamic_xfail_no_run.py::test_this": "XFAIL",
+      "test_xfail_raises.py::test_raises": "FAILED",
+      "test_strict_sanity.py::test_foo": "XFAIL",
+      "[2]": "SKIPPED",
+      "test_reportchars.py::test_1": "FAILED",
+      "test_reportchars.py::test_2": "XFAIL",
+      "test_simple.py::test_foo": "ERROR",
+      "test_reportchars_all.py::test_2": "XFAIL",
+      "test_reportchars_all.py::test_5": "ERROR",
+      "test_reportchars_all.py::test_1": "FAILED",
+      "test_errors_in_xfail_skip_expressions.py::test_nameerror": "ERROR",
+      "test_errors_in_xfail_skip_expressions.py::test_syntax": "ERROR",
+      "test_xfail_skipif_with_globals.py::test_boolean": "XFAIL",
+      "test_xfail.py::test_func": "XFAIL",
+      "test_module_level_skip_error.py": "ERROR",
+      "test_invalid_skip_keyword_parameter.py": "ERROR",
+      "test_summary_list_after_errors.py::test_fail": "FAILED",
+      "testing/test_skipping.py::test_importorskip": "PASSED",
+      "testing/test_skipping.py::TestEvaluation::test_no_marker": "PASSED",
+      "testing/test_skipping.py::TestEvaluation::test_marked_xfail_no_args": "PASSED",
+      "testing/test_skipping.py::TestEvaluation::test_marked_skipif_no_args": "PASSED",
+      "testing/test_skipping.py::TestEvaluation::test_marked_one_arg": "PASSED",
+      "testing/test_skipping.py::TestEvaluation::test_marked_one_arg_with_reason": "PASSED",
+      "testing/test_skipping.py::TestEvaluation::test_marked_one_arg_twice": "PASSED",
+      "testing/test_skipping.py::TestEvaluation::test_marked_one_arg_twice2": "PASSED",
+      "testing/test_skipping.py::TestEvaluation::test_marked_skipif_with_boolean_without_reason": "PASSED",
+      "testing/test_skipping.py::TestEvaluation::test_marked_skipif_with_invalid_boolean": "PASSED",
+      "testing/test_skipping.py::TestEvaluation::test_skipif_class": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_simple[True]": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_simple[False]": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_xpassed": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_using_platform": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_xpassed_strict": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_run_anyway": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_run_with_skip_mark[test_input0-expected0]": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_run_with_skip_mark[test_input1-expected1]": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_evalfalse_but_fails": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_not_report_default": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_not_run_xfail_reporting": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_not_run_no_setup_run": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_xpass": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_imperative": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_imperative_in_setup_function": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_dynamic_xfail_no_run": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_dynamic_xfail_set_during_funcarg_setup": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_raises[TypeError-TypeError-*1": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_raises[(AttributeError,": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_raises[TypeError-IndexError-*1": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_strict_sanity": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_strict_xfail[True]": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_strict_xfail[False]": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_strict_xfail_condition[True]": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_strict_xfail_condition[False]": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_condition_keyword[True]": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_xfail_condition_keyword[False]": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_strict_xfail_default_from_file[true]": "PASSED",
+      "testing/test_skipping.py::TestXFail::test_strict_xfail_default_from_file[false]": "PASSED",
+      "testing/test_skipping.py::TestXFailwithSetupTeardown::test_failing_setup_issue9": "PASSED",
+      "testing/test_skipping.py::TestXFailwithSetupTeardown::test_failing_teardown_issue9": "PASSED",
+      "testing/test_skipping.py::TestSkip::test_skip_class": "PASSED",
+      "testing/test_skipping.py::TestSkip::test_skips_on_false_string": "PASSED",
+      "testing/test_skipping.py::TestSkip::test_arg_as_reason": "PASSED",
+      "testing/test_skipping.py::TestSkip::test_skip_no_reason": "PASSED",
+      "testing/test_skipping.py::TestSkip::test_skip_with_reason": "PASSED",
+      "testing/test_skipping.py::TestSkip::test_only_skips_marked_test": "PASSED",
+      "testing/test_skipping.py::TestSkip::test_strict_and_skip": "PASSED",
+      "testing/test_skipping.py::TestSkipif::test_skipif_conditional": "PASSED",
+      "testing/test_skipping.py::TestSkipif::test_skipif_reporting[\"hasattr(sys,": "PASSED",
+      "testing/test_skipping.py::TestSkipif::test_skipif_reporting[True,": "PASSED",
+      "testing/test_skipping.py::TestSkipif::test_skipif_using_platform": "PASSED",
+      "testing/test_skipping.py::TestSkipif::test_skipif_reporting_multiple[skipif-SKIP-skipped]": "PASSED",
+      "testing/test_skipping.py::TestSkipif::test_skipif_reporting_multiple[xfail-XPASS-xpassed]": "PASSED",
+      "testing/test_skipping.py::test_skip_not_report_default": "PASSED",
+      "testing/test_skipping.py::test_skipif_class": "PASSED",
+      "testing/test_skipping.py::test_skipped_reasons_functional": "PASSED",
+      "testing/test_skipping.py::test_skipped_folding": "PASSED",
+      "testing/test_skipping.py::test_reportchars": "PASSED",
+      "testing/test_skipping.py::test_reportchars_error": "PASSED",
+      "testing/test_skipping.py::test_reportchars_all": "PASSED",
+      "testing/test_skipping.py::test_reportchars_all_error": "PASSED",
+      "testing/test_skipping.py::test_errors_in_xfail_skip_expressions": "PASSED",
+      "testing/test_skipping.py::test_xfail_skipif_with_globals": "PASSED",
+      "testing/test_skipping.py::test_default_markers": "PASSED",
+      "testing/test_skipping.py::test_xfail_test_setup_exception": "PASSED",
+      "testing/test_skipping.py::test_imperativeskip_on_xfail_test": "PASSED",
+      "testing/test_skipping.py::TestBooleanCondition::test_skipif": "PASSED",
+      "testing/test_skipping.py::TestBooleanCondition::test_skipif_noreason": "PASSED",
+      "testing/test_skipping.py::TestBooleanCondition::test_xfail": "PASSED",
+      "testing/test_skipping.py::test_xfail_item": "PASSED",
+      "testing/test_skipping.py::test_module_level_skip_error": "PASSED",
+      "testing/test_skipping.py::test_module_level_skip_with_allow_module_level": "PASSED",
+      "testing/test_skipping.py::test_invalid_skip_keyword_parameter": "PASSED",
+      "testing/test_skipping.py::test_mark_xfail_item": "PASSED",
+      "testing/test_skipping.py::test_summary_list_after_errors": "PASSED",
+      "testing/test_skipping.py::test_relpath_rootdir": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  },
+  {
+    "instance_id": "sympy__sympy-20590",
+    "repo": "sympy/sympy",
+    "model": "gpt-4o",
+    "pipeline_mode": "enhanced_guided",
+    "hide_original_test_patch_in_repair": false,
+    "disable_semantic_bucket_guidance": true,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "enhanced_guided",
+    "original_test_identifiers": [
+      "test_immutable"
+    ],
+    "original_status_counts": {
+      "FAILED": 2,
+      "PASSED": 21
+    },
+    "original_failed_count": 2,
+    "original_passed_count": 21,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_immutable"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_immutable"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/core/tests/test_basic.py:test_immutable",
+        "test_immutable"
+      ],
+      "failure_mode": "attribute_error",
+      "dominant_errors": [
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_immutable F",
+        "________________ sympy/core/tests/test_basic.py:test_immutable _________________",
+        "Traceback (most recent call last):"
+      ],
+      "noise_ratio": 0.006,
+      "target_test_tracebacks": {
+        "test_immutable": "TARGET TEST: test_immutable\n- snippet: test_immutable F\n- snippet: ________________ sympy/core/tests/test_basic.py:test_immutable _________________\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_immutable F\n________________ sympy/core/tests/test_basic.py:test_immutable _________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/core/tests/test_basic.py\", line 38, in test_immutable\nAssertionError\n============= tests finished: 22 passed, 1 failed, in 0.68 seconds ============="
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 3,
+      "keep_top_k": 2,
+      "attempt_budget": 3,
+      "bucket_limit": 3,
+      "template_limit": 3,
+      "failure_mode": "attribute_error",
+      "noise_ratio": 0.006,
+      "difficulty": "low"
+    },
+    "adaptive_num_candidates": 3,
+    "adaptive_keep_top_k": 2,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 3,
+    "kept_enhanced_candidates": 1,
+    "enhanced_candidate_retention_rate": 0.3333333333333333,
+    "enhanced_generation_attempts_total": 9,
+    "enhanced_generation_attempts_avg": 3.0,
+    "kept_enhanced_test_identifiers": [
+      "test_sweb_enhanced_immutable_symbol_dict_absence"
+    ],
+    "enhanced_failed_test_identifiers": [
+      "test_sweb_enhanced_immutable_symbol_dict_absence"
+    ],
+    "enhanced_failed_count": 1,
+    "generated_patch_nonempty": true,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 8,
+    "generated_patch_accepted": true,
+    "generated_patch_acceptance_reason": "accepted_final_validation",
+    "generated_patch_feedback": null,
+    "semantic_oracle_passed": true,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The `Symbol` class in SymPy 1.7 and later versions no longer enforces `__slots__` due to a missing `__slots__` definition in one of its parent classes, likely caused by the introduction of a new mixin or base class that does not define `__slots__`.",
+      "affected_components": [
+        {
+          "file": "sympy/core/_print_helpers.py",
+          "symbol": "Printable",
+          "reason": "This class is a mixin used in SymPy's core classes, and its lack of a `__slots__` definition may contribute to the issue."
+        },
+        {
+          "file": "sympy/core/tests/test_basic.py",
+          "symbol": "test_immutable",
+          "reason": "This test directly verifies the immutability of `Symbol` instances and fails due to the presence of `__dict__`."
+        }
+      ],
+      "failing_signal": "The test `test_immutable` fails with an `AssertionError`, indicating that `Symbol` instances are no longer immutable because they now have a `__dict__` attribute.",
+      "propagation_path": "The missing `__slots__` definition in a parent class allows the `Symbol` class to inherit a `__dict__` attribute, breaking immutability. This propagates to the `test_immutable` test, which asserts that `Symbol` instances should not have a `__dict__`.",
+      "repair_constraint": "The `Symbol` class must remain immutable, and its instances must not have a `__dict__` attribute. Any fix must preserve the intended behavior of all parent classes and mixins.",
+      "suggested_repair_scope": [
+        "sympy/core/_print_helpers.py",
+        "sympy/core/tests/test_basic.py"
+      ],
+      "suspicious_symbols": [
+        "Printable",
+        "Symbol",
+        "__slots__",
+        "__dict__"
+      ],
+      "repair_obligations": [
+        {
+          "id": "test_immutable::core",
+          "source_symbol": "test_immutable",
+          "validation_subject": "core",
+          "why_it_matters": "The test ensures that `Symbol` instances are immutable and do not have a `__dict__`, which is a critical property for SymPy's symbolic computation."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Restore __slots__ enforcement in Symbol class hierarchy",
+      "approach": "Ensure all parent classes of Symbol, including mixins like Printable, define __slots__ to prevent the inheritance of a __dict__ attribute. This will restore immutability for Symbol instances.",
+      "edit_targets": [
+        "sympy/core/_print_helpers.py::Printable"
+      ],
+      "dependency_files": [
+        "sympy/core/tests/test_basic.py",
+        "sympy/core/symbol.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [
+        "negative_gating",
+        "top_of_function_side_path"
+      ],
+      "sufficiency_assessment": "Editing the Printable class to define __slots__ is necessary to prevent the inheritance of a __dict__ attribute. Additionally, the Symbol class must explicitly define __slots__ to ensure immutability. These changes should suffice to fix the issue without requiring modifications to other files.",
+      "risks": [
+        "Potential regressions in classes that inherit from Printable or Symbol, as they may rely on the presence of a __dict__ attribute for dynamic attribute assignment."
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/core/_print_helpers.py",
+          "action": "modify_region",
+          "justification": "The Printable class is a mixin used in SymPy's core classes, and its lack of a __slots__ definition contributes to the inheritance of a __dict__ attribute in Symbol instances, breaking immutability."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "sympy/core/_print_helpers.py",
+          "target_symbol": "Printable",
+          "replacement_mode": "insert_after_anchor",
+          "covers_obligations": [
+            "test_immutable::core"
+          ],
+          "anchor_line_before": "    \"\"\"",
+          "anchor_line_after": "    def __str__(self):",
+          "replacement_block": "    \"\"\"\n\n    __slots__ = ()\n\n    def __str__(self):"
+        }
+      ]
+    },
+    "final_patch_attempted": true,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": true,
+    "final_patch_apply_mode": "clean_apply",
+    "final_patch_cleanly_applied": true,
+    "clean_apply_ratio": 1.0,
+    "resolved": true,
+    "final_resolved": true,
+    "final_status_counts": {
+      "PASSED": 22
+    },
+    "final_failed_count": 0,
+    "final_passed_count": 22,
+    "original_passed_count_improvement": 1,
+    "original_failed_count_reduction": 2,
+    "final_status_map": {
+      "test__aresame": "PASSED",
+      "test_structure": "PASSED",
+      "test_immutable": "PASSED",
+      "test_equality": "PASSED",
+      "test_matches_basic": "PASSED",
+      "test_has": "PASSED",
+      "test_subs": "PASSED",
+      "test_subs_with_unicode_symbols": "PASSED",
+      "test_atoms": "PASSED",
+      "test_free_symbols_empty": "PASSED",
+      "test_doit": "PASSED",
+      "test_S": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_preorder_traversal": "PASSED",
+      "test_sorted_args": "PASSED",
+      "test_call": "PASSED",
+      "test_rewrite": "PASSED",
+      "test_literal_evalf_is_number_is_zero_is_comparable": "PASSED",
+      "test_as_Basic": "PASSED",
+      "test_atomic": "PASSED",
+      "test_as_dummy": "PASSED",
+      "test_canonical_variables": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

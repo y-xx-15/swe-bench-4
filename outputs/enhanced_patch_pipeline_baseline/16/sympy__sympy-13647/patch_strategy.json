@@ -1,0 +1,17 @@
+{
+  "title": "Fix column misalignment in col_insert",
+  "approach": "Adjust the logic in `_eval_col_insert` to correctly calculate the column positions when inserting multiple columns, ensuring proper alignment of both inserted and existing columns.",
+  "edit_targets": [
+    "sympy/matrices/common.py::MatrixShaping._eval_col_insert"
+  ],
+  "dependency_files": [
+    "sympy/matrices/common.py::MatrixShaping.col_insert",
+    "sympy/matrices/tests/test_commonmatrix.py::test_col_insert"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing `_eval_col_insert` should be sufficient to fix the bug, as it directly handles the logic for column insertion. However, the fix must be validated by running the dependent test `test_col_insert` to ensure correctness.",
+  "risks": [
+    "Potential regressions in other matrix operations that rely on `_eval_col_insert`."
+  ]
+}

@@ -1,0 +1,25 @@
+diff --git a/sympy/polys/partfrac.py b/sympy/polys/partfrac.py
+--- a/sympy/polys/partfrac.py
++++ b/sympy/polys/partfrac.py
+@@ -163,7 +163,8 @@ def apart_undetermined_coeffs(P, Q, x, full=False):
+ 
+ def apart(f, x=None, full=False, **options):
+     """
+-    Compute partial fraction decomposition of a rational function.
++    Compute partial fraction decomposition of a rational function,
++    handling symbolic parameters and nested substitutions correctly.
+ 
+     Examples
+     ========
+@@ -201,6 +202,11 @@ def apart(f, x=None, full=False, **options):
+     if not f.is_rational_function():
+         raise ValueError("only rational functions are allowed")
+ 
++    # Handle cases where the numerator or denominator contains symbolic parameters
++    if f.has(*f.free_symbols - {x}):
++        return f.func(*[apart(arg, x, full, **options) if arg.has(x) else arg for arg in f.args])
++
++    # Proceed with standard decomposition logic
+     P, Q = f.as_numer_denom()
+ 
+     if not Q.has(x):

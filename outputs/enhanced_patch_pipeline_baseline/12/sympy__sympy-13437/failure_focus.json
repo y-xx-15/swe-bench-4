@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_bell"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_bell"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/functions/combinatorial/tests/test_comb_numbers.py:test_bell",
+    "test_bell"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_bell F",
+    "______ sympy/functions/combinatorial/tests/test_comb_numbers.py:test_bell ______",
+    "File \"/testbed/sympy/functions/combinatorial/tests/test_comb_numbers.py\", line 87, in test_bell"
+  ],
+  "noise_ratio": 0.0227,
+  "target_test_tracebacks": {
+    "test_bell": "TARGET TEST: test_bell\n- snippet: test_bell F\n- snippet: ______ sympy/functions/combinatorial/tests/test_comb_numbers.py:test_bell ______\n- snippet: File \"/testbed/sympy/functions/combinatorial/tests/test_comb_numbers.py\", line 87, in test_bell\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_bell F\n______ sympy/functions/combinatorial/tests/test_comb_numbers.py:test_bell ______\n  File \"/testbed/sympy/functions/combinatorial/tests/test_comb_numbers.py\", line 87, in test_bell\nAssertionError\n=== tests finished: 16 passed, 1 failed, 3 expected to fail, in 7.44 seconds ==="
+  }
+}

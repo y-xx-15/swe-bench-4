@@ -1,0 +1,28 @@
+{
+  "original_test_identifiers": [
+    "test_sinc"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_sinc"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/functions/elementary/tests/test_trigonometric.py:test_sinc",
+    "sympy/functions/elementary/tests/test_trigonometric.py:test_issue_11864",
+    "test_sinc"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_sinc F",
+    "test_sincos_rewrite ok",
+    "test_sincos_rewrite_sqrt Slow w"
+  ],
+  "noise_ratio": 0.0197,
+  "target_test_tracebacks": {
+    "test_sinc": "TARGET TEST: test_sinc\n- snippet: test_sinc F\n- snippet: test_sincos_rewrite ok\n- snippet: test_sincos_rewrite_sqrt Slow w\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_sinc F\ntest_sincos_rewrite ok\ntest_sincos_rewrite_sqrt Slow w\n_______ sympy/functions/elementary/tests/test_trigonometric.py:test_sinc _______\n  File \"/testbed/sympy/functions/elementary/tests/test_trigonometric.py\", line 717, in test_sinc\nAssertionError\nAssertionError\n tests finished: 58 passed, 2 failed, 2 skipped, 1 expected to fail, "
+  }
+}

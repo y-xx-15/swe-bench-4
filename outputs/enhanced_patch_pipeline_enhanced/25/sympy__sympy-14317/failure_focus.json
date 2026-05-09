@@ -1,0 +1,34 @@
+{
+  "original_test_identifiers": [
+    "test_latex_Poly",
+    "test_latex_Poly_order"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_latex_Poly",
+    "test_latex_Poly_order"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/printing/tests/test_latex.py:test_issue_8470",
+    "sympy/printing/tests/test_latex.py:test_issue_13559",
+    "sympy/printing/tests/test_latex.py:test_latex_Poly",
+    "sympy/printing/tests/test_latex.py:test_latex_Poly_order",
+    "test_latex_Poly"
+  ],
+  "failure_mode": "value_error",
+  "dominant_errors": [
+    "ValueError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_latex_PolyElement ok",
+    "test_latex_Poly F",
+    "test_latex_Poly_order F"
+  ],
+  "noise_ratio": 0.0209,
+  "target_test_tracebacks": {
+    "test_latex_Poly": "TARGET TEST: test_latex_Poly\n- snippet: test_latex_PolyElement ok\n- snippet: test_latex_Poly F\n- snippet: test_latex_Poly_order F\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_latex_PolyElement ok\ntest_latex_Poly F\ntest_latex_Poly_order F\nValueError: Name node can't be used with 'False' constant\nValueError: Name node can't be used with 'False' constant\n______________ sympy/printing/tests/test_latex.py:test_latex_Poly ______________\n  File \"/testbed/sympy/printing/tests/test_latex.py\", line 1145, in test_latex_Poly\nAssertionError\n___________ sympy/printing/tests/test_latex.py:test_latex_Poly_order ___________\n  File \"/testbed/sympy/printing/tests/test_latex.py\", line 1152, in test_latex_Poly_order\nAssertionError\n tests finished: 117 passed, 2 failed, 2 expected to fail, 2 exceptions, ",
+    "test_latex_Poly_order": "TARGET TEST: test_latex_Poly_order\n- snippet: test_latex_PolyElement ok\n- snippet: test_latex_Poly F\n- snippet: test_latex_Poly_order F\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_latex_Poly_order F\nValueError: Name node can't be used with 'False' constant\nValueError: Name node can't be used with 'False' constant\nAssertionError\n___________ sympy/printing/tests/test_latex.py:test_latex_Poly_order ___________\n  File \"/testbed/sympy/printing/tests/test_latex.py\", line 1152, in test_latex_Poly_order\nAssertionError\n tests finished: 117 passed, 2 failed, 2 expected to fail, 2 exceptions, "
+  }
+}

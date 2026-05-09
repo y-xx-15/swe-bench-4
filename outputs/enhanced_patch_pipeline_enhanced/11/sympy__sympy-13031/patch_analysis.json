@@ -1,0 +1,47 @@
+{
+  "root_cause": "The behavior of `Matrix.hstack` has changed in SymPy 1.1, specifically in how it handles matrices with zero rows. The new implementation does not correctly account for the column dimensions of matrices with zero rows, resulting in incorrect output shapes.",
+  "affected_components": [
+    {
+      "file": "sympy/matrices/sparse.py",
+      "symbol": "SparseMatrix",
+      "reason": "The `SparseMatrix` class is directly involved in matrix operations, including `hstack`, and its behavior impacts the test cases."
+    },
+    {
+      "file": "sympy/matrices/tests/test_sparse.py",
+      "symbol": "test_sparse_matrix",
+      "reason": "The failing test directly validates the behavior of `SparseMatrix` operations, including `hstack`."
+    }
+  ],
+  "failing_signal": "The failing assertions indicate that the shape of the horizontally stacked matrix is incorrect when matrices with zero rows are involved.",
+  "propagation_path": "The bug originates from the `hstack` implementation, which does not correctly handle the column dimensions of matrices with zero rows. This leads to incorrect shape calculations, which propagate to the test case and cause assertion failures.",
+  "repair_constraint": "The fix must ensure that `hstack` correctly computes the shape of the resulting matrix, even when matrices with zero rows are involved, without breaking other matrix operations.",
+  "suggested_repair_scope": [
+    "sympy/matrices/sparse.py",
+    "sympy/matrices/tests/test_sparse.py"
+  ],
+  "suspicious_symbols": [
+    "SparseMatrix",
+    "hstack",
+    "Matrix.zeros"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_sparse_matrix::core::shape",
+      "source_symbol": "test_sparse_matrix",
+      "validation_subject": "shape",
+      "why_it_matters": "The test explicitly validates the shape of matrices resulting from `hstack`, which is the primary failure signal."
+    },
+    {
+      "id": "test_sweb_enhanced_hstack_shape_mismatch",
+      "source_symbol": "test_sparse_matrix",
+      "validation_subject": "hstack",
+      "why_it_matters": "The enhanced test highlights the specific issue with `hstack` when handling matrices with zero rows."
+    },
+    {
+      "id": "test_sweb_enhanced_sparse_matrix_hstack_shape",
+      "source_symbol": "SparseMatrix",
+      "validation_subject": "hstack",
+      "why_it_matters": "The enhanced test ensures that the fix addresses the behavior of `SparseMatrix.hstack` for all edge cases, including zero-row matrices."
+    }
+  ]
+}

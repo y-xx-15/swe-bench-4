@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_Derivative"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_Derivative"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/printing/tests/test_mathematica.py:test_Derivative",
+    "test_Derivative"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_Derivative F",
+    "___________ sympy/printing/tests/test_mathematica.py:test_Derivative ___________",
+    "File \"/testbed/sympy/printing/tests/test_mathematica.py\", line 78, in test_Derivative"
+  ],
+  "noise_ratio": 0.0179,
+  "target_test_tracebacks": {
+    "test_Derivative": "TARGET TEST: test_Derivative\n- snippet: test_Derivative F\n- snippet: ___________ sympy/printing/tests/test_mathematica.py:test_Derivative ___________\n- snippet: File \"/testbed/sympy/printing/tests/test_mathematica.py\", line 78, in test_Derivative\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_Derivative F\n___________ sympy/printing/tests/test_mathematica.py:test_Derivative ___________\n  File \"/testbed/sympy/printing/tests/test_mathematica.py\", line 78, in test_Derivative\nAssertionError\n============= tests finished: 9 passed, 1 failed, in 0.03 seconds =============="
+  }
+}

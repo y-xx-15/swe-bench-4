@@ -1,0 +1,306 @@
+[
+  {
+    "instance_id": "sympy__sympy-13971",
+    "repo": "sympy/sympy",
+    "model": "gpt-4o",
+    "pipeline_mode": "baseline_only",
+    "hide_original_test_patch_in_repair": true,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "baseline_fallback",
+    "original_test_identifiers": [
+      "test_latex_sequences"
+    ],
+    "original_status_counts": {
+      "FAILED": 11,
+      "PASSED": 103,
+      "ERROR": 9
+    },
+    "original_failed_count": 20,
+    "original_passed_count": 103,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_latex_sequences"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_latex_sequences"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/printing/tests/test_latex.py:test_latex_indexed",
+        "sympy/printing/tests/test_latex.py:test_latex_derivatives",
+        "sympy/printing/tests/test_latex.py:test_latex_FourierSeries",
+        "sympy/printing/tests/test_latex.py:test_latex_FormalPowerSeries",
+        "sympy/printing/tests/test_latex.py:test_latex_matrix_with_functions"
+      ],
+      "failure_mode": "value_error",
+      "dominant_errors": [
+        "ValueError",
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_latex_sequences F",
+        "____________ sympy/printing/tests/test_latex.py:test_latex_indexed _____________",
+        "__________ sympy/printing/tests/test_latex.py:test_latex_derivatives ___________"
+      ],
+      "noise_ratio": 0.0263,
+      "target_test_tracebacks": {
+        "test_latex_sequences": "TARGET TEST: test_latex_sequences\n- snippet: test_latex_sequences F\n- snippet: ____________ sympy/printing/tests/test_latex.py:test_latex_indexed _____________\n- snippet: __________ sympy/printing/tests/test_latex.py:test_latex_derivatives ___________\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_latex_sequences F\nValueError: Name node can't be used with 'False' constant\nValueError: Name node can't be used with 'False' constant\n___________ sympy/printing/tests/test_latex.py:test_latex_sequences ____________\n  File \"/testbed/sympy/printing/tests/test_latex.py\", line 624, in test_latex_sequences\nAssertionError\n tests finished: 104 passed, 1 failed, 2 expected to fail, 9 exceptions, "
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 7,
+      "keep_top_k": 4,
+      "attempt_budget": 3,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "value_error",
+      "noise_ratio": 0.0263,
+      "difficulty": "high"
+    },
+    "adaptive_num_candidates": 7,
+    "adaptive_keep_top_k": 4,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 0,
+    "kept_enhanced_candidates": 0,
+    "enhanced_candidate_retention_rate": 0.0,
+    "enhanced_generation_attempts_total": 0,
+    "enhanced_generation_attempts_avg": 0.0,
+    "kept_enhanced_test_identifiers": [],
+    "enhanced_failed_test_identifiers": [],
+    "enhanced_failed_count": 0,
+    "generated_patch_nonempty": false,
+    "generated_patch_error": "The replacement_block must start with anchor_line_before exactly.",
+    "generated_patch_attempts": 6,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_not_generated",
+    "generated_patch_feedback": "The replacement_block must start with anchor_line_before exactly.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The LatexPrinter class incorrectly escapes square brackets in sequences, causing improper rendering in Markdown cells.",
+      "affected_components": [
+        {
+          "file": "sympy/printing/latex.py",
+          "symbol": "LatexPrinter",
+          "reason": "Responsible for converting expressions into LaTeX strings, including sequences."
+        },
+        {
+          "file": "sympy/printing/tests/test_latex.py",
+          "symbol": "test_latex_sequences",
+          "reason": "Tests the LaTeX output for sequences, which fails due to incorrect escaping."
+        }
+      ],
+      "failing_signal": "The test_latex_sequences test fails with an AssertionError, indicating that the generated LaTeX output does not match the expected format.",
+      "propagation_path": "The LatexPrinter class escapes square brackets in sequences using '\\left\\[' and '\\right\\]', which propagates to the test output and causes rendering issues in Markdown cells.",
+      "repair_constraint": "The fix must ensure that square brackets in sequences are not escaped while preserving the correctness of other LaTeX outputs.",
+      "suggested_repair_scope": [
+        "sympy/printing/latex.py",
+        "sympy/printing/tests/test_latex.py"
+      ],
+      "suspicious_symbols": [
+        "LatexPrinter",
+        "test_latex_sequences"
+      ],
+      "repair_obligations": [
+        {
+          "id": "obligation_1",
+          "source_symbol": "LatexPrinter",
+          "validation_subject": "SeqFormula",
+          "why_it_matters": "SeqFormula relies on LatexPrinter to generate correct LaTeX output for sequences, which is currently broken."
+        },
+        {
+          "id": "obligation_2",
+          "source_symbol": "test_latex_sequences",
+          "validation_subject": "LatexPrinter",
+          "why_it_matters": "The test ensures that sequences are rendered correctly in LaTeX, and its failure highlights the bug in LatexPrinter."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Fix LaTeX escaping for square brackets in sequences",
+      "approach": "Modify the LatexPrinter class to ensure that square brackets in sequences are not escaped with '\\left[' and '\\right]'. Instead, use plain '[' and ']' for sequences to ensure compatibility with Markdown rendering.",
+      "edit_targets": [
+        "sympy/printing/latex.py::LatexPrinter._print_SeqFormula"
+      ],
+      "dependency_files": [
+        "sympy/printing/tests/test_latex.py::test_latex_sequences"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [
+        "escaped_square_brackets_in_sequences"
+      ],
+      "sufficiency_assessment": "Editing the LatexPrinter class to adjust the escaping logic for square brackets in sequences should be sufficient. However, the corresponding test case in test_latex_sequences must be inspected to ensure it validates the fix.",
+      "risks": [
+        "Potential unintended changes to LaTeX rendering for other components that rely on square brackets."
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/printing/latex.py",
+          "action": "modify_region",
+          "justification": "The LatexPrinter class is responsible for generating LaTeX output, including sequences. The current implementation incorrectly escapes square brackets in sequences, causing rendering issues in Markdown cells."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "sympy/printing/latex.py",
+          "target_symbol": "LatexPrinter._print_SeqFormula",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "obligation_1"
+          ],
+          "anchor_line_before": "        return '\\\\left[' + self._print(expr.formula) + '\\\\right]'",
+          "anchor_line_after": "        return '\\\\left[' + self._print(expr.formula) + '\\\\right]'",
+          "replacement_block": "        return '[' + self._print(expr.formula) + ']'"
+        }
+      ]
+    },
+    "final_patch_attempted": false,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": false,
+    "final_patch_apply_mode": "no_patch",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 11,
+      "PASSED": 103,
+      "ERROR": 9
+    },
+    "final_failed_count": 20,
+    "final_passed_count": 103,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/printing/tests/test_latex.py:test_latex_indexed": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_derivatives": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_FourierSeries": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_FormalPowerSeries": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_matrix_with_functions": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_NDimArray": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_issue_8470": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_issue_13559": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_TensorProduct_printing": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_sequences": "FAILED",
+      "test_printmethod": "PASSED",
+      "test_latex_basic": "PASSED",
+      "test_latex_builtins": "PASSED",
+      "test_latex_SingularityFunction": "PASSED",
+      "test_latex_cycle": "PASSED",
+      "test_latex_permutation": "PASSED",
+      "test_latex_Float": "PASSED",
+      "test_latex_vector_expressions": "PASSED",
+      "test_latex_symbols": "PASSED",
+      "test_latex_functions": "PASSED",
+      "test_hyper_printing": "PASSED",
+      "test_latex_bessel": "PASSED",
+      "test_latex_fresnel": "PASSED",
+      "test_latex_brackets": "PASSED",
+      "test_latex_indexed": "ERROR",
+      "test_latex_derivatives": "ERROR",
+      "test_latex_subs": "PASSED",
+      "test_latex_integrals": "PASSED",
+      "test_latex_sets": "PASSED",
+      "test_latex_Range": "PASSED",
+      "test_latex_sequences": "FAILED",
+      "test_latex_FourierSeries": "ERROR",
+      "test_latex_FormalPowerSeries": "ERROR",
+      "test_latex_intervals": "PASSED",
+      "test_latex_AccumuBounds": "PASSED",
+      "test_latex_emptyset": "PASSED",
+      "test_latex_commutator": "PASSED",
+      "test_latex_union": "PASSED",
+      "test_latex_symmetric_difference": "PASSED",
+      "test_latex_Complement": "PASSED",
+      "test_latex_Complexes": "PASSED",
+      "test_latex_productset": "PASSED",
+      "test_latex_Naturals": "PASSED",
+      "test_latex_Naturals0": "PASSED",
+      "test_latex_Integers": "PASSED",
+      "test_latex_ImageSet": "PASSED",
+      "test_latex_ConditionSet": "PASSED",
+      "test_latex_ComplexRegion": "PASSED",
+      "test_latex_Contains": "PASSED",
+      "test_latex_sum": "PASSED",
+      "test_latex_product": "PASSED",
+      "test_latex_limits": "PASSED",
+      "test_issue_3568": "PASSED",
+      "test_latex": "PASSED",
+      "test_latex_dict": "PASSED",
+      "test_latex_list": "PASSED",
+      "test_latex_rational": "PASSED",
+      "test_latex_inverse": "PASSED",
+      "test_latex_DiracDelta": "PASSED",
+      "test_latex_Heaviside": "PASSED",
+      "test_latex_KroneckerDelta": "PASSED",
+      "test_latex_LeviCivita": "PASSED",
+      "test_mode": "PASSED",
+      "test_latex_Piecewise": "PASSED",
+      "test_latex_Matrix": "PASSED",
+      "test_latex_matrix_with_functions": "ERROR",
+      "test_latex_NDimArray": "ERROR",
+      "test_latex_mul_symbol": "PASSED",
+      "test_latex_issue_4381": "PASSED",
+      "test_latex_issue_4576": "PASSED",
+      "test_latex_pow_fraction": "PASSED",
+      "test_noncommutative": "PASSED",
+      "test_latex_order": "PASSED",
+      "test_latex_Lambda": "PASSED",
+      "test_latex_PolyElement": "PASSED",
+      "test_latex_FracElement": "PASSED",
+      "test_latex_Poly": "PASSED",
+      "test_latex_ComplexRootOf": "PASSED",
+      "test_latex_RootSum": "PASSED",
+      "test_settings": "PASSED",
+      "test_latex_numbers": "PASSED",
+      "test_latex_euler": "PASSED",
+      "test_lamda": "PASSED",
+      "test_custom_symbol_names": "PASSED",
+      "test_matAdd": "PASSED",
+      "test_matMul": "PASSED",
+      "test_latex_MatrixSlice": "PASSED",
+      "test_latex_RandomDomain": "PASSED",
+      "test_PrettyPoly": "PASSED",
+      "test_integral_transforms": "PASSED",
+      "test_PolynomialRingBase": "PASSED",
+      "test_categories": "PASSED",
+      "test_Modules": "PASSED",
+      "test_QuotientRing": "PASSED",
+      "test_Tr": "PASSED",
+      "test_Adjoint": "PASSED",
+      "test_Hadamard": "PASSED",
+      "test_ZeroMatrix": "PASSED",
+      "test_boolean_args_order": "PASSED",
+      "test_imaginary": "PASSED",
+      "test_builtins_without_args": "PASSED",
+      "test_latex_greek_functions": "PASSED",
+      "test_translate": "PASSED",
+      "test_other_symbols": "PASSED",
+      "test_modifiers": "PASSED",
+      "test_greek_symbols": "PASSED",
+      "test_builtin_no_args": "PASSED",
+      "test_issue_6853": "PASSED",
+      "test_Mul": "PASSED",
+      "test_Pow": "PASSED",
+      "test_issue_7180": "PASSED",
+      "test_issue_8409": "PASSED",
+      "test_issue_8470": "ERROR",
+      "test_issue_7117": "PASSED",
+      "test_issue_2934": "PASSED",
+      "test_issue_10489": "PASSED",
+      "test_issue_12886": "PASSED",
+      "test_issue_13559": "ERROR",
+      "test_issue_13651": "PASSED",
+      "test_latex_UnevaluatedExpr": "PASSED",
+      "test_MatrixElement_printing": "PASSED",
+      "test_Quaternion_latex_printing": "PASSED",
+      "test_TensorProduct_printing": "ERROR"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

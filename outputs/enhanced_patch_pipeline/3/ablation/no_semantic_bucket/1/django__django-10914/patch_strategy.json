@@ -1,0 +1,16 @@
+{
+  "title": "Set default FILE_UPLOAD_PERMISSIONS to 0o644",
+  "approach": "Modify the default value of FILE_UPLOAD_PERMISSIONS in django/conf/global_settings.py to 0o644 to ensure consistent file permissions for uploaded files across systems.",
+  "edit_targets": [
+    "django/conf/global_settings.py::FILE_UPLOAD_PERMISSIONS"
+  ],
+  "dependency_files": [
+    "tests/test_utils/tests.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing django/conf/global_settings.py to set FILE_UPLOAD_PERMISSIONS to 0o644 is sufficient to resolve the issue. No other files or symbols need modification, but tests in tests/test_utils/tests.py should verify the change.",
+  "risks": [
+    "Potential backward compatibility issues for users relying on the default None value for FILE_UPLOAD_PERMISSIONS."
+  ]
+}

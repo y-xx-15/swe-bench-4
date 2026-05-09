@@ -1,0 +1,9 @@
+{
+  "original_test_identifiers": [
+    "test_sinc"
+  ],
+  "status_map": {},
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/sympy__sympy-11870/test_output.txt",
+  "timed_out": true,
+  "error": "Test patch did not apply or logs could not be parsed"
+}

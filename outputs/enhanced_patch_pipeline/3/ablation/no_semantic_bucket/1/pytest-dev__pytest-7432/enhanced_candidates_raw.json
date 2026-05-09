@@ -1,0 +1,355 @@
+[
+  {
+    "idea": {
+      "title": "verify_skip_location_with_runxfail",
+      "semantic_bucket": "unspecified",
+      "goal": "ensure that the skip location is correctly reported when --runxfail is used",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_verify_skip_location_with_runxfail"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "src/_pytest/skipping.py::pytest_runtest_makereport",
+      "target_validation_subject": "skip location reporting",
+      "semantic_alignment_tokens": [
+        "pytest_runtest_makereport",
+        "skip",
+        "runxfail",
+        "longrepr"
+      ],
+      "trigger_shape_tokens": [
+        "pytest_runtest_makereport",
+        "rep.longrepr",
+        "item.reportinfo"
+      ],
+      "rationale": "This test explicitly verifies the skip location reporting behavior when --runxfail is used, which is distinct from the original test by focusing on the interaction between skip and xfail markers. It ensures that the reported location points to the test item itself rather than an internal pytest module."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,15 @@\n+def test_sweb_enhanced_verify_skip_location_with_runxfail(testdir):\n+    \"\"\"\n+    Verify that the skip location is correctly reported when --runxfail is used.\n+    \"\"\"\n+    testdir.makepyfile(\n+        test_sample=\"\"\"\n+        import pytest\n+        @pytest.mark.skip(reason=\"unconditional skip\")\n+        def test_skip_location():\n+            assert 0\n+    \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines([\"SKIPPED [1] test_sample.py:2: unconditional skip\"])\n+\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,15 @@\n+def test_sweb_enhanced_verify_skip_location_with_runxfail(testdir):\n+    \"\"\"\n+    Verify that the skip location is correctly reported when --runxfail is used.\n+    \"\"\"\n+    testdir.makepyfile(\n+        test_sample=\"\"\"\n+        import pytest\n+        @pytest.mark.skip(reason=\"unconditional skip\")\n+        def test_skip_location():\n+            assert 0\n+    \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines([\"SKIPPED [1] test_sample.py:2: unconditional skip\"])\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_verify_skip_location_with_runxfail",
+      "test_skip_location"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_verify_skip_location_with_runxfail"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "verify_skipif_condition_with_runxfail",
+      "semantic_bucket": "unspecified",
+      "goal": "stress the behavior of skipif conditions when --runxfail is used, ensuring the skip location is correctly reported",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_skipif_condition_with_runxfail"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "src/_pytest/skipping.py::pytest_runtest_makereport",
+      "target_validation_subject": "skipif condition location reporting",
+      "semantic_alignment_tokens": [
+        "pytest.mark.skipif",
+        "pytest_runtest_makereport",
+        "runxfail"
+      ],
+      "trigger_shape_tokens": [
+        "pytest.mark.skipif",
+        "runxfail",
+        "reportinfo"
+      ],
+      "rationale": "This idea focuses on the specific case of skipif conditions being evaluated and reported under --runxfail, which is distinct from the original test that broadly observed skip location issues. It adds repair guidance by isolating the interaction between skipif and runxfail."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,12 @@\n+def test_sweb_enhanced_skipif_condition_with_runxfail(testdir):\n+    testdir.makepyfile(\n+        \"\"\"\n+        import pytest\n+        @pytest.mark.skipif(True, reason=\"skipif condition triggered\")\n+        def test_skipif_location():\n+            assert 0\n+    \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines(\n+        [\"SKIPPED [1] test_skipif_location.py:2: skipif condition triggered\"]\n+    )\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,12 @@\n+def test_sweb_enhanced_skipif_condition_with_runxfail(testdir):\n+    testdir.makepyfile(\n+        \"\"\"\n+        import pytest\n+        @pytest.mark.skipif(True, reason=\"skipif condition triggered\")\n+        def test_skipif_location():\n+            assert 0\n+    \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines(\n+        [\"SKIPPED [1] test_skipif_location.py:2: skipif condition triggered\"]\n+    )\n```",
+    "identifiers": [
+      "test_sweb_enhanced_skipif_condition_with_runxfail",
+      "test_skipif_location"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_skipif_condition_with_runxfail"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_skip_location_with_runxfail",
+      "semantic_bucket": "unspecified",
+      "goal": "stress the behavior of skip location reporting when --runxfail is enabled",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_skip_location_with_runxfail"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "src/_pytest/skipping.py::pytest_runtest_makereport",
+      "target_validation_subject": "skip location reporting",
+      "semantic_alignment_tokens": [
+        "pytest_runtest_makereport",
+        "skip",
+        "runxfail"
+      ],
+      "trigger_shape_tokens": [
+        "pytest_runtest_makereport",
+        "rep.longrepr",
+        "item.reportinfo"
+      ],
+      "rationale": "This test directly reproduces the failure mode by verifying the skip location when --runxfail is enabled. It differs from the original test by explicitly asserting the reported location matches the test item definition, which was not validated in the original test."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,15 @@\n+def test_sweb_enhanced_skip_location_with_runxfail(testdir):\n+    \"\"\"\n+    Verify skip location reporting when --runxfail is enabled.\n+    \"\"\"\n+    testdir.makepyfile(\n+        test_sample=\"\"\"\n+        import pytest\n+        @pytest.mark.skip\n+        def test_skip_location():\n+            assert 0\n+    \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines([\"SKIPPED [1] test_sample.py:2: unconditional skip\"])\n+\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,15 @@\n+def test_sweb_enhanced_skip_location_with_runxfail(testdir):\n+    \"\"\"\n+    Verify skip location reporting when --runxfail is enabled.\n+    \"\"\"\n+    testdir.makepyfile(\n+        test_sample=\"\"\"\n+        import pytest\n+        @pytest.mark.skip\n+        def test_skip_location():\n+            assert 0\n+    \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines([\"SKIPPED [1] test_sample.py:2: unconditional skip\"])\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_skip_location_with_runxfail",
+      "test_skip_location"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_skip_location_with_runxfail"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "validate_skip_location_with_runxfail",
+      "semantic_bucket": "unspecified",
+      "goal": "ensure that skip location reporting is correct when --runxfail is used",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_skip_location_with_runxfail"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "pytest_runtest_makereport",
+      "target_validation_subject": "skip location reporting",
+      "semantic_alignment_tokens": [
+        "pytest_runtest_makereport",
+        "skip",
+        "runxfail",
+        "longrepr"
+      ],
+      "trigger_shape_tokens": [
+        "pytest_runtest_makereport",
+        "rep.longrepr",
+        "item.reportinfo"
+      ],
+      "rationale": "The original test does not explicitly validate the skip location when --runxfail is used. This test directly targets the skip location reporting logic in pytest_runtest_makereport to ensure that the reported location points to the test item itself, not an internal pytest file. This adds new repair guidance by isolating the specific obligation related to skip location reporting."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,13 @@\n+def test_sweb_enhanced_skip_location_with_runxfail(testdir):\n+    \"\"\"\n+    Validate that skip location reporting points to the test item itself\n+    when --runxfail is used.\n+    \"\"\"\n+    testdir.makepyfile(\n+        \"\"\"\n+        import pytest\n+        @pytest.mark.skip(reason=\"test skip location\")\n+        def test_skip_location():\n+            assert False\n+    \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines(\n+        [\"SKIPPED [1] test_skip_location.py:3: test skip location\"]\n+    )\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,13 @@\n+def test_sweb_enhanced_skip_location_with_runxfail(testdir):\n+    \"\"\"\n+    Validate that skip location reporting points to the test item itself\n+    when --runxfail is used.\n+    \"\"\"\n+    testdir.makepyfile(\n+        \"\"\"\n+        import pytest\n+        @pytest.mark.skip(reason=\"test skip location\")\n+        def test_skip_location():\n+            assert False\n+    \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines(\n+        [\"SKIPPED [1] test_skip_location.py:3: test skip location\"]\n+    )\n```",
+    "identifiers": [
+      "test_sweb_enhanced_skip_location_with_runxfail",
+      "test_skip_location"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_skip_location_with_runxfail"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "validate_skip_location_with_unexpected_xfail",
+      "semantic_bucket": "unspecified",
+      "goal": "stress the behavior of skip location reporting when an unexpected xfail occurs with --runxfail",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_skip_location_with_unexpected_xfail"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "src/_pytest/skipping.py::pytest_runtest_makereport",
+      "target_validation_subject": "skip_location_reporting",
+      "semantic_alignment_tokens": [
+        "pytest_runtest_makereport",
+        "skip",
+        "xfail",
+        "runxfail"
+      ],
+      "trigger_shape_tokens": [
+        "pytest_runtest_makereport",
+        "rep.longrepr",
+        "item.reportinfo"
+      ],
+      "rationale": "This idea focuses on reproducing the bug when an unexpected xfail occurs during skip location reporting with --runxfail. It differs from the original test by explicitly triggering an unexpected xfail scenario, which stresses a distinct validation branch in the same source symbol."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,12 @@\n+def test_sweb_enhanced_skip_location_with_unexpected_xfail(testdir):\n+    testdir.makepyfile(\n+        \"\"\"\n+        import pytest\n+        @pytest.mark.skip(reason=\"unconditional skip\")\n+        @pytest.mark.xfail(reason=\"unexpected xfail\")\n+        def test_func():\n+            assert 0\n+        \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines([\"SKIPPED [1] test_func.py:3: unconditional skip\"])\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,12 @@\n+def test_sweb_enhanced_skip_location_with_unexpected_xfail(testdir):\n+    testdir.makepyfile(\n+        \"\"\"\n+        import pytest\n+        @pytest.mark.skip(reason=\"unconditional skip\")\n+        @pytest.mark.xfail(reason=\"unexpected xfail\")\n+        def test_func():\n+            assert 0\n+        \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines([\"SKIPPED [1] test_func.py:3: unconditional skip\"])\n```",
+    "identifiers": [
+      "test_sweb_enhanced_skip_location_with_unexpected_xfail",
+      "test_func"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_skip_location_with_unexpected_xfail"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "validate_skip_location_with_multiple_marks",
+      "semantic_bucket": "unspecified",
+      "goal": "stress the behavior of skip location reporting when both skip and xfail marks are applied to the same test",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_validate_skip_location_with_multiple_marks"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "src/_pytest/skipping.py::pytest_runtest_makereport",
+      "target_validation_subject": "skip_and_xfail_interaction",
+      "semantic_alignment_tokens": [
+        "pytest.mark.skip",
+        "pytest.mark.xfail",
+        "pytest_runtest_makereport"
+      ],
+      "trigger_shape_tokens": [
+        "pytest.mark.skip",
+        "pytest.mark.xfail",
+        "pytest_runtest_makereport"
+      ],
+      "rationale": "This test combines skip and xfail marks on the same test to validate whether the skip location is correctly reported when --runxfail is used. It differs from the original test by introducing the interaction between skip and xfail, which was not explicitly tested in the original failing case."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,13 @@\n+def test_sweb_enhanced_validate_skip_location_with_multiple_marks(testdir):\n+    testdir.makepyfile(\n+        test_sample=\"\"\"\n+        import pytest\n+        @pytest.mark.skip(reason=\"skip reason\")\n+        @pytest.mark.xfail(reason=\"xfail reason\")\n+        def test_combined_marks():\n+            assert 0\n+    \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines(\n+        [\"SKIPPED [1] test_sample.py:3: skip reason\"]\n+    )\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,13 @@\n+def test_sweb_enhanced_validate_skip_location_with_multiple_marks(testdir):\n+    testdir.makepyfile(\n+        test_sample=\"\"\"\n+        import pytest\n+        @pytest.mark.skip(reason=\"skip reason\")\n+        @pytest.mark.xfail(reason=\"xfail reason\")\n+        def test_combined_marks():\n+            assert 0\n+    \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines(\n+        [\"SKIPPED [1] test_sample.py:3: skip reason\"]\n+    )\n```",
+    "identifiers": [
+      "test_sweb_enhanced_validate_skip_location_with_multiple_marks",
+      "test_combined_marks"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_validate_skip_location_with_multiple_marks"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_skip_location_with_multiple_marks",
+      "semantic_bucket": "unspecified",
+      "goal": "stress the behavior of skip location reporting when multiple marks, including skip and xfail, are applied to the same test",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_skip_location_with_multiple_marks"
+      ],
+      "covers_original_tests": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]"
+      ],
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core"
+      ],
+      "target_source_symbol": "src/_pytest/skipping.py::pytest_runtest_makereport",
+      "target_validation_subject": "skip location reporting",
+      "semantic_alignment_tokens": [
+        "pytest.mark.skip",
+        "pytest.mark.xfail",
+        "pytest_runtest_makereport"
+      ],
+      "trigger_shape_tokens": [
+        "pytest.mark.skip",
+        "pytest.mark.xfail",
+        "pytest_runtest_makereport"
+      ],
+      "rationale": "This idea introduces a scenario where both skip and xfail marks are applied to the same test. It differs from the original test by combining multiple marks to stress the interaction between them and their impact on skip location reporting, which was not explicitly tested in the original failing test."
+    },
+    "patch": "diff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,12 @@\n+def test_sweb_enhanced_skip_location_with_multiple_marks(testdir):\n+    testdir.makepyfile(\n+        test_sample=\"\"\"\n+        import pytest\n+        @pytest.mark.skip(reason=\"skip reason\")\n+        @pytest.mark.xfail(reason=\"xfail reason\")\n+        def test_skip_xfail_combined():\n+            assert 0\n+    \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines([\"SKIPPED [1] test_sample.py:3: skip reason\"])\n",
+    "raw_response": "```diff\ndiff --git a/testing/test_skipping.py b/testing/test_skipping.py\n--- a/testing/test_skipping.py\n+++ b/testing/test_skipping.py\n@@ -259,0 +259,12 @@\n+def test_sweb_enhanced_skip_location_with_multiple_marks(testdir):\n+    testdir.makepyfile(\n+        test_sample=\"\"\"\n+        import pytest\n+        @pytest.mark.skip(reason=\"skip reason\")\n+        @pytest.mark.xfail(reason=\"xfail reason\")\n+        def test_skip_xfail_combined():\n+            assert 0\n+    \"\"\"\n+    )\n+    result = testdir.runpytest(\"-rs\", \"--runxfail\")\n+    result.stdout.fnmatch_lines([\"SKIPPED [1] test_sample.py:3: skip reason\"])\n```",
+    "identifiers": [
+      "test_sweb_enhanced_skip_location_with_multiple_marks",
+      "test_skip_xfail_combined"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_skip_location_with_multiple_marks"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

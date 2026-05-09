@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/_print_helpers.py",
+      "action": "modify_region",
+      "justification": "The `Printable` class is part of the inheritance chain for `Symbol`. Its lack of `__slots__` allows the propagation of a `__dict__` attribute to `Symbol` instances, violating immutability."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/_print_helpers.py",
+      "target_symbol": "Printable",
+      "replacement_mode": "insert_after_anchor",
+      "covers_obligations": [
+        "check_parent_slots"
+      ],
+      "anchor_line_before": "    \"\"\"",
+      "anchor_line_after": "    def __str__(self):",
+      "replacement_block": "    \"\"\"\n\n    __slots__ = ()\n\n    def __str__(self):"
+    }
+  ]
+}

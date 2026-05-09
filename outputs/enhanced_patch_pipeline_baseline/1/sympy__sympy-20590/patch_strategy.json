@@ -1,0 +1,20 @@
+{
+  "title": "Restore Symbol immutability via __slots__ enforcement",
+  "approach": "Ensure all parent classes of Symbol, including Printable, define __slots__ to prevent the creation of __dict__ in Symbol instances.",
+  "edit_targets": [
+    "sympy/core/_print_helpers.py::Printable"
+  ],
+  "dependency_files": [
+    "sympy/core/tests/test_basic.py",
+    "sympy/core/symbol.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing Printable and Symbol is sufficient to restore immutability, as the issue stems from inheritance chain propagation of __slots__. Test files are referenced for validation but do not require edits.",
+  "risks": [
+    "Potential regressions in classes inheriting from Printable or Symbol that rely on dynamic attributes via __dict__."
+  ]
+}

@@ -1,0 +1,93 @@
+[
+  {
+    "idea": {
+      "title": "validate_total_sum_identity_matrix",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect total sum calculation of an identity matrix, which triggers an assertion error",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_validate_total_sum_identity_matrix"
+      ],
+      "covers_original_tests": [
+        "test_Identity"
+      ],
+      "covers_obligations": [
+        "test_Identity::core"
+      ],
+      "target_source_symbol": "test_Identity",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "Identity",
+        "Sum",
+        "total sum"
+      ],
+      "trigger_shape_tokens": [
+        "assertionerror",
+        "Identity",
+        "Sum",
+        "total sum"
+      ],
+      "rationale": "This test directly reproduces the original failure by validating the total sum of an identity matrix. It aligns with the original failure path and exception semantics, ensuring the bug is exposed in the same way as the original test."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_matexpr.py b/sympy/matrices/expressions/tests/test_matexpr.py\n--- a/sympy/matrices/expressions/tests/test_matexpr.py\n+++ b/sympy/matrices/expressions/tests/test_matexpr.py\n@@ -284,0 +284,9 @@\n+def test_sweb_enhanced_validate_total_sum_identity_matrix():\n+    n = symbols('n', integer=True, positive=True)\n+    i, j = symbols('i j', integer=True)\n+    In = Identity(n)\n+\n+    # Validate the total sum of the identity matrix\n+    total_sum = Sum(Sum(In[i, j], (i, 0, n-1)), (j, 0, n-1)).doit()\n+    assert total_sum == n, f\"Expected total sum to be {n}, but got {total_sum}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/expressions/tests/test_matexpr.py b/sympy/matrices/expressions/tests/test_matexpr.py\n--- a/sympy/matrices/expressions/tests/test_matexpr.py\n+++ b/sympy/matrices/expressions/tests/test_matexpr.py\n@@ -284,0 +284,9 @@\n+def test_sweb_enhanced_validate_total_sum_identity_matrix():\n+    n = symbols('n', integer=True, positive=True)\n+    i, j = symbols('i j', integer=True)\n+    In = Identity(n)\n+\n+    # Validate the total sum of the identity matrix\n+    total_sum = Sum(Sum(In[i, j], (i, 0, n-1)), (j, 0, n-1)).doit()\n+    assert total_sum == n, f\"Expected total sum to be {n}, but got {total_sum}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_validate_total_sum_identity_matrix"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_validate_total_sum_identity_matrix"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_validate_total_sum_identity_matrix"
+    ],
+    "eval_status_map": {
+      "sympy/matrices/expressions/tests/test_matexpr.py:test_sweb_enhanced_validate_total_sum_identity_matrix": "FAILED",
+      "test_shape": "PASSED",
+      "test_matexpr": "PASSED",
+      "test_subs": "PASSED",
+      "test_ZeroMatrix": "PASSED",
+      "test_ZeroMatrix_doit": "PASSED",
+      "test_Identity": "PASSED",
+      "test_Identity_doit": "PASSED",
+      "test_addition": "PASSED",
+      "test_multiplication": "PASSED",
+      "test_MatPow": "PASSED",
+      "test_MatrixSymbol": "PASSED",
+      "test_dense_conversion": "PASSED",
+      "test_free_symbols": "PASSED",
+      "test_zero_matmul": "PASSED",
+      "test_matadd_simplify": "PASSED",
+      "test_matmul_simplify": "PASSED",
+      "test_invariants": "PASSED",
+      "test_indexing": "PASSED",
+      "test_single_indexing": "PASSED",
+      "test_MatrixElement_commutative": "PASSED",
+      "test_MatrixSymbol_determinant": "PASSED",
+      "test_MatrixElement_diff": "PASSED",
+      "test_MatrixElement_doit": "PASSED",
+      "test_identity_powers": "PASSED",
+      "test_Zero_power": "PASSED",
+      "test_matrixelement_diff": "PASSED",
+      "test_MatrixElement_with_values": "PASSED"
+    },
+    "generation_attempts": 2,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_Identity"
+    ],
+    "covered_obligations": [
+      "test_Identity::core"
+    ]
+  }
+]

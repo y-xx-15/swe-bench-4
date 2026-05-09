@@ -1,0 +1,233 @@
+[
+  {
+    "idea": {
+      "title": "test vector pretty printing baseline alignment",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress baseline misalignment in vector pretty printing",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_vector_baseline_alignment"
+      ],
+      "covers_original_tests": [
+        "test_pretty_print_unicode"
+      ],
+      "covers_obligations": [
+        "test_pretty_print_unicode::upretty_v_8"
+      ],
+      "target_source_symbol": "sympy.vector.tests.test_printing.test_pretty_print_unicode",
+      "target_validation_subject": "upretty_v_8",
+      "semantic_alignment_tokens": [
+        "upretty(",
+        "baseline",
+        "CoordSys3D",
+        "Vector"
+      ],
+      "trigger_shape_tokens": [
+        "CoordSys3D",
+        "Vector",
+        "baseline",
+        "upretty("
+      ],
+      "rationale": "This idea directly targets the baseline misalignment issue observed in the original failure path for 'test_pretty_print_unicode::upretty_v_8'. It reproduces the bug by constructing a vector expression with the same shape and triggering the failure through the 'upretty' function. Unlike the original test, which may have focused on broader pretty printing issues, this test isolates the baseline alignment problem for vectors, providing more specific repair guidance."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -323,0 +323,8 @@\n+def test_sweb_enhanced_vector_baseline_alignment():\n+    from sympy.vector import CoordSys3D\n+    from sympy import symbols, Integral, Function\n+    a, b = symbols('a b')\n+    N = CoordSys3D('N')\n+    f = Function('f')\n+    expr = N.j - (Integral(f(b)) - N.x**2)*N.k\n+    assert upretty(expr) == u(\"N_j + ⎛   2   ⌠        ⎞ N_k\\n      ⎜N_x  - ⎮ f(b) db⎟    \\n      ⎝       ⌡        ⎠    \")\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -323,0 +323,8 @@\n+def test_sweb_enhanced_vector_baseline_alignment():\n+    from sympy.vector import CoordSys3D\n+    from sympy import symbols, Integral, Function\n+    a, b = symbols('a b')\n+    N = CoordSys3D('N')\n+    f = Function('f')\n+    expr = N.j - (Integral(f(b)) - N.x**2)*N.k\n+    assert upretty(expr) == u(\"N_j + ⎛   2   ⌠        ⎞ N_k\\n      ⎜N_x  - ⎮ f(b) db⎟    \\n      ⎝       ⌡        ⎠    \")\n```",
+    "identifiers": [
+      "test_sweb_enhanced_vector_baseline_alignment"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_vector_baseline_alignment"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_pretty_print_unicode is not semantically aligned with its original failure path. Expected source symbol 'test_pretty_print_unicode' and alignment tokens ['valueerror', 'assertionerror'], but the current content targets 'sympy.vector.tests.test_printing.test_pretty_print_unicode' with tokens ['upretty(', 'baseline', 'CoordSys3D', 'Vector']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_pretty_print_unicode"
+    ],
+    "covered_obligations": [
+      "test_pretty_print_unicode::upretty_v_8"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test vector dot product pretty printing",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior of pretty printing a vector dot product with specific components that trigger the ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_vector_dot_pretty"
+      ],
+      "covers_original_tests": [
+        "test_pretty_print_unicode"
+      ],
+      "covers_obligations": [
+        "test_pretty_print_unicode::upretty_d_7"
+      ],
+      "target_source_symbol": "sympy.vector.Vector.__or__",
+      "target_validation_subject": "dot_product_pretty_print",
+      "semantic_alignment_tokens": [
+        "upretty",
+        "dot product",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "upretty",
+        "dot product",
+        "N.i",
+        "N.k"
+      ],
+      "rationale": "This test specifically targets the pretty printing of a vector dot product involving components that trigger the ValueError. It differs from the original test by focusing on the downstream behavior of the dot product pretty printing, ensuring that the bug is exposed through this specific operation."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -323,0 +323,11 @@\n+def test_sweb_enhanced_vector_dot_pretty():\n+    from sympy.vector import CoordSys3D\n+    from sympy.core.compatibility import u_decode as u\n+\n+    N = CoordSys3D('N')\n+    expr = N.i | N.k\n+\n+    expected = u(\"(N_i|N_k)\")\n+    assert upretty(expr) == expected, f\"Pretty printing failed for dot product: {upretty(expr)}\"\n+\n+    # This test ensures the bug in pretty printing of vector dot products is exposed.\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -323,0 +323,11 @@\n+def test_sweb_enhanced_vector_dot_pretty():\n+    from sympy.vector import CoordSys3D\n+    from sympy.core.compatibility import u_decode as u\n+\n+    N = CoordSys3D('N')\n+    expr = N.i | N.k\n+\n+    expected = u(\"(N_i|N_k)\")\n+    assert upretty(expr) == expected, f\"Pretty printing failed for dot product: {upretty(expr)}\"\n+\n+    # This test ensures the bug in pretty printing of vector dot products is exposed.\n```",
+    "identifiers": [
+      "test_sweb_enhanced_vector_dot_pretty"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_vector_dot_pretty"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "sympy/printing/pretty/tests/test_pretty.py:test_pretty_geometry": "FAILED",
+      "sympy/printing/pretty/tests/test_pretty.py:test_issue_8292": "FAILED",
+      "sympy/printing/pretty/tests/test_pretty.py:test_issue_8344": "FAILED",
+      "test_pretty_ascii_str": "PASSED",
+      "test_pretty_unicode_str": "PASSED",
+      "test_upretty_greek": "PASSED",
+      "test_upretty_multiindex": "PASSED",
+      "test_upretty_sub_super": "PASSED",
+      "test_upretty_subs_missing_in_24": "PASSED",
+      "test_upretty_modifiers": "PASSED",
+      "test_pretty_Cycle": "PASSED",
+      "test_pretty_basic": "PASSED",
+      "test_negative_fractions": "PASSED",
+      "test_issue_5524": "PASSED",
+      "test_pretty_ordering": "PASSED",
+      "test_EulerGamma": "PASSED",
+      "test_GoldenRatio": "PASSED",
+      "test_pretty_relational": "PASSED",
+      "test_Assignment": "PASSED",
+      "test_AugmentedAssignment": "PASSED",
+      "test_issue_7117": "PASSED",
+      "test_pretty_rational": "PASSED",
+      "test_pretty_functions": "PASSED",
+      "test_pretty_sqrt": "PASSED",
+      "test_pretty_sqrt_char_knob": "PASSED",
+      "test_pretty_sqrt_longsymbol_no_sqrt_char": "PASSED",
+      "test_pretty_KroneckerDelta": "PASSED",
+      "test_pretty_product": "PASSED",
+      "test_pretty_lambda": "PASSED",
+      "test_pretty_order": "PASSED",
+      "test_pretty_derivatives": "PASSED",
+      "test_pretty_integrals": "PASSED",
+      "test_pretty_matrix": "PASSED",
+      "test_pretty_ndim_arrays": "PASSED",
+      "test_tensor_TensorProduct": "PASSED",
+      "test_diffgeom_print_WedgeProduct": "PASSED",
+      "test_Adjoint": "PASSED",
+      "test_pretty_Trace_issue_9044": "PASSED",
+      "test_MatrixExpressions": "PASSED",
+      "test_pretty_dotproduct": "PASSED",
+      "test_pretty_piecewise": "PASSED",
+      "test_pretty_ITE": "PASSED",
+      "test_pretty_seq": "PASSED",
+      "test_any_object_in_sequence": "PASSED",
+      "test_print_builtin_set": "PASSED",
+      "test_pretty_sets": "PASSED",
+      "test_pretty_SetExpr": "PASSED",
+      "test_pretty_ImageSet": "PASSED",
+      "test_pretty_ConditionSet": "PASSED",
+      "test_pretty_ComplexRegion": "PASSED",
+      "test_pretty_Union_issue_10414": "PASSED",
+      "test_pretty_Intersection_issue_10414": "PASSED",
+      "test_ProductSet_paranthesis": "PASSED",
+      "test_ProductSet_prod_char_issue_10413": "PASSED",
+      "test_pretty_sequences": "PASSED",
+      "test_pretty_FourierSeries": "PASSED",
+      "test_pretty_FormalPowerSeries": "PASSED",
+      "test_pretty_limits": "PASSED",
+      "test_pretty_ComplexRootOf": "PASSED",
+      "test_pretty_RootSum": "PASSED",
+      "test_GroebnerBasis": "PASSED",
+      "test_pretty_Boolean": "PASSED",
+      "test_pretty_Domain": "PASSED",
+      "test_pretty_prec": "PASSED",
+      "test_pprint": "PASSED",
+      "test_pretty_class": "PASSED",
+      "test_pretty_no_wrap_line": "PASSED",
+      "test_settings": "PASSED",
+      "test_pretty_sum": "PASSED",
+      "test_units": "PASSED",
+      "test_pretty_Subs": "PASSED",
+      "test_gammas": "PASSED",
+      "test_beta": "PASSED",
+      "test_function_subclass_different_name": "PASSED",
+      "test_SingularityFunction": "PASSED",
+      "test_deltas": "PASSED",
+      "test_hyper": "PASSED",
+      "test_meijerg": "PASSED",
+      "test_noncommutative": "PASSED",
+      "test_pretty_special_functions": "PASSED",
+      "test_pretty_geometry": "ERROR",
+      "test_expint": "PASSED",
+      "test_elliptic_functions": "PASSED",
+      "test_RandomDomain": "PASSED",
+      "test_PrettyPoly": "PASSED",
+      "test_issue_6285": "PASSED",
+      "test_issue_6359": "PASSED",
+      "test_issue_6739": "PASSED",
+      "test_complicated_symbol_unchanged": "PASSED",
+      "test_categories": "PASSED",
+      "test_PrettyModules": "PASSED",
+      "test_QuotientRing": "PASSED",
+      "test_Homomorphism": "PASSED",
+      "test_Tr": "PASSED",
+      "test_pretty_Add": "PASSED",
+      "test_issue_7179": "PASSED",
+      "test_issue_7180": "PASSED",
+      "test_pretty_Complement": "PASSED",
+      "test_pretty_SymmetricDifference": "PASSED",
+      "test_pretty_Contains": "PASSED",
+      "test_issue_8292": "ERROR",
+      "test_issue_4335": "PASSED",
+      "test_issue_8344": "ERROR",
+      "test_issue_6324": "PASSED",
+      "test_issue_7927": "PASSED",
+      "test_issue_6134": "PASSED",
+      "test_issue_9877": "PASSED",
+      "test_issue_13651": "PASSED",
+      "test_pretty_primenu": "PASSED",
+      "test_pretty_primeomega": "PASSED",
+      "test_pretty_Mod": "PASSED",
+      "test_issue_11801": "PASSED",
+      "test_pretty_UnevaluatedExpr": "PASSED",
+      "test_issue_10472": "PASSED",
+      "test_MatrixElement_printing": "PASSED",
+      "test_MatrixSymbol_printing": "PASSED",
+      "test_degree_printing": "PASSED",
+      "test_vector_expr_pretty_printing": "PASSED",
+      "test_str_printing": "PASSED",
+      "test_pretty_print_unicode": "PASSED",
+      "test_latex_printing": "PASSED"
+    },
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_pretty_print_unicode"
+    ],
+    "covered_obligations": [
+      "test_pretty_print_unicode::upretty_d_7"
+    ]
+  }
+]

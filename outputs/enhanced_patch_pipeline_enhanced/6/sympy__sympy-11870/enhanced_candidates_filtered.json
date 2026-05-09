@@ -1,0 +1,250 @@
+[
+  {
+    "idea": {
+      "title": "sinc function rewrite validation",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the rewrite behavior of the sinc function to ensure it simplifies exponential terms correctly",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_sinc_rewrite"
+      ],
+      "covers_original_tests": [
+        "test_sinc"
+      ],
+      "covers_obligations": [
+        "test_sinc::core"
+      ],
+      "target_source_symbol": "sympy/functions/elementary/trigonometric.py::sinc",
+      "target_validation_subject": "rewrite behavior",
+      "semantic_alignment_tokens": [
+        "rewrite(",
+        "sinc(",
+        "exp(",
+        "sin(",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "sinc(",
+        "rewrite(",
+        "exp(",
+        "sin(",
+        "AssertionError"
+      ],
+      "rationale": "This test focuses on the rewrite behavior of the sinc function, which is distinct from the original test that primarily validates the direct output of the function. It ensures that the rewrite mechanism correctly simplifies exponential terms into trigonometric identities, exposing any behavioral gaps in the implementation."
+    },
+    "patch": "diff --git a/sympy/functions/elementary/tests/test_trigonometric.py b/sympy/functions/elementary/tests/test_trigonometric.py\n--- a/sympy/functions/elementary/tests/test_trigonometric.py\n+++ b/sympy/functions/elementary/tests/test_trigonometric.py\n@@ -236,0 +236,8 @@\n+def test_sweb_enhanced_sinc_rewrite():\n+    k = Symbol('k', real=True)\n+    f = 1 / 2 * (-I * exp(I * k) + I * exp(-I * k))\n+    rewritten = f.rewrite(sinc)\n+    expected = sin(k)\n+    assert rewritten == expected, f\"Expected {expected}, but got {rewritten}\"\n+\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/elementary/tests/test_trigonometric.py b/sympy/functions/elementary/tests/test_trigonometric.py\n--- a/sympy/functions/elementary/tests/test_trigonometric.py\n+++ b/sympy/functions/elementary/tests/test_trigonometric.py\n@@ -236,0 +236,8 @@\n+def test_sweb_enhanced_sinc_rewrite():\n+    k = Symbol('k', real=True)\n+    f = 1 / 2 * (-I * exp(I * k) + I * exp(-I * k))\n+    rewritten = f.rewrite(sinc)\n+    expected = sin(k)\n+    assert rewritten == expected, f\"Expected {expected}, but got {rewritten}\"\n+\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sinc_rewrite"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sinc_rewrite"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_sinc_rewrite"
+    ],
+    "eval_status_map": {
+      "sympy/functions/elementary/tests/test_trigonometric.py:test_sweb_enhanced_sinc_rewrite": "FAILED",
+      "test_sin": "PASSED",
+      "test_sin_cos": "PASSED",
+      "test_sin_series": "PASSED",
+      "test_sin_rewrite": "PASSED",
+      "test_sin_expansion": "PASSED",
+      "test_sin_AccumBounds": "PASSED",
+      "test_trig_symmetry": "PASSED",
+      "test_cos": "PASSED",
+      "test_issue_6190": "PASSED",
+      "test_cos_series": "PASSED",
+      "test_cos_rewrite": "PASSED",
+      "test_cos_expansion": "PASSED",
+      "test_cos_AccumBounds": "PASSED",
+      "test_tan": "PASSED",
+      "test_tan_series": "PASSED",
+      "test_tan_rewrite": "PASSED",
+      "test_tan_subs": "PASSED",
+      "test_tan_expansion": "PASSED",
+      "test_tan_AccumBounds": "PASSED",
+      "test_cot": "PASSED",
+      "test_cot_series": "PASSED",
+      "test_cot_rewrite": "PASSED",
+      "test_cot_subs": "PASSED",
+      "test_cot_expansion": "PASSED",
+      "test_cot_AccumBounds": "PASSED",
+      "test_sinc": "PASSED",
+      "test_asin": "PASSED",
+      "test_asin_series": "PASSED",
+      "test_asin_rewrite": "PASSED",
+      "test_acos": "PASSED",
+      "test_acos_series": "PASSED",
+      "test_acos_rewrite": "PASSED",
+      "test_atan": "PASSED",
+      "test_atan_rewrite": "PASSED",
+      "test_atan2": "PASSED",
+      "test_acot": "PASSED",
+      "test_acot_rewrite": "PASSED",
+      "test_attributes": "PASSED",
+      "test_sincos_rewrite": "PASSED",
+      "test_evenodd_rewrite": "PASSED",
+      "test_issue_4547": "PASSED",
+      "test_as_leading_term_issue_5272": "PASSED",
+      "test_leading_terms": "PASSED",
+      "test_atan2_expansion": "PASSED",
+      "test_aseries": "PASSED",
+      "test_issue_4420": "PASSED",
+      "test_inverses": "PASSED",
+      "test_real_imag": "PASSED",
+      "test_sec": "PASSED",
+      "test_sec_rewrite": "PASSED",
+      "test_csc": "PASSED",
+      "test_asec": "PASSED",
+      "test_asec_is_real": "PASSED",
+      "test_acsc": "PASSED",
+      "test_csc_rewrite": "PASSED",
+      "test_issue_8653": "PASSED",
+      "test_issue_9157": "PASSED",
+      "test_trig_period": "PASSED",
+      "test_issue_7171": "PASSED"
+    },
+    "generation_attempts": 2,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_sinc"
+    ],
+    "covered_obligations": [
+      "test_sinc::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test_sinc assertion error on trigsimp simplification",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the failure of trigsimp to simplify exponential expressions into trigonometric identities, reproducing the observed AssertionError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_trigsimp_sinc"
+      ],
+      "covers_original_tests": [
+        "test_sinc"
+      ],
+      "covers_obligations": [
+        "test_sinc::core"
+      ],
+      "target_source_symbol": "sympy.functions.elementary.trigonometric.trigsimp",
+      "target_validation_subject": "simplification of exponential to trigonometric identities",
+      "semantic_alignment_tokens": [
+        "trigsimp",
+        "sinc",
+        "sin(k)",
+        "exp"
+      ],
+      "trigger_shape_tokens": [
+        "exp(I*k)",
+        "exp(-I*k)",
+        "sin(k)",
+        "sinc(k)"
+      ],
+      "rationale": "This test directly reproduces the original failure by exercising trigsimp on the same problematic input expressions involving exponential terms. It differs from the original test by explicitly targeting the simplification of exponential expressions into trigonometric identities, which is the root cause of the AssertionError."
+    },
+    "patch": "diff --git a/sympy/functions/elementary/tests/test_trigonometric.py b/sympy/functions/elementary/tests/test_trigonometric.py\n--- a/sympy/functions/elementary/tests/test_trigonometric.py\n+++ b/sympy/functions/elementary/tests/test_trigonometric.py\n@@ -236,0 +236,8 @@\n+def test_sweb_enhanced_trigsimp_sinc():\n+    from sympy import I, exp, symbols, trigsimp, sin, sinc\n+    k = symbols('k', real=True)\n+\n+    f = 1 / 2 * (-I * exp(I * k) + I * exp(-I * k))\n+    assert trigsimp(f) == sin(k)\n+\n+    f_sinc = 1 / (2 * k) * (-I * exp(I * k) + I * exp(-I * k))\n+    assert trigsimp(f_sinc) == sinc(k)\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/elementary/tests/test_trigonometric.py b/sympy/functions/elementary/tests/test_trigonometric.py\n--- a/sympy/functions/elementary/tests/test_trigonometric.py\n+++ b/sympy/functions/elementary/tests/test_trigonometric.py\n@@ -236,0 +236,8 @@\n+def test_sweb_enhanced_trigsimp_sinc():\n+    from sympy import I, exp, symbols, trigsimp, sin, sinc\n+    k = symbols('k', real=True)\n+\n+    f = 1 / 2 * (-I * exp(I * k) + I * exp(-I * k))\n+    assert trigsimp(f) == sin(k)\n+\n+    f_sinc = 1 / (2 * k) * (-I * exp(I * k) + I * exp(-I * k))\n+    assert trigsimp(f_sinc) == sinc(k)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_trigsimp_sinc"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_trigsimp_sinc"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_trigsimp_sinc"
+    ],
+    "eval_status_map": {
+      "sympy/functions/elementary/tests/test_trigonometric.py:test_sweb_enhanced_trigsimp_sinc": "FAILED",
+      "test_sin": "PASSED",
+      "test_sin_cos": "PASSED",
+      "test_sin_series": "PASSED",
+      "test_sin_rewrite": "PASSED",
+      "test_sin_expansion": "PASSED",
+      "test_sin_AccumBounds": "PASSED",
+      "test_trig_symmetry": "PASSED",
+      "test_cos": "PASSED",
+      "test_issue_6190": "PASSED",
+      "test_cos_series": "PASSED",
+      "test_cos_rewrite": "PASSED",
+      "test_cos_expansion": "PASSED",
+      "test_cos_AccumBounds": "PASSED",
+      "test_tan": "PASSED",
+      "test_tan_series": "PASSED",
+      "test_tan_rewrite": "PASSED",
+      "test_tan_subs": "PASSED",
+      "test_tan_expansion": "PASSED",
+      "test_tan_AccumBounds": "PASSED",
+      "test_cot": "PASSED",
+      "test_cot_series": "PASSED",
+      "test_cot_rewrite": "PASSED",
+      "test_cot_subs": "PASSED",
+      "test_cot_expansion": "PASSED",
+      "test_cot_AccumBounds": "PASSED",
+      "test_sinc": "PASSED",
+      "test_asin": "PASSED",
+      "test_asin_series": "PASSED",
+      "test_asin_rewrite": "PASSED",
+      "test_acos": "PASSED",
+      "test_acos_series": "PASSED",
+      "test_acos_rewrite": "PASSED",
+      "test_atan": "PASSED",
+      "test_atan_rewrite": "PASSED",
+      "test_atan2": "PASSED",
+      "test_acot": "PASSED",
+      "test_acot_rewrite": "PASSED",
+      "test_attributes": "PASSED",
+      "test_sincos_rewrite": "PASSED",
+      "test_evenodd_rewrite": "PASSED",
+      "test_issue_4547": "PASSED",
+      "test_as_leading_term_issue_5272": "PASSED",
+      "test_leading_terms": "PASSED",
+      "test_atan2_expansion": "PASSED",
+      "test_aseries": "PASSED",
+      "test_issue_4420": "PASSED",
+      "test_inverses": "PASSED",
+      "test_real_imag": "PASSED",
+      "test_sec": "PASSED",
+      "test_sec_rewrite": "PASSED",
+      "test_csc": "PASSED",
+      "test_asec": "PASSED",
+      "test_asec_is_real": "PASSED",
+      "test_acsc": "PASSED",
+      "test_csc_rewrite": "PASSED",
+      "test_issue_8653": "PASSED",
+      "test_issue_9157": "PASSED",
+      "test_trig_period": "PASSED",
+      "test_issue_7171": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_sinc"
+    ],
+    "covered_obligations": [
+      "test_sinc::core"
+    ]
+  }
+]

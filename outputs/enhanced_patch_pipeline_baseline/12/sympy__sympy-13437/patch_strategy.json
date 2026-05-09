@@ -1,0 +1,16 @@
+{
+  "title": "Handle infinity limit in bell function",
+  "approach": "Modify the `bell` function's `eval` method to explicitly return `oo` when `n` is `S.Infinity`, ensuring consistency with mathematical definitions and similar functions like `fibonacci` and `lucas`.",
+  "edit_targets": [
+    "sympy/functions/combinatorial/numbers.py::bell.eval"
+  ],
+  "dependency_files": [
+    "sympy/functions/combinatorial/tests/test_comb_numbers.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing the `bell.eval` method should be sufficient to fix the bug. The test file `test_comb_numbers.py` should be inspected to ensure proper test coverage for the new behavior.",
+  "risks": [
+    "Potential unintended side effects if the `bell` function is used in contexts where `bell(oo)` was expected to remain unevaluated."
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "title": "Validate matrix operands in __matmul__",
+  "approach": "Add a type check in the `__matmul__` method to ensure both operands are instances of the Matrix class. Raise a `TypeError` if this condition is not met.",
+  "edit_targets": [
+    "sympy/matrices/common.py::MatrixArithmetic.__matmul__"
+  ],
+  "dependency_files": [
+    "sympy/matrices/tests/test_commonmatrix.py::test_matmul"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating"
+  ],
+  "sufficiency_assessment": "Editing the `__matmul__` method in `MatrixArithmetic` is sufficient to enforce the operand type validation. No additional changes are required in helper classes or constructors.",
+  "risks": [
+    "Introducing overly strict type checks could break valid use cases where non-Matrix objects are intentionally used."
+  ]
+}

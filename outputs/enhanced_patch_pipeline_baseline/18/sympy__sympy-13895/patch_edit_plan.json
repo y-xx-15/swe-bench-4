@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/numbers.py",
+      "action": "modify_region",
+      "justification": "The Float._eval_power method is responsible for handling power operations, including cases where the base is negative and the exponent is a non-integer. This is central to the observed discrepancy in the failing tests."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/numbers.py",
+      "target_symbol": "Float._eval_power",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "obligation_1",
+        "obligation_2"
+      ],
+      "anchor_line_before": "            elif isinstance(expt, Rational) and \\",
+      "anchor_line_after": "                return Pow(S.NegativeOne, expt, evaluate=False)*(",
+      "replacement_block": "            if isinstance(expt, Rational) and \\\n                    expt.p == 1 and expt.q % 2 and self.is_negative:\n                # Correctly handle negative bases with non-integer exponents\n                base = -self\n                if expt.q % 2 == 0:\n                    # Even denominator: result is real\n                    return base**expt\n                else:\n                    # Odd denominator: result is complex\n                    return Pow(S.NegativeOne, expt, evaluate=False) * base**expt"
+    }
+  ]
+}

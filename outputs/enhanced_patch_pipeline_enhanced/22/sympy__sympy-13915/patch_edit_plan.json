@@ -1,0 +1,44 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/mul.py",
+      "action": "modify_region",
+      "justification": "The Mul._eval_subs method is directly responsible for substitution logic and must be updated to handle cases where substitutions result in undefined expressions, such as division by zero."
+    },
+    {
+      "target_file": "sympy/core/mul.py",
+      "action": "modify_region",
+      "justification": "The Mul.flatten method processes multiplication terms and must be updated to ensure proper handling of undefined terms during term processing."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/mul.py",
+      "target_symbol": "Mul._eval_subs",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_Mul_does_not_cancel_infinities::core::limit_substitution",
+        "test_Mul_does_not_cancel_infinities::core::substitution_invariant",
+        "test_Mul_does_not_cancel_infinities::core::substitution behavior",
+        "test_Mul_does_not_cancel_infinities::core"
+      ],
+      "anchor_line_before": "    def _eval_subs(self, old, new):",
+      "anchor_line_after": "        return self.func(*args)",
+      "replacement_block": "    def _eval_subs(self, old, new):\n        args = [arg._eval_subs(old, new) for arg in self.args]\n        if any(arg.is_zero for arg in args if isinstance(arg, sympy.core.numbers.Infinity)):  # Handle undefined cases\n            return S.NaN\n        return self.func(*args)"
+    },
+    {
+      "target_file": "sympy/core/mul.py",
+      "target_symbol": "Mul.flatten",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_Mul_does_not_cancel_infinities::core::limit_substitution",
+        "test_Mul_does_not_cancel_infinities::core::substitution_invariant",
+        "test_Mul_does_not_cancel_infinities::core::substitution behavior",
+        "test_Mul_does_not_cancel_infinities::core"
+      ],
+      "anchor_line_before": "        \"\"\"Return commutative, noncommutative and order arguments by",
+      "anchor_line_after": "        combining related terms.",
+      "replacement_block": "        \"\"\"Return commutative, noncommutative and order arguments by\n        combining related terms.\n\n        Notes\n        =====\n            * Updated to handle undefined expressions during term processing.\n\n        if any(isinstance(arg, sympy.core.numbers.Infinity) and arg.is_zero for arg in seq):\n            return S.NaN\n        combining related terms."
+    }
+  ]
+}

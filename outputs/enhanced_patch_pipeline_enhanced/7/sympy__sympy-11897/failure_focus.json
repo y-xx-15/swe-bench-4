@@ -1,0 +1,32 @@
+{
+  "original_test_identifiers": [
+    "test_latex_Piecewise"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_latex_Piecewise"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/printing/tests/test_latex.py:test_latex_indexed",
+    "sympy/printing/tests/test_latex.py:test_latex_derivatives",
+    "sympy/printing/tests/test_latex.py:test_latex_FourierSeries",
+    "sympy/printing/tests/test_latex.py:test_latex_FormalPowerSeries",
+    "sympy/printing/tests/test_latex.py:test_latex_matrix_with_functions"
+  ],
+  "failure_mode": "value_error",
+  "dominant_errors": [
+    "RecursionError",
+    "ValueError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_latex_Piecewise F",
+    "____________ sympy/printing/tests/test_latex.py:test_latex_indexed _____________",
+    "__________ sympy/printing/tests/test_latex.py:test_latex_derivatives ___________"
+  ],
+  "noise_ratio": 0.0022,
+  "target_test_tracebacks": {
+    "test_latex_Piecewise": "TARGET TEST: test_latex_Piecewise\n- snippet: test_latex_Piecewise F\n- snippet: ____________ sympy/printing/tests/test_latex.py:test_latex_indexed _____________\n- snippet: __________ sympy/printing/tests/test_latex.py:test_latex_derivatives ___________\n- dominant_errors: RecursionError, ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_latex_Piecewise F\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\nValueError: Name node can't be used with 'False' constant\n___________ sympy/printing/tests/test_latex.py:test_latex_Piecewise ____________\n  File \"/testbed/sympy/printing/tests/test_latex.py\", line 870, in test_latex_Piecewise\nAssertionError\n tests finished: 97 passed, 1 failed, 2 expected to fail, 7 exceptions, "
+  }
+}

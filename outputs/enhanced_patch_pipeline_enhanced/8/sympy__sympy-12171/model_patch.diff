@@ -1,0 +1,18 @@
+diff --git a/sympy/printing/mathematica.py b/sympy/printing/mathematica.py
+--- a/sympy/printing/mathematica.py
++++ b/sympy/printing/mathematica.py
+@@ -109,4 +109,14 @@ class MCodePrinter(CodePrinter):
+         return "Hold[Sum[" + ', '.join(self.doprint(a) for a in expr.args) + "]]"
+ 
++    def _print_Derivative(self, expr):
++        """Prints derivatives in Mathematica syntax using D."""
++        return "Hold[D[%s]]" % self.stringify(expr.args, ", ")
++
++    def _print_Float(self, expr):
++        """Prints floats in Mathematica syntax, converting scientific notation."""
++        res = str(expr)
++        return res.replace('e', '*^')
++
++
+ def mathematica_code(expr, **settings):
+     r"""Converts an expr to a string of the Wolfram Mathematica code

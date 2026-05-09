@@ -1,0 +1,18 @@
+{
+  "title": "Fix power operation for negative bases with non-integer exponents",
+  "approach": "Update the Float._eval_power method to correctly handle cases where the base is negative and the exponent is non-integer, ensuring mathematical equivalence and consistency with numerical evaluation.",
+  "edit_targets": [
+    "sympy/core/numbers.py::Float._eval_power"
+  ],
+  "dependency_files": [
+    "sympy/core/tests/test_numbers.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating"
+  ],
+  "sufficiency_assessment": "Editing Float._eval_power should be sufficient to fix the bug, as the issue lies in the incorrect handling of power operations. Test files are referenced to validate the fix but do not require modifications.",
+  "risks": [
+    "Potential regressions in other parts of the codebase that rely on Float._eval_power for power operations, especially for edge cases involving negative bases and non-integer exponents."
+  ]
+}

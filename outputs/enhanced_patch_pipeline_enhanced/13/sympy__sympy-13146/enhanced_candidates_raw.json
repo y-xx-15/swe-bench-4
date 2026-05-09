@@ -1,0 +1,348 @@
+[
+  {
+    "idea": {
+      "title": "simplify_exponent_evaluation_bug",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the failure to simplify equivalent exponent expressions during evalf",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_simplify_exponent"
+      ],
+      "covers_original_tests": [
+        "test_evalf_bugs"
+      ],
+      "covers_obligations": [
+        "test_evalf_bugs::core"
+      ],
+      "target_source_symbol": "sympy.core.operations.AssocOp._eval_evalf",
+      "target_validation_subject": "exponent_simplification",
+      "semantic_alignment_tokens": [
+        "evalf(",
+        "simplify(",
+        "AssocOp",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "evalf(",
+        "simplify(",
+        "AssocOp"
+      ],
+      "rationale": "This test directly reproduces the failure mode observed in test_evalf_bugs by constructing an equivalent exponent subtraction scenario that fails to simplify to zero. It differs from the original test by isolating the specific exponentiation simplification obligation within AssocOp._eval_evalf, providing more precise repair guidance."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +205,8 @@\n+def test_sweb_enhanced_simplify_exponent():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = expr1 - expr2\n+    simplified_result = simplify(result.evalf(5))\n+    assert simplified_result == 0, (\n+        f\"Expected simplified result to be 0, but got {simplified_result}\"\n+    )\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +205,8 @@\n+def test_sweb_enhanced_simplify_exponent():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = expr1 - expr2\n+    simplified_result = simplify(result.evalf(5))\n+    assert simplified_result == 0, (\n+        f\"Expected simplified result to be 0, but got {simplified_result}\"\n+    )\n```",
+    "identifiers": [
+      "test_sweb_enhanced_simplify_exponent"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_simplify_exponent"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_evalf_bugs_exponent_simplification",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream behavior of exponent simplification in evalf",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_evalf_exponent_simplification"
+      ],
+      "covers_original_tests": [
+        "test_evalf_bugs"
+      ],
+      "covers_obligations": [
+        "test_evalf_bugs::core"
+      ],
+      "target_source_symbol": "AssocOp._eval_evalf",
+      "target_validation_subject": "exponent_simplification",
+      "semantic_alignment_tokens": [
+        "evalf(",
+        "simplify(",
+        "AssocOp"
+      ],
+      "trigger_shape_tokens": [
+        "evalf(",
+        "simplify(",
+        "AssocOp"
+      ],
+      "rationale": "This test focuses on the downstream consequence of incorrect exponent simplification during evalf, which leads to incorrect numerical results. It differs from the original test by explicitly verifying that the subtraction of two equivalent expressions simplifies to zero after evalf, exposing the bug's impact on numerical equivalence."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +204,8 @@\n+def test_sweb_enhanced_evalf_exponent_simplification():\n+    from sympy import Symbol, simplify, S\n+    x = Symbol('x')\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = simplify((expr1 - expr2).evalf())\n+    assert result == 0, f\"Expected 0, but got {result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +204,8 @@\n+def test_sweb_enhanced_evalf_exponent_simplification():\n+    from sympy import Symbol, simplify, S\n+    x = Symbol('x')\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = simplify((expr1 - expr2).evalf())\n+    assert result == 0, f\"Expected 0, but got {result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_evalf_exponent_simplification"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_evalf_exponent_simplification"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_evalf_behavioral_consequence_simplify_exponent",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream simplification behavior when evalf fails to simplify exponents",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_simplify_exponent"
+      ],
+      "covers_original_tests": [
+        "test_evalf_bugs"
+      ],
+      "covers_obligations": [
+        "test_evalf_bugs::core"
+      ],
+      "target_source_symbol": "AssocOp._eval_evalf",
+      "target_validation_subject": "simplification of exponentiation during evalf",
+      "semantic_alignment_tokens": [
+        "evalf(",
+        "simplify(",
+        "AssocOp"
+      ],
+      "trigger_shape_tokens": [
+        "evalf(",
+        "simplify(",
+        "AssocOp"
+      ],
+      "rationale": "This test focuses on the downstream consequence of evalf failing to simplify exponents, which is distinct from the original test that directly observed the assertion error. It highlights how the bug propagates into incorrect simplification results, providing additional repair guidance."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +204,8 @@\n+def test_sweb_enhanced_simplify_exponent_behavior():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = expr1 - expr2\n+    simplified_result = simplify(result.evalf())\n+    # The expected behavior is that the expression simplifies to 0\n+    assert simplified_result == 0, f\"Expected 0, got {simplified_result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +204,8 @@\n+def test_sweb_enhanced_simplify_exponent_behavior():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = expr1 - expr2\n+    simplified_result = simplify(result.evalf())\n+    # The expected behavior is that the expression simplifies to 0\n+    assert simplified_result == 0, f\"Expected 0, got {simplified_result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_simplify_exponent_behavior"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_simplify_exponent_behavior"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_evalf_exponentiation_simplification",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream behavior of evalf when simplifying expressions with fractional exponents",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_evalf_exponentiation"
+      ],
+      "covers_original_tests": [
+        "test_evalf_bugs"
+      ],
+      "covers_obligations": [
+        "test_evalf_bugs::core"
+      ],
+      "target_source_symbol": "AssocOp._eval_evalf",
+      "target_validation_subject": "evalf_simplification",
+      "semantic_alignment_tokens": [
+        "evalf(",
+        "simplify(",
+        "AssocOp"
+      ],
+      "trigger_shape_tokens": [
+        "evalf(",
+        "fractional_exponent",
+        "simplify("
+      ],
+      "rationale": "This test focuses on the downstream consequence of incorrect simplification during evalf operations, specifically targeting fractional exponents. Unlike the original test, which broadly exposes the bug, this idea isolates the failure to the behavior of evalf when handling fractional exponents, providing more precise repair guidance."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +204,7 @@\n+def test_sweb_enhanced_evalf_exponentiation():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = expr1 - expr2\n+    simplified_result = simplify(result.evalf(5))\n+    assert simplified_result == 0, f\"Expected 0, got {simplified_result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +205,8 @@\n+def test_sweb_enhanced_evalf_exponentiation():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = expr1 - expr2\n+    simplified_result = simplify(result.evalf(5))\n+    assert simplified_result == 0, f\"Expected 0, got {simplified_result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_evalf_exponentiation"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_evalf_exponentiation"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "evalf simplification mismatch",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect simplification behavior when evalf is applied to expressions with fractional exponents",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_evalf_simplify"
+      ],
+      "covers_original_tests": [
+        "test_evalf_bugs"
+      ],
+      "covers_obligations": [
+        "test_evalf_bugs::core"
+      ],
+      "target_source_symbol": "sympy.core.tests.test_evalf.test_evalf_bugs",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "evalf(",
+        "simplify(",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "evalf(",
+        "fractional exponent"
+      ],
+      "rationale": "This test directly reproduces the original failure by constructing an expression with fractional exponents and applying evalf followed by simplify. It aligns with the original failure path by targeting the evalf simplification behavior and triggering the same assertion error observed in the original test."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +204,7 @@\n+def test_sweb_enhanced_evalf_simplify():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = expr1 - expr2\n+    simplified_result = simplify(result.evalf(5))\n+    assert simplified_result == 0, f\"Expected 0, but got {simplified_result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +204,7 @@\n+def test_sweb_enhanced_evalf_simplify():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = expr1 - expr2\n+    simplified_result = simplify(result.evalf(5))\n+    assert simplified_result == 0, f\"Expected 0, but got {simplified_result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_evalf_simplify"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_evalf_simplify"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_evalf_exponentiation_buggy_simplification",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress incorrect simplification behavior in exponentiation leading to assertion_error",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_evalf_exponentiation_bug"
+      ],
+      "covers_original_tests": [
+        "test_evalf_bugs"
+      ],
+      "covers_obligations": [
+        "test_evalf_bugs::core"
+      ],
+      "target_source_symbol": "AssocOp._eval_evalf",
+      "target_validation_subject": "exponentiation_simplification",
+      "semantic_alignment_tokens": [
+        "evalf",
+        "simplify",
+        "exponentiation",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "evalf",
+        "simplify",
+        "AssocOp",
+        "Pow"
+      ],
+      "rationale": "This test focuses on the downstream behavioral consequence of incorrect exponentiation simplification, which leads to assertion errors during evaluation. It differs from the original test by isolating the buggy simplification behavior in a specific exponentiation scenario rather than general evalf failures."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +204,8 @@\n+def test_sweb_enhanced_evalf_exponentiation_bug():\n+    # This test isolates the buggy behavior in exponentiation simplification\n+    # where incorrect handling of fractional powers leads to assertion errors.\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = simplify(expr1 - expr2)\n+    assert result == 0, f\"Expected 0, but got {result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +204,8 @@\n+def test_sweb_enhanced_evalf_exponentiation_bug():\n+    # This test isolates the buggy behavior in exponentiation simplification\n+    # where incorrect handling of fractional powers leads to assertion errors.\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = simplify(expr1 - expr2)\n+    assert result == 0, f\"Expected 0, but got {result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_evalf_exponentiation_bug"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_evalf_exponentiation_bug"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test fractional exponent simplification",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the failure to simplify fractional exponents to zero when they cancel out",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_fractional_exponent_simplification"
+      ],
+      "covers_original_tests": [
+        "test_evalf_bugs"
+      ],
+      "covers_obligations": [
+        "test_evalf_bugs::core"
+      ],
+      "target_source_symbol": "test_evalf_bugs",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "evalf(",
+        "simplify(",
+        "fractional exponent"
+      ],
+      "trigger_shape_tokens": [
+        "evalf(",
+        "simplify(",
+        "fractional exponent"
+      ],
+      "rationale": "This test directly reproduces the original failure by constructing an expression with fractional exponents that should simplify to zero but fails due to the bug. It aligns with the original failure path and exception semantics, providing a minimal and focused reproduction of the bug."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +205,7 @@\n+def test_sweb_enhanced_fractional_exponent_simplification():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    res = expr1 - expr2\n+    simplified_res = simplify(res.evalf(5))\n+    assert simplified_res == 0, f\"Expected 0, but got {simplified_res}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +205,7 @@\n+def test_sweb_enhanced_fractional_exponent_simplification():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    res = expr1 - expr2\n+    simplified_res = simplify(res.evalf(5))\n+    assert simplified_res == 0, f\"Expected 0, but got {simplified_res}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_fractional_exponent_simplification"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_fractional_exponent_simplification"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

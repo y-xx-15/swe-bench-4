@@ -1,0 +1,87 @@
+[
+  {
+    "idea": {
+      "title": "validate_immutable_symbol_dict_absence",
+      "semantic_bucket": "unspecified",
+      "goal": "ensure that Symbol instances do not have a __dict__ attribute when __slots__ is defined",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "slots_visibility_check",
+      "target_tests": [
+        "test_sweb_enhanced_immutable_symbol_dict_absence"
+      ],
+      "covers_original_tests": [
+        "test_immutable"
+      ],
+      "covers_obligations": [
+        "test_immutable::core"
+      ],
+      "target_source_symbol": "sympy.Symbol",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Symbol(",
+        "__slots__",
+        "__dict__",
+        "AttributeError"
+      ],
+      "trigger_shape_tokens": [
+        "Symbol(",
+        "__slots__",
+        "__dict__"
+      ],
+      "rationale": "This test directly validates the absence of the __dict__ attribute on Symbol instances, which is the root cause of the original failure. Unlike the original test, which indirectly observed the issue through an assertion mismatch, this test explicitly targets the attribute-level behavior of Symbol instances, providing more precise repair guidance."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_immutable_symbol_dict_absence():\n+    s = Symbol('test')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute when __slots__ is defined.\"\n+    with raises(AttributeError):\n+        s.new_attr = 42  # Attempting to set an attribute should raise an AttributeError due to __slots__.\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_immutable_symbol_dict_absence():\n+    s = Symbol('test')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute when __slots__ is defined.\"\n+    with raises(AttributeError):\n+        s.new_attr = 42  # Attempting to set an attribute should raise an AttributeError due to __slots__.\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_immutable_symbol_dict_absence"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_immutable_symbol_dict_absence"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_immutable_symbol_dict_absence"
+    ],
+    "eval_status_map": {
+      "sympy/core/tests/test_basic.py:test_sweb_enhanced_immutable_symbol_dict_absence": "FAILED",
+      "test__aresame": "PASSED",
+      "test_structure": "PASSED",
+      "test_equality": "PASSED",
+      "test_matches_basic": "PASSED",
+      "test_has": "PASSED",
+      "test_subs": "PASSED",
+      "test_subs_with_unicode_symbols": "PASSED",
+      "test_atoms": "PASSED",
+      "test_free_symbols_empty": "PASSED",
+      "test_doit": "PASSED",
+      "test_S": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_preorder_traversal": "PASSED",
+      "test_sorted_args": "PASSED",
+      "test_call": "PASSED",
+      "test_rewrite": "PASSED",
+      "test_literal_evalf_is_number_is_zero_is_comparable": "PASSED",
+      "test_as_Basic": "PASSED",
+      "test_atomic": "PASSED",
+      "test_as_dummy": "PASSED",
+      "test_canonical_variables": "PASSED",
+      "test_replace_exceptions": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_immutable"
+    ],
+    "covered_obligations": [
+      "test_immutable::core"
+    ]
+  }
+]

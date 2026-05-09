@@ -1,0 +1,149 @@
+[
+  {
+    "idea": {
+      "title": "limit_behavior_for_bell_infinity",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect limit evaluation behavior of bell(n).limit(n, oo) returning bell(oo) instead of oo",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_limit_behavior_for_bell_infinity"
+      ],
+      "covers_original_tests": [
+        "test_bell"
+      ],
+      "covers_obligations": [
+        "test_bell::core"
+      ],
+      "target_source_symbol": "bell",
+      "target_validation_subject": "limit_behavior",
+      "semantic_alignment_tokens": [
+        "bell(",
+        ".limit(",
+        "oo"
+      ],
+      "trigger_shape_tokens": [
+        "bell(",
+        ".limit(",
+        "oo"
+      ],
+      "rationale": "This test directly exercises the same API path and failure mode as the original test_bell, focusing on the incorrect limit evaluation behavior for bell(n).limit(n, oo). It ensures that the bug is exposed through the same semantic alignment tokens and exception type, while providing a compact and focused assertion that reproduces the failure."
+    },
+    "patch": "diff --git a/sympy/functions/combinatorial/tests/test_comb_numbers.py b/sympy/functions/combinatorial/tests/test_comb_numbers.py\n--- a/sympy/functions/combinatorial/tests/test_comb_numbers.py\n+++ b/sympy/functions/combinatorial/tests/test_comb_numbers.py\n@@ -235,0 +235,5 @@\n+def test_sweb_enhanced_limit_behavior_for_bell_infinity():\n+    n = Symbol('n', integer=True, positive=True)\n+    result = bell(n).limit(n, oo)\n+    assert result == S.Infinity, f\"Expected limit of bell(n) as n -> oo to be Infinity, but got {result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/combinatorial/tests/test_comb_numbers.py b/sympy/functions/combinatorial/tests/test_comb_numbers.py\n--- a/sympy/functions/combinatorial/tests/test_comb_numbers.py\n+++ b/sympy/functions/combinatorial/tests/test_comb_numbers.py\n@@ -235,0 +235,5 @@\n+def test_sweb_enhanced_limit_behavior_for_bell_infinity():\n+    n = Symbol('n', integer=True, positive=True)\n+    result = bell(n).limit(n, oo)\n+    assert result == S.Infinity, f\"Expected limit of bell(n) as n -> oo to be Infinity, but got {result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_limit_behavior_for_bell_infinity"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_limit_behavior_for_bell_infinity"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Bell number limit assertion",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect limit behavior of bell(n).limit(n, oo) returning bell(oo) instead of infinity",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_bell_limit"
+      ],
+      "covers_original_tests": [
+        "test_bell"
+      ],
+      "covers_obligations": [
+        "test_bell::core"
+      ],
+      "target_source_symbol": "bell",
+      "target_validation_subject": "limit_behavior",
+      "semantic_alignment_tokens": [
+        "bell(",
+        ".limit(",
+        "oo"
+      ],
+      "trigger_shape_tokens": [
+        "bell(",
+        ".limit(",
+        "oo"
+      ],
+      "rationale": "This test directly reproduces the original failure by asserting the correct limit behavior of bell(n).limit(n, oo). It differs from the original test by explicitly focusing on the limit behavior and verifying the expected output as infinity, which adds precision to the repair obligation."
+    },
+    "patch": "diff --git a/sympy/functions/combinatorial/tests/test_comb_numbers.py b/sympy/functions/combinatorial/tests/test_comb_numbers.py\n--- a/sympy/functions/combinatorial/tests/test_comb_numbers.py\n+++ b/sympy/functions/combinatorial/tests/test_comb_numbers.py\n@@ -235,0 +235,6 @@\n+def test_sweb_enhanced_bell_limit():\n+    n = Symbol('n', integer=True, positive=True)\n+    result = bell(n).limit(n, oo)\n+    assert result == S.Infinity, (\n+        f\"Expected bell(n).limit(n, oo) to return S.Infinity, but got {result}\"\n+    )\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/combinatorial/tests/test_comb_numbers.py b/sympy/functions/combinatorial/tests/test_comb_numbers.py\n--- a/sympy/functions/combinatorial/tests/test_comb_numbers.py\n+++ b/sympy/functions/combinatorial/tests/test_comb_numbers.py\n@@ -235,0 +235,6 @@\n+def test_sweb_enhanced_bell_limit():\n+    n = Symbol('n', integer=True, positive=True)\n+    result = bell(n).limit(n, oo)\n+    assert result == S.Infinity, (\n+        f\"Expected bell(n).limit(n, oo) to return S.Infinity, but got {result}\"\n+    )\n```",
+    "identifiers": [
+      "test_sweb_enhanced_bell_limit"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_bell_limit"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Bell number limit assertion",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect limit behavior of bell(n).limit(n, oo) returning bell(oo) instead of infinity",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_bell_limit"
+      ],
+      "covers_original_tests": [
+        "test_bell"
+      ],
+      "covers_obligations": [
+        "test_bell::core"
+      ],
+      "target_source_symbol": "bell",
+      "target_validation_subject": "limit_behavior",
+      "semantic_alignment_tokens": [
+        "bell(",
+        "limit(",
+        "oo"
+      ],
+      "trigger_shape_tokens": [
+        "bell(",
+        "limit(",
+        "oo"
+      ],
+      "rationale": "This test directly reproduces the original failure by asserting the limit behavior of bell(n).limit(n, oo), which was incorrectly returning bell(oo) instead of infinity. It aligns with the original failure path and exception semantics, ensuring the bug is exposed through the same API path and observed AssertionError."
+    },
+    "patch": "diff --git a/sympy/functions/combinatorial/tests/test_comb_numbers.py b/sympy/functions/combinatorial/tests/test_comb_numbers.py\n--- a/sympy/functions/combinatorial/tests/test_comb_numbers.py\n+++ b/sympy/functions/combinatorial/tests/test_comb_numbers.py\n@@ -235,0 +235,6 @@\n+def test_sweb_enhanced_bell_limit_with_substitution():\n+    n = Symbol('n', integer=True, positive=True)\n+    expr = bell(n).limit(n, oo).subs(bell(oo), S.Infinity)\n+    assert expr == S.Infinity, \"Expected bell(n).limit(n, oo) to evaluate to Infinity after substitution\"\n+\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/combinatorial/tests/test_comb_numbers.py b/sympy/functions/combinatorial/tests/test_comb_numbers.py\n--- a/sympy/functions/combinatorial/tests/test_comb_numbers.py\n+++ b/sympy/functions/combinatorial/tests/test_comb_numbers.py\n@@ -235,0 +235,6 @@\n+def test_sweb_enhanced_bell_limit_with_substitution():\n+    n = Symbol('n', integer=True, positive=True)\n+    expr = bell(n).limit(n, oo).subs(bell(oo), S.Infinity)\n+    assert expr == S.Infinity, \"Expected bell(n).limit(n, oo) to evaluate to Infinity after substitution\"\n+\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_bell_limit_with_substitution"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_bell_limit_with_substitution"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

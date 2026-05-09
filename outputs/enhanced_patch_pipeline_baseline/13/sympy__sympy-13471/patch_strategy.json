@@ -1,0 +1,14 @@
+{
+  "title": "Handle Python 2 long literals during unpickling",
+  "approach": "Modify the Float.__new__ method to handle Python 2 long literals ('1L') by stripping the trailing 'L' before attempting to convert the string to an integer.",
+  "edit_targets": [
+    "sympy/core/numbers.py::Float.__new__"
+  ],
+  "dependency_files": [],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing Float.__new__ in sympy/core/numbers.py is sufficient because the issue is isolated to the handling of hexadecimal strings during unpickling. No other files or symbols are involved in this specific deserialization logic.",
+  "risks": [
+    "Ensure that the fix does not inadvertently alter valid hexadecimal strings or introduce regressions in other parts of the Float.__new__ method."
+  ]
+}

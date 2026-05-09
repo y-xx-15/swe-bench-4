@@ -1,0 +1,245 @@
+[
+  {
+    "idea": {
+      "title": "test_decompose with unordered polynomial decomposition",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the behavior of decompose() when returning unordered lists, triggering assertion_error",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_decompose_unordered"
+      ],
+      "covers_original_tests": [
+        "test_decompose"
+      ],
+      "covers_obligations": [
+        "test_decompose::core"
+      ],
+      "target_source_symbol": "sympy.integrals.intpoly.decompose",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "decompose(",
+        "separate=True",
+        "list(poly_dict.values())"
+      ],
+      "trigger_shape_tokens": [
+        "decompose(",
+        "separate=True"
+      ],
+      "rationale": "This test directly reproduces the original failure by invoking decompose() with separate=True and asserting the order of returned values. It differs from the original test by explicitly verifying the ordering of the returned list, which is the root cause of the assertion_error."
+    },
+    "patch": "diff --git a/sympy/integrals/tests/test_intpoly.py b/sympy/integrals/tests/test_intpoly.py\n--- a/sympy/integrals/tests/test_intpoly.py\n+++ b/sympy/integrals/tests/test_intpoly.py\n@@ -196,0 +196,8 @@\n+def test_sweb_enhanced_decompose_unordered():\n+    # Test decompose with separate=True to verify ordering of returned list\n+    result = decompose(3*x**2 + 2*y + x*y**2 + 5, separate=True)\n+    expected = [5, 2*y, 3*x**2, x*y**2]  # Correctly ordered list\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n+    # This test ensures that the unordered behavior of decompose() with separate=True\n+    # triggers an assertion error on buggy code.\n",
+    "raw_response": "```diff\ndiff --git a/sympy/integrals/tests/test_intpoly.py b/sympy/integrals/tests/test_intpoly.py\n--- a/sympy/integrals/tests/test_intpoly.py\n+++ b/sympy/integrals/tests/test_intpoly.py\n@@ -196,0 +196,8 @@\n+def test_sweb_enhanced_decompose_unordered():\n+    # Test decompose with separate=True to verify ordering of returned list\n+    result = decompose(3*x**2 + 2*y + x*y**2 + 5, separate=True)\n+    expected = [5, 2*y, 3*x**2, x*y**2]  # Correctly ordered list\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n+    # This test ensures that the unordered behavior of decompose() with separate=True\n+    # triggers an assertion error on buggy code.\n```",
+    "identifiers": [
+      "test_sweb_enhanced_decompose_unordered"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_decompose_unordered"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_decompose with unordered output validation",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the assertion error caused by unordered output from decompose()",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_decompose_order"
+      ],
+      "covers_original_tests": [
+        "test_decompose"
+      ],
+      "covers_obligations": [
+        "test_decompose::core"
+      ],
+      "target_source_symbol": "sympy.integrals.intpoly.decompose",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "decompose(",
+        "separate=",
+        "list(poly_dict.values())"
+      ],
+      "trigger_shape_tokens": [
+        "assertionerror",
+        "decompose(",
+        "separate=",
+        "list(poly_dict.values())"
+      ],
+      "rationale": "This test directly reproduces the original failure by validating the order of output from decompose() when separate=True, ensuring the same assertion error is triggered as in the original test_decompose."
+    },
+    "patch": "diff --git a/sympy/integrals/tests/test_intpoly.py b/sympy/integrals/tests/test_intpoly.py\n--- a/sympy/integrals/tests/test_intpoly.py\n+++ b/sympy/integrals/tests/test_intpoly.py\n@@ -196,0 +196,7 @@\n+def test_sweb_enhanced_decompose_order():\n+    # Test to validate the order of output from decompose() when separate=True\n+    expr = 3*x**2 + 2*y + x*y + y**2\n+    result = decompose(expr, separate=True)\n+    expected = [2*y, y**2, x*y, 3*x**2]  # Correctly ordered list\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/integrals/tests/test_intpoly.py b/sympy/integrals/tests/test_intpoly.py\n--- a/sympy/integrals/tests/test_intpoly.py\n+++ b/sympy/integrals/tests/test_intpoly.py\n@@ -196,0 +196,7 @@\n+def test_sweb_enhanced_decompose_order():\n+    # Test to validate the order of output from decompose() when separate=True\n+    expr = 3*x**2 + 2*y + x*y + y**2\n+    result = decompose(expr, separate=True)\n+    expected = [2*y, y**2, x*y, 3*x**2]  # Correctly ordered list\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_decompose_order"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_decompose_order"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_decompose_order_invariant",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the order-invariance of the decompose() function output when separate=True",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_decompose_order_invariant"
+      ],
+      "covers_original_tests": [
+        "test_decompose"
+      ],
+      "covers_obligations": [
+        "test_decompose::core"
+      ],
+      "target_source_symbol": "sympy.integrals.intpoly.decompose",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "decompose(",
+        "separate=True"
+      ],
+      "trigger_shape_tokens": [
+        "decompose(",
+        "separate=True",
+        "list(poly_dict.values())"
+      ],
+      "rationale": "This test directly exercises the same decompose() function with separate=True, ensuring that the output order is invariant. It reproduces the original failure by asserting the expected order-invariant behavior, which the buggy implementation violates."
+    },
+    "patch": "diff --git a/sympy/integrals/tests/test_intpoly.py b/sympy/integrals/tests/test_intpoly.py\n--- a/sympy/integrals/tests/test_intpoly.py\n+++ b/sympy/integrals/tests/test_intpoly.py\n@@ -196,0 +196,10 @@\n+def test_sweb_enhanced_decompose_order_invariant():\n+    # Test to ensure decompose() with separate=True produces order-invariant output\n+    expr = 3*x**2 + 2*y + x*y + y**2 + 5\n+    result = decompose(expr, separate=True)\n+    # Expected result should be sorted by degree and then by term order\n+    expected = [5, 2*y, x*y, y**2, 3*x**2]\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n+    # Additional check with a different expression\n+    assert decompose(x**3 + y**3 + x*y, separate=True) == [x*y, x**3, y**3]\n",
+    "raw_response": "```diff\ndiff --git a/sympy/integrals/tests/test_intpoly.py b/sympy/integrals/tests/test_intpoly.py\n--- a/sympy/integrals/tests/test_intpoly.py\n+++ b/sympy/integrals/tests/test_intpoly.py\n@@ -196,0 +196,10 @@\n+def test_sweb_enhanced_decompose_order_invariant():\n+    # Test to ensure decompose() with separate=True produces order-invariant output\n+    expr = 3*x**2 + 2*y + x*y + y**2 + 5\n+    result = decompose(expr, separate=True)\n+    # Expected result should be sorted by degree and then by term order\n+    expected = [5, 2*y, x*y, y**2, 3*x**2]\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n+    # Additional check with a different expression\n+    assert decompose(x**3 + y**3 + x*y, separate=True) == [x*y, x**3, y**3]\n```",
+    "identifiers": [
+      "test_sweb_enhanced_decompose_order_invariant"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_decompose_order_invariant"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "decompose() order invariant validation",
+      "semantic_bucket": "structural_invariant",
+      "goal": "stress that decompose() must return a consistent order of monomials regardless of input changes",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_decompose_order_invariant"
+      ],
+      "covers_original_tests": [
+        "test_decompose"
+      ],
+      "covers_obligations": [
+        "test_decompose::core"
+      ],
+      "target_source_symbol": "sympy.integrals.intpoly.decompose",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "decompose(",
+        "separate=True"
+      ],
+      "trigger_shape_tokens": [
+        "decompose(",
+        "separate=True"
+      ],
+      "rationale": "This test ensures that the decompose() function maintains a consistent order of monomials, which is a structural invariant. Unlike the original test, which only checks correctness of decomposition, this test explicitly validates the ordering behavior, exposing a deeper obligation."
+    },
+    "patch": "diff --git a/sympy/integrals/tests/test_intpoly.py b/sympy/integrals/tests/test_intpoly.py\n--- a/sympy/integrals/tests/test_intpoly.py\n+++ b/sympy/integrals/tests/test_intpoly.py\n@@ -196,0 +196,7 @@\n+def test_sweb_enhanced_decompose_order_boundary():\n+    # Test to ensure consistent decomposition order for boundary cases\n+    expr = x**2 + x*y + y**2 + x + y + 1\n+    result = decompose(expr, separate=True)\n+    expected = [1, x, y, x**2, x*y, y**2]\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/integrals/tests/test_intpoly.py b/sympy/integrals/tests/test_intpoly.py\n--- a/sympy/integrals/tests/test_intpoly.py\n+++ b/sympy/integrals/tests/test_intpoly.py\n@@ -196,0 +196,7 @@\n+def test_sweb_enhanced_decompose_order_boundary():\n+    # Test to ensure consistent decomposition order for boundary cases\n+    expr = x**2 + x*y + y**2 + x + y + 1\n+    result = decompose(expr, separate=True)\n+    expected = [1, x, y, x**2, x*y, y**2]\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_decompose_order_boundary"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_decompose_order_boundary"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_decompose_order_invariant",
+      "semantic_bucket": "structural_invariant",
+      "goal": "stress the invariant that decompose() must return a consistent order of monomials regardless of dictionary order",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_decompose_order_invariant"
+      ],
+      "covers_original_tests": [
+        "test_decompose"
+      ],
+      "covers_obligations": [
+        "test_decompose::core"
+      ],
+      "target_source_symbol": "decompose",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "decompose(",
+        "separate=True",
+        "list(poly_dict.values())"
+      ],
+      "trigger_shape_tokens": [
+        "decompose(",
+        "separate=True"
+      ],
+      "rationale": "This test focuses on the invariant that the output of decompose() must be consistently ordered, which is distinct from the original test that primarily checks the correctness of decomposition itself. By stressing the order invariant, it adds repair guidance for ensuring deterministic behavior in the function."
+    },
+    "patch": "diff --git a/sympy/integrals/tests/test_intpoly.py b/sympy/integrals/tests/test_intpoly.py\n--- a/sympy/integrals/tests/test_intpoly.py\n+++ b/sympy/integrals/tests/test_intpoly.py\n@@ -196,0 +196,8 @@\n+def test_sweb_enhanced_decompose_order_invariant():\n+    # Test that decompose() with separate=True returns a consistent order\n+    expr = 3*x**2 + 2*y + x*y + 5\n+    result = decompose(expr, separate=True)\n+    expected = [5, 2*y, x*y, 3*x**2]  # Expected consistent order\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n+    # Ensure the order is invariant under dictionary key changes\n",
+    "raw_response": "```diff\ndiff --git a/sympy/integrals/tests/test_intpoly.py b/sympy/integrals/tests/test_intpoly.py\n--- a/sympy/integrals/tests/test_intpoly.py\n+++ b/sympy/integrals/tests/test_intpoly.py\n@@ -196,0 +196,8 @@\n+def test_sweb_enhanced_decompose_order_invariant():\n+    # Test that decompose() with separate=True returns a consistent order\n+    expr = 3*x**2 + 2*y + x*y + 5\n+    result = decompose(expr, separate=True)\n+    expected = [5, 2*y, x*y, 3*x**2]  # Expected consistent order\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n+    # Ensure the order is invariant under dictionary key changes\n```",
+    "identifiers": [
+      "test_sweb_enhanced_decompose_order_invariant"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_decompose_order_invariant"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

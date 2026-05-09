@@ -1,0 +1,28 @@
+```diff
+diff --git a/sympy/core/mul.py b/sympy/core/mul.py
+--- a/sympy/core/mul.py
++++ b/sympy/core/mul.py
+@@ -97,6 +97,12 @@ class Mul(Expr, AssocOp):
+     @classmethod
+     def flatten(cls, seq):
+         """Return commutative, noncommutative and order arguments by
++        combining related terms.
++
++        Notes
++        =====
++        * If any term in the sequence is NaN, the entire product is NaN.
++        """
+         from sympy.calculus.util import AccumBounds
+         from sympy.matrices.expressions import MatrixExpr
+         rv = None
+@@ -137,6 +143,10 @@ class Mul(Expr, AssocOp):
+         # NOTE: this is optimized for all-objects-are-commutative case
+         for o in seq:
+             # O(x)
++            if o is S.NaN:
++                # If any term is NaN, the result is NaN
++                return [S.NaN], [], None
++
+             if o.is_Order:
+                 o, order_symbols = o.as_expr_variables(order_symbols)
+```

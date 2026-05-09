@@ -1,0 +1,154 @@
+[
+  {
+    "idea": {
+      "title": "SparseMatrix hstack shape assertion for empty rows",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the shape mismatch behavior in SparseMatrix.hstack when combining matrices with zero rows",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_sparse_matrix_hstack_shape"
+      ],
+      "covers_original_tests": [
+        "test_sparse_matrix"
+      ],
+      "covers_obligations": [
+        "test_sparse_matrix::core"
+      ],
+      "target_source_symbol": "sympy.matrices.sparse.SparseMatrix.hstack",
+      "target_validation_subject": "shape",
+      "semantic_alignment_tokens": [
+        "SparseMatrix",
+        "hstack",
+        "Matrix.zeros",
+        "shape",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "SparseMatrix",
+        "hstack",
+        "Matrix.zeros",
+        "shape"
+      ],
+      "rationale": "This test directly reproduces the original failure by combining SparseMatrix instances with zero rows using hstack and asserting the resulting shape. It differs from the original test by explicitly isolating the shape validation behavior for zero-row matrices, providing focused repair guidance for the shape mismatch issue."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_sparse.py b/sympy/matrices/tests/test_sparse.py\n--- a/sympy/matrices/tests/test_sparse.py\n+++ b/sympy/matrices/tests/test_sparse.py\n@@ -289,0 +289,8 @@\n+def test_sweb_enhanced_sparse_matrix_hstack_shape():\n+    # Test hstack with zero-row SparseMatrix instances\n+    M1 = SparseMatrix.zeros(0, 0)\n+    M2 = SparseMatrix.zeros(0, 2)\n+    M3 = SparseMatrix.zeros(0, 4)\n+    result = SparseMatrix.hstack(M1, M2, M3)\n+    assert result.shape == (0, 6), f\"Expected shape (0, 6), got {result.shape}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_sparse.py b/sympy/matrices/tests/test_sparse.py\n--- a/sympy/matrices/tests/test_sparse.py\n+++ b/sympy/matrices/tests/test_sparse.py\n@@ -289,0 +289,8 @@\n+def test_sweb_enhanced_sparse_matrix_hstack_shape():\n+    # Test hstack with zero-row SparseMatrix instances\n+    M1 = SparseMatrix.zeros(0, 0)\n+    M2 = SparseMatrix.zeros(0, 2)\n+    M3 = SparseMatrix.zeros(0, 4)\n+    result = SparseMatrix.hstack(M1, M2, M3)\n+    assert result.shape == (0, 6), f\"Expected shape (0, 6), got {result.shape}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sparse_matrix_hstack_shape"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sparse_matrix_hstack_shape"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "hstack shape mismatch with zero-row matrices",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream behavior of hstack when combining zero-row matrices with varying column counts",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_hstack_zero_row_matrices"
+      ],
+      "covers_original_tests": [
+        "test_sparse_matrix"
+      ],
+      "covers_obligations": [
+        "test_sparse_matrix::core"
+      ],
+      "target_source_symbol": "sympy.matrices.sparse.SparseMatrix.hstack",
+      "target_validation_subject": "shape",
+      "semantic_alignment_tokens": [
+        "hstack(",
+        "Matrix.zeros(",
+        "shape"
+      ],
+      "trigger_shape_tokens": [
+        "Matrix.zeros(",
+        "hstack(",
+        "shape"
+      ],
+      "rationale": "This test focuses on the behavioral consequence of the shape mismatch when combining zero-row matrices with varying column counts, which differs from the original test by explicitly targeting the downstream effect of incorrect shape computation."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_sparse.py b/sympy/matrices/tests/test_sparse.py\n--- a/sympy/matrices/tests/test_sparse.py\n+++ b/sympy/matrices/tests/test_sparse.py\n@@ -289,0 +289,8 @@\n+def test_sweb_enhanced_hstack_zero_row_matrices():\n+    # Test hstack with zero-row matrices of varying column counts\n+    M1 = SparseMatrix.zeros(0, 0)\n+    M2 = SparseMatrix.zeros(0, 2)\n+    M3 = SparseMatrix.zeros(0, 4)\n+    result = SparseMatrix.hstack(M1, M2, M3)\n+    assert result.shape == (0, 6), f\"Expected shape (0, 6), got {result.shape}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_sparse.py b/sympy/matrices/tests/test_sparse.py\n--- a/sympy/matrices/tests/test_sparse.py\n+++ b/sympy/matrices/tests/test_sparse.py\n@@ -289,0 +289,8 @@\n+def test_sweb_enhanced_hstack_zero_row_matrices():\n+    # Test hstack with zero-row matrices of varying column counts\n+    M1 = SparseMatrix.zeros(0, 0)\n+    M2 = SparseMatrix.zeros(0, 2)\n+    M3 = SparseMatrix.zeros(0, 4)\n+    result = SparseMatrix.hstack(M1, M2, M3)\n+    assert result.shape == (0, 6), f\"Expected shape (0, 6), got {result.shape}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_hstack_zero_row_matrices"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_hstack_zero_row_matrices"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "SparseMatrix hstack shape mismatch with empty rows",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the shape mismatch behavior when hstack is applied to SparseMatrix instances with empty rows",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_hstack_shape_mismatch"
+      ],
+      "covers_original_tests": [
+        "test_sparse_matrix"
+      ],
+      "covers_obligations": [
+        "test_sparse_matrix::core"
+      ],
+      "target_source_symbol": "sympy.matrices.sparse.SparseMatrix.hstack",
+      "target_validation_subject": "shape",
+      "semantic_alignment_tokens": [
+        "SparseMatrix",
+        "hstack(",
+        "shape",
+        "zeros(",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "hstack(",
+        "Matrix.zeros(",
+        "shape"
+      ],
+      "rationale": "This test directly reproduces the original failure by targeting the hstack behavior with SparseMatrix instances containing empty rows. It aligns with the original failure path and exception semantics, exposing the shape mismatch issue in a minimal and focused way."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_sparse.py b/sympy/matrices/tests/test_sparse.py\n--- a/sympy/matrices/tests/test_sparse.py\n+++ b/sympy/matrices/tests/test_sparse.py\n@@ -289,0 +289,7 @@\n+def test_sweb_enhanced_hstack_shape_mismatch():\n+    # Test hstack with SparseMatrix instances having empty rows\n+    M1 = SparseMatrix.zeros(0, 0)\n+    M2 = SparseMatrix.zeros(0, 2)\n+    M3 = SparseMatrix.zeros(0, 3)\n+    result = SparseMatrix.hstack(M1, M2, M3)\n+    assert result.shape == (0, 5), f\"Expected shape (0, 5), got {result.shape}\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_sparse.py b/sympy/matrices/tests/test_sparse.py\n--- a/sympy/matrices/tests/test_sparse.py\n+++ b/sympy/matrices/tests/test_sparse.py\n@@ -289,0 +289,7 @@\n+def test_sweb_enhanced_hstack_shape_mismatch():\n+    # Test hstack with SparseMatrix instances having empty rows\n+    M1 = SparseMatrix.zeros(0, 0)\n+    M2 = SparseMatrix.zeros(0, 2)\n+    M3 = SparseMatrix.zeros(0, 3)\n+    result = SparseMatrix.hstack(M1, M2, M3)\n+    assert result.shape == (0, 5), f\"Expected shape (0, 5), got {result.shape}\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_hstack_shape_mismatch"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_hstack_shape_mismatch"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

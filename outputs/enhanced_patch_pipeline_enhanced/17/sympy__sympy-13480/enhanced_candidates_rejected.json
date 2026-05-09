@@ -1,0 +1,471 @@
+[
+  {
+    "idea": {
+      "title": "test_coth_subs_integral_values",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the buggy behavior of coth(log(tan(x))) substitution for integral values",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_coth_subs"
+      ],
+      "covers_original_tests": [
+        "test_coth"
+      ],
+      "covers_obligations": [
+        "test_coth::core"
+      ],
+      "target_source_symbol": "coth",
+      "target_validation_subject": "subs",
+      "semantic_alignment_tokens": [
+        "coth(",
+        "log(",
+        "tan(",
+        "subs(",
+        "NameError"
+      ],
+      "trigger_shape_tokens": [
+        "coth(",
+        "log(",
+        "tan(",
+        "subs(",
+        "NameError"
+      ],
+      "rationale": "This test directly reproduces the bug by substituting integral values into coth(log(tan(x))). It differs from the original test by focusing specifically on substitution behavior for problematic integral values, ensuring the bug is exposed in the same way as the original traceback."
+    },
+    "patch": "diff --git a/sympy/functions/elementary/tests/test_hyperbolic.py b/sympy/functions/elementary/tests/test_hyperbolic.py\n--- a/sympy/functions/elementary/tests/test_hyperbolic.py\n+++ b/sympy/functions/elementary/tests/test_hyperbolic.py\n@@ -304,0 +305,7 @@\n+def test_sweb_enhanced_coth_subs():\n+    x = Symbol('x')\n+    expr = coth(log(tan(x)))\n+    try:\n+        expr.subs(x, 2)\n+    except NameError as e:\n+        assert \"cotm\" in str(e)\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/elementary/tests/test_hyperbolic.py b/sympy/functions/elementary/tests/test_hyperbolic.py\n--- a/sympy/functions/elementary/tests/test_hyperbolic.py\n+++ b/sympy/functions/elementary/tests/test_hyperbolic.py\n@@ -304,0 +305,7 @@\n+def test_sweb_enhanced_coth_subs():\n+    x = Symbol('x')\n+    expr = coth(log(tan(x)))\n+    try:\n+        expr.subs(x, 2)\n+    except NameError as e:\n+        assert \"cotm\" in str(e)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_coth_subs"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_coth_subs"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_sinh": "PASSED",
+      "test_sinh_series": "PASSED",
+      "test_cosh": "PASSED",
+      "test_cosh_series": "PASSED",
+      "test_tanh": "PASSED",
+      "test_tanh_series": "PASSED",
+      "test_coth": "PASSED",
+      "test_coth_series": "PASSED",
+      "test_csch": "PASSED",
+      "test_csch_series": "PASSED",
+      "test_sech": "PASSED",
+      "test_sech_series": "PASSED",
+      "test_asinh": "PASSED",
+      "test_asinh_rewrite": "PASSED",
+      "test_asinh_series": "PASSED",
+      "test_acosh": "PASSED",
+      "test_acosh_rewrite": "PASSED",
+      "test_acosh_series": "PASSED",
+      "test_asech": "PASSED",
+      "test_asech_series": "PASSED",
+      "test_asech_rewrite": "PASSED",
+      "test_acsch": "PASSED",
+      "test_acsch_infinities": "PASSED",
+      "test_acsch_rewrite": "PASSED",
+      "test_atanh": "PASSED",
+      "test_atanh_rewrite": "PASSED",
+      "test_atanh_series": "PASSED",
+      "test_acoth": "PASSED",
+      "test_acoth_rewrite": "PASSED",
+      "test_acoth_series": "PASSED",
+      "test_inverses": "PASSED",
+      "test_leading_term": "PASSED",
+      "test_complex": "PASSED",
+      "test_complex_2899": "PASSED",
+      "test_simplifications": "PASSED",
+      "test_issue_4136": "PASSED",
+      "test_sinh_rewrite": "PASSED",
+      "test_cosh_rewrite": "PASSED",
+      "test_tanh_rewrite": "PASSED",
+      "test_coth_rewrite": "PASSED",
+      "test_csch_rewrite": "PASSED",
+      "test_sech_rewrite": "PASSED",
+      "test_derivs": "PASSED",
+      "test_sinh_expansion": "PASSED",
+      "test_cosh_expansion": "PASSED"
+    },
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_coth"
+    ],
+    "covered_obligations": [
+      "test_coth::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test_coth_behavioral_consequence_with_subs",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream behavior of coth(log(tan(x))) substitution for integral values",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_coth_subs"
+      ],
+      "covers_original_tests": [
+        "test_coth"
+      ],
+      "covers_obligations": [
+        "test_coth::core"
+      ],
+      "target_source_symbol": "coth",
+      "target_validation_subject": "subs",
+      "semantic_alignment_tokens": [
+        "coth(",
+        "log(",
+        "tan(",
+        "subs(",
+        "NameError"
+      ],
+      "trigger_shape_tokens": [
+        "coth(",
+        "log(",
+        "tan(",
+        "subs(",
+        "NameError"
+      ],
+      "rationale": "This test exercises the downstream behavior of coth(log(tan(x))) substitution for integral values, which is distinct from the original test that directly evaluates coth. It adds repair guidance by verifying the substitution behavior, which is a behavioral consequence of the bug."
+    },
+    "patch": "diff --git a/sympy/functions/elementary/tests/test_hyperbolic.py b/sympy/functions/elementary/tests/test_hyperbolic.py\n--- a/sympy/functions/elementary/tests/test_hyperbolic.py\n+++ b/sympy/functions/elementary/tests/test_hyperbolic.py\n@@ -304,0 +305,8 @@\n+def test_sweb_enhanced_coth_subs_boundary():\n+    x = Symbol('x')\n+    e = coth(log(tan(x)))\n+    # Test substitution at a boundary condition where tan(x) approaches infinity\n+    result = e.subs(x, pi/2 - 1e-10)\n+    assert result == coth(log(tan(pi/2 - 1e-10))), \"Boundary substitution failed\"\n+\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/elementary/tests/test_hyperbolic.py b/sympy/functions/elementary/tests/test_hyperbolic.py\n--- a/sympy/functions/elementary/tests/test_hyperbolic.py\n+++ b/sympy/functions/elementary/tests/test_hyperbolic.py\n@@ -304,0 +305,8 @@\n+def test_sweb_enhanced_coth_subs_boundary():\n+    x = Symbol('x')\n+    e = coth(log(tan(x)))\n+    # Test substitution at a boundary condition where tan(x) approaches infinity\n+    result = e.subs(x, pi/2 - 1e-10)\n+    assert result == coth(log(tan(pi/2 - 1e-10))), \"Boundary substitution failed\"\n+\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_coth_subs_boundary"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_coth_subs_boundary"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_sinh": "PASSED",
+      "test_sinh_series": "PASSED",
+      "test_cosh": "PASSED",
+      "test_cosh_series": "PASSED",
+      "test_tanh": "PASSED",
+      "test_tanh_series": "PASSED",
+      "test_coth": "PASSED",
+      "test_coth_series": "PASSED",
+      "test_csch": "PASSED",
+      "test_csch_series": "PASSED",
+      "test_sech": "PASSED",
+      "test_sech_series": "PASSED",
+      "test_asinh": "PASSED",
+      "test_asinh_rewrite": "PASSED",
+      "test_asinh_series": "PASSED",
+      "test_acosh": "PASSED",
+      "test_acosh_rewrite": "PASSED",
+      "test_acosh_series": "PASSED",
+      "test_asech": "PASSED",
+      "test_asech_series": "PASSED",
+      "test_asech_rewrite": "PASSED",
+      "test_acsch": "PASSED",
+      "test_acsch_infinities": "PASSED",
+      "test_acsch_rewrite": "PASSED",
+      "test_atanh": "PASSED",
+      "test_atanh_rewrite": "PASSED",
+      "test_atanh_series": "PASSED",
+      "test_acoth": "PASSED",
+      "test_acoth_rewrite": "PASSED",
+      "test_acoth_series": "PASSED",
+      "test_inverses": "PASSED",
+      "test_leading_term": "PASSED",
+      "test_complex": "PASSED",
+      "test_complex_2899": "PASSED",
+      "test_simplifications": "PASSED",
+      "test_issue_4136": "PASSED",
+      "test_sinh_rewrite": "PASSED",
+      "test_cosh_rewrite": "PASSED",
+      "test_tanh_rewrite": "PASSED",
+      "test_coth_rewrite": "PASSED",
+      "test_csch_rewrite": "PASSED",
+      "test_sech_rewrite": "PASSED",
+      "test_derivs": "PASSED",
+      "test_sinh_expansion": "PASSED",
+      "test_cosh_expansion": "PASSED"
+    },
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_coth"
+    ],
+    "covered_obligations": [
+      "test_coth::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test_coth_behavioral_consequence_with_subs",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream substitution behavior for coth(log(tan(x))) to expose buggy NameError propagation",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_coth_subs"
+      ],
+      "covers_original_tests": [
+        "test_coth"
+      ],
+      "covers_obligations": [
+        "test_coth::core"
+      ],
+      "target_source_symbol": "coth",
+      "target_validation_subject": "subs",
+      "semantic_alignment_tokens": [
+        "coth(",
+        "log(",
+        "tan(",
+        "subs(",
+        "NameError"
+      ],
+      "trigger_shape_tokens": [
+        "coth(",
+        "log(",
+        "tan(",
+        "subs(",
+        "NameError"
+      ],
+      "rationale": "This test exercises the downstream substitution behavior of coth(log(tan(x))) for specific integral values, which is distinct from the original test that directly evaluates coth. It exposes the propagation of the NameError when subs is applied, providing additional repair guidance for handling substitution scenarios."
+    },
+    "patch": "diff --git a/sympy/functions/elementary/tests/test_hyperbolic.py b/sympy/functions/elementary/tests/test_hyperbolic.py\n--- a/sympy/functions/elementary/tests/test_hyperbolic.py\n+++ b/sympy/functions/elementary/tests/test_hyperbolic.py\n@@ -304,0 +305,6 @@\n+def test_sweb_enhanced_coth_subs():\n+    x = Symbol('x')\n+    expr = coth(log(tan(x)))\n+    # Substituting an integral value that triggers the bug\n+    raises(NameError, lambda: expr.subs(x, 3))\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/elementary/tests/test_hyperbolic.py b/sympy/functions/elementary/tests/test_hyperbolic.py\n--- a/sympy/functions/elementary/tests/test_hyperbolic.py\n+++ b/sympy/functions/elementary/tests/test_hyperbolic.py\n@@ -304,0 +305,6 @@\n+def test_sweb_enhanced_coth_subs():\n+    x = Symbol('x')\n+    expr = coth(log(tan(x)))\n+    # Substituting an integral value that triggers the bug\n+    raises(NameError, lambda: expr.subs(x, 3))\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_coth_subs"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_coth_subs"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_sinh": "PASSED",
+      "test_sinh_series": "PASSED",
+      "test_cosh": "PASSED",
+      "test_cosh_series": "PASSED",
+      "test_tanh": "PASSED",
+      "test_tanh_series": "PASSED",
+      "test_coth": "PASSED",
+      "test_coth_series": "PASSED",
+      "test_csch": "PASSED",
+      "test_csch_series": "PASSED",
+      "test_sech": "PASSED",
+      "test_sech_series": "PASSED",
+      "test_asinh": "PASSED",
+      "test_asinh_rewrite": "PASSED",
+      "test_asinh_series": "PASSED",
+      "test_acosh": "PASSED",
+      "test_acosh_rewrite": "PASSED",
+      "test_acosh_series": "PASSED",
+      "test_asech": "PASSED",
+      "test_asech_series": "PASSED",
+      "test_asech_rewrite": "PASSED",
+      "test_acsch": "PASSED",
+      "test_acsch_infinities": "PASSED",
+      "test_acsch_rewrite": "PASSED",
+      "test_atanh": "PASSED",
+      "test_atanh_rewrite": "PASSED",
+      "test_atanh_series": "PASSED",
+      "test_acoth": "PASSED",
+      "test_acoth_rewrite": "PASSED",
+      "test_acoth_series": "PASSED",
+      "test_inverses": "PASSED",
+      "test_leading_term": "PASSED",
+      "test_complex": "PASSED",
+      "test_complex_2899": "PASSED",
+      "test_simplifications": "PASSED",
+      "test_issue_4136": "PASSED",
+      "test_sinh_rewrite": "PASSED",
+      "test_cosh_rewrite": "PASSED",
+      "test_tanh_rewrite": "PASSED",
+      "test_coth_rewrite": "PASSED",
+      "test_csch_rewrite": "PASSED",
+      "test_sech_rewrite": "PASSED",
+      "test_derivs": "PASSED",
+      "test_sinh_expansion": "PASSED",
+      "test_cosh_expansion": "PASSED"
+    },
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_coth"
+    ],
+    "covered_obligations": [
+      "test_coth::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test_coth_behavioral_consequence_with_subs",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream behavior of coth(log(tan(x))) substitution for integral values",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_coth_subs"
+      ],
+      "covers_original_tests": [
+        "test_coth"
+      ],
+      "covers_obligations": [
+        "test_coth::core"
+      ],
+      "target_source_symbol": "coth",
+      "target_validation_subject": "subs",
+      "semantic_alignment_tokens": [
+        "coth(",
+        "log(",
+        "tan(",
+        "subs(",
+        "NameError"
+      ],
+      "trigger_shape_tokens": [
+        "coth(",
+        "log(",
+        "tan(",
+        "subs(",
+        "NameError"
+      ],
+      "rationale": "This test focuses on the behavioral consequence of the bug by verifying the substitution behavior for integral values, which is distinct from the original test that primarily exposed the direct symptom of the NameError."
+    },
+    "patch": "diff --git a/sympy/functions/elementary/tests/test_hyperbolic.py b/sympy/functions/elementary/tests/test_hyperbolic.py\n--- a/sympy/functions/elementary/tests/test_hyperbolic.py\n+++ b/sympy/functions/elementary/tests/test_hyperbolic.py\n@@ -304,0 +305,7 @@\n+def test_sweb_enhanced_coth_subs():\n+    x = Symbol('x')\n+    expr = coth(log(tan(x)))\n+    # Substitution with an integral value that triggers the bug\n+    try:\n+        expr.subs(x, 3)\n+    except NameError as e:\n+        assert \"cotm\" in str(e), \"Expected NameError related to 'cotm', but got a different error.\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/elementary/tests/test_hyperbolic.py b/sympy/functions/elementary/tests/test_hyperbolic.py\n--- a/sympy/functions/elementary/tests/test_hyperbolic.py\n+++ b/sympy/functions/elementary/tests/test_hyperbolic.py\n@@ -304,0 +305,7 @@\n+def test_sweb_enhanced_coth_subs():\n+    x = Symbol('x')\n+    expr = coth(log(tan(x)))\n+    # Substitution with an integral value that triggers the bug\n+    try:\n+        expr.subs(x, 3)\n+    except NameError as e:\n+        assert \"cotm\" in str(e), \"Expected NameError related to 'cotm', but got a different error.\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_coth_subs"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_coth_subs"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "evaluation produced an empty status_map; likely log_parse_failed or tests_not_collected",
+    "failing_identifiers": null,
+    "eval_status_map": {},
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_coth"
+    ],
+    "covered_obligations": [
+      "test_coth::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test_coth_with_specific_integral_values",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the buggy behavior when substituting specific integral values into coth(log(tan(x)))",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_coth_integral_values"
+      ],
+      "covers_original_tests": [
+        "test_coth"
+      ],
+      "covers_obligations": [
+        "test_coth::core"
+      ],
+      "target_source_symbol": "coth",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "coth(",
+        "log(",
+        "tan(",
+        "subs(",
+        "NameError"
+      ],
+      "trigger_shape_tokens": [
+        "coth(",
+        "log(",
+        "tan(",
+        "subs(",
+        "NameError"
+      ],
+      "rationale": "This test directly reproduces the bug by substituting specific integral values into coth(log(tan(x))). It differs from the original test by explicitly targeting the buggy substitution behavior for integral values like 2, 3, 5, etc., which were shown to trigger the NameError. This provides a focused regression example to validate the fix."
+    },
+    "patch": "diff --git a/sympy/functions/elementary/tests/test_hyperbolic.py b/sympy/functions/elementary/tests/test_hyperbolic.py\n--- a/sympy/functions/elementary/tests/test_hyperbolic.py\n+++ b/sympy/functions/elementary/tests/test_hyperbolic.py\n@@ -304,0 +305,8 @@\n+def test_sweb_enhanced_coth_integral_values():\n+    x = Symbol('x')\n+    expr = coth(log(tan(x)))\n+    \n+    # Test specific integral values that trigger the bug\n+    raises(NameError, lambda: expr.subs(x, 2))\n+    raises(NameError, lambda: expr.subs(x, 3))\n+    raises(NameError, lambda: expr.subs(x, 5))\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/elementary/tests/test_hyperbolic.py b/sympy/functions/elementary/tests/test_hyperbolic.py\n--- a/sympy/functions/elementary/tests/test_hyperbolic.py\n+++ b/sympy/functions/elementary/tests/test_hyperbolic.py\n@@ -304,0 +305,8 @@\n+def test_sweb_enhanced_coth_integral_values():\n+    x = Symbol('x')\n+    expr = coth(log(tan(x)))\n+    \n+    # Test specific integral values that trigger the bug\n+    raises(NameError, lambda: expr.subs(x, 2))\n+    raises(NameError, lambda: expr.subs(x, 3))\n+    raises(NameError, lambda: expr.subs(x, 5))\n```",
+    "identifiers": [
+      "test_sweb_enhanced_coth_integral_values"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_coth_integral_values"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_sinh": "PASSED",
+      "test_sinh_series": "PASSED",
+      "test_cosh": "PASSED",
+      "test_cosh_series": "PASSED",
+      "test_tanh": "PASSED",
+      "test_tanh_series": "PASSED",
+      "test_coth": "PASSED",
+      "test_coth_series": "PASSED",
+      "test_csch": "PASSED",
+      "test_csch_series": "PASSED",
+      "test_sech": "PASSED",
+      "test_sech_series": "PASSED",
+      "test_asinh": "PASSED",
+      "test_asinh_rewrite": "PASSED",
+      "test_asinh_series": "PASSED",
+      "test_acosh": "PASSED",
+      "test_acosh_rewrite": "PASSED",
+      "test_acosh_series": "PASSED",
+      "test_asech": "PASSED",
+      "test_asech_series": "PASSED",
+      "test_asech_rewrite": "PASSED",
+      "test_acsch": "PASSED",
+      "test_acsch_infinities": "PASSED",
+      "test_acsch_rewrite": "PASSED",
+      "test_atanh": "PASSED",
+      "test_atanh_rewrite": "PASSED",
+      "test_atanh_series": "PASSED",
+      "test_acoth": "PASSED",
+      "test_acoth_rewrite": "PASSED",
+      "test_acoth_series": "PASSED",
+      "test_inverses": "PASSED",
+      "test_leading_term": "PASSED",
+      "test_complex": "PASSED",
+      "test_complex_2899": "PASSED",
+      "test_simplifications": "PASSED",
+      "test_issue_4136": "PASSED",
+      "test_sinh_rewrite": "PASSED",
+      "test_cosh_rewrite": "PASSED",
+      "test_tanh_rewrite": "PASSED",
+      "test_coth_rewrite": "PASSED",
+      "test_csch_rewrite": "PASSED",
+      "test_sech_rewrite": "PASSED",
+      "test_derivs": "PASSED",
+      "test_sinh_expansion": "PASSED",
+      "test_cosh_expansion": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_coth"
+    ],
+    "covered_obligations": [
+      "test_coth::core"
+    ]
+  }
+]

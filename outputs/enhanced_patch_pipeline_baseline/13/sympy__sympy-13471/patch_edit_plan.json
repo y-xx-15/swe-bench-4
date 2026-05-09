@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/numbers.py",
+      "action": "modify_region",
+      "justification": "The Float.__new__ method is responsible for handling the deserialization of pickled data. The failure occurs due to the method's inability to handle Python 2 long literals ('1L') during unpickling in Python 3."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/numbers.py",
+      "target_symbol": "Float.__new__",
+      "replacement_mode": "insert_before_anchor",
+      "covers_obligations": [
+        "handle_long_hex_conversion"
+      ],
+      "anchor_line_before": "        if isinstance(num, string_types):",
+      "anchor_line_after": "            num = num.replace(' ', '')",
+      "replacement_block": "        if isinstance(num, string_types) and num.endswith('L'):\n            num = num[:-1]  # Strip the trailing 'L' from Python 2 long literals\n\n        if isinstance(num, string_types):\n            num = num.replace(' ', '')"
+    }
+  ]
+}

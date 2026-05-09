@@ -1,0 +1,22 @@
+```diff
+diff --git a/sympy/printing/pretty/pretty.py b/sympy/printing/pretty/pretty.py
+--- a/sympy/printing/pretty/pretty.py
++++ b/sympy/printing/pretty/pretty.py
+@@ -1127,7 +1127,15 @@ class PrettyPrinter(Printer):
+         for system, vect in items:
+             inneritems = list(vect.components.items())
+             inneritems.sort(key=lambda x: x[0].__str__())
+-            for k, v in inneritems:
++            for k, v in inneritems:
++                # Ensure baseline alignment for nested expressions
++                if isinstance(v, Pow):
++                    v_pform = self._print(v)
++                    v_pform.baseline = v_pform.height() // 2
++                else:
++                    v_pform = self._print(v)
++
++                # Format components with proper alignment
+                 if v == 1:
+                     o1.append(u"" + k._pretty_form)
+                 elif v == -1:
+```

@@ -1,0 +1,19 @@
+{
+  "title": "Fix vector pretty printing alignment",
+  "approach": "Adjust the `_print_BasisDependent` method to ensure proper alignment and formatting of vector components during pretty printing. Specifically, handle the baseline calculation and newline adjustments to center the output correctly.",
+  "edit_targets": [
+    "sympy/printing/pretty/pretty.py::PrettyPrinter._print_BasisDependent"
+  ],
+  "dependency_files": [
+    "sympy/vector/tests/test_printing.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing `_print_BasisDependent` should be sufficient to fix the alignment and formatting issues. Test cases in `sympy/vector/tests/test_printing.py` will validate the fix.",
+  "risks": [
+    "Potential misalignment of other vector-related pretty printing outputs if the baseline adjustment logic is incorrect."
+  ]
+}

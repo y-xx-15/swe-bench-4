@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "django/conf/global_settings.py",
+      "action": "modify_region",
+      "justification": "The default value of FILE_UPLOAD_PERMISSIONS must be updated to 0o644 to ensure consistent and secure file permissions for uploaded files, as required by the failing test."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "django/conf/global_settings.py",
+      "target_symbol": "FILE_UPLOAD_PERMISSIONS",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core::FILE_UPLOAD_PERMISSIONS"
+      ],
+      "anchor_line_before": "FILE_UPLOAD_TEMP_DIR = None",
+      "anchor_line_after": "# The numeric mode to assign to newly-created directories, when uploading files.",
+      "replacement_block": "# `None` will make Django use the operating system's default temporary directory\n# (i.e. \"/tmp\" on *nix systems).\nFILE_UPLOAD_TEMP_DIR = None\n\n# The numeric mode to set newly-uploaded files to. The value should be a mode\n# you'd pass directly to os.chmod; see https://docs.python.org/library/os.html#files-and-directories.\nFILE_UPLOAD_PERMISSIONS = 0o644\n\n# The numeric mode to assign to newly-created directories, when uploading files.\n# The value should be a mode as you'd pass to os.chmod;\n# see https://docs.python.org/library/os.html#files-and-directories.\nFILE_UPLOAD_DIRECTORY_PERMISSIONS = None"
+    }
+  ]
+}

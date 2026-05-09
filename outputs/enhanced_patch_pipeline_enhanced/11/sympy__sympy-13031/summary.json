@@ -1,0 +1,202 @@
+{
+  "instance_id": "sympy__sympy-13031",
+  "repo": "sympy/sympy",
+  "model": "gpt-4o",
+  "pipeline_mode": "enhanced_guided",
+  "hide_original_test_patch_in_repair": false,
+  "disable_semantic_bucket_guidance": false,
+  "disable_enhanced_test_filtering": false,
+  "repair_mode": "enhanced_guided",
+  "original_test_identifiers": [
+    "test_sparse_matrix"
+  ],
+  "original_status_counts": {
+    "FAILED": 2,
+    "PASSED": 9
+  },
+  "original_failed_count": 2,
+  "original_passed_count": 9,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_sparse_matrix"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_sparse_matrix"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/matrices/tests/test_sparse.py:test_sparse_matrix",
+      "test_sparse_matrix"
+    ],
+    "failure_mode": "assertion_error",
+    "dominant_errors": [
+      "AssertionError"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "test_sparse_matrix F",
+      "____________ sympy/matrices/tests/test_sparse.py:test_sparse_matrix ____________",
+      "File \"/testbed/sympy/matrices/tests/test_sparse.py\", line 31, in test_sparse_matrix"
+    ],
+    "noise_ratio": 0.0063,
+    "target_test_tracebacks": {
+      "test_sparse_matrix": "TARGET TEST: test_sparse_matrix\n- snippet: test_sparse_matrix F\n- snippet: ____________ sympy/matrices/tests/test_sparse.py:test_sparse_matrix ____________\n- snippet: File \"/testbed/sympy/matrices/tests/test_sparse.py\", line 31, in test_sparse_matrix\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_sparse_matrix F\ntest_errors ok\n____________ sympy/matrices/tests/test_sparse.py:test_sparse_matrix ____________\n  File \"/testbed/sympy/matrices/tests/test_sparse.py\", line 31, in test_sparse_matrix\nAssertionError\n============= tests finished: 10 passed, 1 failed, in 0.29 seconds ============="
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 3,
+    "keep_top_k": 2,
+    "attempt_budget": 3,
+    "bucket_limit": 3,
+    "template_limit": 3,
+    "failure_mode": "assertion_error",
+    "noise_ratio": 0.0063,
+    "difficulty": "low"
+  },
+  "adaptive_num_candidates": 3,
+  "adaptive_keep_top_k": 2,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 3,
+  "kept_enhanced_candidates": 2,
+  "enhanced_candidate_retention_rate": 0.6666666666666666,
+  "enhanced_generation_attempts_total": 8,
+  "enhanced_generation_attempts_avg": 2.6666666666666665,
+  "kept_enhanced_test_identifiers": [
+    "test_sweb_enhanced_hstack_shape_mismatch",
+    "test_sweb_enhanced_sparse_matrix_hstack_shape"
+  ],
+  "enhanced_failed_test_identifiers": [
+    "test_sweb_enhanced_hstack_shape_mismatch",
+    "test_sweb_enhanced_sparse_matrix_hstack_shape"
+  ],
+  "enhanced_failed_count": 2,
+  "generated_patch_nonempty": true,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 11,
+  "generated_patch_accepted": false,
+  "generated_patch_acceptance_reason": "rejected_patch_apply_failed",
+  "generated_patch_feedback": "The previous patch was rejected because it did not satisfy the acceptance gate. Patch apply mode: fuzzy_apply. Baseline passed=9, failed=2. Candidate passed=9, failed=2. Hard failure signal: none. FAIL_TO_PASS tests still failing after patch: test_sparse_matrix. Your patch must make ALL of these tests pass, not just improve aggregate counts. Semantic oracle failed identifiers: test_sweb_enhanced_hstack_shape_mismatch, test_sweb_enhanced_sparse_matrix_hstack_shape. Semantic oracle failure summaries: test_sweb_enhanced_hstack_shape_mismatch: AssertionError: Expected shape (0, 5), got (0, 3)\n\n====== tests finished: 10 passed, 1 failed, 1 exceptions, in 0.42 seconds ======\nDO *NOT* COMMIT!\n+ echo '>>>>> End Test Output'\n+ git checkout 2dfa7457f20ee187fbb09b5b6a1631da4458388c sympy/matrices/tests/test_sparse.py\n>>>>> End Test Output\nUpdated 1 path from d51bdba\n test_sweb_enhanced_sparse_matrix_hstack_shape: AssertionError: Expected shape (0, 6), got (0, 4)\n\n====== tests finished: 10 passed, 1 failed, 1 exceptions, in 0.45 seconds ======\nDO *NOT* COMMIT!\n+ echo '>>>>> End Test Output'\n+ git checkout 2dfa7457f20ee187fbb09b5b6a1631da4458388c sympy/matrices/tests/test_sparse.py\n>>>>> End Test Output\nUpdated 1 path from d51bdba\n.  Target files: sympy/matrices/sparse.py. Target symbols: SparseMatrix.hstack. Generate a new source-only unified diff that is closer to the exact file context and lands inside the target class body.",
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [
+    "test_sweb_enhanced_hstack_shape_mismatch",
+    "test_sweb_enhanced_sparse_matrix_hstack_shape"
+  ],
+  "patch_analysis": {
+    "root_cause": "The behavior of `Matrix.hstack` has changed in SymPy 1.1, specifically in how it handles matrices with zero rows. The new implementation does not correctly account for the column dimensions of matrices with zero rows, resulting in incorrect output shapes.",
+    "affected_components": [
+      {
+        "file": "sympy/matrices/sparse.py",
+        "symbol": "SparseMatrix",
+        "reason": "The `SparseMatrix` class is directly involved in matrix operations, including `hstack`, and its behavior impacts the test cases."
+      },
+      {
+        "file": "sympy/matrices/tests/test_sparse.py",
+        "symbol": "test_sparse_matrix",
+        "reason": "The failing test directly validates the behavior of `SparseMatrix` operations, including `hstack`."
+      }
+    ],
+    "failing_signal": "The failing assertions indicate that the shape of the horizontally stacked matrix is incorrect when matrices with zero rows are involved.",
+    "propagation_path": "The bug originates from the `hstack` implementation, which does not correctly handle the column dimensions of matrices with zero rows. This leads to incorrect shape calculations, which propagate to the test case and cause assertion failures.",
+    "repair_constraint": "The fix must ensure that `hstack` correctly computes the shape of the resulting matrix, even when matrices with zero rows are involved, without breaking other matrix operations.",
+    "suggested_repair_scope": [
+      "sympy/matrices/sparse.py",
+      "sympy/matrices/tests/test_sparse.py"
+    ],
+    "suspicious_symbols": [
+      "SparseMatrix",
+      "hstack",
+      "Matrix.zeros"
+    ],
+    "repair_obligations": [
+      {
+        "id": "test_sparse_matrix::core::shape",
+        "source_symbol": "test_sparse_matrix",
+        "validation_subject": "shape",
+        "why_it_matters": "The test explicitly validates the shape of matrices resulting from `hstack`, which is the primary failure signal."
+      },
+      {
+        "id": "test_sweb_enhanced_hstack_shape_mismatch",
+        "source_symbol": "test_sparse_matrix",
+        "validation_subject": "hstack",
+        "why_it_matters": "The enhanced test highlights the specific issue with `hstack` when handling matrices with zero rows."
+      },
+      {
+        "id": "test_sweb_enhanced_sparse_matrix_hstack_shape",
+        "source_symbol": "SparseMatrix",
+        "validation_subject": "hstack",
+        "why_it_matters": "The enhanced test ensures that the fix addresses the behavior of `SparseMatrix.hstack` for all edge cases, including zero-row matrices."
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Fix hstack shape computation for zero-row matrices",
+    "approach": "Update the `hstack` implementation in the `SparseMatrix` class to correctly compute the resulting shape when horizontally stacking matrices with zero rows. Ensure that the column dimensions of all input matrices are summed, even when the row count is zero.",
+    "edit_targets": [
+      "sympy/matrices/sparse.py::SparseMatrix.hstack"
+    ],
+    "dependency_files": [
+      "sympy/matrices/tests/test_sparse.py"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [],
+    "sufficiency_assessment": "Editing the `SparseMatrix.hstack` method is sufficient to address the issue because the bug is isolated to the shape computation logic within this method. No changes are required in other parts of the `SparseMatrix` class or its dependencies.",
+    "risks": [
+      "Potential regressions in other use cases of `hstack`, such as matrices with non-zero rows or mixed dimensions. Thorough testing is required to ensure correctness."
+    ]
+  },
+  "patch_edit_plan": {
+    "coverage_check": [
+      {
+        "target_file": "sympy/matrices/sparse.py",
+        "action": "modify_region",
+        "justification": "The `SparseMatrix.hstack` method is directly responsible for the incorrect shape computation when horizontally stacking matrices with zero rows. This method must be updated to correctly handle the column dimensions of such matrices."
+      }
+    ],
+    "edits": [
+      {
+        "target_file": "sympy/matrices/sparse.py",
+        "target_symbol": "SparseMatrix.hstack",
+        "replacement_mode": "replace_span",
+        "covers_obligations": [
+          "test_sparse_matrix::core::shape",
+          "test_sweb_enhanced_hstack_shape_mismatch",
+          "test_sweb_enhanced_sparse_matrix_hstack_shape"
+        ],
+        "anchor_line_before": "        cols = sum(arg.cols for arg in args)",
+        "anchor_line_after": "        return cls._new(rows, cols, data)",
+        "replacement_block": "        cols = sum(arg.cols for arg in args)\n        if rows == 0:\n            # Special case: all matrices have zero rows\n            data = {}\n        else:\n            data = {}\n            for i, arg in enumerate(args):\n                for (row, col), value in arg._smat.items():\n                    data[(row, col + sum(a.cols for a in args[:i]))] = value\n        return cls._new(rows, cols, data)"
+      }
+    ]
+  },
+  "final_patch_attempted": true,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": true,
+  "final_patch_apply_mode": "fuzzy_apply",
+  "final_patch_cleanly_applied": false,
+  "clean_apply_ratio": 0.0,
+  "resolved": false,
+  "final_resolved": false,
+  "final_status_counts": {
+    "FAILED": 2,
+    "PASSED": 9
+  },
+  "final_failed_count": 2,
+  "final_passed_count": 9,
+  "original_passed_count_improvement": 0,
+  "original_failed_count_reduction": 0,
+  "final_status_map": {
+    "sympy/matrices/tests/test_sparse.py:test_sparse_matrix": "FAILED",
+    "test_sparse_matrix": "FAILED",
+    "test_transpose": "PASSED",
+    "test_trace": "PASSED",
+    "test_CL_RL": "PASSED",
+    "test_add": "PASSED",
+    "test_errors": "PASSED",
+    "test_len": "PASSED",
+    "test_sparse_zeros_sparse_eye": "PASSED",
+    "test_copyin": "PASSED",
+    "test_sparse_solve": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

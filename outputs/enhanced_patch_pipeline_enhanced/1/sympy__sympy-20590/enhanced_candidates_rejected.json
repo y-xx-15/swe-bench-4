@@ -1,0 +1,86 @@
+[
+  {
+    "idea": {
+      "target_validation_subject": "core",
+      "covers_obligations": [
+        "test_immutable::core::core"
+      ]
+    },
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_1():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.new_attribute = 42  # Attempting to set an attribute should raise an AttributeError\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_1():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.new_attribute = 42  # Attempting to set an attribute should raise an AttributeError\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_1"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_1"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_immutable is not semantically aligned with its original failure path. Expected source symbol 'test_immutable' and alignment tokens ['assertionerror'], but the current content targets 'unknown' with tokens []. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_immutable"
+    ],
+    "covered_obligations": []
+  },
+  {
+    "idea": {
+      "target_validation_subject": "core",
+      "covers_obligations": [
+        "test_immutable::core::core"
+      ]
+    },
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_2():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.new_attribute = 42  # Attempting to assign a new attribute should raise an AttributeError\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,6 @@\n+def test_sweb_enhanced_2():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.new_attribute = 42  # Attempting to assign a new attribute should raise an AttributeError\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_2"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_2"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_immutable is not semantically aligned with its original failure path. Expected source symbol 'test_immutable' and alignment tokens ['assertionerror'], but the current content targets 'unknown' with tokens []. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_immutable"
+    ],
+    "covered_obligations": []
+  },
+  {
+    "idea": {
+      "target_validation_subject": "core",
+      "covers_obligations": [
+        "test_immutable::core::core"
+      ]
+    },
+    "patch": "diff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,5 @@\n+def test_sweb_enhanced_3():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.new_attr = 42\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_basic.py b/sympy/core/tests/test_basic.py\n--- a/sympy/core/tests/test_basic.py\n+++ b/sympy/core/tests/test_basic.py\n@@ -271,0 +271,5 @@\n+def test_sweb_enhanced_3():\n+    s = Symbol('s')\n+    assert not hasattr(s, '__dict__'), \"Symbol instances should not have a __dict__ attribute\"\n+    with raises(AttributeError):\n+        s.new_attr = 42\n```",
+    "identifiers": [
+      "test_sweb_enhanced_3"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_3"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_immutable is not semantically aligned with its original failure path. Expected source symbol 'test_immutable' and alignment tokens ['assertionerror'], but the current content targets 'unknown' with tokens []. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_immutable"
+    ],
+    "covered_obligations": []
+  }
+]

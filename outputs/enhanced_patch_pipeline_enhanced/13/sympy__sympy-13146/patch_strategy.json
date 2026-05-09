@@ -1,0 +1,19 @@
+{
+  "title": "Handle fractional exponent equivalence in AssocOp",
+  "approach": "Modify the `AssocOp` class in `sympy/core/operations.py` to correctly identify and simplify terms with equivalent fractional exponents during symbolic operations. Specifically, enhance the `flatten` method to detect and combine terms with matching bases and fractional exponents.",
+  "edit_targets": [
+    "sympy/core/operations.py::AssocOp.flatten"
+  ],
+  "dependency_files": [
+    "sympy/core/tests/test_evalf.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing `AssocOp.flatten` is sufficient to address the bug because it directly impacts how terms are grouped and simplified during symbolic operations. However, validation requires running enhanced tests in `sympy/core/tests/test_evalf.py` to confirm correct handling of fractional exponents.",
+  "risks": [
+    "Potential regressions in other symbolic operations that rely on `AssocOp.flatten`, such as addition and multiplication of non-fractional terms."
+  ]
+}

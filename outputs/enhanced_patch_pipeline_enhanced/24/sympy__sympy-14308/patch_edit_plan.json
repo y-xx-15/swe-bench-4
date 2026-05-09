@@ -1,0 +1,25 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/pretty/pretty.py",
+      "action": "modify_region",
+      "justification": "PrettyPrinter._print_BasisDependent is directly responsible for rendering vectors, and the failing tests indicate issues with alignment and formatting in this method."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/pretty/pretty.py",
+      "target_symbol": "PrettyPrinter._print_BasisDependent",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_issue_12675::core",
+        "test_sweb_enhanced_validate_valueerror_in_test_issue_12675",
+        "test_sweb_enhanced_pretty_unicode_baseline",
+        "test_sweb_enhanced_pretty_print_unicode_baseline"
+      ],
+      "anchor_line_before": "        from sympy.vector import Vector",
+      "anchor_line_after": "        if not self._use_unicode:",
+      "replacement_block": "        from sympy.vector import Vector\n\n        if not self._use_unicode:\n            raise NotImplementedError(\"ASCII pretty printing of BasisDependent is not implemented\")\n\n        if expr == expr.zero:\n            return prettyForm(expr.zero._pretty_form)\n\n        o1 = []\n        vectstrs = []\n        if isinstance(expr, Vector):\n            items = expr.separate().items()\n        else:\n            items = [(0, expr)]\n\n        for system, vect in items:\n            inneritems = list(vect.components.items())\n            inneritems.sort(key=lambda x: x[0].__str__())\n\n            for k, v in inneritems:\n                if v == 1:\n                    o1.append(k._pretty_form)\n                elif v == -1:\n                    o1.append(u\"(-1) \" + k._pretty_form)\n                else:\n                    arg_str = self._print(v).parens()[0]\n                    o1.append(arg_str + ' ' + k._pretty_form)\n                vectstrs.append(k._pretty_form)\n\n        # Adjust baseline alignment for nested expressions\n        max_length = max(len(line) for line in o1)\n        centered_lines = [line.center(max_length) for line in o1]\n        outstr = u\"\\n\".join(centered_lines)\n\n        return prettyForm(outstr)"
+    }
+  ]
+}

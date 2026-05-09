@@ -1,0 +1,20 @@
+{
+  "original_test_identifiers": [
+    "test_Derivative"
+  ],
+  "status_map": {
+    "sympy/printing/tests/test_mathematica.py:test_Derivative": "FAILED",
+    "test_Integer": "PASSED",
+    "test_Rational": "PASSED",
+    "test_Function": "PASSED",
+    "test_Pow": "PASSED",
+    "test_Mul": "PASSED",
+    "test_constants": "PASSED",
+    "test_containers": "PASSED",
+    "test_Integral": "PASSED",
+    "test_Derivative": "FAILED"
+  },
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/sympy__sympy-12171/test_output.txt",
+  "timed_out": false,
+  "error": null
+}

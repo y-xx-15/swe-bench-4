@@ -1,0 +1,41 @@
+--- a/sympy/matrices/sparse.py
++++ b/sympy/matrices/sparse.py
+@@ -990,6 +990,38 @@
+         A, B = self, other
+         if not A.cols == B.cols:
+             raise ShapeError()
++        if A.cols == 0:
++            return type(self)(A.rows + B.rows, 0, {})
++        A = A.copy()
++        if not isinstance(B, SparseMatrix):
++            k = 0
++            b = B._mat
++            for i in range(B.rows):
++                for j in range(B.cols):
++                    if b[k]:
++                        A._smat[(i + A.rows, j)] = b[k]
++                    k += 1
++        else:
++            for (i, j), v in B._smat.items():
++                A._smat[(i + A.rows, j)] = v
++        A.rows += B.rows
++        return A
++        if A.rows == 0:
++            return type(self)(0, A.cols + B.cols, {})
++        A = A.copy()
++        if not isinstance(B, SparseMatrix):
++            k = 0
++            b = B._mat
++            for i in range(B.rows):
++                for j in range(B.cols):
++                    if b[k]:
++                        A._smat[(i, j + A.cols)] = b[k]
++                    k += 1
++        else:
++            for (i, j), v in B._smat.items():
++                A._smat[(i, j + A.cols)] = v
++        A.cols += B.cols
++        return A
+         A = A.copy()
+         if not isinstance(B, SparseMatrix):
+             k = 0

@@ -1,0 +1,40 @@
+{
+  "root_cause": "The `decompose()` function in `intpoly.py` returns a list of monomials in arbitrary order when `separate=True`, which causes inconsistent behavior in downstream operations that rely on deterministic ordering, leading to test failures.",
+  "affected_components": [
+    {
+      "file": "sympy/integrals/intpoly.py",
+      "symbol": "decompose",
+      "reason": "The function directly returns a list of monomials in arbitrary order when `separate=True`, which is the source of the inconsistency."
+    },
+    {
+      "file": "sympy/integrals/tests/test_intpoly.py",
+      "symbol": "test_decompose",
+      "reason": "The test explicitly checks for deterministic behavior of `decompose()` and fails due to the arbitrary ordering."
+    }
+  ],
+  "failing_signal": "The test `test_decompose` fails with an `AssertionError` because the output of `decompose()` does not match the expected deterministic order of monomials.",
+  "propagation_path": "The arbitrary ordering of monomials in `decompose()` propagates to downstream operations that rely on consistent ordering, causing mismatches in expected results during testing.",
+  "repair_constraint": "The `decompose()` function must continue to return all constituent monomials of the input polynomial, but the order must be deterministic, such as sorted by degree and lexicographic order.",
+  "suggested_repair_scope": [
+    "sympy/integrals/intpoly.py",
+    "sympy/integrals/tests/test_intpoly.py"
+  ],
+  "suspicious_symbols": [
+    "decompose",
+    "test_decompose"
+  ],
+  "repair_obligations": [
+    {
+      "id": "ensure_deterministic_ordering",
+      "source_symbol": "decompose",
+      "validation_subject": "output_list",
+      "why_it_matters": "The output list of monomials must be sorted deterministically to ensure consistent behavior in downstream operations and to pass the test `test_decompose`."
+    },
+    {
+      "id": "validate_test_expectations",
+      "source_symbol": "test_decompose",
+      "validation_subject": "expected_output",
+      "why_it_matters": "The test must validate the deterministic ordering of monomials returned by `decompose()` to ensure correctness."
+    }
+  ]
+}

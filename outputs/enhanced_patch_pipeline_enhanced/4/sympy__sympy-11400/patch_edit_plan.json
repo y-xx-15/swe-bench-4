@@ -1,0 +1,38 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/ccode.py",
+      "action": "modify_region",
+      "justification": "The `CCodePrinter._print_Function` method needs to be updated to handle the `sinc` function explicitly, as it currently does not support it, causing `test_ccode_sinc` to fail."
+    },
+    {
+      "target_file": "sympy/printing/ccode.py",
+      "action": "modify_region",
+      "justification": "The `CCodePrinter._print_Relational` method needs to be updated to correctly handle relational operators in the generated C code, as the current implementation causes `test_ccode_Relational` to fail."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/ccode.py",
+      "target_symbol": "CCodePrinter._print_Function",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_ccode_sinc::core"
+      ],
+      "anchor_line_before": "        if func in self.known_functions:",
+      "anchor_line_after": "            return self._print_known_func(expr, func)",
+      "replacement_block": "        if func in self.known_functions:\n            return self._print_known_func(expr, func)\n        elif func == 'sinc':\n            arg = self._print(expr.args[0])\n            return f'(({arg} != 0) ? (sin({arg}) / {arg}) : 1)'"
+    },
+    {
+      "target_file": "sympy/printing/ccode.py",
+      "target_symbol": "CCodePrinter._print_Relational",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_ccode_Relational::core::Relational operator handling"
+      ],
+      "anchor_line_before": "        if op == '==':",
+      "anchor_line_after": "        elif op == '!=':",
+      "replacement_block": "        if op == '==':\n            return f'({lhs} == {rhs})'\n        elif op == '!=':\n            return f'({lhs} != {rhs})'\n        elif op == '<':\n            return f'({lhs} < {rhs})'\n        elif op == '<=':\n            return f'({lhs} <= {rhs})'\n        elif op == '>':\n            return f'({lhs} > {rhs})'\n        elif op == '>=':\n            return f'({lhs} >= {rhs})'"
+    }
+  ]
+}

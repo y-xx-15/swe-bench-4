@@ -270,11 +270,27 @@ def make_repo_script_list_py(
     """
     branch = REPO_BASE_COMMIT_BRANCH.get(repo, {}).get(base_commit, "")
     branch = f"--branch {branch}" if branch else ""
-    setup_commands = [
-        f"git clone -o origin {branch} --single-branch https://github.com/{repo} {repo_directory}",
-        f"chmod -R 777 {repo_directory}",  # So nonroot user can run tests
-        f"cd {repo_directory}",
-        f"git reset --hard {base_commit}",
+    if repo == "sympy/sympy":
+        setup_commands = [
+            "git config --global http.version HTTP/1.1",
+            f"mkdir -p {repo_directory}",
+            f"cd {repo_directory}",
+            "git init",
+            f"git remote add origin https://github.com/{repo}",
+            f'for attempt in 1 2 3 4 5; do git fetch --filter=blob:none --depth=1 origin {base_commit} && break; if [ "$attempt" = 5 ]; then exit 1; fi; sleep $((attempt * 10)); done',
+            f"git checkout --detach {base_commit}",
+            f"chmod -R 777 {repo_directory}",  # So nonroot user can run tests
+            f"git reset --hard {base_commit}",
+        ]
+    else:
+        setup_commands = [
+            "git config --global http.version HTTP/1.1",
+            f"git clone -o origin {branch} --single-branch --filter=blob:none --no-checkout https://github.com/{repo} {repo_directory}",
+            f"chmod -R 777 {repo_directory}",  # So nonroot user can run tests
+            f"cd {repo_directory}",
+            f"git reset --hard {base_commit}",
+        ]
+    setup_commands += [
         # Remove the remote and tags so the agent won't see newer commits.
         "git remote remove origin",
         # Remove only tags pointing to commits after target timestamp

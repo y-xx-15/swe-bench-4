@@ -1,0 +1,18 @@
+{
+  "title": "Fix LaTeX escaping for square brackets in sequences",
+  "approach": "Modify the LatexPrinter class to ensure that square brackets in sequences are not escaped with '\\left[' and '\\right]'. Instead, use plain '[' and ']' for sequences to ensure compatibility with Markdown rendering.",
+  "edit_targets": [
+    "sympy/printing/latex.py::LatexPrinter._print_SeqFormula"
+  ],
+  "dependency_files": [
+    "sympy/printing/tests/test_latex.py::test_latex_sequences"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "escaped_square_brackets_in_sequences"
+  ],
+  "sufficiency_assessment": "Editing the LatexPrinter class to adjust the escaping logic for square brackets in sequences should be sufficient. However, the corresponding test case in test_latex_sequences must be inspected to ensure it validates the fix.",
+  "risks": [
+    "Potential unintended changes to LaTeX rendering for other components that rely on square brackets."
+  ]
+}

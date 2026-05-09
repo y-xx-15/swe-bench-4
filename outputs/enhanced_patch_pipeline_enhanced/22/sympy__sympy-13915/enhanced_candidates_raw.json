@@ -1,0 +1,347 @@
+[
+  {
+    "idea": {
+      "title": "test_Mul_handles_undefined_substitution",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the behavior of Mul when substitution leads to undefined expressions",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_Mul_handles_undefined_substitution"
+      ],
+      "covers_original_tests": [
+        "test_Mul_does_not_cancel_infinities"
+      ],
+      "covers_obligations": [
+        "test_Mul_does_not_cancel_infinities::core"
+      ],
+      "target_source_symbol": "sympy.core.mul.Mul",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Mul(",
+        "subs(",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "Mul(",
+        "subs(",
+        "AssertionError"
+      ],
+      "rationale": "This test directly exercises the behavior of Mul when substitution results in undefined expressions, which is the core issue exposed by the original test. It differs from the original test by explicitly verifying the handling of substitution-induced undefined states, ensuring the bug is exposed in a focused manner."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +277,9 @@\n+def test_sweb_enhanced_Mul_handles_undefined_substitution():\n+    a, b = symbols('a b')\n+    # Expression where substitution leads to undefined (zoo) state\n+    expr = (1/(a + b) + 1/(a - b)) * (1/(a + b) - 1/(a - b))\n+    result = expr.subs(b, a)\n+    # The result should be nan because substitution leads to an undefined state\n+    assert result is nan\n+\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +277,9 @@\n+def test_sweb_enhanced_Mul_handles_undefined_substitution():\n+    a, b = symbols('a b')\n+    # Expression where substitution leads to undefined (zoo) state\n+    expr = (1/(a + b) + 1/(a - b)) * (1/(a + b) - 1/(a - b))\n+    result = expr.subs(b, a)\n+    # The result should be nan because substitution leads to an undefined state\n+    assert result is nan\n+\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Mul_handles_undefined_substitution"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Mul_handles_undefined_substitution"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "limit_substitution_behavior",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Ensure that substitution of variables leading to undefined expressions triggers the correct behavior.",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_limit_substitution"
+      ],
+      "covers_original_tests": [
+        "test_Mul_does_not_cancel_infinities"
+      ],
+      "covers_obligations": [
+        "test_Mul_does_not_cancel_infinities::core"
+      ],
+      "target_source_symbol": "sympy.core.mul.Mul",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "subs",
+        "limit",
+        "undefined",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "subs",
+        "limit",
+        "b,a"
+      ],
+      "rationale": "This test focuses on the downstream behavior of the substitution operation when it leads to undefined expressions, which is a consequence of the bug in the `Mul` class. It differs from the original test by explicitly verifying the behavior of the `subs` method in conjunction with `limit`, ensuring that the correct result is returned when substitution leads to an undefined expression. This provides additional repair guidance by highlighting the need to handle substitution edge cases correctly."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +277,8 @@\n+def test_sweb_enhanced_limit_substitution():\n+    from sympy import symbols, limit, oo, nan\n+    a, b = symbols('a b')\n+    expr = (1/(a + b) + 1/(a - b)) / (1/(a + b) - 1/(a - b))\n+    # Substituting b -> a should result in an undefined expression (nan)\n+    assert expr.subs(b, a) is nan\n+    # Using limit instead should yield the correct result\n+    assert limit(expr, b, a) == -1\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +277,8 @@\n+def test_sweb_enhanced_limit_substitution():\n+    from sympy import symbols, limit, oo, nan\n+    a, b = symbols('a b')\n+    expr = (1/(a + b) + 1/(a - b)) / (1/(a + b) - 1/(a - b))\n+    # Substituting b -> a should result in an undefined expression (nan)\n+    assert expr.subs(b, a) is nan\n+    # Using limit instead should yield the correct result\n+    assert limit(expr, b, a) == -1\n```",
+    "identifiers": [
+      "test_sweb_enhanced_limit_substitution"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_limit_substitution"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "limit_substitution_behavior",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior of substitution when it leads to undefined expressions and ensure the limit is correctly computed",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_limit_substitution"
+      ],
+      "covers_original_tests": [
+        "test_Mul_does_not_cancel_infinities"
+      ],
+      "covers_obligations": [
+        "test_Mul_does_not_cancel_infinities::core"
+      ],
+      "target_source_symbol": "sympy.core.mul.Mul",
+      "target_validation_subject": "limit_substitution",
+      "semantic_alignment_tokens": [
+        "subs(",
+        "limit(",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "subs(",
+        "limit(",
+        "b=a"
+      ],
+      "rationale": "This test extends the original failure by verifying the downstream behavior when substitution leads to undefined expressions. It ensures that the limit computation is correctly handled, which was not explicitly tested in the original case."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +278,7 @@\n+def test_sweb_enhanced_limit_substitution_boundary():\n+    a, b = symbols('a b')\n+    expr = (1/(a + b) + 1/(a - b))/(1/(a + b) - 1/(a - b))\n+    # Substitution leading to undefined expression\n+    assert expr.subs(b, a) is nan\n+    # Verify the limit computation as b approaches a\n+    assert expr.limit(b, a) == -1\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +278,7 @@\n+def test_sweb_enhanced_limit_substitution_boundary():\n+    a, b = symbols('a b')\n+    expr = (1/(a + b) + 1/(a - b))/(1/(a + b) - 1/(a - b))\n+    # Substitution leading to undefined expression\n+    assert expr.subs(b, a) is nan\n+    # Verify the limit computation as b approaches a\n+    assert expr.limit(b, a) == -1\n```",
+    "identifiers": [
+      "test_sweb_enhanced_limit_substitution_boundary"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_limit_substitution_boundary"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test substitution with undefined subexpression",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream behavior when substitution leads to undefined expressions",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_substitution_undefined"
+      ],
+      "covers_original_tests": [
+        "test_Mul_does_not_cancel_infinities"
+      ],
+      "covers_obligations": [
+        "test_Mul_does_not_cancel_infinities::core"
+      ],
+      "target_source_symbol": "Mul.flatten",
+      "target_validation_subject": "substitution behavior",
+      "semantic_alignment_tokens": [
+        "subs(",
+        "limit(",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "subs(",
+        "limit(",
+        "AssertionError"
+      ],
+      "rationale": "This test explores the downstream consequence of substitution leading to undefined expressions, which is distinct from the original test that focused on the direct symptom of assertion failure. It provides additional repair guidance by verifying that the substitution correctly handles undefined subexpressions without causing downstream errors."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +277,8 @@\n+def test_sweb_enhanced_substitution_undefined():\n+    from sympy import symbols, nan\n+    a, b = symbols('a b')\n+    expr = (1/(a + b) + 1/(a - b)) / (1/(a + b) - 1/(a - b))\n+    result = expr.subs(b, a)\n+    # The substitution should lead to an undefined expression (nan).\n+    assert result is nan\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +277,8 @@\n+def test_sweb_enhanced_substitution_undefined():\n+    from sympy import symbols, nan\n+    a, b = symbols('a b')\n+    expr = (1/(a + b) + 1/(a - b)) / (1/(a + b) - 1/(a - b))\n+    result = expr.subs(b, a)\n+    # The substitution should lead to an undefined expression (nan).\n+    assert result is nan\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_substitution_undefined"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_substitution_undefined"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test substitution with undefined subexpression",
+      "semantic_bucket": "structural_invariant",
+      "goal": "stress the invariant that substitution should not lead to undefined expressions when subexpressions are undefined",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_substitution_invariant"
+      ],
+      "covers_original_tests": [
+        "test_Mul_does_not_cancel_infinities"
+      ],
+      "covers_obligations": [
+        "test_Mul_does_not_cancel_infinities::core"
+      ],
+      "target_source_symbol": "Mul.flatten",
+      "target_validation_subject": "substitution_invariant",
+      "semantic_alignment_tokens": [
+        "subs(",
+        "limit(",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "subs(",
+        "limit(",
+        "AssertionError"
+      ],
+      "rationale": "This test directly stresses the invariant that substitution should not lead to undefined expressions, which is distinct from the original test focusing on cancellation behavior. It provides additional repair guidance by exposing the invariant violation explicitly."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +277,7 @@\n+def test_sweb_enhanced_substitution_invariant():\n+    a, b = symbols('a b')\n+    expr = (1/(a + b) + 1/(a - b)) / (1/(a + b) - 1/(a - b))\n+    # Substituting b = a should result in an undefined expression (nan)\n+    result = expr.subs(b, a)\n+    assert result is nan, f\"Expected nan, but got {result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +277,7 @@\n+def test_sweb_enhanced_substitution_invariant():\n+    a, b = symbols('a b')\n+    expr = (1/(a + b) + 1/(a - b)) / (1/(a + b) - 1/(a - b))\n+    # Substituting b = a should result in an undefined expression (nan)\n+    result = expr.subs(b, a)\n+    assert result is nan, f\"Expected nan, but got {result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_substitution_invariant"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_substitution_invariant"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test substitution with undefined subexpression",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "verify that substituting variables in an expression with undefined subexpressions triggers the correct handling of undefined behavior",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_substitution_undefined"
+      ],
+      "covers_original_tests": [
+        "test_Mul_does_not_cancel_infinities"
+      ],
+      "covers_obligations": [
+        "test_Mul_does_not_cancel_infinities::core"
+      ],
+      "target_source_symbol": "Mul.flatten",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "subs",
+        "limit",
+        "undefined",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "subs",
+        "limit",
+        "undefined"
+      ],
+      "rationale": "This test extends the original failure by explicitly verifying the downstream behavioral consequence of substituting variables in an expression where a subexpression becomes undefined. It ensures that the bug is not limited to the direct symptom but also impacts substitution behavior, which is critical for mathematical correctness."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +277,8 @@\n+def test_sweb_enhanced_substitution_limit_undefined():\n+    a, b = symbols('a b')\n+    expr = (1/(a + b) + 1/(a - b)) / (1/(a + b) - 1/(a - b))\n+    limit_expr = expr.limit(b, a)\n+    assert limit_expr == -1  # The limit should evaluate to -1\n+    assert expr.subs(b, a) is nan  # Substituting b with a should result in nan\n+    assert expr.subs(b, a).is_real is False  # Ensure the result is not real\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +277,8 @@\n+def test_sweb_enhanced_substitution_limit_undefined():\n+    a, b = symbols('a b')\n+    expr = (1/(a + b) + 1/(a - b)) / (1/(a + b) - 1/(a - b))\n+    limit_expr = expr.limit(b, a)\n+    assert limit_expr == -1  # The limit should evaluate to -1\n+    assert expr.subs(b, a) is nan  # Substituting b with a should result in nan\n+    assert expr.subs(b, a).is_real is False  # Ensure the result is not real\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_substitution_limit_undefined"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_substitution_limit_undefined"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test substitution with undefined expression limit",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior when substitution leads to an undefined expression",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_substitution_limit"
+      ],
+      "covers_original_tests": [
+        "test_Mul_does_not_cancel_infinities"
+      ],
+      "covers_obligations": [
+        "test_Mul_does_not_cancel_infinities::core"
+      ],
+      "target_source_symbol": "Mul.flatten",
+      "target_validation_subject": "substitution behavior",
+      "semantic_alignment_tokens": [
+        "subs(",
+        "limit(",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "subs(",
+        "limit(",
+        "Mul("
+      ],
+      "rationale": "This test exercises the downstream limit behavior when substitution results in an undefined expression, which is distinct from the original test that directly checks for cancellation of infinities. It adds repair guidance by verifying the correct handling of undefined expressions in substitution scenarios."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +277,7 @@\n+def test_sweb_enhanced_substitution_limit():\n+    a, b = symbols('a b')\n+    expr = (1/(a + b) + 1/(a - b)) / (1/(a + b) - 1/(a - b))\n+    # Substitution that leads to an undefined expression\n+    result = expr.subs(b, a)\n+    assert result is nan, \"Substitution should result in nan when the expression becomes undefined\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_arit.py b/sympy/core/tests/test_arit.py\n--- a/sympy/core/tests/test_arit.py\n+++ b/sympy/core/tests/test_arit.py\n@@ -277,0 +277,7 @@\n+def test_sweb_enhanced_substitution_limit():\n+    a, b = symbols('a b')\n+    expr = (1/(a + b) + 1/(a - b)) / (1/(a + b) - 1/(a - b))\n+    # Substitution that leads to an undefined expression\n+    result = expr.subs(b, a)\n+    assert result is nan, \"Substitution should result in nan when the expression becomes undefined\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_substitution_limit"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_substitution_limit"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

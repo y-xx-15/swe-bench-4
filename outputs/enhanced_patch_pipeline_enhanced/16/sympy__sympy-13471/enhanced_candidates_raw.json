@@ -1,0 +1,249 @@
+[
+  {
+    "idea": {
+      "title": "test_Float_from_tuple_invalid_hex_literal",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the invalid literal for int() with base 16 error when handling pickled float tuples",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_Float_from_tuple_invalid_hex_literal"
+      ],
+      "covers_original_tests": [
+        "test_Float_from_tuple"
+      ],
+      "covers_obligations": [
+        "test_Float_from_tuple::core"
+      ],
+      "target_source_symbol": "sympy.core.numbers.Float",
+      "target_validation_subject": "tuple[1] (hexadecimal string)",
+      "semantic_alignment_tokens": [
+        "long(",
+        "ValueError",
+        "invalid literal for int() with base 16"
+      ],
+      "trigger_shape_tokens": [
+        "tuple[1]",
+        "long(",
+        "hexadecimal string"
+      ],
+      "rationale": "This test directly reproduces the bug by constructing a float tuple with an invalid hexadecimal string ('1L') and triggering the ValueError exception. It differs from the original test by isolating the invalid literal handling in the tuple parsing logic, providing more specific repair guidance for the validation of hexadecimal strings."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,6 @@\n+def test_sweb_enhanced_Float_from_tuple_invalid_hex_literal():\n+    # Test for invalid hexadecimal string in tuple[1]\n+    raises(ValueError, lambda: Float((0, '1L', 0, 1)))\n+    # Ensure valid hexadecimal string does not raise an error\n+    assert Float((0, '1', 0, 1)) == Float(1.0)\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,6 @@\n+def test_sweb_enhanced_Float_from_tuple_invalid_hex_literal():\n+    # Test for invalid hexadecimal string in tuple[1]\n+    raises(ValueError, lambda: Float((0, '1L', 0, 1)))\n+    # Ensure valid hexadecimal string does not raise an error\n+    assert Float((0, '1', 0, 1)) == Float(1.0)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Float_from_tuple_invalid_hex_literal"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Float_from_tuple_invalid_hex_literal"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "pickle compatibility across Python versions",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior of loading pickled float-containing expressions across Python versions",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_pickle_load_float"
+      ],
+      "covers_original_tests": [
+        "test_Float_from_tuple"
+      ],
+      "covers_obligations": [
+        "test_Float_from_tuple::core"
+      ],
+      "target_source_symbol": "Float.__new__",
+      "target_validation_subject": "num[1] conversion logic",
+      "semantic_alignment_tokens": [
+        "pickle.loads",
+        "pickle.dumps",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "pickle.loads",
+        "pickle.dumps",
+        "long(num[1], 16)"
+      ],
+      "rationale": "This test exercises the downstream consequence of pickling and unpickling float-containing expressions across Python versions, which is distinct from the original test that directly validates tuple-to-Float conversion. It highlights the broader impact of the bug on serialization compatibility."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,10 @@\n+def test_sweb_enhanced_pickle_load_float():\n+    import pickle\n+    from sympy import Float\n+    \n+    # Create a Float object with a tuple that triggers the bug\n+    obj = Float((0, '1L', 0, 1))\n+    \n+    # Serialize and deserialize the object across Python versions\n+    serialized = pickle.dumps(obj, protocol=2)\n+    raises(ValueError, lambda: pickle.loads(serialized))\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,10 @@\n+def test_sweb_enhanced_pickle_load_float():\n+    import pickle\n+    from sympy import Float\n+    \n+    # Create a Float object with a tuple that triggers the bug\n+    obj = Float((0, '1L', 0, 1))\n+    \n+    # Serialize and deserialize the object across Python versions\n+    serialized = pickle.dumps(obj, protocol=2)\n+    raises(ValueError, lambda: pickle.loads(serialized))\n```",
+    "identifiers": [
+      "test_sweb_enhanced_pickle_load_float"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_pickle_load_float"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test invalid hexadecimal literal in Float tuple",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the failure mode where invalid hexadecimal literals in Float tuple cause ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_invalid_hex_literal"
+      ],
+      "covers_original_tests": [
+        "test_Float_from_tuple"
+      ],
+      "covers_obligations": [
+        "test_Float_from_tuple::core"
+      ],
+      "target_source_symbol": "Float",
+      "target_validation_subject": "tuple[1] (hexadecimal literal)",
+      "semantic_alignment_tokens": [
+        "tuple",
+        "long",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "tuple",
+        "long",
+        "ValueError"
+      ],
+      "rationale": "This test directly targets the invalid hexadecimal literal parsing in Float tuples, which is the root cause of the ValueError observed in the original failure. Unlike the original test, which may implicitly rely on broader tuple handling, this test isolates the specific obligation of correctly parsing hexadecimal literals in the tuple."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,5 @@\n+def test_sweb_enhanced_invalid_hex_literal():\n+    raises(ValueError, lambda: Float((0, 'invalid_hex', 0, 1)))\n+    raises(ValueError, lambda: Float((0, '1G', 0, 1)))  # 'G' is not valid in hexadecimal\n+    raises(ValueError, lambda: Float((0, '0x1L', 0, 1)))  # '0x' prefix is invalid in this context\n+    raises(ValueError, lambda: Float((0, '', 0, 1)))  # Empty string should also raise ValueError\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,5 @@\n+def test_sweb_enhanced_invalid_hex_literal():\n+    raises(ValueError, lambda: Float((0, 'invalid_hex', 0, 1)))\n+    raises(ValueError, lambda: Float((0, '1G', 0, 1)))  # 'G' is not valid in hexadecimal\n+    raises(ValueError, lambda: Float((0, '0x1L', 0, 1)))  # '0x' prefix is invalid in this context\n+    raises(ValueError, lambda: Float((0, '', 0, 1)))  # Empty string should also raise ValueError\n```",
+    "identifiers": [
+      "test_sweb_enhanced_invalid_hex_literal"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_invalid_hex_literal"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "float tuple validation in mpf creation",
+      "semantic_bucket": "structural_invariant",
+      "goal": "stress the validation of tuple inputs for float creation, ensuring proper handling of hexadecimal literals",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_float_tuple_validation"
+      ],
+      "covers_original_tests": [
+        "test_Float_from_tuple"
+      ],
+      "covers_obligations": [
+        "test_Float_from_tuple::core"
+      ],
+      "target_source_symbol": "Float.__new__",
+      "target_validation_subject": "tuple input for float creation",
+      "semantic_alignment_tokens": [
+        "tuple",
+        "long",
+        "ValueError",
+        "invalid literal for int()"
+      ],
+      "trigger_shape_tokens": [
+        "tuple",
+        "long",
+        "hexadecimal"
+      ],
+      "rationale": "This idea focuses on the validation of tuple inputs containing hexadecimal literals during float creation, which is distinct from the original test's broader pickle compatibility issue. It adds repair guidance by isolating the tuple validation logic and ensuring proper handling of hexadecimal literals, which directly addresses the observed ValueError."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,6 @@\n+def test_sweb_enhanced_float_tuple_validation():\n+    # Test invalid hexadecimal literal in tuple input for Float creation\n+    raises(ValueError, lambda: Float((0, '1G', 0, 1)))\n+    # Test valid hexadecimal literal in tuple input for Float creation\n+    assert Float((0, '1A', 0, 1)) == Float(26)\n+    assert Float((1, '1A', 0, 1)) == Float(-26)\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,6 @@\n+def test_sweb_enhanced_float_tuple_validation():\n+    # Test invalid hexadecimal literal in tuple input for Float creation\n+    raises(ValueError, lambda: Float((0, '1G', 0, 1)))\n+    # Test valid hexadecimal literal in tuple input for Float creation\n+    assert Float((0, '1A', 0, 1)) == Float(26)\n+    assert Float((1, '1A', 0, 1)) == Float(-26)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_float_tuple_validation"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_float_tuple_validation"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "tuple-based float construction validation",
+      "semantic_bucket": "direct_symptom",
+      "goal": "ensure tuple-based float construction raises ValueError for invalid literals",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_tuple_float_invalid_literal"
+      ],
+      "covers_original_tests": [
+        "test_Float_from_tuple"
+      ],
+      "covers_obligations": [
+        "test_Float_from_tuple::core"
+      ],
+      "target_source_symbol": "sympy.core.numbers.Float",
+      "target_validation_subject": "tuple-based float construction",
+      "semantic_alignment_tokens": [
+        "tuple",
+        "Float",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "tuple",
+        "long",
+        "base 16",
+        "ValueError"
+      ],
+      "rationale": "This test directly targets the invalid literal handling in tuple-based float construction, which is the root cause of the ValueError. Unlike the original test, it isolates the tuple input validation logic, providing precise repair guidance for this specific obligation."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,5 @@\n+def test_sweb_enhanced_tuple_float_invalid_literal():\n+    # Test invalid literal in tuple-based float construction\n+    raises(ValueError, lambda: Float((0, 'invalid_literal', 0, 1)))\n+    raises(ValueError, lambda: Float((0, '1L', 0, 1)))  # Python 2-style long literal\n+    raises(ValueError, lambda: Float((0, '0x1', 0, 1)))  # Hexadecimal string\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,5 @@\n+def test_sweb_enhanced_tuple_float_invalid_literal():\n+    # Test invalid literal in tuple-based float construction\n+    raises(ValueError, lambda: Float((0, 'invalid_literal', 0, 1)))\n+    raises(ValueError, lambda: Float((0, '1L', 0, 1)))  # Python 2-style long literal\n+    raises(ValueError, lambda: Float((0, '0x1', 0, 1)))  # Hexadecimal string\n```",
+    "identifiers": [
+      "test_sweb_enhanced_tuple_float_invalid_literal"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_tuple_float_invalid_literal"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

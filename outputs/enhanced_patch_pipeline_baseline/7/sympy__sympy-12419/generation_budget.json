@@ -1,0 +1,10 @@
+{
+  "candidate_budget": 3,
+  "keep_top_k": 2,
+  "attempt_budget": 3,
+  "bucket_limit": 3,
+  "template_limit": 3,
+  "failure_mode": "assertion_error",
+  "noise_ratio": 0.0175,
+  "difficulty": "low"
+}

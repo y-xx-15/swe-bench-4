@@ -5,6 +5,7 @@ import json
 import os
 import re
 import shlex
+import time
 import traceback
 from difflib import unified_diff
 
@@ -14,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 import docker
-from openai import OpenAI
+from openai import APIConnectionError, APIStatusError, APITimeoutError, OpenAI, RateLimitError
 from unidiff import PatchSet
 from unidiff.errors import UnidiffParseError
 
@@ -3275,6 +3276,7 @@ def build_idea_feedback(
     failure_focus: dict[str, Any] | None = None,
     required_uncovered_obligations: list[str] | None = None,
     code_context: dict[str, str] | None = None,
+    enforce_semantic_buckets: bool = True,
 ) -> str | None:
     if idea is None:
         return (
@@ -3387,12 +3389,12 @@ def build_idea_feedback(
     ):
         return "The rationale appears to validate buggy behavior. Describe the intended fixed behavior instead."
     semantic_bucket = str(idea.get("semantic_bucket", "")).strip()
-    if semantic_bucket not in allowed_buckets:
+    if enforce_semantic_buckets and semantic_bucket not in allowed_buckets:
         return (
             "The JSON idea must include semantic_bucket chosen from: "
             + ", ".join(allowed_buckets)
         )
-    if semantic_bucket in seen_buckets:
+    if enforce_semantic_buckets and semantic_bucket in seen_buckets:
         return f"The semantic_bucket '{semantic_bucket}' already exists. Choose a different bucket."
     return None
 
@@ -3546,6 +3548,7 @@ def build_test_idea_prompt(
     feedback: str | None = None,
     uncovered_original_tests: list[str] | None = None,
     uncovered_obligations: list[str] | None = None,
+    disable_semantic_bucket_guidance: bool = False,
 ) -> str:
     context_text = format_code_context(code_context)
     original_test_identifiers = get_original_test_identifiers(instance)
@@ -3556,10 +3559,20 @@ def build_test_idea_prompt(
     uncovered_obligations = [
         str(name) for name in (uncovered_obligations or []) if str(name).strip()
     ]
-    bucket_definitions = "\n".join(
-        f"- {bucket}: {SEMANTIC_BUCKET_GUIDANCE.get(bucket, 'choose a distinct semantic angle for this bucket')}"
-        for bucket in semantic_buckets
-    )
+    if disable_semantic_bucket_guidance:
+        bucket_instruction = (
+            "Semantic bucket guidance is disabled for this ablation. Use semantic_bucket='unspecified'. "
+            "Do not try to diversify ideas by named semantic bucket; focus only on reproducing the original failing behavior."
+        )
+    else:
+        bucket_definitions = "\n".join(
+            f"- {bucket}: {SEMANTIC_BUCKET_GUIDANCE.get(bucket, 'choose a distinct semantic angle for this bucket')}"
+            for bucket in semantic_buckets
+        )
+        bucket_instruction = (
+            f"Allowed semantic buckets: {', '.join(semantic_buckets)}\n"
+            f"Bucket definitions:\n{bucket_definitions}"
+        )
     prompt = (
         "Task: propose one high-quality enhanced test idea before writing any diff.\n"
         "Return exactly one JSON object.\n"
@@ -3581,8 +3594,7 @@ def build_test_idea_prompt(
         '}\n\n'
         f"Detected failure mode: {failure_mode}\n"
         f"Allowed templates: {', '.join(template_names)}\n"
-        f"Allowed semantic buckets: {', '.join(semantic_buckets)}\n"
-        f"Bucket definitions:\n{bucket_definitions}\n\n"
+        f"{bucket_instruction}\n\n"
         f"Failure mode constraint: the proposed test idea must be explicitly designed to trigger the detected failure mode '{failure_mode}' or a closely related manifestation of the same bug.\n"
         "Prefer a compact idea that can be implemented as one new test function with one setup, one action, and one assertion block.\n"
         "Avoid parameterized, multi-case, or kitchen-sink ideas unless the original failing behavior itself requires multiple inputs.\n"
@@ -7132,6 +7144,46 @@ class OpenAIResponder:
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.client = OpenAI(api_key=api_key, base_url=api_base)
+        self.max_retries = int(os.environ.get("OPENAI_MAX_RETRIES", "6"))
+        self.retry_initial_sleep = float(os.environ.get("OPENAI_RETRY_INITIAL_SLEEP", "10"))
+
+    def _create_chat_completion(self, request: dict[str, Any]):
+        retryable_exceptions = (
+            APIConnectionError,
+            APITimeoutError,
+            RateLimitError,
+            APIStatusError,
+        )
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                try:
+                    return self.client.chat.completions.create(
+                        **request,
+                        max_completion_tokens=self.max_tokens,
+                    )
+                except TypeError:
+                    return self.client.chat.completions.create(
+                        **request,
+                        max_tokens=self.max_tokens,
+                    )
+            except retryable_exceptions as exc:
+                status_code = getattr(exc, "status_code", None)
+                retryable_status = status_code in {408, 409, 429, 500, 502, 503, 504}
+                if isinstance(exc, APIStatusError) and not retryable_status:
+                    raise
+                if attempt >= self.max_retries:
+                    raise
+                sleep_seconds = min(
+                    self.retry_initial_sleep * (2 ** (attempt - 1)),
+                    120,
+                )
+                print(
+                    f"OpenAI request failed ({type(exc).__name__}, status={status_code}); "
+                    f"retrying {attempt}/{self.max_retries} after {sleep_seconds:.0f}s",
+                    flush=True,
+                )
+                time.sleep(sleep_seconds)
+        raise RuntimeError("OpenAI request retry loop exhausted unexpectedly.")
 
     def complete(self, prompt: str) -> tuple[str, str]:
         request = {
@@ -7142,16 +7194,7 @@ class OpenAIResponder:
             ],
             "temperature": self.temperature,
         }
-        try:
-            response = self.client.chat.completions.create(
-                **request,
-                max_completion_tokens=self.max_tokens,
-            )
-        except TypeError:
-            response = self.client.chat.completions.create(
-                **request,
-                max_tokens=self.max_tokens,
-            )
+        response = self._create_chat_completion(request)
         text = response.choices[0].message.content or ""
         patch, error = sanitize_unified_diff(extract_diff(text))
         if error and not patch:
@@ -7167,16 +7210,7 @@ class OpenAIResponder:
             ],
             "temperature": self.temperature,
         }
-        try:
-            response = self.client.chat.completions.create(
-                **request,
-                max_completion_tokens=self.max_tokens,
-            )
-        except TypeError:
-            response = self.client.chat.completions.create(
-                **request,
-                max_tokens=self.max_tokens,
-            )
+        response = self._create_chat_completion(request)
         return response.choices[0].message.content or ""
 
 
@@ -7194,6 +7228,7 @@ def generate_test_idea(
     max_candidate_attempts: int,
     covered_original_tests: set[str] | None = None,
     covered_obligations: set[str] | None = None,
+    disable_semantic_bucket_guidance: bool = False,
 ) -> tuple[dict[str, Any] | None, int]:
     feedback = None
     last_idea = None
@@ -7224,6 +7259,7 @@ def generate_test_idea(
                 feedback=feedback,
                 uncovered_original_tests=uncovered_original_tests,
                 uncovered_obligations=uncovered_obligations,
+                disable_semantic_bucket_guidance=disable_semantic_bucket_guidance,
             )
         )
         idea = parse_json_object(raw_text)
@@ -7237,11 +7273,13 @@ def generate_test_idea(
             failure_focus=failure_focus,
             required_uncovered_obligations=uncovered_obligations,
             code_context=code_context,
+            enforce_semantic_buckets=not disable_semantic_bucket_guidance,
         )
         last_idea = idea
         if feedback is None:
             seen_titles.add(str(idea["title"]).strip())
-            seen_buckets.add(str(idea["semantic_bucket"]).strip())
+            if not disable_semantic_bucket_guidance:
+                seen_buckets.add(str(idea["semantic_bucket"]).strip())
             return idea, attempt
     return last_idea, max_candidate_attempts
 
@@ -8465,6 +8503,7 @@ def generate_enhanced_candidates(
     generation_budget: dict[str, Any],
     failure_focus: dict[str, Any] | None,
     max_candidate_attempts: int,
+    disable_semantic_bucket_guidance: bool = False,
 ) -> list[CandidatePatch]:
     original_identifiers = get_original_test_identifiers(instance)
     failure_mode = str(generation_budget["failure_mode"])
@@ -8472,9 +8511,13 @@ def generate_enhanced_candidates(
         failure_mode,
         limit=int(generation_budget["template_limit"]),
     )
-    semantic_buckets = select_semantic_buckets(
-        failure_mode,
-        limit=int(generation_budget["bucket_limit"]),
+    semantic_buckets = (
+        ["unspecified"]
+        if disable_semantic_bucket_guidance
+        else select_semantic_buckets(
+            failure_mode,
+            limit=int(generation_budget["bucket_limit"]),
+        )
     )
     target_candidates = int(generation_budget["candidate_budget"])
     attempt_budget = int(generation_budget["attempt_budget"])
@@ -8500,6 +8543,7 @@ def generate_enhanced_candidates(
             attempt_budget,
             covered_original_tests=covered_original_tests,
             covered_obligations=covered_obligations,
+            disable_semantic_bucket_guidance=disable_semantic_bucket_guidance,
         )
         for name in ((idea or {}).get("covers_original_tests") or []):
             if isinstance(name, str) and name.strip():
@@ -8714,6 +8758,80 @@ def filter_candidates(
     return retain_missing_symbol_cluster_subject_candidates(selected, candidates, keep_top_k)
 
 
+def use_unfiltered_enhanced_candidates(
+    instance: dict[str, Any],
+    candidates: list[CandidatePatch],
+    keep_top_k: int | None = None,
+    failure_focus: dict[str, Any] | None = None,
+    code_context: dict[str, str] | None = None,
+) -> tuple[list[CandidatePatch], list[CandidatePatch]]:
+    used: list[CandidatePatch] = []
+    rejected: list[CandidatePatch] = []
+    original_identifiers = get_original_test_identifiers(instance)
+    for idx, candidate in enumerate(candidates, start=1):
+        print(f"[{instance['instance_id']}] 跳过筛选并使用增强测试候选 {idx}/{len(candidates)}")
+        sanitized_patch, patch_error = sanitize_unified_diff(candidate.patch)
+        if not sanitized_patch:
+            candidate.kept = False
+            candidate.reason = f"unfiltered ablation rejected invalid unified diff: {patch_error or 'unknown parse error'}"
+            rejected.append(candidate)
+            continue
+        candidate.patch = sanitized_patch
+        candidate.identifiers = extract_test_identifiers_from_patch(candidate.patch)
+        candidate.enhanced_identifiers = get_enhanced_test_identifiers(candidate.identifiers)
+        candidate.duplicate_identifiers = find_duplicate_test_identifiers(
+            candidate.identifiers,
+            original_identifiers,
+        )
+        if not candidate.enhanced_identifiers:
+            candidate.kept = False
+            candidate.reason = "unfiltered ablation rejected candidate without test_sweb_enhanced_* test"
+            rejected.append(candidate)
+            continue
+        if candidate.duplicate_identifiers:
+            candidate.kept = False
+            candidate.reason = (
+                "unfiltered ablation rejected candidate reusing original SWE-bench test names: "
+                + ", ".join(candidate.duplicate_identifiers)
+            )
+            rejected.append(candidate)
+            continue
+        candidate.covered_original_tests = [
+            str(name)
+            for name in ((candidate.idea or {}).get("covers_original_tests") or [])
+            if isinstance(name, str)
+        ]
+        backfill_candidate_minimal_structure(candidate, failure_focus, code_context)
+        candidate.covered_obligations = _normalize_obligation_ids(
+            (candidate.idea or {}).get("covers_obligations"),
+            candidate.covered_original_tests,
+            failure_focus,
+            code_context,
+        )
+        candidate.kept = True
+        candidate.reason = (
+            "retained by --disable_enhanced_test_filtering; semantic alignment and buggy-code "
+            "reproduction checks were intentionally skipped"
+        )
+        candidate.quality_score = 0.0
+        candidate.quality_breakdown = {
+            "filtering_disabled": 1.0,
+            "reproduction": 0.0,
+            "novelty": 0.0,
+            "compactness": 0.0,
+            "parseability": 0.0,
+        }
+        used.append(candidate)
+    if keep_top_k is not None:
+        overflow = used[keep_top_k:]
+        for candidate in overflow:
+            candidate.kept = False
+            candidate.reason = "unfiltered ablation candidate omitted by keep_top_k budget"
+        rejected.extend(overflow)
+        used = used[:keep_top_k]
+    return used, rejected
+
+
 def run_instance_pipeline(
     instance: dict[str, Any],
     responder: OpenAIResponder,
@@ -8724,6 +8842,8 @@ def run_instance_pipeline(
     max_candidate_attempts: int,
     baseline_only: bool = False,
     hide_original_test_patch_in_repair: bool = False,
+    disable_semantic_bucket_guidance: bool = False,
+    disable_enhanced_test_filtering: bool = False,
 ) -> dict[str, Any]:
     instance_dir = output_dir / instance["instance_id"]
     instance_dir.mkdir(parents=True, exist_ok=True)
@@ -8796,22 +8916,30 @@ def run_instance_pipeline(
             generation_budget=generation_budget,
             failure_focus=failure_focus,
             max_candidate_attempts=max_candidate_attempts,
+            disable_semantic_bucket_guidance=disable_semantic_bucket_guidance,
         )
         write_json(instance_dir / "enhanced_candidates_raw.json", [asdict(x) for x in candidates])
 
-        kept_candidates = filter_candidates(
-            instance,
-            candidates,
-            timeout=timeout,
-            keep_top_k=int(generation_budget["keep_top_k"]),
-            failure_focus=failure_focus,
-            code_context=code_context,
-        )
+        if disable_enhanced_test_filtering:
+            kept_candidates, rejected_candidates = use_unfiltered_enhanced_candidates(
+                instance,
+                candidates,
+                keep_top_k=int(generation_budget["keep_top_k"]),
+                failure_focus=failure_focus,
+                code_context=code_context,
+            )
+        else:
+            kept_candidates = filter_candidates(
+                instance,
+                candidates,
+                timeout=timeout,
+                keep_top_k=int(generation_budget["keep_top_k"]),
+                failure_focus=failure_focus,
+                code_context=code_context,
+            )
+            rejected_candidates = [candidate for candidate in candidates if not candidate.kept]
         write_json(instance_dir / "enhanced_candidates_filtered.json", [asdict(x) for x in kept_candidates])
-        write_json(
-            instance_dir / "enhanced_candidates_rejected.json",
-            [asdict(x) for x in candidates if not x.kept],
-        )
+        write_json(instance_dir / "enhanced_candidates_rejected.json", [asdict(x) for x in rejected_candidates])
 
     print(f"[{instance['instance_id']}] 基于增强测试生成补丁")
     patch_result = generate_patch_with_strategy(
@@ -8897,6 +9025,8 @@ def run_instance_pipeline(
         "model": responder.model,
         "pipeline_mode": "baseline_only" if baseline_only else "enhanced_guided",
         "hide_original_test_patch_in_repair": hide_original_test_patch_in_repair,
+        "disable_semantic_bucket_guidance": disable_semantic_bucket_guidance,
+        "disable_enhanced_test_filtering": disable_enhanced_test_filtering,
         "repair_mode": get_repair_mode(kept_candidates),
         "original_test_identifiers": get_original_test_identifiers(instance),
         "original_status_counts": original_status_counts,
@@ -8990,6 +9120,22 @@ def build_parser() -> ArgumentParser:
         help=(
             "Hide the official SWE-bench test patch from source-code repair prompts. "
             "Final validation still uses the original test patch."
+        ),
+    )
+    parser.add_argument(
+        "--disable_semantic_bucket_guidance",
+        action="store_true",
+        help=(
+            "Ablation: disable semantic-bucket guidance and bucket-diversity enforcement during "
+            "enhanced test idea generation."
+        ),
+    )
+    parser.add_argument(
+        "--disable_enhanced_test_filtering",
+        action="store_true",
+        help=(
+            "Ablation: use generated enhanced test candidates without semantic alignment or "
+            "buggy-code reproduction filtering. Invalid diffs and duplicate test names are still discarded."
         ),
     )
     parser.add_argument(
@@ -9261,6 +9407,8 @@ def main() -> None:
             max_candidate_attempts=args.max_candidate_attempts,
             baseline_only=args.baseline_only,
             hide_original_test_patch_in_repair=args.hide_original_test_patch_in_repair,
+            disable_semantic_bucket_guidance=args.disable_semantic_bucket_guidance,
+            disable_enhanced_test_filtering=args.disable_enhanced_test_filtering,
         )
         summaries.append(summary)
         print(

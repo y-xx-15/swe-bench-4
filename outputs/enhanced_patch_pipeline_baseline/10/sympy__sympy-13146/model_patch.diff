@@ -1,0 +1,30 @@
+--- a/sympy/core/operations.py
++++ b/sympy/core/operations.py
+@@ -116,6 +116,27 @@
+         does not define its own flatten routine."""
+         # apply associativity, no commutativity property is used
+         new_seq = []
++        fractional_powers = {}
++        while seq:
++            o = seq.pop()
++            if o.__class__ is cls:  # classes must match exactly
++                seq.extend(o.args)
++            else:
++                # Check for fractional powers and combine equivalent terms
++                if o.is_Pow and o.exp.is_Rational:
++                    base, exp = o.base, o.exp
++                    if (base, exp) in fractional_powers:
++                        fractional_powers[(base, exp)] += o.coeff
++                    else:
++                        fractional_powers[(base, exp)] = o.coeff
++                else:
++                    new_seq.append(o)
++        # Add combined fractional powers back to the sequence
++        for (base, exp), coeff in fractional_powers.items():
++            if coeff != 0:
++                new_seq.append(coeff * base**exp)
++        # c_part, nc_part, order_symbols
++        return [], new_seq, None
+         while seq:
+             o = seq.pop()
+             if o.__class__ is cls:  # classes must match exactly

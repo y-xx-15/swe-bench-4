@@ -1,0 +1,20 @@
+{
+  "title": "Handle undefined expressions in substitution",
+  "approach": "Modify the substitution logic in `Mul.flatten` to detect and handle cases where the substituted value leads to undefined expressions, such as division by zero. Ensure that the result is marked as undefined or handled using mathematical limits.",
+  "edit_targets": [
+    "sympy/core/mul.py::Mul.flatten"
+  ],
+  "dependency_files": [
+    "sympy/core/mul.py",
+    "sympy/core/tests/test_arit.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing `Mul.flatten` should be sufficient to address the issue, as it directly handles substitution logic. However, validation through tests in `test_arit.py` is necessary to ensure correctness.",
+  "risks": [
+    "Potential regression in substitution behavior for valid expressions."
+  ]
+}

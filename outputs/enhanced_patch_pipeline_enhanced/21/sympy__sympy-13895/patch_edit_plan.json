@@ -1,0 +1,40 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/numbers.py",
+      "action": "modify_region",
+      "justification": "The Float._eval_power method directly handles fractional powers of negative numbers and contains the incorrect logic that leads to inequivalent simplifications. This must be updated to correctly handle complex results when necessary."
+    },
+    {
+      "target_file": "sympy/core/numbers.py",
+      "action": "modify_region",
+      "justification": "The Number._eval_power method is a base class method for power evaluation and propagates incorrect assumptions about negative bases. This must be updated to ensure correct handling of fractional powers."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/numbers.py",
+      "target_symbol": "Float._eval_power",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_issue_13890::core",
+        "test_powers_Integer::core"
+      ],
+      "anchor_line_before": "        if self == 0:",
+      "anchor_line_after": "            if expt.is_positive:",
+      "replacement_block": "        if self == 0:\n            if expt.is_positive:\n                return S.Zero\n            if expt.is_negative:\n                return Float('inf')\n        if isinstance(expt, Number):\n            if isinstance(expt, Integer):\n                prec = self._prec\n                return Float._new(\n                    mlib.mpf_pow_int(self._mpf_, expt.p, prec, rnd), prec)\n            if isinstance(expt, Rational):\n                if self.is_negative and expt.q % 2 == 1:\n                    # Handle fractional powers of negative numbers explicitly\n                    base = -self\n                    return Pow(S.NegativeOne, expt, evaluate=False) * base._eval_power(expt)\n                else:\n                    return Float._new(\n                        mlib.mpf_pow(self._mpf_, expt._to_mpf(), self._prec, rnd), self._prec)\n        return Pow(self, expt, evaluate=False)"
+    },
+    {
+      "target_file": "sympy/core/numbers.py",
+      "target_symbol": "Number._eval_power",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_issue_13890::core",
+        "test_powers_Integer::core"
+      ],
+      "anchor_line_before": "        if self == 0:",
+      "anchor_line_after": "            if expt.is_positive:",
+      "replacement_block": "        if self == 0:\n            if expt.is_positive:\n                return S.Zero\n            if expt.is_negative:\n                return Float('inf')\n        if isinstance(expt, Number):\n            if isinstance(expt, Integer):\n                return self**expt\n            if isinstance(expt, Rational):\n                if self.is_negative and expt.q % 2 == 1:\n                    # Handle fractional powers of negative numbers explicitly\n                    base = -self\n                    return Pow(S.NegativeOne, expt, evaluate=False) * base._eval_power(expt)\n                else:\n                    return Pow(self, expt, evaluate=False)\n        return Pow(self, expt, evaluate=False)"
+    }
+  ]
+}

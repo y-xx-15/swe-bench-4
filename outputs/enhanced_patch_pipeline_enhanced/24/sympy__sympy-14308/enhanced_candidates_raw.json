@@ -1,0 +1,254 @@
+[
+  {
+    "idea": {
+      "title": "test vector pretty printing with invalid unicode baseline",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the failure mode where vector pretty printing produces incorrect unicode baselines, triggering a ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_pretty_print_unicode_baseline"
+      ],
+      "covers_original_tests": [
+        "test_pretty_print_unicode"
+      ],
+      "covers_obligations": [
+        "test_pretty_print_unicode::upretty"
+      ],
+      "target_source_symbol": "sympy.vector.tests.test_printing.upretty",
+      "target_validation_subject": "unicode_baseline",
+      "semantic_alignment_tokens": [
+        "upretty",
+        "baseline",
+        "unicode",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "CoordSys3D",
+        "upretty",
+        "baseline",
+        "unicode"
+      ],
+      "rationale": "This test directly targets the failure mode observed in test_pretty_print_unicode, focusing on the incorrect unicode baseline alignment for vector pretty printing. It differs from the original test by isolating the baseline misalignment as the trigger shape and reproducing the ValueError explicitly."
+    },
+    "patch": "diff --git a/sympy/vector/tests/test_printing.py b/sympy/vector/tests/test_printing.py\n--- a/sympy/vector/tests/test_printing.py\n+++ b/sympy/vector/tests/test_printing.py\n@@ -135,0 +136,10 @@\n+def test_sweb_enhanced_pretty_print_unicode_baseline():\n+    A = CoordSys3D('A')\n+    expr = (A.i + A.j + A.k) * (A.x / A.y)\n+    \n+    expected_unicode = u(\"\"\"\\\n+⎛A_x⎞ (A_i + A_j + A_k)\\n\\\n+⎜───⎟                \\n\\\n+⎝A_y⎠                \\\n+\"\"\")\n+    assert upretty(expr) == expected_unicode\n",
+    "raw_response": "```diff\ndiff --git a/sympy/vector/tests/test_printing.py b/sympy/vector/tests/test_printing.py\n--- a/sympy/vector/tests/test_printing.py\n+++ b/sympy/vector/tests/test_printing.py\n@@ -135,0 +136,10 @@\n+def test_sweb_enhanced_pretty_print_unicode_baseline():\n+    A = CoordSys3D('A')\n+    expr = (A.i + A.j + A.k) * (A.x / A.y)\n+    \n+    expected_unicode = u(\"\"\"\\\n+⎛A_x⎞ (A_i + A_j + A_k)\\n\\\n+⎜───⎟                \\n\\\n+⎝A_y⎠                \\\n+\"\"\")\n+    assert upretty(expr) == expected_unicode\n```",
+    "identifiers": [
+      "test_sweb_enhanced_pretty_print_unicode_baseline"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_pretty_print_unicode_baseline"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "validate_valueerror_in_test_issue_12675",
+      "semantic_bucket": "direct_symptom",
+      "goal": "ensure that the ValueError is correctly raised when invalid input is passed to the test_issue_12675 function",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_validate_valueerror_in_test_issue_12675"
+      ],
+      "covers_original_tests": [
+        "test_issue_12675"
+      ],
+      "covers_obligations": [
+        "test_issue_12675::core"
+      ],
+      "target_source_symbol": "test_issue_12675",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "valueerror",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "valueerror",
+        "assertionerror"
+      ],
+      "rationale": "This test directly reproduces the failure observed in test_issue_12675 by passing an input that triggers the ValueError. It aligns with the original failure path and exception semantics, ensuring the bug is exposed in the same context as the original failure."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -323,0 +323,10 @@\n+def test_sweb_enhanced_validate_valueerror_in_test_issue_12675():\n+    from sympy.vector import CoordSys3D\n+    from sympy import symbols\n+    x, y, t = symbols('x y t')\n+    e = CoordSys3D('e')\n+\n+    try:\n+        upretty((x / y)**t * e.j, use_unicode=False)  # Invalid input boundary\n+    except ValueError as ve:\n+        assert \"Name node can't be used with 'False' constant\" in str(ve)\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -323,0 +323,10 @@\n+def test_sweb_enhanced_validate_valueerror_in_test_issue_12675():\n+    from sympy.vector import CoordSys3D\n+    from sympy import symbols\n+    x, y, t = symbols('x y t')\n+    e = CoordSys3D('e')\n+\n+    try:\n+        upretty((x / y)**t * e.j, use_unicode=False)  # Invalid input boundary\n+    except ValueError as ve:\n+        assert \"Name node can't be used with 'False' constant\" in str(ve)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_validate_valueerror_in_test_issue_12675"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_validate_valueerror_in_test_issue_12675"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test vector pretty printing baseline alignment",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress baseline misalignment in vector pretty printing",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_vector_baseline_alignment"
+      ],
+      "covers_original_tests": [
+        "test_pretty_print_unicode"
+      ],
+      "covers_obligations": [
+        "test_pretty_print_unicode::upretty_v_8"
+      ],
+      "target_source_symbol": "sympy.vector.tests.test_printing.test_pretty_print_unicode",
+      "target_validation_subject": "upretty_v_8",
+      "semantic_alignment_tokens": [
+        "upretty(",
+        "baseline",
+        "CoordSys3D",
+        "Vector"
+      ],
+      "trigger_shape_tokens": [
+        "CoordSys3D",
+        "Vector",
+        "baseline",
+        "upretty("
+      ],
+      "rationale": "This idea directly targets the baseline misalignment issue observed in the original failure path for 'test_pretty_print_unicode::upretty_v_8'. It reproduces the bug by constructing a vector expression with the same shape and triggering the failure through the 'upretty' function. Unlike the original test, which may have focused on broader pretty printing issues, this test isolates the baseline alignment problem for vectors, providing more specific repair guidance."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -323,0 +323,8 @@\n+def test_sweb_enhanced_vector_baseline_alignment():\n+    from sympy.vector import CoordSys3D\n+    from sympy import symbols, Integral, Function\n+    a, b = symbols('a b')\n+    N = CoordSys3D('N')\n+    f = Function('f')\n+    expr = N.j - (Integral(f(b)) - N.x**2)*N.k\n+    assert upretty(expr) == u(\"N_j + ⎛   2   ⌠        ⎞ N_k\\n      ⎜N_x  - ⎮ f(b) db⎟    \\n      ⎝       ⌡        ⎠    \")\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -323,0 +323,8 @@\n+def test_sweb_enhanced_vector_baseline_alignment():\n+    from sympy.vector import CoordSys3D\n+    from sympy import symbols, Integral, Function\n+    a, b = symbols('a b')\n+    N = CoordSys3D('N')\n+    f = Function('f')\n+    expr = N.j - (Integral(f(b)) - N.x**2)*N.k\n+    assert upretty(expr) == u(\"N_j + ⎛   2   ⌠        ⎞ N_k\\n      ⎜N_x  - ⎮ f(b) db⎟    \\n      ⎝       ⌡        ⎠    \")\n```",
+    "identifiers": [
+      "test_sweb_enhanced_vector_baseline_alignment"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_vector_baseline_alignment"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test vector pretty printing with invalid unicode baseline alignment",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect baseline alignment of unicode pretty printing for vectors, reproducing the observed ValueError and AssertionError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_pretty_unicode_baseline"
+      ],
+      "covers_original_tests": [
+        "test_pretty_print_unicode"
+      ],
+      "covers_obligations": [
+        "test_pretty_print_unicode::upretty_v_11"
+      ],
+      "target_source_symbol": "sympy.vector.tests.test_printing.upretty",
+      "target_validation_subject": "unicode_baseline_alignment",
+      "semantic_alignment_tokens": [
+        "upretty",
+        "unicode",
+        "baseline",
+        "ValueError",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "upretty",
+        "unicode",
+        "baseline",
+        "ValueError",
+        "AssertionError"
+      ],
+      "rationale": "This idea directly reproduces the bug observed in test_pretty_print_unicode by focusing on the incorrect baseline alignment for unicode pretty printing of vectors. It differs from the original test by isolating the specific obligation related to upretty_v_11, ensuring the failure signal is tied to the unicode baseline alignment issue rather than general vector printing."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -323,0 +323,8 @@\n+def test_sweb_enhanced_pretty_unicode_baseline():\n+    from sympy.vector import CoordSys3D\n+    from sympy import symbols\n+    x, y = symbols('x y')\n+    A = CoordSys3D('A')\n+    expected = u(\"⎛x⎞ A_j\\n⎝y⎠    \")\n+    assert upretty((x / y) * A.j) == expected, \"Unicode baseline alignment is incorrect for vector pretty printing.\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -323,0 +323,8 @@\n+def test_sweb_enhanced_pretty_unicode_baseline():\n+    from sympy.vector import CoordSys3D\n+    from sympy import symbols\n+    x, y = symbols('x y')\n+    A = CoordSys3D('A')\n+    expected = u(\"⎛x⎞ A_j\\n⎝y⎠    \")\n+    assert upretty((x / y) * A.j) == expected, \"Unicode baseline alignment is incorrect for vector pretty printing.\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_pretty_unicode_baseline"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_pretty_unicode_baseline"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test vector dot product pretty printing",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior of pretty printing a vector dot product with specific components that trigger the ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_vector_dot_pretty"
+      ],
+      "covers_original_tests": [
+        "test_pretty_print_unicode"
+      ],
+      "covers_obligations": [
+        "test_pretty_print_unicode::upretty_d_7"
+      ],
+      "target_source_symbol": "sympy.vector.Vector.__or__",
+      "target_validation_subject": "dot_product_pretty_print",
+      "semantic_alignment_tokens": [
+        "upretty",
+        "dot product",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "upretty",
+        "dot product",
+        "N.i",
+        "N.k"
+      ],
+      "rationale": "This test specifically targets the pretty printing of a vector dot product involving components that trigger the ValueError. It differs from the original test by focusing on the downstream behavior of the dot product pretty printing, ensuring that the bug is exposed through this specific operation."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -323,0 +323,11 @@\n+def test_sweb_enhanced_vector_dot_pretty():\n+    from sympy.vector import CoordSys3D\n+    from sympy.core.compatibility import u_decode as u\n+\n+    N = CoordSys3D('N')\n+    expr = N.i | N.k\n+\n+    expected = u(\"(N_i|N_k)\")\n+    assert upretty(expr) == expected, f\"Pretty printing failed for dot product: {upretty(expr)}\"\n+\n+    # This test ensures the bug in pretty printing of vector dot products is exposed.\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -323,0 +323,11 @@\n+def test_sweb_enhanced_vector_dot_pretty():\n+    from sympy.vector import CoordSys3D\n+    from sympy.core.compatibility import u_decode as u\n+\n+    N = CoordSys3D('N')\n+    expr = N.i | N.k\n+\n+    expected = u(\"(N_i|N_k)\")\n+    assert upretty(expr) == expected, f\"Pretty printing failed for dot product: {upretty(expr)}\"\n+\n+    # This test ensures the bug in pretty printing of vector dot products is exposed.\n```",
+    "identifiers": [
+      "test_sweb_enhanced_vector_dot_pretty"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_vector_dot_pretty"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

@@ -1,0 +1,256 @@
+[
+  {
+    "instance_id": "sympy__sympy-13773",
+    "repo": "sympy/sympy",
+    "model": "gpt-4o",
+    "pipeline_mode": "enhanced_guided",
+    "hide_original_test_patch_in_repair": false,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "enhanced_guided",
+    "original_test_identifiers": [
+      "test_matmul"
+    ],
+    "original_status_counts": {
+      "FAILED": 13,
+      "PASSED": 69,
+      "ERROR": 12
+    },
+    "original_failed_count": 25,
+    "original_passed_count": 69,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_matmul"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_matmul"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/matrices/tests/test_commonmatrix.py:test_applyfunc",
+        "sympy/matrices/tests/test_commonmatrix.py:test_refine",
+        "sympy/matrices/tests/test_commonmatrix.py:test_multiplication",
+        "sympy/matrices/tests/test_commonmatrix.py:test_matmul",
+        "sympy/matrices/tests/test_commonmatrix.py:test_div"
+      ],
+      "failure_mode": "type_error",
+      "dominant_errors": [
+        "TypeError",
+        "MatrixError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_matmul E",
+        "___________ sympy/matrices/tests/test_commonmatrix.py:test_applyfunc ___________",
+        "____________ sympy/matrices/tests/test_commonmatrix.py:test_refine _____________"
+      ],
+      "noise_ratio": 0.0276,
+      "target_test_tracebacks": {
+        "test_matmul": "TARGET TEST: test_matmul\n- snippet: test_matmul E\n- snippet: ___________ sympy/matrices/tests/test_commonmatrix.py:test_applyfunc ___________\n- snippet: ____________ sympy/matrices/tests/test_commonmatrix.py:test_refine _____________\n- dominant_errors: TypeError, MatrixError\nWEAK TRACEBACK CONTEXT:\ntest_matmul E\n    raises(TypeError, lambda: a*{})\n    raises(TypeError, lambda: a*{})\n____________ sympy/matrices/tests/test_commonmatrix.py:test_matmul _____________\n  File \"/testbed/sympy/matrices/tests/test_commonmatrix.py\", line 680, in test_matmul\n    raises(MatrixError, lambda: m.diagonalize(reals_only=True))\n    raises(MatrixError, lambda: m.diagonalize(reals_only=True))\n    raises(TypeError, lambda: M*v)\n    raises(TypeError, lambda: M*v)"
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 7,
+      "keep_top_k": 4,
+      "attempt_budget": 4,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "type_error",
+      "noise_ratio": 0.0276,
+      "difficulty": "high"
+    },
+    "adaptive_num_candidates": 7,
+    "adaptive_keep_top_k": 4,
+    "adaptive_attempt_budget": 4,
+    "enhanced_candidates_total": 7,
+    "kept_enhanced_candidates": 1,
+    "enhanced_candidate_retention_rate": 0.14285714285714285,
+    "enhanced_generation_attempts_total": 28,
+    "enhanced_generation_attempts_avg": 4.0,
+    "kept_enhanced_test_identifiers": [
+      "test_sweb_enhanced_scalar_operand_matmul"
+    ],
+    "enhanced_failed_test_identifiers": [
+      "test_sweb_enhanced_scalar_operand_matmul"
+    ],
+    "enhanced_failed_count": 1,
+    "generated_patch_nonempty": false,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 4,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_not_generated",
+    "generated_patch_feedback": null,
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The `__matmul__` method currently delegates to `__mul__`, which does not enforce matrix-specific constraints. This allows scalar operands to be treated as valid inputs for matrix multiplication, contrary to expected behavior.",
+      "affected_components": [
+        {
+          "file": "sympy/matrices/common.py",
+          "symbol": "MatrixArithmetic",
+          "reason": "This class provides the `__matmul__` method, which is incorrectly implemented to allow scalar operands."
+        },
+        {
+          "file": "sympy/matrices/tests/test_commonmatrix.py",
+          "symbol": "test_matmul",
+          "reason": "This test case explicitly checks for invalid scalar operands and expects a `TypeError`, which is currently not raised."
+        }
+      ],
+      "failing_signal": "The test `test_matmul` fails because scalar operands are incorrectly allowed in matrix multiplication, leading to unexpected results instead of raising a `TypeError`.",
+      "propagation_path": "The `__matmul__` method in `MatrixArithmetic` directly calls `__mul__`, which does not validate the types of operands. This allows scalars to be treated as valid inputs, leading to incorrect results and test failures.",
+      "repair_constraint": "The `__matmul__` method must ensure that both operands are matrices and raise a `TypeError` if this condition is not met. Existing valid matrix-matrix multiplication behavior must remain unaffected.",
+      "suggested_repair_scope": [
+        "sympy/matrices/common.py",
+        "sympy/matrices/tests/test_commonmatrix.py"
+      ],
+      "suspicious_symbols": [
+        "__matmul__",
+        "__mul__",
+        "test_matmul"
+      ],
+      "repair_obligations": [
+        {
+          "id": "test_matmul::core",
+          "source_symbol": "test_matmul",
+          "validation_subject": "core",
+          "why_it_matters": "The test explicitly validates that scalar operands should raise a `TypeError` when used with the `@` operator. Fixing this ensures compliance with expected matrix behavior."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Restrict __matmul__ to matrix operands",
+      "approach": "Modify the `__matmul__` method in the `MatrixArithmetic` class to validate that both operands are matrices. If either operand is not a matrix, raise a `TypeError`. This ensures compliance with expected matrix multiplication behavior.",
+      "edit_targets": [
+        "sympy/matrices/common.py::MatrixArithmetic.__matmul__"
+      ],
+      "dependency_files": [
+        "sympy/matrices/tests/test_commonmatrix.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [
+        "negative_gating",
+        "top_of_function_side_path"
+      ],
+      "sufficiency_assessment": "Editing the `__matmul__` method in `MatrixArithmetic` is sufficient to enforce the matrix-only constraint for the `@` operator. No changes are required in other methods or classes, as the validation logic will be localized to this method.",
+      "risks": [
+        "Potential regressions if existing code relies on scalar operands being allowed in `@`. Ensure thorough testing to confirm no unintended side effects."
+      ]
+    },
+    "patch_edit_plan": null,
+    "final_patch_attempted": false,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": false,
+    "final_patch_apply_mode": "no_patch",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 13,
+      "PASSED": 69,
+      "ERROR": 12
+    },
+    "final_failed_count": 25,
+    "final_passed_count": 69,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/matrices/tests/test_commonmatrix.py:test_applyfunc": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_refine": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_multiplication": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_matmul": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_div": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_eigenvects": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_left_eigenvects": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_diagonalize": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_is_diagonalizable": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_jordan_form": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_jacobian2": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_limit": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_issue_13774": "FAILED",
+      "test__MinimalMatrix": "PASSED",
+      "test_vec": "PASSED",
+      "test_tolist": "PASSED",
+      "test_row_col_del": "PASSED",
+      "test_get_diag_blocks1": "PASSED",
+      "test_get_diag_blocks2": "PASSED",
+      "test_shape": "PASSED",
+      "test_reshape": "PASSED",
+      "test_row_col": "PASSED",
+      "test_row_join": "PASSED",
+      "test_col_join": "PASSED",
+      "test_row_insert": "PASSED",
+      "test_col_insert": "PASSED",
+      "test_extract": "PASSED",
+      "test_hstack": "PASSED",
+      "test_vstack": "PASSED",
+      "test_atoms": "PASSED",
+      "test_free_symbols": "PASSED",
+      "test_has": "PASSED",
+      "test_is_anti_symmetric": "PASSED",
+      "test_diagonal_symmetrical": "PASSED",
+      "test_is_hermitian": "PASSED",
+      "test_is_Identity": "PASSED",
+      "test_is_symbolic": "PASSED",
+      "test_is_upper": "PASSED",
+      "test_is_lower": "PASSED",
+      "test_is_square": "PASSED",
+      "test_is_symmetric": "PASSED",
+      "test_is_hessenberg": "PASSED",
+      "test_is_zero": "PASSED",
+      "test_values": "PASSED",
+      "test_applyfunc": "ERROR",
+      "test_adjoint": "PASSED",
+      "test_as_real_imag": "PASSED",
+      "test_conjugate": "PASSED",
+      "test_doit": "PASSED",
+      "test_evalf": "PASSED",
+      "test_expand": "PASSED",
+      "test_refine": "ERROR",
+      "test_replace": "PASSED",
+      "test_replace_map": "PASSED",
+      "test_simplify": "PASSED",
+      "test_subs": "PASSED",
+      "test_trace": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_permute": "PASSED",
+      "test_abs": "PASSED",
+      "test_add": "PASSED",
+      "test_multiplication": "ERROR",
+      "test_matmul": "ERROR",
+      "test_power": "PASSED",
+      "test_neg": "PASSED",
+      "test_sub": "PASSED",
+      "test_div": "ERROR",
+      "test_det": "PASSED",
+      "test_adjugate": "PASSED",
+      "test_cofactor_and_minors": "PASSED",
+      "test_charpoly": "PASSED",
+      "test_row_op": "PASSED",
+      "test_col_op": "PASSED",
+      "test_is_echelon": "PASSED",
+      "test_echelon_form": "PASSED",
+      "test_rref": "PASSED",
+      "test_eye": "PASSED",
+      "test_ones": "PASSED",
+      "test_zeros": "PASSED",
+      "test_diag": "PASSED",
+      "test_jordan_block": "PASSED",
+      "test_columnspace": "PASSED",
+      "test_rowspace": "PASSED",
+      "test_nullspace": "PASSED",
+      "test_eigenvals": "PASSED",
+      "test_eigenvects": "ERROR",
+      "test_left_eigenvects": "ERROR",
+      "test_diagonalize": "ERROR",
+      "test_is_diagonalizable": "ERROR",
+      "test_jordan_form": "ERROR",
+      "test_singular_values": "PASSED",
+      "test_integrate": "PASSED",
+      "test_jacobian2": "ERROR",
+      "test_limit": "ERROR"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

@@ -1,0 +1,347 @@
+[
+  {
+    "idea": {
+      "title": "validate_apart_with_nontrivial_expression",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the assertion error caused by incorrect handling of apart decomposition for specific symbolic expressions",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_apart_assertion_error"
+      ],
+      "covers_original_tests": [
+        "test_div"
+      ],
+      "covers_obligations": [
+        "test_div::core"
+      ],
+      "target_source_symbol": "sympy.polys.partfrac.apart",
+      "target_validation_subject": "apart decomposition logic",
+      "semantic_alignment_tokens": [
+        "apart(",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "apart(",
+        "symbols(",
+        "real=True",
+        "negative=False"
+      ],
+      "rationale": "This test directly exercises the apart decomposition logic with a nontrivial symbolic expression that reproduces the assertion error observed in the original failure. It differs from the original test by explicitly targeting the decomposition of a symbolic expression with specific properties (real=True, negative=False) and ensuring that the assertion error is triggered in the same context. This provides additional repair guidance by isolating the failure to the apart decomposition logic."
+    },
+    "patch": "diff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,8 @@\n+def test_sweb_enhanced_apart_assertion_error():\n+    from sympy import symbols, apart\n+    a = symbols('a', real=True)\n+    t = symbols('t', real=True, negative=False)\n+    expr = a * (-t + (-t + 1) * (2 * t - 1)) / (2 * t - 1)\n+    result = apart(expr)\n+    assert result == a * (-t + 1/2 - 1/(2 * (2 * t - 1))), \"Incorrect apart decomposition result\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,8 @@\n+def test_sweb_enhanced_apart_assertion_error():\n+    from sympy import symbols, apart\n+    a = symbols('a', real=True)\n+    t = symbols('t', real=True, negative=False)\n+    expr = a * (-t + (-t + 1) * (2 * t - 1)) / (2 * t - 1)\n+    result = apart(expr)\n+    assert result == a * (-t + 1/2 - 1/(2 * (2 * t - 1))), \"Incorrect apart decomposition result\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_apart_assertion_error"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_apart_assertion_error"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_div_apart_assertion_error",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the assertion error caused by incorrect handling of symbolic expressions in apart decomposition",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_apart_assertion_error"
+      ],
+      "covers_original_tests": [
+        "test_div"
+      ],
+      "covers_obligations": [
+        "test_div::core"
+      ],
+      "target_source_symbol": "sympy.polys.partfrac.apart",
+      "target_validation_subject": "apart decomposition with symbolic input",
+      "semantic_alignment_tokens": [
+        "apart(",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "apart(",
+        "symbolic",
+        "assertionerror"
+      ],
+      "rationale": "This test directly exercises the same API path and exception semantics as the original failure in 'test_div', focusing on the assertion error triggered by symbolic input in the apart decomposition. It differs from the original test by isolating the symbolic decomposition case to provide more precise repair guidance."
+    },
+    "patch": "diff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,7 @@\n+def test_sweb_enhanced_apart_symbolic_input():\n+    from sympy.polys.partfrac import apart\n+    from sympy import symbols\n+    x, y = symbols('x y')\n+    expr = (x + y) / (x - y)\n+    result = apart(expr, x)\n+    assert result == 1 + (2 * y) / (x - y)\n",
+    "raw_response": "```diff\ndiff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,7 @@\n+def test_sweb_enhanced_apart_symbolic_input():\n+    from sympy.polys.partfrac import apart\n+    from sympy import symbols\n+    x, y = symbols('x y')\n+    expr = (x + y) / (x - y)\n+    result = apart(expr, x)\n+    assert result == 1 + (2 * y) / (x - y)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_apart_symbolic_input"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_apart_symbolic_input"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_apart_with_nested_subs",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the behavior of apart when handling nested substitutions with symbolic expressions",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_nested_subs_apart"
+      ],
+      "covers_original_tests": [
+        "test_div"
+      ],
+      "covers_obligations": [
+        "test_div::core"
+      ],
+      "target_source_symbol": "sympy.polys.partfrac.apart",
+      "target_validation_subject": "apart decomposition with nested substitutions",
+      "semantic_alignment_tokens": [
+        "apart",
+        "subs",
+        "symbolic",
+        "nested"
+      ],
+      "trigger_shape_tokens": [
+        "apart",
+        "subs",
+        "symbolic",
+        "nested"
+      ],
+      "rationale": "This test introduces a nested substitution scenario that exercises apart's handling of symbolic expressions in a more complex context. It differs from the original test by explicitly chaining substitutions before invoking apart, which stresses a downstream behavioral consequence of the bug."
+    },
+    "patch": "diff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,10 @@\n+def test_sweb_enhanced_nested_subs_apart():\n+    from sympy import symbols\n+    from sympy.polys.partfrac import apart\n+\n+    a, t = symbols('a t', real=True)\n+    expr = a * (-t + (-t + 1) * (2 * t - 1)) / (2 * t - 1)\n+    substituted_expr = expr.subs(a, 1)\n+    result = apart(substituted_expr)\n+\n+    assert result == -t + 1/2 - 1/(2*(2*t - 1))\n",
+    "raw_response": "```diff\ndiff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,10 @@\n+def test_sweb_enhanced_nested_subs_apart():\n+    from sympy import symbols\n+    from sympy.polys.partfrac import apart\n+\n+    a, t = symbols('a t', real=True)\n+    expr = a * (-t + (-t + 1) * (2 * t - 1)) / (2 * t - 1)\n+    substituted_expr = expr.subs(a, 1)\n+    result = apart(substituted_expr)\n+\n+    assert result == -t + 1/2 - 1/(2*(2*t - 1))\n```",
+    "identifiers": [
+      "test_sweb_enhanced_nested_subs_apart"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_nested_subs_apart"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_apart_behavioral_consequence",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior of apart when applied to a symbolic expression with nested terms, ensuring correct partial fraction decomposition",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_apart_behavioral_consequence"
+      ],
+      "covers_original_tests": [
+        "test_div"
+      ],
+      "covers_obligations": [
+        "test_div::core"
+      ],
+      "target_source_symbol": "sympy.polys.partfrac.apart",
+      "target_validation_subject": "partial_fraction_decomposition",
+      "semantic_alignment_tokens": [
+        "apart(",
+        "partial fraction",
+        "symbolic expression"
+      ],
+      "trigger_shape_tokens": [
+        "nested terms",
+        "symbolic coefficients",
+        "apart("
+      ],
+      "rationale": "This test exercises a downstream behavior of the apart function by applying it to a symbolic expression with nested terms. It differs from the original test by focusing on the correctness of the decomposition result rather than the immediate assertion error. This provides additional repair guidance by verifying the functional correctness of the decomposition output."
+    },
+    "patch": "diff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,10 @@\n+def test_sweb_enhanced_apart_behavioral_consequence():\n+    from sympy.polys.partfrac import apart\n+    from sympy import symbols\n+\n+    a, b, x = symbols('a b x', real=True)\n+    expr = a * (x + b) / (x**2 + b*x + b**2)\n+    result = apart(expr)\n+\n+    expected = a / (x + b)  # Correct partial fraction decomposition\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,10 @@\n+def test_sweb_enhanced_apart_behavioral_consequence():\n+    from sympy.polys.partfrac import apart\n+    from sympy import symbols\n+\n+    a, b, x = symbols('a b x', real=True)\n+    expr = a * (x + b) / (x**2 + b*x + b**2)\n+    result = apart(expr)\n+\n+    expected = a / (x + b)  # Correct partial fraction decomposition\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_apart_behavioral_consequence"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_apart_behavioral_consequence"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_apart_behavioral_consequence",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior of apart when handling symbolic expressions with nested substitutions, ensuring it produces consistent results across equivalent forms",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_apart_nested_substitution"
+      ],
+      "covers_original_tests": [
+        "test_div"
+      ],
+      "covers_obligations": [
+        "test_div::core"
+      ],
+      "target_source_symbol": "sympy.polys.partfrac.apart",
+      "target_validation_subject": "apart_nested_substitution",
+      "semantic_alignment_tokens": [
+        "apart",
+        "subs",
+        "symbolic",
+        "nested"
+      ],
+      "trigger_shape_tokens": [
+        "apart(",
+        "subs(",
+        "symbolic"
+      ],
+      "rationale": "This test idea differs from the original failure by focusing on a downstream behavioral consequence of the bug. Specifically, it verifies that nested symbolic substitutions combined with `apart` yield consistent results, which is not directly tested in the original `test_div`. This adds new repair guidance by highlighting how the bug impacts symbolic manipulation workflows."
+    },
+    "patch": "diff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,12 @@\n+def test_sweb_enhanced_apart_nested_substitution():\n+    from sympy import symbols\n+    from sympy.polys.partfrac import apart\n+\n+    a, t = symbols('a t', real=True)\n+    t = symbols('t', real=True, negative=False)\n+    expr = a * (-t + (-t + 1) * (2 * t - 1)) / (2 * t - 1)\n+\n+    result = apart(expr.subs(a, 1).subs(t, 1/2))\n+    expected = 1/2\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,12 @@\n+def test_sweb_enhanced_apart_nested_substitution():\n+    from sympy import symbols\n+    from sympy.polys.partfrac import apart\n+\n+    a, t = symbols('a t', real=True)\n+    t = symbols('t', real=True, negative=False)\n+    expr = a * (-t + (-t + 1) * (2 * t - 1)) / (2 * t - 1)\n+\n+    result = apart(expr.subs(a, 1).subs(t, 1/2))\n+    expected = 1/2\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_apart_nested_substitution"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_apart_nested_substitution"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_apart_with_nested_substitution",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior of apart when applied to an expression with nested substitutions",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_nested_apart"
+      ],
+      "covers_original_tests": [
+        "test_div"
+      ],
+      "covers_obligations": [
+        "test_div::core"
+      ],
+      "target_source_symbol": "sympy.polys.partfrac.apart",
+      "target_validation_subject": "nested_substitution_behavior",
+      "semantic_alignment_tokens": [
+        "apart(",
+        "subs(",
+        "nested"
+      ],
+      "trigger_shape_tokens": [
+        "apart(",
+        "subs(",
+        "nested"
+      ],
+      "rationale": "This test exercises a downstream behavioral consequence of the bug by applying apart to an expression that involves nested substitutions. It differs from the original test by focusing on how apart handles the transformed structure of the expression, rather than the direct failure symptom. This adds repair guidance by revealing whether the fix correctly propagates through nested transformations."
+    },
+    "patch": "diff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,12 @@\n+def test_sweb_enhanced_nested_apart():\n+    from sympy import symbols\n+    from sympy.polys.partfrac import apart\n+\n+    a = symbols('a', real=True)\n+    t = symbols('t', real=True, negative=False)\n+    expr = a * (-t + (-t + 1) * (2 * t - 1)) / (2 * t - 1)\n+\n+    # Apply substitution and apart\n+    result = apart(expr.subs(a, 1), t)\n+    expected = -t + 1/2 - 1/(2*(2*t - 1))\n+    assert result == expected\n",
+    "raw_response": "```diff\ndiff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,12 @@\n+def test_sweb_enhanced_nested_apart():\n+    from sympy import symbols\n+    from sympy.polys.partfrac import apart\n+\n+    a = symbols('a', real=True)\n+    t = symbols('t', real=True, negative=False)\n+    expr = a * (-t + (-t + 1) * (2 * t - 1)) / (2 * t - 1)\n+\n+    # Apply substitution and apart\n+    result = apart(expr.subs(a, 1), t)\n+    expected = -t + 1/2 - 1/(2*(2*t - 1))\n+    assert result == expected\n```",
+    "identifiers": [
+      "test_sweb_enhanced_nested_apart"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_nested_apart"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_apart_with_nested_substitution",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior of the apart function when applied to an expression with nested substitutions",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_nested_apart"
+      ],
+      "covers_original_tests": [
+        "test_div"
+      ],
+      "covers_obligations": [
+        "test_div::core"
+      ],
+      "target_source_symbol": "sympy.polys.partfrac.apart",
+      "target_validation_subject": "nested substitution handling in apart",
+      "semantic_alignment_tokens": [
+        "apart(",
+        "subs(",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "apart(",
+        "subs(",
+        "assertionerror"
+      ],
+      "rationale": "This test idea focuses on a downstream behavioral consequence of the bug by introducing nested substitutions before calling apart. The original test directly applied apart to a single expression, but this test adds complexity by chaining substitutions, which may expose additional edge cases in the apart logic. This provides new repair guidance by highlighting how nested substitutions interact with the apart function."
+    },
+    "patch": "diff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,8 @@\n+def test_sweb_enhanced_nested_apart():\n+    from sympy import symbols\n+    from sympy.polys.partfrac import apart\n+\n+    a, t = symbols('a t', real=True)\n+    expr = a * (-t + (-t + 1) * (2 * t - 1)) / (2 * t - 1)\n+    result = apart(expr.subs(a, 1).subs(t, 1/2))\n+    assert result == -1/2, f\"Expected -1/2, got {result}\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/polys/tests/test_polytools.py b/sympy/polys/tests/test_polytools.py\n--- a/sympy/polys/tests/test_polytools.py\n+++ b/sympy/polys/tests/test_polytools.py\n@@ -237,0 +237,8 @@\n+def test_sweb_enhanced_nested_apart():\n+    from sympy import symbols\n+    from sympy.polys.partfrac import apart\n+\n+    a, t = symbols('a t', real=True)\n+    expr = a * (-t + (-t + 1) * (2 * t - 1)) / (2 * t - 1)\n+    result = apart(expr.subs(a, 1).subs(t, 1/2))\n+    assert result == -1/2, f\"Expected -1/2, got {result}\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_nested_apart"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_nested_apart"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

@@ -1,0 +1,15 @@
+```diff
+diff --git a/sympy/integrals/intpoly.py b/sympy/integrals/intpoly.py
+--- a/sympy/integrals/intpoly.py
++++ b/sympy/integrals/intpoly.py
+@@ -1012,7 +1012,8 @@ def decompose(expr, separate=False):
+                return [monom[1] for monom in degrees]
+            else:
+                for monom in degrees:
+-                    degree, term = monom
++                    degrees.sort(key=lambda monom: (monom[0], str(monom[1])))
++                    degree, term = monom
+                    if poly_dict.get(degree):
+                        poly_dict[degree] += term
+                    else:
+```

@@ -1,0 +1,469 @@
+[
+  {
+    "idea": {
+      "title": "evalf simplification mismatch",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect simplification behavior when evalf is applied to expressions with fractional exponents",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_evalf_simplify"
+      ],
+      "covers_original_tests": [
+        "test_evalf_bugs"
+      ],
+      "covers_obligations": [
+        "test_evalf_bugs::core"
+      ],
+      "target_source_symbol": "sympy.core.tests.test_evalf.test_evalf_bugs",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "evalf(",
+        "simplify(",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "evalf(",
+        "fractional exponent"
+      ],
+      "rationale": "This test directly reproduces the original failure by constructing an expression with fractional exponents and applying evalf followed by simplify. It aligns with the original failure path by targeting the evalf simplification behavior and triggering the same assertion error observed in the original test."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +204,7 @@\n+def test_sweb_enhanced_evalf_simplify():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = expr1 - expr2\n+    simplified_result = simplify(result.evalf(5))\n+    assert simplified_result == 0, f\"Expected 0, but got {simplified_result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +204,7 @@\n+def test_sweb_enhanced_evalf_simplify():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = expr1 - expr2\n+    simplified_result = simplify(result.evalf(5))\n+    assert simplified_result == 0, f\"Expected 0, but got {simplified_result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_evalf_simplify"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_evalf_simplify"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_evalf_simplify"
+    ],
+    "eval_status_map": {
+      "sympy/core/tests/test_evalf.py:test_evalf_logs": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_trig": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_ramanujan": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_bugs": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_integer_parts": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_issue_4956_5204": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_issue_4806": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_mul": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_AssocOp_Function": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_sweb_enhanced_evalf_simplify": "FAILED",
+      "test_evalf_helpers": "PASSED",
+      "test_evalf_basic": "PASSED",
+      "test_cancellation": "PASSED",
+      "test_evalf_powers": "PASSED",
+      "test_evalf_rump": "PASSED",
+      "test_evalf_complex": "PASSED",
+      "test_evalf_complex_powers": "PASSED",
+      "test_evalf_exponentiation": "PASSED",
+      "test_evalf_complex_cancellation": "PASSED",
+      "test_evalf_logs": "ERROR",
+      "test_evalf_trig": "ERROR",
+      "test_evalf_near_integers": "PASSED",
+      "test_evalf_ramanujan": "ERROR",
+      "test_evalf_bugs": "ERROR",
+      "test_evalf_integer_parts": "ERROR",
+      "test_evalf_trig_zero_detection": "PASSED",
+      "test_evalf_sum": "PASSED",
+      "test_evalf_divergent_series": "PASSED",
+      "test_evalf_product": "PASSED",
+      "test_evalf_py_methods": "PASSED",
+      "test_evalf_power_subs_bugs": "PASSED",
+      "test_evalf_arguments": "PASSED",
+      "test_implemented_function_evalf": "PASSED",
+      "test_evaluate_false": "PASSED",
+      "test_evalf_relational": "PASSED",
+      "test_issue_5486": "PASSED",
+      "test_issue_5486_bug": "PASSED",
+      "test_bugs": "PASSED",
+      "test_subs": "PASSED",
+      "test_issue_4956_5204": "ERROR",
+      "test_old_docstring": "PASSED",
+      "test_issue_4806": "ERROR",
+      "test_evalf_mul": "ERROR",
+      "test_scaled_zero": "PASSED",
+      "test_chop_value": "PASSED",
+      "test_infinities": "PASSED",
+      "test_to_mpmath": "PASSED",
+      "test_issue_6632_evalf": "PASSED",
+      "test_issue_4945": "PASSED",
+      "test_evalf_integral": "PASSED",
+      "test_issue_8821_highprec_from_str": "PASSED",
+      "test_issue_8853": "PASSED",
+      "test_issue_9326": "PASSED",
+      "test_issue_10323": "PASSED",
+      "test_AssocOp_Function": "ERROR",
+      "test_issue_10395": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_evalf_bugs"
+    ],
+    "covered_obligations": [
+      "test_evalf_bugs::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "simplify_exponent_evaluation_bug",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the failure to simplify equivalent exponent expressions during evalf",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_simplify_exponent"
+      ],
+      "covers_original_tests": [
+        "test_evalf_bugs"
+      ],
+      "covers_obligations": [
+        "test_evalf_bugs::core"
+      ],
+      "target_source_symbol": "sympy.core.operations.AssocOp._eval_evalf",
+      "target_validation_subject": "exponent_simplification",
+      "semantic_alignment_tokens": [
+        "evalf(",
+        "simplify(",
+        "AssocOp",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "evalf(",
+        "simplify(",
+        "AssocOp"
+      ],
+      "rationale": "This test directly reproduces the failure mode observed in test_evalf_bugs by constructing an equivalent exponent subtraction scenario that fails to simplify to zero. It differs from the original test by isolating the specific exponentiation simplification obligation within AssocOp._eval_evalf, providing more precise repair guidance."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +205,8 @@\n+def test_sweb_enhanced_simplify_exponent():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = expr1 - expr2\n+    simplified_result = simplify(result.evalf(5))\n+    assert simplified_result == 0, (\n+        f\"Expected simplified result to be 0, but got {simplified_result}\"\n+    )\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +205,8 @@\n+def test_sweb_enhanced_simplify_exponent():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = expr1 - expr2\n+    simplified_result = simplify(result.evalf(5))\n+    assert simplified_result == 0, (\n+        f\"Expected simplified result to be 0, but got {simplified_result}\"\n+    )\n```",
+    "identifiers": [
+      "test_sweb_enhanced_simplify_exponent"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_simplify_exponent"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_simplify_exponent"
+    ],
+    "eval_status_map": {
+      "sympy/core/tests/test_evalf.py:test_evalf_logs": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_trig": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_ramanujan": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_integer_parts": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_issue_4956_5204": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_issue_4806": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_mul": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_AssocOp_Function": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_sweb_enhanced_simplify_exponent": "FAILED",
+      "test_evalf_helpers": "PASSED",
+      "test_evalf_basic": "PASSED",
+      "test_cancellation": "PASSED",
+      "test_evalf_powers": "PASSED",
+      "test_evalf_rump": "PASSED",
+      "test_evalf_complex": "PASSED",
+      "test_evalf_complex_powers": "PASSED",
+      "test_evalf_exponentiation": "PASSED",
+      "test_evalf_complex_cancellation": "PASSED",
+      "test_evalf_logs": "ERROR",
+      "test_evalf_trig": "ERROR",
+      "test_evalf_near_integers": "PASSED",
+      "test_evalf_ramanujan": "ERROR",
+      "test_evalf_bugs": "PASSED",
+      "test_evalf_integer_parts": "ERROR",
+      "test_evalf_trig_zero_detection": "PASSED",
+      "test_evalf_sum": "PASSED",
+      "test_evalf_divergent_series": "PASSED",
+      "test_evalf_product": "PASSED",
+      "test_evalf_py_methods": "PASSED",
+      "test_evalf_power_subs_bugs": "PASSED",
+      "test_evalf_arguments": "PASSED",
+      "test_implemented_function_evalf": "PASSED",
+      "test_evaluate_false": "PASSED",
+      "test_evalf_relational": "PASSED",
+      "test_issue_5486": "PASSED",
+      "test_issue_5486_bug": "PASSED",
+      "test_bugs": "PASSED",
+      "test_subs": "PASSED",
+      "test_issue_4956_5204": "ERROR",
+      "test_old_docstring": "PASSED",
+      "test_issue_4806": "ERROR",
+      "test_evalf_mul": "ERROR",
+      "test_scaled_zero": "PASSED",
+      "test_chop_value": "PASSED",
+      "test_infinities": "PASSED",
+      "test_to_mpmath": "PASSED",
+      "test_issue_6632_evalf": "PASSED",
+      "test_issue_4945": "PASSED",
+      "test_evalf_integral": "PASSED",
+      "test_issue_8821_highprec_from_str": "PASSED",
+      "test_issue_8853": "PASSED",
+      "test_issue_9326": "PASSED",
+      "test_issue_10323": "PASSED",
+      "test_AssocOp_Function": "ERROR",
+      "test_issue_10395": "PASSED"
+    },
+    "generation_attempts": 1,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_evalf_bugs"
+    ],
+    "covered_obligations": [
+      "test_evalf_bugs::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test_evalf_exponentiation_buggy_simplification",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress incorrect simplification behavior in exponentiation leading to assertion_error",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_evalf_exponentiation_bug"
+      ],
+      "covers_original_tests": [
+        "test_evalf_bugs"
+      ],
+      "covers_obligations": [
+        "test_evalf_bugs::core"
+      ],
+      "target_source_symbol": "AssocOp._eval_evalf",
+      "target_validation_subject": "exponentiation_simplification",
+      "semantic_alignment_tokens": [
+        "evalf",
+        "simplify",
+        "exponentiation",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "evalf",
+        "simplify",
+        "AssocOp",
+        "Pow"
+      ],
+      "rationale": "This test focuses on the downstream behavioral consequence of incorrect exponentiation simplification, which leads to assertion errors during evaluation. It differs from the original test by isolating the buggy simplification behavior in a specific exponentiation scenario rather than general evalf failures."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +204,8 @@\n+def test_sweb_enhanced_evalf_exponentiation_bug():\n+    # This test isolates the buggy behavior in exponentiation simplification\n+    # where incorrect handling of fractional powers leads to assertion errors.\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = simplify(expr1 - expr2)\n+    assert result == 0, f\"Expected 0, but got {result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +204,8 @@\n+def test_sweb_enhanced_evalf_exponentiation_bug():\n+    # This test isolates the buggy behavior in exponentiation simplification\n+    # where incorrect handling of fractional powers leads to assertion errors.\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    result = simplify(expr1 - expr2)\n+    assert result == 0, f\"Expected 0, but got {result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_evalf_exponentiation_bug"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_evalf_exponentiation_bug"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_evalf_exponentiation_bug"
+    ],
+    "eval_status_map": {
+      "sympy/core/tests/test_evalf.py:test_evalf_trig": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_ramanujan": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_bugs": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_integer_parts": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_issue_4956_5204": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_issue_4806": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_mul": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_AssocOp_Function": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_sweb_enhanced_evalf_exponentiation_bug": "FAILED",
+      "test_evalf_helpers": "PASSED",
+      "test_evalf_basic": "PASSED",
+      "test_cancellation": "PASSED",
+      "test_evalf_powers": "PASSED",
+      "test_evalf_rump": "PASSED",
+      "test_evalf_complex": "PASSED",
+      "test_evalf_complex_powers": "PASSED",
+      "test_evalf_exponentiation": "PASSED",
+      "test_evalf_complex_cancellation": "PASSED",
+      "test_evalf_logs": "PASSED",
+      "test_evalf_trig": "ERROR",
+      "test_evalf_near_integers": "PASSED",
+      "test_evalf_ramanujan": "ERROR",
+      "test_evalf_bugs": "ERROR",
+      "test_evalf_integer_parts": "ERROR",
+      "test_evalf_trig_zero_detection": "PASSED",
+      "test_evalf_sum": "PASSED",
+      "test_evalf_divergent_series": "PASSED",
+      "test_evalf_product": "PASSED",
+      "test_evalf_py_methods": "PASSED",
+      "test_evalf_power_subs_bugs": "PASSED",
+      "test_evalf_arguments": "PASSED",
+      "test_implemented_function_evalf": "PASSED",
+      "test_evaluate_false": "PASSED",
+      "test_evalf_relational": "PASSED",
+      "test_issue_5486": "PASSED",
+      "test_issue_5486_bug": "PASSED",
+      "test_bugs": "PASSED",
+      "test_subs": "PASSED",
+      "test_issue_4956_5204": "ERROR",
+      "test_old_docstring": "PASSED",
+      "test_issue_4806": "ERROR",
+      "test_evalf_mul": "ERROR",
+      "test_scaled_zero": "PASSED",
+      "test_chop_value": "PASSED",
+      "test_infinities": "PASSED",
+      "test_to_mpmath": "PASSED",
+      "test_issue_6632_evalf": "PASSED",
+      "test_issue_4945": "PASSED",
+      "test_evalf_integral": "PASSED",
+      "test_issue_8821_highprec_from_str": "PASSED",
+      "test_issue_8853": "PASSED",
+      "test_issue_9326": "PASSED",
+      "test_issue_10323": "PASSED",
+      "test_AssocOp_Function": "ERROR",
+      "test_issue_10395": "PASSED"
+    },
+    "generation_attempts": 2,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_evalf_bugs"
+    ],
+    "covered_obligations": [
+      "test_evalf_bugs::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test fractional exponent simplification",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the failure to simplify fractional exponents to zero when they cancel out",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_fractional_exponent_simplification"
+      ],
+      "covers_original_tests": [
+        "test_evalf_bugs"
+      ],
+      "covers_obligations": [
+        "test_evalf_bugs::core"
+      ],
+      "target_source_symbol": "test_evalf_bugs",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "evalf(",
+        "simplify(",
+        "fractional exponent"
+      ],
+      "trigger_shape_tokens": [
+        "evalf(",
+        "simplify(",
+        "fractional exponent"
+      ],
+      "rationale": "This test directly reproduces the original failure by constructing an expression with fractional exponents that should simplify to zero but fails due to the bug. It aligns with the original failure path and exception semantics, providing a minimal and focused reproduction of the bug."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +205,7 @@\n+def test_sweb_enhanced_fractional_exponent_simplification():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    res = expr1 - expr2\n+    simplified_res = simplify(res.evalf(5))\n+    assert simplified_res == 0, f\"Expected 0, but got {simplified_res}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_evalf.py b/sympy/core/tests/test_evalf.py\n--- a/sympy/core/tests/test_evalf.py\n+++ b/sympy/core/tests/test_evalf.py\n@@ -204,0 +205,7 @@\n+def test_sweb_enhanced_fractional_exponent_simplification():\n+    expr1 = S(1)/2 * x**2.5\n+    expr2 = S(1) * x**(S(5)/2) / 2\n+    res = expr1 - expr2\n+    simplified_res = simplify(res.evalf(5))\n+    assert simplified_res == 0, f\"Expected 0, but got {simplified_res}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_fractional_exponent_simplification"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_fractional_exponent_simplification"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_fractional_exponent_simplification"
+    ],
+    "eval_status_map": {
+      "sympy/core/tests/test_evalf.py:test_evalf_trig": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_ramanujan": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_bugs": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_integer_parts": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_issue_4806": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_evalf_mul": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_AssocOp_Function": "FAILED",
+      "sympy/core/tests/test_evalf.py:test_sweb_enhanced_fractional_exponent_simplification": "FAILED",
+      "test_evalf_helpers": "PASSED",
+      "test_evalf_basic": "PASSED",
+      "test_cancellation": "PASSED",
+      "test_evalf_powers": "PASSED",
+      "test_evalf_rump": "PASSED",
+      "test_evalf_complex": "PASSED",
+      "test_evalf_complex_powers": "PASSED",
+      "test_evalf_exponentiation": "PASSED",
+      "test_evalf_complex_cancellation": "PASSED",
+      "test_evalf_logs": "PASSED",
+      "test_evalf_trig": "ERROR",
+      "test_evalf_near_integers": "PASSED",
+      "test_evalf_ramanujan": "ERROR",
+      "test_evalf_bugs": "ERROR",
+      "test_evalf_integer_parts": "ERROR",
+      "test_evalf_trig_zero_detection": "PASSED",
+      "test_evalf_sum": "PASSED",
+      "test_evalf_divergent_series": "PASSED",
+      "test_evalf_product": "PASSED",
+      "test_evalf_py_methods": "PASSED",
+      "test_evalf_power_subs_bugs": "PASSED",
+      "test_evalf_arguments": "PASSED",
+      "test_implemented_function_evalf": "PASSED",
+      "test_evaluate_false": "PASSED",
+      "test_evalf_relational": "PASSED",
+      "test_issue_5486": "PASSED",
+      "test_issue_5486_bug": "PASSED",
+      "test_bugs": "PASSED",
+      "test_subs": "PASSED",
+      "test_issue_4956_5204": "PASSED",
+      "test_old_docstring": "PASSED",
+      "test_issue_4806": "ERROR",
+      "test_evalf_mul": "ERROR",
+      "test_scaled_zero": "PASSED",
+      "test_chop_value": "PASSED",
+      "test_infinities": "PASSED",
+      "test_to_mpmath": "PASSED",
+      "test_issue_6632_evalf": "PASSED",
+      "test_issue_4945": "PASSED",
+      "test_evalf_integral": "PASSED",
+      "test_issue_8821_highprec_from_str": "PASSED",
+      "test_issue_8853": "PASSED",
+      "test_issue_9326": "PASSED",
+      "test_issue_10323": "PASSED",
+      "test_AssocOp_Function": "ERROR",
+      "test_issue_10395": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_evalf_bugs"
+    ],
+    "covered_obligations": [
+      "test_evalf_bugs::core"
+    ]
+  }
+]

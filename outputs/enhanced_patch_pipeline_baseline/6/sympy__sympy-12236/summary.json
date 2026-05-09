@@ -1,0 +1,370 @@
+{
+  "instance_id": "sympy__sympy-12236",
+  "repo": "sympy/sympy",
+  "model": "gpt-4o",
+  "pipeline_mode": "baseline_only",
+  "hide_original_test_patch_in_repair": true,
+  "disable_semantic_bucket_guidance": false,
+  "disable_enhanced_test_filtering": false,
+  "repair_mode": "baseline_fallback",
+  "original_test_identifiers": [
+    "test_div"
+  ],
+  "original_status_counts": {
+    "FAILED": 10,
+    "ERROR": 8,
+    "PASSED": 133
+  },
+  "original_failed_count": 18,
+  "original_passed_count": 133,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_div"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_div"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/polys/tests/test_partfrac.py:test_apart",
+      "sympy/polys/tests/test_partfrac.py:test_apart_extension",
+      "sympy/polys/tests/test_polytools.py:test_sturm",
+      "sympy/polys/tests/test_polytools.py:test_factor",
+      "sympy/polys/tests/test_polytools.py:test_intervals"
+    ],
+    "failure_mode": "assertion_error",
+    "dominant_errors": [
+      "RecursionError",
+      "AssertionError"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "test_div F",
+      "________________ sympy/polys/tests/test_partfrac.py:test_apart _________________",
+      "___________ sympy/polys/tests/test_partfrac.py:test_apart_extension ____________"
+    ],
+    "noise_ratio": 0.0004,
+    "target_test_tracebacks": {
+      "test_div": "TARGET TEST: test_div\n- snippet: test_div F\n- snippet: ________________ sympy/polys/tests/test_partfrac.py:test_apart _________________\n- snippet: ___________ sympy/polys/tests/test_partfrac.py:test_apart_extension ____________\n- dominant_errors: RecursionError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_div F\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded in comparison\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded in comparison\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded in __instancecheck__\nRecursionError: maximum recursion depth exceeded while calling a Python object\n_________________ sympy/polys/tests/test_polytools.py:test_div _________________\n  File \"/testbed/sympy/polys/tests/test_polytools.py\", line 1705, in test_div\nAssertionError\n tests finished: 136 passed, 1 failed, 4 expected to fail, 8 exceptions, "
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 7,
+    "keep_top_k": 4,
+    "attempt_budget": 3,
+    "bucket_limit": 5,
+    "template_limit": 4,
+    "failure_mode": "assertion_error",
+    "noise_ratio": 0.0004,
+    "difficulty": "high"
+  },
+  "adaptive_num_candidates": 7,
+  "adaptive_keep_top_k": 4,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 0,
+  "kept_enhanced_candidates": 0,
+  "enhanced_candidate_retention_rate": 0.0,
+  "enhanced_generation_attempts_total": 0,
+  "enhanced_generation_attempts_avg": 0.0,
+  "kept_enhanced_test_identifiers": [],
+  "enhanced_failed_test_identifiers": [],
+  "enhanced_failed_count": 0,
+  "generated_patch_nonempty": false,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 9,
+  "generated_patch_accepted": false,
+  "generated_patch_acceptance_reason": "rejected_not_generated",
+  "generated_patch_feedback": "The patch did not target the expected file sympy/polys/partfrac.py.",
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [],
+  "patch_analysis": {
+    "root_cause": "The `apart` function does not correctly handle symbolic coefficients when applied to expressions involving multiple variables, leading to incorrect simplifications or recursion errors.",
+    "affected_components": [
+      {
+        "file": "sympy/polys/tests/test_partfrac.py",
+        "symbol": "test_apart",
+        "reason": "This test directly verifies the behavior of the `apart` function and exposes the incorrect result."
+      },
+      {
+        "file": "sympy/polys/tests/test_partfrac.py",
+        "symbol": "test_apart_extension",
+        "reason": "This test checks the `apart` function with extensions, which may also fail due to incorrect handling of symbolic coefficients."
+      },
+      {
+        "file": "sympy/polys/domains/polynomialring.py",
+        "symbol": "PolynomialRing",
+        "reason": "The `PolynomialRing` class is involved in symbolic polynomial operations and may propagate incorrect behavior to the `apart` function."
+      }
+    ],
+    "failing_signal": "The `apart` function produces incorrect results for symbolic coefficients and raises recursion errors in some cases, as indicated by the `RecursionError` and `AssertionError` in the test logs.",
+    "propagation_path": "The bug originates in the symbolic coefficient handling within the `apart` function or its dependencies (e.g., `PolynomialRing`), leading to incorrect simplifications or infinite recursion during partial fraction decomposition.",
+    "repair_constraint": "The `apart` function must correctly handle symbolic coefficients and avoid infinite recursion, ensuring that all tests in `test_partfrac.py` and related modules pass.",
+    "suggested_repair_scope": [
+      "sympy/polys/tests/test_partfrac.py",
+      "sympy/polys/domains/polynomialring.py"
+    ],
+    "suspicious_symbols": [
+      "apart",
+      "PolynomialRing",
+      "from_PolynomialRing",
+      "from_sympy"
+    ],
+    "repair_obligations": [
+      {
+        "id": "obligation_1",
+        "source_symbol": "apart",
+        "validation_subject": "test_apart",
+        "why_it_matters": "The `apart` function must correctly simplify expressions as verified by this test."
+      },
+      {
+        "id": "obligation_2",
+        "source_symbol": "apart",
+        "validation_subject": "test_apart_extension",
+        "why_it_matters": "The `apart` function must handle extensions correctly, as verified by this test."
+      },
+      {
+        "id": "obligation_3",
+        "source_symbol": "PolynomialRing",
+        "validation_subject": "from_PolynomialRing",
+        "why_it_matters": "The `from_PolynomialRing` method is responsible for converting polynomials and may propagate incorrect behavior to `apart`."
+      },
+      {
+        "id": "obligation_4",
+        "source_symbol": "PolynomialRing",
+        "validation_subject": "from_sympy",
+        "why_it_matters": "The `from_sympy` method converts SymPy expressions to polynomial representations, which is critical for the correctness of `apart`."
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Fix apart symbolic coefficient handling",
+    "approach": "Update the `apart` function to correctly handle symbolic coefficients by ensuring proper conversion and decomposition of symbolic expressions. Modify the `from_PolynomialRing` method in `PolynomialRing` to handle symbolic coefficients robustly.",
+    "edit_targets": [
+      "sympy/polys/partfrac.py::apart",
+      "sympy/polys/domains/polynomialring.py::PolynomialRing.from_PolynomialRing"
+    ],
+    "dependency_files": [
+      "sympy/polys/tests/test_partfrac.py",
+      "sympy/polys/tests/test_polytools.py"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [],
+    "sufficiency_assessment": "Editing both `apart` and `from_PolynomialRing` is necessary because the issue involves symbolic coefficient handling during partial fraction decomposition, which relies on the conversion logic in `PolynomialRing`. Test files are included for validation.",
+    "risks": [
+      "Potential regressions in other parts of the codebase that rely on `apart` or `PolynomialRing` for symbolic coefficient handling.",
+      "Performance degradation if the updated logic introduces inefficiencies in symbolic expression processing."
+    ]
+  },
+  "patch_edit_plan": {
+    "coverage_check": [
+      {
+        "target_file": "sympy/polys/partfrac.py",
+        "action": "modify_region",
+        "justification": "The `apart` function is directly responsible for the incorrect handling of symbolic coefficients, as evidenced by the failing tests. It requires modification to ensure correct behavior."
+      },
+      {
+        "target_file": "sympy/polys/domains/polynomialring.py",
+        "action": "modify_region",
+        "justification": "The `PolynomialRing.from_PolynomialRing` method is involved in converting polynomials and symbolic coefficients, which impacts the behavior of the `apart` function. It must be updated to handle symbolic coefficients robustly."
+      }
+    ],
+    "edits": [
+      {
+        "target_file": "sympy/polys/partfrac.py",
+        "target_symbol": "apart",
+        "replacement_mode": "replace_span",
+        "covers_obligations": [
+          "obligation_1",
+          "obligation_2"
+        ],
+        "anchor_line_before": "    if not expr.is_Add:",
+        "anchor_line_after": "    return _apart(expr, x, **options)",
+        "replacement_block": "    if not expr.is_Add:\n        # Ensure symbolic coefficients are handled correctly\n        if expr.has(Symbol):\n            expr = expr.expand()\n    return _apart(expr, x, **options)"
+      },
+      {
+        "target_file": "sympy/polys/domains/polynomialring.py",
+        "target_symbol": "PolynomialRing.from_PolynomialRing",
+        "replacement_mode": "replace_span",
+        "covers_obligations": [
+          "obligation_3",
+          "obligation_4"
+        ],
+        "anchor_line_before": "        try:",
+        "anchor_line_after": "            return a.set_ring(K1.ring)",
+        "replacement_block": "        try:\n            # Handle symbolic coefficients during conversion\n            if a.has(Symbol):\n                a = a.expand()\n            return a.set_ring(K1.ring)"
+      }
+    ]
+  },
+  "final_patch_attempted": false,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": false,
+  "final_patch_apply_mode": "no_patch",
+  "final_patch_cleanly_applied": false,
+  "clean_apply_ratio": 0.0,
+  "resolved": false,
+  "final_resolved": false,
+  "final_status_counts": {
+    "FAILED": 10,
+    "ERROR": 8,
+    "PASSED": 133
+  },
+  "final_failed_count": 18,
+  "final_passed_count": 133,
+  "original_passed_count_improvement": 0,
+  "original_failed_count_reduction": 0,
+  "final_status_map": {
+    "sympy/polys/tests/test_partfrac.py:test_apart": "FAILED",
+    "sympy/polys/tests/test_partfrac.py:test_apart_extension": "FAILED",
+    "sympy/polys/tests/test_polytools.py:test_sturm": "FAILED",
+    "sympy/polys/tests/test_polytools.py:test_factor": "FAILED",
+    "sympy/polys/tests/test_polytools.py:test_intervals": "FAILED",
+    "sympy/polys/tests/test_polytools.py:test_nroots": "FAILED",
+    "sympy/polys/tests/test_polytools.py:test_torational_factor_list": "FAILED",
+    "sympy/polys/tests/test_polytools.py:test_cancel": "FAILED",
+    "sympy/polys/tests/test_polytools.py:test_div": "FAILED",
+    "test_apart": "ERROR",
+    "test_apart_matrix": "PASSED",
+    "test_apart_symbolic": "PASSED",
+    "test_apart_extension": "ERROR",
+    "test_apart_full": "PASSED",
+    "test_apart_undetermined_coeffs": "PASSED",
+    "test_apart_list": "PASSED",
+    "test_assemble_partfrac_list": "PASSED",
+    "test_noncommutative": "PASSED",
+    "test_Poly_from_dict": "PASSED",
+    "test_Poly_from_list": "PASSED",
+    "test_Poly_from_poly": "PASSED",
+    "test_Poly_from_expr": "PASSED",
+    "test_Poly__new__": "PASSED",
+    "test_Poly__args": "PASSED",
+    "test_Poly__gens": "PASSED",
+    "test_Poly_zero": "PASSED",
+    "test_Poly_one": "PASSED",
+    "test_Poly__unify": "PASSED",
+    "test_Poly_free_symbols": "PASSED",
+    "test_PurePoly_free_symbols": "PASSED",
+    "test_Poly__eq__": "PASSED",
+    "test_PurePoly__eq__": "PASSED",
+    "test_PurePoly_Poly": "PASSED",
+    "test_Poly_get_domain": "PASSED",
+    "test_Poly_set_domain": "PASSED",
+    "test_Poly_get_modulus": "PASSED",
+    "test_Poly_set_modulus": "PASSED",
+    "test_Poly_add_ground": "PASSED",
+    "test_Poly_sub_ground": "PASSED",
+    "test_Poly_mul_ground": "PASSED",
+    "test_Poly_quo_ground": "PASSED",
+    "test_Poly_exquo_ground": "PASSED",
+    "test_Poly_abs": "PASSED",
+    "test_Poly_neg": "PASSED",
+    "test_Poly_add": "PASSED",
+    "test_Poly_sub": "PASSED",
+    "test_Poly_mul": "PASSED",
+    "test_Poly_sqr": "PASSED",
+    "test_Poly_pow": "PASSED",
+    "test_Poly_divmod": "PASSED",
+    "test_Poly_eq_ne": "PASSED",
+    "test_Poly_nonzero": "PASSED",
+    "test_Poly_properties": "PASSED",
+    "test_Poly_is_irreducible": "PASSED",
+    "test_Poly_subs": "PASSED",
+    "test_Poly_replace": "PASSED",
+    "test_Poly_reorder": "PASSED",
+    "test_Poly_ltrim": "PASSED",
+    "test_Poly_has_only_gens": "PASSED",
+    "test_Poly_to_ring": "PASSED",
+    "test_Poly_to_field": "PASSED",
+    "test_Poly_to_exact": "PASSED",
+    "test_Poly_retract": "PASSED",
+    "test_Poly_slice": "PASSED",
+    "test_Poly_coeffs": "PASSED",
+    "test_Poly_monoms": "PASSED",
+    "test_Poly_terms": "PASSED",
+    "test_Poly_all_coeffs": "PASSED",
+    "test_Poly_all_monoms": "PASSED",
+    "test_Poly_all_terms": "PASSED",
+    "test_Poly_termwise": "PASSED",
+    "test_Poly_length": "PASSED",
+    "test_Poly_as_dict": "PASSED",
+    "test_Poly_as_expr": "PASSED",
+    "test_Poly_lift": "PASSED",
+    "test_Poly_deflate": "PASSED",
+    "test_Poly_inject": "PASSED",
+    "test_Poly_eject": "PASSED",
+    "test_Poly_exclude": "PASSED",
+    "test_Poly__gen_to_level": "PASSED",
+    "test_Poly_degree": "PASSED",
+    "test_Poly_degree_list": "PASSED",
+    "test_Poly_total_degree": "PASSED",
+    "test_Poly_homogenize": "PASSED",
+    "test_Poly_homogeneous_order": "PASSED",
+    "test_Poly_LC": "PASSED",
+    "test_Poly_TC": "PASSED",
+    "test_Poly_EC": "PASSED",
+    "test_Poly_coeff": "PASSED",
+    "test_Poly_nth": "PASSED",
+    "test_Poly_LM": "PASSED",
+    "test_Poly_LM_custom_order": "PASSED",
+    "test_Poly_EM": "PASSED",
+    "test_Poly_LT": "PASSED",
+    "test_Poly_ET": "PASSED",
+    "test_Poly_max_norm": "PASSED",
+    "test_Poly_l1_norm": "PASSED",
+    "test_Poly_clear_denoms": "PASSED",
+    "test_Poly_rat_clear_denoms": "PASSED",
+    "test_Poly_integrate": "PASSED",
+    "test_Poly_diff": "PASSED",
+    "test_issue_9585": "PASSED",
+    "test_Poly_eval": "PASSED",
+    "test_Poly___call__": "PASSED",
+    "test_parallel_poly_from_expr": "PASSED",
+    "test_pdiv": "PASSED",
+    "test_div": "FAILED",
+    "test_gcdex": "PASSED",
+    "test_revert": "PASSED",
+    "test_subresultants": "PASSED",
+    "test_resultant": "PASSED",
+    "test_discriminant": "PASSED",
+    "test_dispersion": "PASSED",
+    "test_gcd_list": "PASSED",
+    "test_lcm_list": "PASSED",
+    "test_gcd": "PASSED",
+    "test_gcd_numbers_vs_polys": "PASSED",
+    "test_terms_gcd": "PASSED",
+    "test_trunc": "PASSED",
+    "test_monic": "PASSED",
+    "test_content": "PASSED",
+    "test_primitive": "PASSED",
+    "test_compose": "PASSED",
+    "test_shift": "PASSED",
+    "test_transform": "PASSED",
+    "test_sturm": "ERROR",
+    "test_gff": "PASSED",
+    "test_sqf_norm": "PASSED",
+    "test_sqf": "PASSED",
+    "test_factor": "ERROR",
+    "test_factor_large": "PASSED",
+    "test_intervals": "ERROR",
+    "test_refine_root": "PASSED",
+    "test_count_roots": "PASSED",
+    "test_Poly_root": "PASSED",
+    "test_real_roots": "PASSED",
+    "test_all_roots": "PASSED",
+    "test_nroots": "ERROR",
+    "test_ground_roots": "PASSED",
+    "test_nth_power_roots_poly": "PASSED",
+    "test_torational_factor_list": "ERROR",
+    "test_cancel": "ERROR",
+    "test_reduced": "PASSED",
+    "test_groebner": "PASSED",
+    "test_fglm": "PASSED",
+    "test_is_zero_dimensional": "PASSED",
+    "test_GroebnerBasis": "PASSED",
+    "test_poly": "PASSED",
+    "test_keep_coeff": "PASSED",
+    "test_to_rational_coeffs": "PASSED",
+    "test_factor_terms": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

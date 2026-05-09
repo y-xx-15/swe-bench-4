@@ -1,0 +1,12 @@
+diff --git a/sympy/core/numbers.py b/sympy/core/numbers.py
+--- a/sympy/core/numbers.py
++++ b/sympy/core/numbers.py
+@@ -1230,7 +1230,7 @@
+             elif isinstance(expt, Rational) and \
+                     expt.p == 1 and expt.q % 2 and self.is_negative:
+                 return Pow(S.NegativeOne, expt, evaluate=False)*(
+-                    -self)._eval_power(expt)
++                    -self)._eval_power(expt) if expt.q % 2 else (-self)**expt
+         return Pow(self, expt, evaluate=False)
+ 
+     def __eq__(self, other):

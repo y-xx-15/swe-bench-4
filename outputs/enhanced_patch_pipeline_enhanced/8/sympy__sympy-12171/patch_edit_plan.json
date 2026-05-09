@@ -1,0 +1,33 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/mathematica.py",
+      "action": "modify_region",
+      "justification": "The `MCodePrinter` class is responsible for converting Python expressions into Mathematica code. Adding `_print_Derivative` and `_print_Float` methods is necessary to handle derivatives and floats correctly, as the current implementation lacks these methods."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/mathematica.py",
+      "target_symbol": "MCodePrinter._print_Derivative",
+      "replacement_mode": "insert_after_anchor",
+      "covers_obligations": [
+        "test_Derivative::core"
+      ],
+      "anchor_line_before": "    _not_supported = set()",
+      "anchor_line_after": "    def __init__(self, settings={}):",
+      "replacement_block": "    _not_supported = set()\n\n    def _print_Derivative(self, expr):\n        return \"D[%s]\" % (self.stringify(expr.args, \", \"))\n"
+    },
+    {
+      "target_file": "sympy/printing/mathematica.py",
+      "target_symbol": "MCodePrinter._print_Float",
+      "replacement_mode": "insert_after_anchor",
+      "covers_obligations": [
+        "test_Derivative::core"
+      ],
+      "anchor_line_before": "    _not_supported = set()",
+      "anchor_line_after": "    def __init__(self, settings={}):",
+      "replacement_block": "    _not_supported = set()\n\n    def _print_Float(self, expr):\n        res = str(expr)\n        return res.replace('e', '*^')\n"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "original_test_identifiers": [
+    "test_sinc"
+  ],
+  "active_fail_to_pass_identifiers": [],
+  "inactive_fail_to_pass_identifiers": [
+    "test_sinc"
+  ],
+  "failing_tests_sample": [],
+  "failure_mode": "generic_failure",
+  "dominant_errors": [],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [],
+  "noise_ratio": 0.0248,
+  "target_test_tracebacks": {
+    "test_sinc": "TARGET TEST: test_sinc"
+  }
+}

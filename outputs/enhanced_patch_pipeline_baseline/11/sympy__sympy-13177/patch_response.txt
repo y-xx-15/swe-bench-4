@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/mod.py",
+      "action": "modify_region",
+      "justification": "The `Mod.eval` method is directly responsible for the incorrect behavior due to missing validation for integer bases. This file must be edited to add the necessary validation logic."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/mod.py",
+      "target_symbol": "Mod.eval",
+      "replacement_mode": "insert_before_anchor",
+      "covers_obligations": [
+        "obligation_1"
+      ],
+      "anchor_line_before": "            if (p == q or p == -q or",
+      "anchor_line_after": "                    p.is_Pow and p.exp.is_Integer and p.base == q or",
+      "replacement_block": "            if not p.is_integer:\n                return None\n\n            if (p == q or p == -q or"
+    }
+  ]
+}

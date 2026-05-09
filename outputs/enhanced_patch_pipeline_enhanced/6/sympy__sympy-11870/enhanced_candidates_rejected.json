@@ -1,0 +1,57 @@
+[
+  {
+    "idea": {
+      "title": "test_sweb_enhanced_sinc_identity_behavioral",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream behavior of trigsimp failing to simplify exponential-to-sinc identity",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_sinc_identity_behavioral"
+      ],
+      "covers_original_tests": [
+        "test_sinc"
+      ],
+      "covers_obligations": [
+        "test_sinc::core"
+      ],
+      "target_source_symbol": "sympy.functions.elementary.trigonometric.trigsimp",
+      "target_validation_subject": "simplification_identity",
+      "semantic_alignment_tokens": [
+        "trigsimp",
+        "sinc",
+        "sin",
+        "exp"
+      ],
+      "trigger_shape_tokens": [
+        "exp",
+        "I",
+        "k",
+        "trigsimp"
+      ],
+      "rationale": "This test focuses on the downstream behavioral consequence of the bug by verifying the failure of trigsimp to simplify the exponential-to-sinc identity. Unlike the original test, which directly asserts the expected output, this test highlights the broader impact of the bug on mathematical simplifications involving sinc identities."
+    },
+    "patch": "diff --git a/sympy/functions/elementary/tests/test_trigonometric.py b/sympy/functions/elementary/tests/test_trigonometric.py\n--- a/sympy/functions/elementary/tests/test_trigonometric.py\n+++ b/sympy/functions/elementary/tests/test_trigonometric.py\n@@ -236,0 +236,8 @@\n+def test_sweb_enhanced_sinc_identity_behavioral():\n+    from sympy import I, exp, symbols, trigsimp, sin, sinc\n+    k = symbols('k', real=True)\n+    f = 1 / (2 * k) * (-I * exp(I * k) + I * exp(-I * k))\n+    simplified = trigsimp(f)\n+    expected = sinc(k)\n+    assert simplified == expected, f\"Expected {expected}, but got {simplified}. This indicates trigsimp failed to simplify the exponential-to-sinc identity.\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/elementary/tests/test_trigonometric.py b/sympy/functions/elementary/tests/test_trigonometric.py\n--- a/sympy/functions/elementary/tests/test_trigonometric.py\n+++ b/sympy/functions/elementary/tests/test_trigonometric.py\n@@ -236,0 +236,8 @@\n+def test_sweb_enhanced_sinc_identity_behavioral():\n+    from sympy import I, exp, symbols, trigsimp, sin, sinc\n+    k = symbols('k', real=True)\n+    f = 1 / (2 * k) * (-I * exp(I * k) + I * exp(-I * k))\n+    simplified = trigsimp(f)\n+    expected = sinc(k)\n+    assert simplified == expected, f\"Expected {expected}, but got {simplified}. This indicates trigsimp failed to simplify the exponential-to-sinc identity.\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sinc_identity_behavioral"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sinc_identity_behavioral"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_sinc is not semantically aligned with its original failure path. Expected source symbol 'test_sinc' and alignment tokens ['assertionerror'], but the current content targets 'sympy.functions.elementary.trigonometric.trigsimp' with tokens ['trigsimp', 'sinc', 'sin', 'exp']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_sinc"
+    ],
+    "covered_obligations": [
+      "test_sinc::core"
+    ]
+  }
+]

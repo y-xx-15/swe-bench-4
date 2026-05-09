@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/integrals/intpoly.py",
+      "action": "modify_region",
+      "justification": "The `decompose` function directly returns an unordered list of monomials when `separate=True`, causing test failures. This behavior must be fixed by sorting the list deterministically."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/integrals/intpoly.py",
+      "target_symbol": "decompose",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_decompose::core"
+      ],
+      "anchor_line_before": "        return list(poly_dict.values())",
+      "anchor_line_after": "    return poly_dict",
+      "replacement_block": "        return sorted(poly_dict.values(), key=lambda monom: (monom.as_expr().as_ordered_terms(), monom))\n    return poly_dict"
+    }
+  ]
+}

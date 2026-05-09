@@ -1,0 +1,35 @@
+{
+  "original_test_identifiers": [
+    "test_mod",
+    "test_mod_inverse"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_mod"
+  ],
+  "inactive_fail_to_pass_identifiers": [
+    "test_mod_inverse"
+  ],
+  "failing_tests_sample": [
+    "sympy/core/tests/test_numbers.py:test_powers_Integer",
+    "sympy/core/tests/test_numbers.py:test_powers_Rational",
+    "sympy/core/tests/test_numbers.py:test_mod",
+    "test_mod",
+    "test_powers_Integer"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "RecursionError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_mod F",
+    "test_powers_Integer E",
+    "test_mod_inverse ok"
+  ],
+  "noise_ratio": 0.0014,
+  "target_test_tracebacks": {
+    "test_mod": "TARGET TEST: test_mod\n- snippet: test_mod F\n- snippet: test_powers_Integer E\n- snippet: test_mod_inverse ok\n- dominant_errors: RecursionError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_mod F\ntest_mod_inverse ok\nRecursionError: maximum recursion depth exceeded in comparison\nRecursionError: maximum recursion depth exceeded in comparison\n__________________ sympy/core/tests/test_numbers.py:test_mod ___________________\n  File \"/testbed/sympy/core/tests/test_numbers.py\", line 132, in test_mod\nAssertionError\n tests finished: 78 passed, 1 failed, 1 expected to fail, 2 exceptions, ",
+    "test_mod_inverse": "TARGET TEST: test_mod_inverse\n- snippet: test_mod F\n- snippet: test_powers_Integer E\n- snippet: test_mod_inverse ok\n- dominant_errors: RecursionError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_mod_inverse ok\nRecursionError: maximum recursion depth exceeded in comparison\nRecursionError: maximum recursion depth exceeded in comparison\nAssertionError\n tests finished: 78 passed, 1 failed, 1 expected to fail, 2 exceptions, "
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "original_test_identifiers": [
+    "test_col_insert"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_col_insert"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/matrices/tests/test_commonmatrix.py:test_refine",
+    "sympy/matrices/tests/test_commonmatrix.py:test_jacobian2",
+    "sympy/matrices/tests/test_commonmatrix.py:test_limit",
+    "sympy/matrices/tests/test_commonmatrix.py:test_col_insert",
+    "test_col_insert"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_col_insert F",
+    "____________ sympy/matrices/tests/test_commonmatrix.py:test_refine _____________",
+    "___________ sympy/matrices/tests/test_commonmatrix.py:test_jacobian2 ___________"
+  ],
+  "noise_ratio": 0.0194,
+  "target_test_tracebacks": {
+    "test_col_insert": "TARGET TEST: test_col_insert\n- snippet: test_col_insert F\n- snippet: ____________ sympy/matrices/tests/test_commonmatrix.py:test_refine _____________\n- snippet: ___________ sympy/matrices/tests/test_commonmatrix.py:test_jacobian2 ___________\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_col_insert F\n__________ sympy/matrices/tests/test_commonmatrix.py:test_col_insert ___________\n  File \"/testbed/sympy/matrices/tests/test_commonmatrix.py\", line 204, in test_col_insert\nAssertionError\n tests finished: 76 passed, 1 failed, 1 expected to fail, 3 exceptions, "
+  }
+}

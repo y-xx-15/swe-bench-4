@@ -1,0 +1,346 @@
+[
+  {
+    "idea": {
+      "title": "Piecewise with overlapping conditions",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the behavior of the LaTeX printer when handling a Piecewise expression with overlapping conditions, which may trigger a ValueError or incorrect output",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_Piecewise_overlap"
+      ],
+      "covers_original_tests": [
+        "test_latex_Piecewise"
+      ],
+      "covers_obligations": [
+        "test_latex_Piecewise::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_Piecewise",
+      "target_validation_subject": "Piecewise conditions",
+      "semantic_alignment_tokens": [
+        "Piecewise",
+        "conditions",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "Piecewise",
+        "conditions",
+        "overlap"
+      ],
+      "rationale": "This test specifically targets the handling of overlapping conditions in a Piecewise expression, which is distinct from the original test by focusing on a specific edge case that may not have been explicitly tested. It provides additional repair guidance by exposing a concrete failure scenario related to condition validation."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,7 @@\n+def test_sweb_enhanced_Piecewise_overlap():\n+    from sympy import Piecewise, Eq, Symbol\n+    x = Symbol('x')\n+    expr = Piecewise((x**2, Eq(x, 0)), (x**3, Eq(x, 0)), (x, True))\n+    expected = r\"\\begin{cases} x^{2} & \\text{for}\\: x = 0 \\\\x^{3} & \\text{for}\\: x = 0 \\\\x & \\text{otherwise} \\end{cases}\"\n+    assert latex(expr) == expected, \"LaTeX printer failed to handle overlapping conditions in Piecewise\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,8 @@\n+def test_sweb_enhanced_Piecewise_overlap():\n+    from sympy import Piecewise, Eq, Symbol\n+    x = Symbol('x')\n+    expr = Piecewise((x**2, Eq(x, 0)), (x**3, Eq(x, 0)), (x, True))\n+    expected = r\"\\begin{cases} x^{2} & \\text{for}\\: x = 0 \\\\x^{3} & \\text{for}\\: x = 0 \\\\x & \\text{otherwise} \\end{cases}\"\n+    assert latex(expr) == expected, \"LaTeX printer failed to handle overlapping conditions in Piecewise\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Piecewise_overlap"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Piecewise_overlap"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_latex_Piecewise_behavioral_consequence",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream LaTeX output correctness for Piecewise expressions with nested conditions",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_Piecewise_nested_conditions"
+      ],
+      "covers_original_tests": [
+        "test_latex_Piecewise"
+      ],
+      "covers_obligations": [
+        "test_latex_Piecewise::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_Piecewise",
+      "target_validation_subject": "Piecewise LaTeX output",
+      "semantic_alignment_tokens": [
+        "Piecewise(",
+        "latex(",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "Piecewise(",
+        "condition",
+        "ValueError"
+      ],
+      "rationale": "This test extends the original failure by introducing nested conditions in a Piecewise expression, which exercises a downstream behavioral consequence of the bug. The original test only covered simple conditions, while this test ensures that the LaTeX output remains consistent and valid for more complex nested structures, revealing additional repair obligations."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,9 @@\n+def test_sweb_enhanced_Piecewise_nested_conditions():\n+    from sympy import Piecewise, Eq, Symbol\n+    A, B, C = symbols('A B C')\n+    expr = Piecewise(\n+        (A**2, Eq(A, B)),\n+        (Piecewise((B**2, Eq(B, C)), (C**2, True)), True)\n+    )\n+    expected = r\"\\begin{cases} A^{2} & \\text{for}\\: A = B \\\\ \\begin{cases} B^{2} & \\text{for}\\: B = C \\\\ C^{2} & \\text{otherwise} \\end{cases} & \\text{otherwise} \\end{cases}\"\n+    assert latex(expr) == expected\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,9 @@\n+def test_sweb_enhanced_Piecewise_nested_conditions():\n+    from sympy import Piecewise, Eq, Symbol\n+    A, B, C = symbols('A B C')\n+    expr = Piecewise(\n+        (A**2, Eq(A, B)),\n+        (Piecewise((B**2, Eq(B, C)), (C**2, True)), True)\n+    )\n+    expected = r\"\\begin{cases} A^{2} & \\text{for}\\: A = B \\\\ \\begin{cases} B^{2} & \\text{for}\\: B = C \\\\ C^{2} & \\text{otherwise} \\end{cases} & \\text{otherwise} \\end{cases}\"\n+    assert latex(expr) == expected\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Piecewise_nested_conditions"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Piecewise_nested_conditions"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_latex_Piecewise_direct_symptom",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the LaTeX printer's direct failure to handle Piecewise expressions correctly, reproducing the ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_Piecewise_direct_symptom"
+      ],
+      "covers_original_tests": [
+        "test_latex_Piecewise"
+      ],
+      "covers_obligations": [
+        "test_latex_Piecewise::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_Piecewise",
+      "target_validation_subject": "Piecewise",
+      "semantic_alignment_tokens": [
+        "Piecewise",
+        "latex",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "Piecewise",
+        "conditions",
+        "ValueError"
+      ],
+      "rationale": "This test directly targets the LaTeX printer's failure to handle Piecewise expressions, focusing on reproducing the ValueError. Unlike the original test, which may have broader coverage, this test isolates the failure symptom by constructing a minimal Piecewise expression that triggers the bug."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,8 @@\n+def test_sweb_enhanced_Piecewise_direct_symptom():\n+    from sympy import Piecewise, Symbol, latex\n+    x = Symbol('x')\n+    p = Piecewise((x**2, x > 0), (x + 1, True))\n+    expected = r\"\\begin{cases} x^{2} & \\text{for}\\: x > 0 \\\\x + 1 & \\text{otherwise} \\end{cases}\"\n+    assert latex(p) == expected, \"LaTeX printer failed to handle Piecewise correctly\"\n+    # This assertion should fail on the buggy code due to incorrect LaTeX formatting\n+    # and pass after the fix.\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,8 @@\n+def test_sweb_enhanced_Piecewise_direct_symptom():\n+    from sympy import Piecewise, Symbol, latex\n+    x = Symbol('x')\n+    p = Piecewise((x**2, x > 0), (x + 1, True))\n+    expected = r\"\\begin{cases} x^{2} & \\text{for}\\: x > 0 \\\\x + 1 & \\text{otherwise} \\end{cases}\"\n+    assert latex(p) == expected, \"LaTeX printer failed to handle Piecewise correctly\"\n+    # This assertion should fail on the buggy code due to incorrect LaTeX formatting\n+    # and pass after the fix.\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Piecewise_direct_symptom"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Piecewise_direct_symptom"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_latex_Piecewise_direct_symptom",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the exact ValueError raised when LaTeX printer encounters an unsupported Piecewise structure",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_Piecewise_direct_symptom"
+      ],
+      "covers_original_tests": [
+        "test_latex_Piecewise"
+      ],
+      "covers_obligations": [
+        "test_latex_Piecewise::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_Piecewise",
+      "target_validation_subject": "Piecewise structure validation",
+      "semantic_alignment_tokens": [
+        "Piecewise",
+        "ValueError",
+        "latex"
+      ],
+      "trigger_shape_tokens": [
+        "Piecewise",
+        "conditions",
+        "ValueError"
+      ],
+      "rationale": "This test directly targets the failure mode where the LaTeX printer raises a ValueError for unsupported Piecewise structures. It differs from the original test by isolating the specific validation subject (Piecewise structure) and ensuring the exact ValueError is triggered, providing a more focused signal for repair."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,7 @@\n+def test_sweb_enhanced_Piecewise_invalid_condition():\n+    # Test to trigger ValueError for invalid Piecewise condition\n+    p = Piecewise((x**2, x > 0), (x + 1, \"invalid_condition\"))\n+    try:\n+        latex(p)\n+    except ValueError as e:\n+        assert \"Name node can't be used with 'False' constant\" in str(e)\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,7 @@\n+def test_sweb_enhanced_Piecewise_invalid_condition():\n+    # Test to trigger ValueError for invalid Piecewise condition\n+    p = Piecewise((x**2, x > 0), (x + 1, \"invalid_condition\"))\n+    try:\n+        latex(p)\n+    except ValueError as e:\n+        assert \"Name node can't be used with 'False' constant\" in str(e)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Piecewise_invalid_condition"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Piecewise_invalid_condition"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_latex_Piecewise_direct_symptom",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the exact ValueError raised when the LaTeX printer encounters an unsupported Piecewise structure",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_latex_Piecewise_direct_symptom"
+      ],
+      "covers_original_tests": [
+        "test_latex_Piecewise"
+      ],
+      "covers_obligations": [
+        "test_latex_Piecewise::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_Piecewise",
+      "target_validation_subject": "Piecewise structure handling",
+      "semantic_alignment_tokens": [
+        "Piecewise",
+        "ValueError",
+        "latex"
+      ],
+      "trigger_shape_tokens": [
+        "Piecewise",
+        "conditions",
+        "ValueError"
+      ],
+      "rationale": "This idea directly targets the failure symptom by constructing a Piecewise expression with unsupported conditions, ensuring the ValueError is raised as observed in the original failure. Unlike the original test, this focuses on the exact exception type and message alignment, providing precise repair guidance."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,8 @@\n+def test_sweb_enhanced_latex_Piecewise_direct_symptom():\n+    from sympy import Piecewise, Symbol, Eq\n+    x = Symbol('x')\n+    expr = Piecewise((x + 1, Eq(x, 0)), (x**2, False))  # Invalid condition 'False'\n+    try:\n+        latex(expr)\n+    except ValueError as e:\n+        assert \"Name node can't be used with 'False' constant\" in str(e)\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,8 @@\n+def test_sweb_enhanced_latex_Piecewise_direct_symptom():\n+    from sympy import Piecewise, Symbol, Eq\n+    x = Symbol('x')\n+    expr = Piecewise((x + 1, Eq(x, 0)), (x**2, False))  # Invalid condition 'False'\n+    try:\n+        latex(expr)\n+    except ValueError as e:\n+        assert \"Name node can't be used with 'False' constant\" in str(e)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_latex_Piecewise_direct_symptom"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_latex_Piecewise_direct_symptom"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_latex_Piecewise_value_error_on_invalid_piece",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the behavior of the LaTeX printer when handling invalid or malformed Piecewise expressions, ensuring it raises the correct ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_invalid_piecewise"
+      ],
+      "covers_original_tests": [
+        "test_latex_Piecewise"
+      ],
+      "covers_obligations": [
+        "test_latex_Piecewise::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_Piecewise",
+      "target_validation_subject": "Piecewise expression",
+      "semantic_alignment_tokens": [
+        "Piecewise",
+        "latex",
+        "valueerror"
+      ],
+      "trigger_shape_tokens": [
+        "Piecewise(",
+        "ExprCondPair",
+        "ValueError"
+      ],
+      "rationale": "This test directly targets the same failure path as the original test_latex_Piecewise by constructing a malformed Piecewise expression that triggers the ValueError. Unlike the original test, which may have focused on valid inputs, this test ensures the printer correctly handles invalid cases, exposing a distinct validation obligation."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,8 @@\n+def test_sweb_enhanced_invalid_piecewise():\n+    from sympy import Piecewise, Symbol, latex\n+    x = Symbol('x')\n+    # Construct a malformed Piecewise expression with an invalid condition\n+    invalid_piecewise = Piecewise((x, True), (x**2, False), (x**3, False))\n+    try:\n+        latex(invalid_piecewise)\n+        assert False, \"Expected ValueError for invalid Piecewise expression, but no error was raised.\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,8 @@\n+def test_sweb_enhanced_invalid_piecewise():\n+    from sympy import Piecewise, Symbol, latex\n+    x = Symbol('x')\n+    # Construct a malformed Piecewise expression with an invalid condition\n+    invalid_piecewise = Piecewise((x, True), (x**2, False), (x**3, False))\n+    try:\n+        latex(invalid_piecewise)\n+        assert False, \"Expected ValueError for invalid Piecewise expression, but no error was raised.\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_invalid_piecewise"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_invalid_piecewise"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_latex_Piecewise_direct_symptom",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the direct failure of LaTeX printer when handling Piecewise expressions with inconsistent formatting or assumptions",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_Piecewise_direct_symptom"
+      ],
+      "covers_original_tests": [
+        "test_latex_Piecewise"
+      ],
+      "covers_obligations": [
+        "test_latex_Piecewise::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_Piecewise",
+      "target_validation_subject": "Piecewise formatting",
+      "semantic_alignment_tokens": [
+        "Piecewise",
+        "latex",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "Piecewise",
+        "Add",
+        "Mul",
+        "latex"
+      ],
+      "rationale": "This idea directly targets the failure symptom by constructing a Piecewise expression with edge-case conditions and assumptions that lead to inconsistent LaTeX output. Unlike the original test, which may focus on broader behavior, this test isolates the specific failure in formatting logic, providing clearer repair guidance."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,7 @@\n+def test_sweb_enhanced_Piecewise_direct_symptom():\n+    from sympy import Piecewise, Eq, Symbol\n+    A, B = symbols('A B')\n+    p = Piecewise((A**2, Eq(A, B)), (A*B, True))\n+    expected = r\"\\begin{cases} A^{2} & \\text{for}\\: A = B \\\\A B & \\text{otherwise} \\end{cases}\"\n+    assert latex(p) == expected\n+    assert latex(A * p) == r\"A \\left(%s\\right)\" % expected\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -188,0 +188,7 @@\n+def test_sweb_enhanced_Piecewise_direct_symptom():\n+    from sympy import Piecewise, Eq, Symbol\n+    A, B = symbols('A B')\n+    p = Piecewise((A**2, Eq(A, B)), (A*B, True))\n+    expected = r\"\\begin{cases} A^{2} & \\text{for}\\: A = B \\\\A B & \\text{otherwise} \\end{cases}\"\n+    assert latex(p) == expected\n+    assert latex(A * p) == r\"A \\left(%s\\right)\" % expected\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Piecewise_direct_symptom"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Piecewise_direct_symptom"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

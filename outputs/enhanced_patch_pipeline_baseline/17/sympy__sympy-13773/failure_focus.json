@@ -1,0 +1,31 @@
+{
+  "original_test_identifiers": [
+    "test_matmul"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_matmul"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/matrices/tests/test_commonmatrix.py:test_applyfunc",
+    "sympy/matrices/tests/test_commonmatrix.py:test_refine",
+    "sympy/matrices/tests/test_commonmatrix.py:test_multiplication",
+    "sympy/matrices/tests/test_commonmatrix.py:test_matmul",
+    "sympy/matrices/tests/test_commonmatrix.py:test_div"
+  ],
+  "failure_mode": "type_error",
+  "dominant_errors": [
+    "TypeError",
+    "MatrixError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_matmul E",
+    "___________ sympy/matrices/tests/test_commonmatrix.py:test_applyfunc ___________",
+    "____________ sympy/matrices/tests/test_commonmatrix.py:test_refine _____________"
+  ],
+  "noise_ratio": 0.0273,
+  "target_test_tracebacks": {
+    "test_matmul": "TARGET TEST: test_matmul\n- snippet: test_matmul E\n- snippet: ___________ sympy/matrices/tests/test_commonmatrix.py:test_applyfunc ___________\n- snippet: ____________ sympy/matrices/tests/test_commonmatrix.py:test_refine _____________\n- dominant_errors: TypeError, MatrixError\nWEAK TRACEBACK CONTEXT:\ntest_matmul E\n    raises(TypeError, lambda: a*{})\n    raises(TypeError, lambda: a*{})\n____________ sympy/matrices/tests/test_commonmatrix.py:test_matmul _____________\n  File \"/testbed/sympy/matrices/tests/test_commonmatrix.py\", line 680, in test_matmul\n    raises(MatrixError, lambda: m.diagonalize(reals_only=True))\n    raises(MatrixError, lambda: m.diagonalize(reals_only=True))\n    raises(TypeError, lambda: M*v)\n    raises(TypeError, lambda: M*v)"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "title": "Enforce __slots__ in inheritance chain",
+  "approach": "Add a `__slots__` declaration to the `Printable` class to ensure that all subclasses, including `Symbol`, inherit the immutability constraint and do not create a `__dict__` attribute.",
+  "edit_targets": [
+    "sympy/core/_print_helpers.py::Printable"
+  ],
+  "dependency_files": [
+    "sympy/core/symbol.py",
+    "sympy/core/tests/test_basic.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating"
+  ],
+  "sufficiency_assessment": "Editing the `Printable` class to include `__slots__` should be sufficient to fix the issue, as it directly addresses the root cause in the inheritance chain. No additional edits to `Symbol` or other classes are required.",
+  "risks": [
+    "Potential unintended side effects on other classes inheriting from `Printable` that may rely on dynamic attributes."
+  ]
+}

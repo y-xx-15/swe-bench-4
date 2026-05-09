@@ -1,0 +1,253 @@
+[
+  {
+    "idea": {
+      "title": "test ccode sinc function unsupported behavior",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the unsupported behavior of ccode when handling the sinc function",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_ccode_sinc"
+      ],
+      "covers_original_tests": [
+        "test_ccode_sinc"
+      ],
+      "covers_obligations": [
+        "test_ccode_sinc::core"
+      ],
+      "target_source_symbol": "sympy.printing.tests.test_ccode.test_ccode_sinc",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "ccode",
+        "sinc"
+      ],
+      "trigger_shape_tokens": [
+        "assertionerror",
+        "ccode",
+        "sinc"
+      ],
+      "rationale": "This test directly reproduces the failure observed in test_ccode_sinc by invoking ccode with the sinc function. It aligns with the original failure path and exception semantics, ensuring the bug signal is preserved while exposing the unsupported behavior of ccode for sinc."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,8 @@\n+def test_sweb_enhanced_ccode_sinc():\n+    from sympy import sinc, Piecewise, sin, Ne\n+    expr = sinc(x)\n+    expected = (\n+        \"((x != 0) ? (\\n\"\n+        \"   sin(x)/x\\n\"\n+        \")\\n\"\n+        \": (\\n   1\\n))\")\n+    assert ccode(expr) == expected\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,8 @@\n+def test_sweb_enhanced_ccode_sinc():\n+    from sympy import sinc, Piecewise, sin, Ne\n+    expr = sinc(x)\n+    expected = (\n+        \"((x != 0) ? (\\n\"\n+        \"   sin(x)/x\\n\"\n+        \")\\n\"\n+        \": (\\n   1\\n))\")\n+    assert ccode(expr) == expected\n```",
+    "identifiers": [
+      "test_sweb_enhanced_ccode_sinc"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_ccode_sinc"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Relational operator assertion in ccode",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the assertion error caused by incorrect handling of Relational operators in ccode",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_Relational"
+      ],
+      "covers_original_tests": [
+        "test_ccode_Relational"
+      ],
+      "covers_obligations": [
+        "test_ccode_Relational::core"
+      ],
+      "target_source_symbol": "sympy.printing.ccode.ccode",
+      "target_validation_subject": "Relational operator handling",
+      "semantic_alignment_tokens": [
+        "ccode(",
+        "Relational(",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "Relational(",
+        "ccode(",
+        "assertionerror"
+      ],
+      "rationale": "This test directly exercises the Relational operator handling in ccode, which is the root cause of the original failure. It reproduces the assertion error observed in test_ccode_Relational by using a Relational expression that triggers the buggy behavior. Unlike the original test, this enhanced test isolates the failure to the specific validation subject, providing clearer guidance for repair."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,8 @@\n+def test_sweb_enhanced_Relational():\n+    from sympy import Eq, Ne\n+    # Test for equality (==) and inequality (!=) handling in ccode\n+    expr_eq = Eq(x, 0)\n+    expr_ne = Ne(x, 0)\n+    assert ccode(expr_eq) == \"x == 0\"\n+    assert ccode(expr_ne) == \"x != 0\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,8 @@\n+def test_sweb_enhanced_Relational():\n+    from sympy import Eq, Ne\n+    # Test for equality (==) and inequality (!=) handling in ccode\n+    expr_eq = Eq(x, 0)\n+    expr_ne = Ne(x, 0)\n+    assert ccode(expr_eq) == \"x == 0\"\n+    assert ccode(expr_ne) == \"x != 0\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Relational"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Relational"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_piecewise_sinc_handling",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream behavior when ccode encounters a Piecewise representation of sinc",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_piecewise_sinc"
+      ],
+      "covers_original_tests": [
+        "test_ccode_sinc"
+      ],
+      "covers_obligations": [
+        "test_ccode_sinc::core"
+      ],
+      "target_source_symbol": "sympy.printing.ccode.ccode",
+      "target_validation_subject": "Piecewise representation of sinc",
+      "semantic_alignment_tokens": [
+        "Piecewise(",
+        "sin(",
+        "theta",
+        "Ne(",
+        "ccode"
+      ],
+      "trigger_shape_tokens": [
+        "Piecewise(",
+        "sin(",
+        "theta",
+        "Ne(",
+        "ccode"
+      ],
+      "rationale": "This test exercises the downstream behavior of ccode when encountering a Piecewise representation of sinc, which is distinct from the original test that directly calls ccode(sinc(x)). It ensures that the bug is exposed in a broader usage scenario involving Piecewise constructs."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,11 @@\n+def test_sweb_enhanced_piecewise_sinc():\n+    from sympy import Piecewise, sin, Ne, symbols\n+    theta = symbols('theta')\n+    expr = Piecewise((sin(theta)/theta, Ne(theta, 0)), (1, True))\n+    expected = (\n+        \"((Ne(theta, 0)) ? (\\n\"\n+        \"   sin(theta)/theta\\n\"\n+        \")\\n\"\n+        \": (\\n\"\n+        \"   1\\n))\")\n+    assert ccode(expr) == expected\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,11 @@\n+def test_sweb_enhanced_piecewise_sinc():\n+    from sympy import Piecewise, sin, Ne, symbols\n+    theta = symbols('theta')\n+    expr = Piecewise((sin(theta)/theta, Ne(theta, 0)), (1, True))\n+    expected = (\n+        \"((Ne(theta, 0)) ? (\\n\"\n+        \"   sin(theta)/theta\\n\"\n+        \")\\n\"\n+        \": (\\n\"\n+        \"   1\\n))\")\n+    assert ccode(expr) == expected\n```",
+    "identifiers": [
+      "test_sweb_enhanced_piecewise_sinc"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_piecewise_sinc"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test ccode sinc function handling",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the buggy behavior of ccode when handling the sinc function",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_ccode_sinc"
+      ],
+      "covers_original_tests": [
+        "test_ccode_sinc"
+      ],
+      "covers_obligations": [
+        "test_ccode_sinc::core"
+      ],
+      "target_source_symbol": "sympy.printing.ccode.ccode",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "ccode",
+        "sinc(",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "ccode",
+        "sinc(",
+        "assertionerror"
+      ],
+      "rationale": "This test directly exercises the ccode function with the sinc function, reproducing the original failure mode (AssertionError). It differs from the original test by explicitly targeting the buggy handling of the sinc function and verifying the correct behavior after the fix."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,9 @@\n+def test_sweb_enhanced_ccode_sinc_zero():\n+    from sympy import sinc\n+    # Test the edge case where the argument to sinc is exactly zero\n+    expr = sinc(0)\n+    assert ccode(expr) == (\n+            \"((0 != 0) ? (\\n\"\n+            \"   sin(0)/0\\n\"\n+            \")\\n\"\n+            \": (\\n   1\\n))\")\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,9 @@\n+def test_sweb_enhanced_ccode_sinc_zero():\n+    from sympy import sinc\n+    # Test the edge case where the argument to sinc is exactly zero\n+    expr = sinc(0)\n+    assert ccode(expr) == (\n+            \"((0 != 0) ? (\\n\"\n+            \"   sin(0)/0\\n\"\n+            \")\\n\"\n+            \": (\\n   1\\n))\")\n```",
+    "identifiers": [
+      "test_sweb_enhanced_ccode_sinc_zero"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_ccode_sinc_zero"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test ccode Piecewise sinc fallback behavior",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the fallback behavior of ccode when encountering unsupported functions like sinc within a Piecewise expression",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_Piecewise_sinc"
+      ],
+      "covers_original_tests": [
+        "test_ccode_Relational",
+        "test_ccode_sinc"
+      ],
+      "covers_obligations": [
+        "test_ccode_Relational::core",
+        "test_ccode_sinc::core"
+      ],
+      "target_source_symbol": "sympy.printing.ccode.ccode",
+      "target_validation_subject": "Piecewise fallback handling",
+      "semantic_alignment_tokens": [
+        "Piecewise(",
+        "sinc(",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "Piecewise(",
+        "sinc(",
+        "ValueError"
+      ],
+      "rationale": "This test exercises the fallback behavior of ccode when unsupported functions like sinc are embedded within a Piecewise expression. Unlike the original tests, which directly call ccode(sinc(x)), this test verifies whether ccode correctly handles unsupported functions within a conditional structure, exposing a distinct repair obligation related to Piecewise handling."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,9 @@\n+def test_sweb_enhanced_Piecewise_sinc():\n+    from sympy import Piecewise, sinc, sin\n+    expr = Piecewise((sinc(x), x < 1), (sin(x), True))\n+    expected = (\n+        \"((x < 1) ? (\\n\"\n+        \"   ((x != 0) ? (\\n\"\n+        \"      sin(x)/x\\n\"\n+        \"   )\\n\"\n+        \"   : (\\n\"\n+        \"      1\\n\"\n+        \"   )))\\n\"\n+        \": (\\n\"\n+        \"   sin(x)\\n\"\n+        \"))\")\n+    assert ccode(expr) == expected\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,9 @@\n+def test_sweb_enhanced_Piecewise_sinc():\n+    from sympy import Piecewise, sinc, sin\n+    expr = Piecewise((sinc(x), x < 1), (sin(x), True))\n+    expected = (\n+        \"((x < 1) ? (\\n\"\n+        \"   ((x != 0) ? (\\n\"\n+        \"      sin(x)/x\\n\"\n+        \"   )\\n\"\n+        \"   : (\\n\"\n+        \"      1\\n\"\n+        \"   )))\\n\"\n+        \": (\\n\"\n+        \"   sin(x)\\n\"\n+        \"))\")\n+    assert ccode(expr) == expected\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Piecewise_sinc"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Piecewise_sinc"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

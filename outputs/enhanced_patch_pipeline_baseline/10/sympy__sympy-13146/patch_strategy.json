@@ -1,0 +1,19 @@
+{
+  "title": "Fix fractional power simplification",
+  "approach": "Enhance the `AssocOp.flatten` method to correctly identify and combine terms with equivalent fractional powers during symbolic operations.",
+  "edit_targets": [
+    "sympy/core/operations.py::AssocOp.flatten"
+  ],
+  "dependency_files": [
+    "sympy/core/tests/test_evalf.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing `AssocOp.flatten` should be sufficient to address the bug since it directly impacts how terms are combined. However, tests in `test_evalf.py` must be inspected to confirm the fix resolves the issue without introducing regressions.",
+  "risks": [
+    "Potential regressions in other symbolic operations that rely on `AssocOp.flatten`, such as addition or multiplication involving fractional powers."
+  ]
+}

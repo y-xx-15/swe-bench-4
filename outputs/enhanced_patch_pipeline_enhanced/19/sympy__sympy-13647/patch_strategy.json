@@ -1,0 +1,19 @@
+{
+  "title": "Fix column insertion misalignment",
+  "approach": "Correct the logic in `_eval_col_insert` to ensure proper alignment of original and inserted columns by adjusting the index calculations.",
+  "edit_targets": [
+    "sympy/matrices/common.py::MatrixShaping._eval_col_insert"
+  ],
+  "dependency_files": [
+    "sympy/matrices/tests/test_commonmatrix.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing `_eval_col_insert` alone should be sufficient to fix the misalignment issue, as this method directly handles the column insertion logic. However, the test file `test_commonmatrix.py` must be referenced to validate the fix against existing and enhanced tests.",
+  "risks": [
+    "Potential regressions in other matrix operations that rely on `_eval_col_insert`, such as `col_join` or `reshape`."
+  ]
+}

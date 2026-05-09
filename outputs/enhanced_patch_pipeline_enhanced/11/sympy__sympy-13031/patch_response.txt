@@ -1,0 +1,19 @@
+```diff
+diff --git a/sympy/matrices/sparse.py b/sympy/matrices/sparse.py
+--- a/sympy/matrices/sparse.py
++++ b/sympy/matrices/sparse.py
+@@ -1298,6 +1298,16 @@
+     @classmethod
+     def hstack(cls, *args):
+         if not args:
+             return cls.zeros(0, 0)
++        # Handle zero-row matrices correctly
++        if all(arg.rows == 0 for arg in args):
++            total_cols = sum(arg.cols for arg in args)
++            return cls.zeros(0, total_cols)
++
+         rows = args[0].rows
+         if any(arg.rows != rows for arg in args):
+             raise ShapeError("All matrices must have the same number of rows.")
+         smat = {}
+```

@@ -1,0 +1,197 @@
+{
+  "instance_id": "sympy__sympy-20590",
+  "repo": "sympy/sympy",
+  "model": "gpt-4o",
+  "pipeline_mode": "enhanced_guided",
+  "hide_original_test_patch_in_repair": false,
+  "disable_semantic_bucket_guidance": false,
+  "disable_enhanced_test_filtering": true,
+  "repair_mode": "enhanced_guided",
+  "original_test_identifiers": [
+    "test_immutable"
+  ],
+  "original_status_counts": {
+    "FAILED": 2,
+    "PASSED": 21
+  },
+  "original_failed_count": 2,
+  "original_passed_count": 21,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_immutable"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_immutable"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/core/tests/test_basic.py:test_immutable",
+      "test_immutable"
+    ],
+    "failure_mode": "attribute_error",
+    "dominant_errors": [
+      "AssertionError"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "test_immutable F",
+      "________________ sympy/core/tests/test_basic.py:test_immutable _________________",
+      "Traceback (most recent call last):"
+    ],
+    "noise_ratio": 0.006,
+    "target_test_tracebacks": {
+      "test_immutable": "TARGET TEST: test_immutable\n- snippet: test_immutable F\n- snippet: ________________ sympy/core/tests/test_basic.py:test_immutable _________________\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_immutable F\n________________ sympy/core/tests/test_basic.py:test_immutable _________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/core/tests/test_basic.py\", line 38, in test_immutable\nAssertionError\n============= tests finished: 22 passed, 1 failed, in 0.14 seconds ============="
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 3,
+    "keep_top_k": 2,
+    "attempt_budget": 3,
+    "bucket_limit": 3,
+    "template_limit": 3,
+    "failure_mode": "attribute_error",
+    "noise_ratio": 0.006,
+    "difficulty": "low"
+  },
+  "adaptive_num_candidates": 3,
+  "adaptive_keep_top_k": 2,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 3,
+  "kept_enhanced_candidates": 2,
+  "enhanced_candidate_retention_rate": 0.6666666666666666,
+  "enhanced_generation_attempts_total": 9,
+  "enhanced_generation_attempts_avg": 3.0,
+  "kept_enhanced_test_identifiers": [
+    "test_sweb_enhanced_1",
+    "test_sweb_enhanced_2"
+  ],
+  "enhanced_failed_test_identifiers": [],
+  "enhanced_failed_count": 0,
+  "generated_patch_nonempty": true,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 8,
+  "generated_patch_accepted": true,
+  "generated_patch_acceptance_reason": "accepted_final_validation",
+  "generated_patch_feedback": null,
+  "semantic_oracle_passed": true,
+  "semantic_oracle_failed_identifiers": [],
+  "patch_analysis": {
+    "root_cause": "The `Symbol` class in SymPy 1.7 no longer defines `__slots__`, likely due to a missing `__slots__` declaration in a parent class or mixin, causing instances to have a `__dict__` attribute. This breaks the immutability assumption of `Symbol` objects.",
+    "affected_components": [
+      {
+        "file": "sympy/core/_print_helpers.py",
+        "symbol": "Printable",
+        "reason": "This mixin class is part of the inheritance hierarchy and may influence the behavior of `Symbol` instances."
+      },
+      {
+        "file": "sympy/core/tests/test_basic.py",
+        "symbol": "test_immutable",
+        "reason": "This test directly validates the immutability of `Symbol` instances and fails due to the presence of `__dict__`."
+      }
+    ],
+    "failing_signal": "The test `test_immutable` fails with an `AssertionError`, indicating that the immutability of `Symbol` instances is compromised.",
+    "propagation_path": "The absence of `__slots__` in a parent class or mixin allows `Symbol` instances to have a `__dict__`, which violates the immutability assumption. This propagates to the `test_immutable` test, which asserts the immutability of `Symbol` objects.",
+    "repair_constraint": "The `Symbol` class and its instances must remain immutable, and the `__dict__` attribute must not exist on `Symbol` instances.",
+    "suggested_repair_scope": [
+      "sympy/core/_print_helpers.py",
+      "sympy/core/tests/test_basic.py"
+    ],
+    "suspicious_symbols": [
+      "Printable",
+      "Symbol",
+      "__slots__",
+      "__dict__"
+    ],
+    "repair_obligations": [
+      {
+        "id": "test_immutable::core::core",
+        "source_symbol": "test_immutable",
+        "validation_subject": "core",
+        "why_it_matters": "The test explicitly validates the immutability of `Symbol` instances, which is a critical property for their correct behavior."
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Restore __slots__ in Symbol inheritance hierarchy",
+    "approach": "Ensure that all parent classes of Symbol, including mixins like Printable, explicitly define __slots__ to prevent the creation of __dict__ attributes on Symbol instances.",
+    "edit_targets": [
+      "sympy/core/_print_helpers.py::Printable"
+    ],
+    "dependency_files": [
+      "sympy/core/tests/test_basic.py",
+      "sympy/core/symbol.py"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [
+      "negative_gating",
+      "top_of_function_side_path"
+    ],
+    "sufficiency_assessment": "Editing the Symbol class alone is insufficient because the issue originates from the inheritance hierarchy. The Printable mixin must also define __slots__ explicitly to ensure immutability propagates correctly.",
+    "risks": [
+      "Potential regressions in classes inheriting from Printable or Symbol that rely on dynamic attributes."
+    ]
+  },
+  "patch_edit_plan": {
+    "coverage_check": [
+      {
+        "target_file": "sympy/core/_print_helpers.py",
+        "action": "modify_region",
+        "justification": "The Printable class is part of the inheritance hierarchy affecting Symbol instances. Adding __slots__ here ensures immutability propagates correctly and prevents the creation of __dict__ attributes."
+      }
+    ],
+    "edits": [
+      {
+        "target_file": "sympy/core/_print_helpers.py",
+        "target_symbol": "Printable",
+        "replacement_mode": "insert_after_anchor",
+        "covers_obligations": [
+          "test_immutable::core::core"
+        ],
+        "anchor_line_before": "    \"\"\"",
+        "anchor_line_after": "    def __str__(self):",
+        "replacement_block": "    \"\"\"\n\n    __slots__ = ()\n\n    def __str__(self):"
+      }
+    ]
+  },
+  "final_patch_attempted": true,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": true,
+  "final_patch_apply_mode": "clean_apply",
+  "final_patch_cleanly_applied": true,
+  "clean_apply_ratio": 1.0,
+  "resolved": true,
+  "final_resolved": true,
+  "final_status_counts": {
+    "PASSED": 22
+  },
+  "final_failed_count": 0,
+  "final_passed_count": 22,
+  "original_passed_count_improvement": 1,
+  "original_failed_count_reduction": 2,
+  "final_status_map": {
+    "test__aresame": "PASSED",
+    "test_structure": "PASSED",
+    "test_immutable": "PASSED",
+    "test_equality": "PASSED",
+    "test_matches_basic": "PASSED",
+    "test_has": "PASSED",
+    "test_subs": "PASSED",
+    "test_subs_with_unicode_symbols": "PASSED",
+    "test_atoms": "PASSED",
+    "test_free_symbols_empty": "PASSED",
+    "test_doit": "PASSED",
+    "test_S": "PASSED",
+    "test_xreplace": "PASSED",
+    "test_preorder_traversal": "PASSED",
+    "test_sorted_args": "PASSED",
+    "test_call": "PASSED",
+    "test_rewrite": "PASSED",
+    "test_literal_evalf_is_number_is_zero_is_comparable": "PASSED",
+    "test_as_Basic": "PASSED",
+    "test_atomic": "PASSED",
+    "test_as_dummy": "PASSED",
+    "test_canonical_variables": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

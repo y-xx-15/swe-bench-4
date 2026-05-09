@@ -1,0 +1,20 @@
+{
+  "title": "Fix vector pretty printing alignment",
+  "approach": "Adjust the rendering logic in PrettyPrinter to correctly handle baseline alignment and formatting for vectors, ensuring nested expressions are displayed properly.",
+  "edit_targets": [
+    "sympy/printing/pretty/pretty.py::PrettyPrinter._print_BasisDependent"
+  ],
+  "dependency_files": [
+    "sympy/vector/tests/test_printing.py",
+    "sympy/printing/pretty/tests/test_pretty.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing PrettyPrinter._print_BasisDependent is sufficient to fix the rendering issue for vectors. Dependency files are referenced for validation but do not require edits.",
+  "risks": [
+    "Potential misalignment of other pretty printing outputs if the baseline adjustment logic inadvertently affects unrelated cases."
+  ]
+}

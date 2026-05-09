@@ -1,0 +1,149 @@
+[
+  {
+    "idea": {
+      "title": "validate_file_upload_permissions_default_mode",
+      "semantic_bucket": "unspecified",
+      "goal": "ensure the default FILE_UPLOAD_PERMISSIONS is correctly applied to uploaded files",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_validate_file_upload_permissions_default_mode"
+      ],
+      "covers_original_tests": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+      ],
+      "covers_obligations": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core"
+      ],
+      "target_source_symbol": "FILE_UPLOAD_PERMISSIONS",
+      "target_validation_subject": "uploaded_file_mode",
+      "semantic_alignment_tokens": [
+        "FILE_UPLOAD_PERMISSIONS",
+        "os.chmod",
+        "uploaded_file"
+      ],
+      "trigger_shape_tokens": [
+        "FILE_UPLOAD_PERMISSIONS",
+        "uploaded_file",
+        "os.stat"
+      ],
+      "rationale": "This test directly asserts the corrected invariant for the default file mode (420 or 0o644) applied to uploaded files, which was mismatched in the original failure. It avoids downstream propagation into storage or handlers and focuses on the immediate assertion mismatch."
+    },
+    "patch": "diff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,12 @@\n+    def test_sweb_enhanced_validate_file_upload_permissions_default_mode(self):\n+        \"\"\"\n+        Ensure the default FILE_UPLOAD_PERMISSIONS is correctly applied to uploaded files.\n+        \"\"\"\n+        # Create a temporary file to simulate an uploaded file\n+        with default_storage.open('test_upload.txt', 'w') as uploaded_file:\n+            uploaded_file.write('test content')\n+\n+        # Check the file mode using os.stat\n+        file_mode = os.stat(uploaded_file.name).st_mode & 0o777\n+        self.assertEqual(file_mode, 0o644, f\"Expected file mode 0o644, got {oct(file_mode)}\")\n+\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,12 @@\n+    def test_sweb_enhanced_validate_file_upload_permissions_default_mode(self):\n+        \"\"\"\n+        Ensure the default FILE_UPLOAD_PERMISSIONS is correctly applied to uploaded files.\n+        \"\"\"\n+        # Create a temporary file to simulate an uploaded file\n+        with default_storage.open('test_upload.txt', 'w') as uploaded_file:\n+            uploaded_file.write('test content')\n+\n+        # Check the file mode using os.stat\n+        file_mode = os.stat(uploaded_file.name).st_mode & 0o777\n+        self.assertEqual(file_mode, 0o644, f\"Expected file mode 0o644, got {oct(file_mode)}\")\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_validate_file_upload_permissions_default_mode"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_validate_file_upload_permissions_default_mode"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "assert default file upload permissions",
+      "semantic_bucket": "unspecified",
+      "goal": "ensure that the default FILE_UPLOAD_PERMISSIONS is correctly applied to uploaded files",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_file_upload_permissions"
+      ],
+      "covers_original_tests": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+      ],
+      "covers_obligations": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core"
+      ],
+      "target_source_symbol": "FILE_UPLOAD_PERMISSIONS",
+      "target_validation_subject": "uploaded_file_permissions",
+      "semantic_alignment_tokens": [
+        "FILE_UPLOAD_PERMISSIONS",
+        "os.chmod",
+        "default_storage.save"
+      ],
+      "trigger_shape_tokens": [
+        "FILE_UPLOAD_PERMISSIONS",
+        "os.chmod",
+        "default_storage.save"
+      ],
+      "rationale": "This test directly asserts that the permissions of a file uploaded using the default storage mechanism match the expected default FILE_UPLOAD_PERMISSIONS value. It differs from the original test by explicitly verifying the invariant of the permission value rather than relying on downstream behavior or indirect effects."
+    },
+    "patch": "diff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,14 @@\n+    def test_sweb_enhanced_file_upload_permissions(self):\n+        \"\"\"\n+        Ensure that the default FILE_UPLOAD_PERMISSIONS is correctly applied\n+        to files uploaded using the default storage mechanism.\n+        \"\"\"\n+        file_name = \"test_file.txt\"\n+        file_content = \"dummy content\"\n+        try:\n+            saved_file_name = default_storage.save(file_name, StringIO(file_content))\n+            file_path = default_storage.path(saved_file_name)\n+            self.assertEqual(os.stat(file_path).st_mode & 0o777, 0o644)\n+        finally:\n+            if default_storage.exists(file_name):\n+                default_storage.delete(file_name)\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,14 @@\n+    def test_sweb_enhanced_file_upload_permissions(self):\n+        \"\"\"\n+        Ensure that the default FILE_UPLOAD_PERMISSIONS is correctly applied\n+        to files uploaded using the default storage mechanism.\n+        \"\"\"\n+        file_name = \"test_file.txt\"\n+        file_content = \"dummy content\"\n+        try:\n+            saved_file_name = default_storage.save(file_name, StringIO(file_content))\n+            file_path = default_storage.path(saved_file_name)\n+            self.assertEqual(os.stat(file_path).st_mode & 0o777, 0o644)\n+        finally:\n+            if default_storage.exists(file_name):\n+                default_storage.delete(file_name)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_file_upload_permissions"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_file_upload_permissions"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test file upload permission default invariant",
+      "semantic_bucket": "unspecified",
+      "goal": "stress the invariant that FILE_UPLOAD_PERMISSIONS defaults to 0o644 and triggers an AssertionError when it is None",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_file_upload_permissions"
+      ],
+      "covers_original_tests": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)"
+      ],
+      "covers_obligations": [
+        "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core"
+      ],
+      "target_source_symbol": "FILE_UPLOAD_PERMISSIONS",
+      "target_validation_subject": "FILE_UPLOAD_PERMISSIONS",
+      "semantic_alignment_tokens": [
+        "FILE_UPLOAD_PERMISSIONS",
+        "assertEqual",
+        "0o644"
+      ],
+      "trigger_shape_tokens": [
+        "FILE_UPLOAD_PERMISSIONS",
+        "assertEqual",
+        "None"
+      ],
+      "rationale": "This test directly asserts the corrected invariant for FILE_UPLOAD_PERMISSIONS (defaulting to 0o644) and reproduces the AssertionError when it is None. It avoids downstream propagation into storage or handler behavior, focusing instead on the exact mismatch in the original failure."
+    },
+    "patch": "diff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,8 @@\n+class EnhancedFileUploadPermissionsTests(SimpleTestCase):\n+\n+    def test_sweb_enhanced_file_upload_permissions_default(self):\n+        \"\"\"\n+        Ensure FILE_UPLOAD_PERMISSIONS defaults to 0o644.\n+        \"\"\"\n+        self.assertEqual(default_storage.file_permissions_mode, 0o644)\n+\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_utils/tests.py b/tests/test_utils/tests.py\n--- a/tests/test_utils/tests.py\n+++ b/tests/test_utils/tests.py\n@@ -228,0 +228,8 @@\n+class EnhancedFileUploadPermissionsTests(SimpleTestCase):\n+\n+    def test_sweb_enhanced_file_upload_permissions_default(self):\n+        \"\"\"\n+        Ensure FILE_UPLOAD_PERMISSIONS defaults to 0o644.\n+        \"\"\"\n+        self.assertEqual(default_storage.file_permissions_mode, 0o644)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_file_upload_permissions_default"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_file_upload_permissions_default"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

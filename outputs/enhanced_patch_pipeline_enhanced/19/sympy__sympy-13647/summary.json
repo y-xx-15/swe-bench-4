@@ -1,0 +1,268 @@
+{
+  "instance_id": "sympy__sympy-13647",
+  "repo": "sympy/sympy",
+  "model": "gpt-4o",
+  "pipeline_mode": "enhanced_guided",
+  "hide_original_test_patch_in_repair": false,
+  "disable_semantic_bucket_guidance": false,
+  "disable_enhanced_test_filtering": false,
+  "repair_mode": "enhanced_guided",
+  "original_test_identifiers": [
+    "test_col_insert"
+  ],
+  "original_status_counts": {
+    "FAILED": 5,
+    "PASSED": 76,
+    "ERROR": 2
+  },
+  "original_failed_count": 7,
+  "original_passed_count": 76,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_col_insert"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_col_insert"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/matrices/tests/test_commonmatrix.py:test_refine",
+      "sympy/matrices/tests/test_commonmatrix.py:test_jacobian2",
+      "sympy/matrices/tests/test_commonmatrix.py:test_limit",
+      "sympy/matrices/tests/test_commonmatrix.py:test_col_insert",
+      "test_col_insert"
+    ],
+    "failure_mode": "assertion_error",
+    "dominant_errors": [
+      "AssertionError"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "test_col_insert F",
+      "____________ sympy/matrices/tests/test_commonmatrix.py:test_refine _____________",
+      "___________ sympy/matrices/tests/test_commonmatrix.py:test_jacobian2 ___________"
+    ],
+    "noise_ratio": 0.02,
+    "target_test_tracebacks": {
+      "test_col_insert": "TARGET TEST: test_col_insert\n- snippet: test_col_insert F\n- snippet: ____________ sympy/matrices/tests/test_commonmatrix.py:test_refine _____________\n- snippet: ___________ sympy/matrices/tests/test_commonmatrix.py:test_jacobian2 ___________\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_col_insert F\n__________ sympy/matrices/tests/test_commonmatrix.py:test_col_insert ___________\n  File \"/testbed/sympy/matrices/tests/test_commonmatrix.py\", line 204, in test_col_insert\nAssertionError\n tests finished: 76 passed, 1 failed, 1 expected to fail, 3 exceptions, "
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 5,
+    "keep_top_k": 3,
+    "attempt_budget": 3,
+    "bucket_limit": 5,
+    "template_limit": 4,
+    "failure_mode": "assertion_error",
+    "noise_ratio": 0.02,
+    "difficulty": "medium"
+  },
+  "adaptive_num_candidates": 5,
+  "adaptive_keep_top_k": 3,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 5,
+  "kept_enhanced_candidates": 1,
+  "enhanced_candidate_retention_rate": 0.2,
+  "enhanced_generation_attempts_total": 11,
+  "enhanced_generation_attempts_avg": 2.2,
+  "kept_enhanced_test_identifiers": [
+    "test_sweb_enhanced_col_insert_integrity"
+  ],
+  "enhanced_failed_test_identifiers": [
+    "test_sweb_enhanced_col_insert_integrity"
+  ],
+  "enhanced_failed_count": 1,
+  "generated_patch_nonempty": false,
+  "generated_patch_error": "Generated Python source is not syntactically valid at sympy/matrices/common.py:94: unexpected indent.",
+  "generated_patch_attempts": 8,
+  "generated_patch_accepted": false,
+  "generated_patch_acceptance_reason": "rejected_not_generated",
+  "generated_patch_feedback": "Generated Python source is not syntactically valid at sympy/matrices/common.py:94: unexpected indent.",
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [],
+  "patch_analysis": {
+    "root_cause": "The `_eval_col_insert` method in `MatrixShaping` incorrectly calculates the indices for the new matrix when inserting columns, causing a misalignment of the original and inserted columns.",
+    "affected_components": [
+      {
+        "file": "sympy/matrices/common.py",
+        "symbol": "MatrixShaping._eval_col_insert",
+        "reason": "This method is responsible for the logic of inserting columns into a matrix and directly affects the behavior of `Matrix.col_insert`."
+      },
+      {
+        "file": "sympy/matrices/common.py",
+        "symbol": "MatrixShaping.col_insert",
+        "reason": "This method is the public interface for column insertion and relies on `_eval_col_insert` for its implementation."
+      },
+      {
+        "file": "sympy/matrices/tests/test_commonmatrix.py",
+        "symbol": "test_col_insert",
+        "reason": "This test directly validates the behavior of `Matrix.col_insert` and fails due to the bug in `_eval_col_insert`."
+      }
+    ],
+    "failing_signal": "The test `test_col_insert` fails with an `AssertionError`, indicating that the resulting matrix does not match the expected structure after column insertion.",
+    "propagation_path": "The bug in `_eval_col_insert` miscalculates the indices for the new matrix, leading to incorrect placement of the original and inserted columns. This error propagates to `Matrix.col_insert`, which then produces an incorrectly structured matrix. The test `test_col_insert` detects this mismatch and fails.",
+    "repair_constraint": "The fix must ensure that the original and inserted columns are correctly aligned in the resulting matrix while preserving the existing behavior of other matrix operations.",
+    "suggested_repair_scope": [
+      "sympy/matrices/common.py",
+      "sympy/matrices/tests/test_commonmatrix.py"
+    ],
+    "suspicious_symbols": [
+      "_eval_col_insert",
+      "col_insert",
+      "test_col_insert"
+    ],
+    "repair_obligations": [
+      {
+        "id": "test_col_insert::core",
+        "source_symbol": "test_col_insert",
+        "validation_subject": "core",
+        "why_it_matters": "The test validates the correctness of `Matrix.col_insert`, which is a core functionality of the matrix module."
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Fix column insertion misalignment",
+    "approach": "Correct the logic in `_eval_col_insert` to ensure proper alignment of original and inserted columns by adjusting the index calculations.",
+    "edit_targets": [
+      "sympy/matrices/common.py::MatrixShaping._eval_col_insert"
+    ],
+    "dependency_files": [
+      "sympy/matrices/tests/test_commonmatrix.py"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [
+      "negative_gating",
+      "top_of_function_side_path"
+    ],
+    "sufficiency_assessment": "Editing `_eval_col_insert` alone should be sufficient to fix the misalignment issue, as this method directly handles the column insertion logic. However, the test file `test_commonmatrix.py` must be referenced to validate the fix against existing and enhanced tests.",
+    "risks": [
+      "Potential regressions in other matrix operations that rely on `_eval_col_insert`, such as `col_join` or `reshape`."
+    ]
+  },
+  "patch_edit_plan": {
+    "coverage_check": [
+      {
+        "target_file": "sympy/matrices/common.py",
+        "action": "modify_region",
+        "justification": "The `_eval_col_insert` method contains the logic responsible for column insertion, which is directly causing the misalignment issue. This file must be edited to correct the index calculations."
+      }
+    ],
+    "edits": [
+      {
+        "target_file": "sympy/matrices/common.py",
+        "target_symbol": "MatrixShaping._eval_col_insert",
+        "replacement_mode": "replace_span",
+        "covers_obligations": [
+          "test_col_insert::core"
+        ],
+        "anchor_line_before": "        cols = self.cols",
+        "anchor_line_after": "        def entry(i, j):",
+        "replacement_block": "        cols = self.cols\n\n        def entry(i, j):\n            if j < pos:\n                return self[i, j]\n            elif pos <= j < pos + other.cols:\n                return other[i, j - pos]\n            else:\n                return self[i, j - other.cols]\n\n        return self._new(self.rows, self.cols + other.cols,\n                         lambda i, j: entry(i, j))"
+      }
+    ]
+  },
+  "final_patch_attempted": false,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": false,
+  "final_patch_apply_mode": "no_patch",
+  "final_patch_cleanly_applied": false,
+  "clean_apply_ratio": 0.0,
+  "resolved": false,
+  "final_resolved": false,
+  "final_status_counts": {
+    "FAILED": 5,
+    "PASSED": 76,
+    "ERROR": 2
+  },
+  "final_failed_count": 7,
+  "final_passed_count": 76,
+  "original_passed_count_improvement": 0,
+  "original_failed_count_reduction": 0,
+  "final_status_map": {
+    "sympy/matrices/tests/test_commonmatrix.py:test_refine": "FAILED",
+    "sympy/matrices/tests/test_commonmatrix.py:test_jacobian2": "FAILED",
+    "sympy/matrices/tests/test_commonmatrix.py:test_limit": "FAILED",
+    "sympy/matrices/tests/test_commonmatrix.py:test_col_insert": "FAILED",
+    "test__MinimalMatrix": "PASSED",
+    "test_vec": "PASSED",
+    "test_tolist": "PASSED",
+    "test_row_col_del": "PASSED",
+    "test_get_diag_blocks1": "PASSED",
+    "test_get_diag_blocks2": "PASSED",
+    "test_shape": "PASSED",
+    "test_reshape": "PASSED",
+    "test_row_col": "PASSED",
+    "test_row_join": "PASSED",
+    "test_col_join": "PASSED",
+    "test_row_insert": "PASSED",
+    "test_col_insert": "FAILED",
+    "test_extract": "PASSED",
+    "test_hstack": "PASSED",
+    "test_vstack": "PASSED",
+    "test_atoms": "PASSED",
+    "test_free_symbols": "PASSED",
+    "test_has": "PASSED",
+    "test_is_anti_symmetric": "PASSED",
+    "test_diagonal_symmetrical": "PASSED",
+    "test_is_hermitian": "PASSED",
+    "test_is_Identity": "PASSED",
+    "test_is_symbolic": "PASSED",
+    "test_is_upper": "PASSED",
+    "test_is_lower": "PASSED",
+    "test_is_square": "PASSED",
+    "test_is_symmetric": "PASSED",
+    "test_is_hessenberg": "PASSED",
+    "test_is_zero": "PASSED",
+    "test_values": "PASSED",
+    "test_applyfunc": "PASSED",
+    "test_adjoint": "PASSED",
+    "test_as_real_imag": "PASSED",
+    "test_conjugate": "PASSED",
+    "test_doit": "PASSED",
+    "test_evalf": "PASSED",
+    "test_expand": "PASSED",
+    "test_refine": "ERROR",
+    "test_replace": "PASSED",
+    "test_replace_map": "PASSED",
+    "test_simplify": "PASSED",
+    "test_subs": "PASSED",
+    "test_trace": "PASSED",
+    "test_xreplace": "PASSED",
+    "test_permute": "PASSED",
+    "test_abs": "PASSED",
+    "test_add": "PASSED",
+    "test_multiplication": "PASSED",
+    "test_power": "PASSED",
+    "test_neg": "PASSED",
+    "test_sub": "PASSED",
+    "test_div": "PASSED",
+    "test_det": "PASSED",
+    "test_adjugate": "PASSED",
+    "test_cofactor_and_minors": "PASSED",
+    "test_charpoly": "PASSED",
+    "test_row_op": "PASSED",
+    "test_col_op": "PASSED",
+    "test_is_echelon": "PASSED",
+    "test_echelon_form": "PASSED",
+    "test_rref": "PASSED",
+    "test_eye": "PASSED",
+    "test_ones": "PASSED",
+    "test_zeros": "PASSED",
+    "test_diag": "PASSED",
+    "test_jordan_block": "PASSED",
+    "test_columnspace": "PASSED",
+    "test_rowspace": "PASSED",
+    "test_nullspace": "PASSED",
+    "test_eigenvals": "PASSED",
+    "test_eigenvects": "PASSED",
+    "test_left_eigenvects": "PASSED",
+    "test_diagonalize": "PASSED",
+    "test_is_diagonalizable": "PASSED",
+    "test_jordan_form": "PASSED",
+    "test_singular_values": "PASSED",
+    "test_integrate": "PASSED",
+    "test_jacobian2": "ERROR"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

@@ -1,0 +1,301 @@
+{
+  "instance_id": "pytest-dev__pytest-7432",
+  "repo": "pytest-dev/pytest",
+  "model": "gpt-4o",
+  "pipeline_mode": "enhanced_guided",
+  "hide_original_test_patch_in_repair": false,
+  "disable_semantic_bucket_guidance": true,
+  "disable_enhanced_test_filtering": false,
+  "repair_mode": "enhanced_guided",
+  "original_test_identifiers": [
+    "test_xfail_run_with_skip_mark[test_input1-expected1]"
+  ],
+  "original_status_counts": {
+    "SKIPPED": 2,
+    "FAILED": 7,
+    "XFAIL": 9,
+    "ERROR": 6,
+    "PASSED": 77
+  },
+  "original_failed_count": 13,
+  "original_passed_count": 86,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_xfail_run_with_skip_mark[test_input1-expected1]"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_xfail_run_with_skip_mark[test_input1-expected1]"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "test_xfail_run_anyway.py::test_func",
+      "test_xfail_imperative_in_setup_function.py::test_this",
+      "test_xfail_raises.py::test_raises",
+      "test_reportchars.py::test_1",
+      "test_simple.py::test_foo"
+    ],
+    "failure_mode": "type_error",
+    "dominant_errors": [
+      "AssertionError",
+      "TypeError",
+      "AttributeError",
+      "IndexError",
+      "Error"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "________ TestXFail.test_xfail_run_with_skip_mark[test_input1-expected1] ________",
+      "test_xfail_run_anyway.py:4: AssertionError",
+      "FAILED test_xfail_run_anyway.py::test_func - assert 0"
+    ],
+    "noise_ratio": 0.0023,
+    "target_test_tracebacks": {
+      "test_xfail_run_with_skip_mark[test_input1-expected1]": "FAILED testing/test_skipping.py::TestXFail::test_xfail_run_with_skip_mark[test_input1-expected1]\n========================= 1 failed, 78 passed in 4.39s =========================\n+ echo '>>>>> End Test Output'\n+ git checkout e6e300e729dd33956e5448d8be9a0b1540b4e53a testing/test_skipping.py\n>>>>> End Test Output\nUpdated 1 path from 877d43379"
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 7,
+    "keep_top_k": 4,
+    "attempt_budget": 3,
+    "bucket_limit": 5,
+    "template_limit": 4,
+    "failure_mode": "type_error",
+    "noise_ratio": 0.0023,
+    "difficulty": "high"
+  },
+  "adaptive_num_candidates": 7,
+  "adaptive_keep_top_k": 4,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 7,
+  "kept_enhanced_candidates": 4,
+  "enhanced_candidate_retention_rate": 0.5714285714285714,
+  "enhanced_generation_attempts_total": 13,
+  "enhanced_generation_attempts_avg": 1.8571428571428572,
+  "kept_enhanced_test_identifiers": [
+    "test_sweb_enhanced_skip_location_with_unexpected_xfail",
+    "test_sweb_enhanced_skip_location_with_multiple_marks",
+    "test_sweb_enhanced_verify_skip_location_with_runxfail",
+    "test_sweb_enhanced_skip_location_with_runxfail"
+  ],
+  "enhanced_failed_test_identifiers": [
+    "test_sweb_enhanced_skip_location_with_unexpected_xfail",
+    "test_sweb_enhanced_skip_location_with_multiple_marks",
+    "test_sweb_enhanced_verify_skip_location_with_runxfail",
+    "test_sweb_enhanced_skip_location_with_runxfail"
+  ],
+  "enhanced_failed_count": 4,
+  "generated_patch_nonempty": true,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 10,
+  "generated_patch_accepted": true,
+  "generated_patch_acceptance_reason": "accepted_final_validation",
+  "generated_patch_feedback": null,
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [
+    "test_sweb_enhanced_skip_location_with_unexpected_xfail",
+    "test_sweb_enhanced_skip_location_with_multiple_marks"
+  ],
+  "patch_analysis": {
+    "root_cause": "The `pytest_runtest_makereport` hook has a conditional branch for `--runxfail` that prevents the correction logic for skip location reporting from executing. Specifically, the `elif` branch for `item._store.get(skipped_by_mark_key, True)` becomes unreachable when `--runxfail` is enabled, as the earlier `elif item.config.option.runxfail` short-circuits the control flow.",
+    "affected_components": [
+      {
+        "file": "src/_pytest/skipping.py",
+        "symbol": "pytest_runtest_makereport",
+        "reason": "This hook is responsible for generating test reports, including skip location reporting. The bug lies in its conditional logic."
+      }
+    ],
+    "failing_signal": "When `--runxfail` is enabled, the skip location in the test report incorrectly points to `src/_pytest/skipping.py:238` instead of the test item definition, as evidenced by the test failure logs.",
+    "propagation_path": "The `--runxfail` flag triggers the `elif item.config.option.runxfail` branch in `pytest_runtest_makereport`, which prevents the subsequent correction logic for skip location reporting from executing. This results in the wrong location being reported in the test output.",
+    "repair_constraint": "The fix must ensure that skip location reporting works correctly regardless of whether `--runxfail` is enabled, without altering the behavior of xfail reporting.",
+    "suggested_repair_scope": [
+      "src/_pytest/skipping.py"
+    ],
+    "suspicious_symbols": [
+      "pytest_runtest_makereport",
+      "skipped_by_mark_key",
+      "item.reportinfo"
+    ],
+    "repair_obligations": [
+      {
+        "id": "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip_location_reporting",
+        "source_symbol": "src/_pytest/skipping.py::pytest_runtest_makereport",
+        "validation_subject": "skip_location_reporting",
+        "why_it_matters": "This obligation ensures that the skip location in test reports points to the test item definition, which is critical for accurate reporting."
+      },
+      {
+        "id": "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip location reporting",
+        "source_symbol": "src/_pytest/skipping.py::pytest_runtest_makereport",
+        "validation_subject": "skip location reporting",
+        "why_it_matters": "This obligation ensures that the skip location reporting logic correctly handles cases where `--runxfail` is enabled, maintaining consistency in test output."
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Restore unreachable skip location correction branch",
+    "approach": "Convert the `elif` branch for `item._store.get(skipped_by_mark_key, True)` in `pytest_runtest_makereport` to a standalone `if` statement to ensure the skip location correction logic executes regardless of the `--runxfail` flag. This structural change restores reachability for the correction logic without interfering with xfail reporting.",
+    "edit_targets": [
+      "src/_pytest/skipping.py::pytest_runtest_makereport"
+    ],
+    "dependency_files": [
+      "testing/test_skipping.py"
+    ],
+    "structural_rules": [
+      "restore_unreachable_existing_branch"
+    ],
+    "forbidden_patterns": [
+      "negative_gating",
+      "top_of_function_side_path"
+    ],
+    "sufficiency_assessment": "Editing `pytest_runtest_makereport` alone is sufficient because the unreachable correction branch already contains the necessary logic for skip location reporting. No changes are needed in other functions or files.",
+    "risks": [
+      "Ensure the change does not inadvertently alter xfail reporting behavior or introduce regressions in other test reporting logic."
+    ]
+  },
+  "patch_edit_plan": {
+    "coverage_check": [
+      {
+        "target_file": "src/_pytest/skipping.py",
+        "action": "modify_region",
+        "justification": "The `pytest_runtest_makereport` function contains the conditional logic responsible for skip location reporting. The bug lies in its unreachable branch for `item._store.get(skipped_by_mark_key, True)` when `--runxfail` is enabled, requiring a structural fix."
+      }
+    ],
+    "edits": [
+      {
+        "target_file": "src/_pytest/skipping.py",
+        "target_symbol": "pytest_runtest_makereport",
+        "replacement_mode": "replace_span",
+        "covers_obligations": [
+          "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip_location_reporting",
+          "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip location reporting"
+        ],
+        "anchor_line_before": "    elif item.config.option.runxfail:",
+        "anchor_line_after": "    elif item._store.get(skipped_by_mark_key, True):",
+        "replacement_block": "    elif item.config.option.runxfail:\n        rep.outcome = \"skipped\"\n        rep.wasxfail = \"runxfail\"\n\n    if item._store.get(skipped_by_mark_key, True):\n        rep.outcome = \"skipped\"\n        rep.longrepr = item.reportinfo() + (\"unconditional skip\",)"
+      }
+    ]
+  },
+  "final_patch_attempted": true,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": true,
+  "final_patch_apply_mode": "clean_apply",
+  "final_patch_cleanly_applied": true,
+  "clean_apply_ratio": 1.0,
+  "resolved": true,
+  "final_resolved": true,
+  "final_status_counts": {
+    "FAILED": 6,
+    "SKIPPED": 2,
+    "XFAIL": 9,
+    "ERROR": 6,
+    "PASSED": 78
+  },
+  "final_failed_count": 12,
+  "final_passed_count": 87,
+  "original_passed_count_improvement": 1,
+  "original_failed_count_reduction": 1,
+  "final_status_map": {
+    "test_xfail_run_anyway.py::test_func": "FAILED",
+    "[1]": "SKIPPED",
+    "test_one.py::test_this": "XFAIL",
+    "test_one.py::test_this_true": "XFAIL",
+    "test_xfail_imperative.py::test_this": "XFAIL",
+    "test_xfail_imperative_in_setup_function.py::test_this": "FAILED",
+    "test_dynamic_xfail_no_run.py::test_this": "XFAIL",
+    "test_xfail_raises.py::test_raises": "FAILED",
+    "test_strict_sanity.py::test_foo": "XFAIL",
+    "[2]": "SKIPPED",
+    "test_reportchars.py::test_1": "FAILED",
+    "test_reportchars.py::test_2": "XFAIL",
+    "test_simple.py::test_foo": "ERROR",
+    "test_reportchars_all.py::test_2": "XFAIL",
+    "test_reportchars_all.py::test_5": "ERROR",
+    "test_reportchars_all.py::test_1": "FAILED",
+    "test_errors_in_xfail_skip_expressions.py::test_nameerror": "ERROR",
+    "test_errors_in_xfail_skip_expressions.py::test_syntax": "ERROR",
+    "test_xfail_skipif_with_globals.py::test_boolean": "XFAIL",
+    "test_xfail.py::test_func": "XFAIL",
+    "test_module_level_skip_error.py": "ERROR",
+    "test_invalid_skip_keyword_parameter.py": "ERROR",
+    "test_summary_list_after_errors.py::test_fail": "FAILED",
+    "testing/test_skipping.py::test_importorskip": "PASSED",
+    "testing/test_skipping.py::TestEvaluation::test_no_marker": "PASSED",
+    "testing/test_skipping.py::TestEvaluation::test_marked_xfail_no_args": "PASSED",
+    "testing/test_skipping.py::TestEvaluation::test_marked_skipif_no_args": "PASSED",
+    "testing/test_skipping.py::TestEvaluation::test_marked_one_arg": "PASSED",
+    "testing/test_skipping.py::TestEvaluation::test_marked_one_arg_with_reason": "PASSED",
+    "testing/test_skipping.py::TestEvaluation::test_marked_one_arg_twice": "PASSED",
+    "testing/test_skipping.py::TestEvaluation::test_marked_one_arg_twice2": "PASSED",
+    "testing/test_skipping.py::TestEvaluation::test_marked_skipif_with_boolean_without_reason": "PASSED",
+    "testing/test_skipping.py::TestEvaluation::test_marked_skipif_with_invalid_boolean": "PASSED",
+    "testing/test_skipping.py::TestEvaluation::test_skipif_class": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_simple[True]": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_simple[False]": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_xpassed": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_using_platform": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_xpassed_strict": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_run_anyway": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_run_with_skip_mark[test_input0-expected0]": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_run_with_skip_mark[test_input1-expected1]": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_evalfalse_but_fails": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_not_report_default": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_not_run_xfail_reporting": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_not_run_no_setup_run": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_xpass": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_imperative": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_imperative_in_setup_function": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_dynamic_xfail_no_run": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_dynamic_xfail_set_during_funcarg_setup": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_raises[TypeError-TypeError-*1": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_raises[(AttributeError,": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_raises[TypeError-IndexError-*1": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_strict_sanity": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_strict_xfail[True]": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_strict_xfail[False]": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_strict_xfail_condition[True]": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_strict_xfail_condition[False]": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_condition_keyword[True]": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_xfail_condition_keyword[False]": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_strict_xfail_default_from_file[true]": "PASSED",
+    "testing/test_skipping.py::TestXFail::test_strict_xfail_default_from_file[false]": "PASSED",
+    "testing/test_skipping.py::TestXFailwithSetupTeardown::test_failing_setup_issue9": "PASSED",
+    "testing/test_skipping.py::TestXFailwithSetupTeardown::test_failing_teardown_issue9": "PASSED",
+    "testing/test_skipping.py::TestSkip::test_skip_class": "PASSED",
+    "testing/test_skipping.py::TestSkip::test_skips_on_false_string": "PASSED",
+    "testing/test_skipping.py::TestSkip::test_arg_as_reason": "PASSED",
+    "testing/test_skipping.py::TestSkip::test_skip_no_reason": "PASSED",
+    "testing/test_skipping.py::TestSkip::test_skip_with_reason": "PASSED",
+    "testing/test_skipping.py::TestSkip::test_only_skips_marked_test": "PASSED",
+    "testing/test_skipping.py::TestSkip::test_strict_and_skip": "PASSED",
+    "testing/test_skipping.py::TestSkipif::test_skipif_conditional": "PASSED",
+    "testing/test_skipping.py::TestSkipif::test_skipif_reporting[\"hasattr(sys,": "PASSED",
+    "testing/test_skipping.py::TestSkipif::test_skipif_reporting[True,": "PASSED",
+    "testing/test_skipping.py::TestSkipif::test_skipif_using_platform": "PASSED",
+    "testing/test_skipping.py::TestSkipif::test_skipif_reporting_multiple[skipif-SKIP-skipped]": "PASSED",
+    "testing/test_skipping.py::TestSkipif::test_skipif_reporting_multiple[xfail-XPASS-xpassed]": "PASSED",
+    "testing/test_skipping.py::test_skip_not_report_default": "PASSED",
+    "testing/test_skipping.py::test_skipif_class": "PASSED",
+    "testing/test_skipping.py::test_skipped_reasons_functional": "PASSED",
+    "testing/test_skipping.py::test_skipped_folding": "PASSED",
+    "testing/test_skipping.py::test_reportchars": "PASSED",
+    "testing/test_skipping.py::test_reportchars_error": "PASSED",
+    "testing/test_skipping.py::test_reportchars_all": "PASSED",
+    "testing/test_skipping.py::test_reportchars_all_error": "PASSED",
+    "testing/test_skipping.py::test_errors_in_xfail_skip_expressions": "PASSED",
+    "testing/test_skipping.py::test_xfail_skipif_with_globals": "PASSED",
+    "testing/test_skipping.py::test_default_markers": "PASSED",
+    "testing/test_skipping.py::test_xfail_test_setup_exception": "PASSED",
+    "testing/test_skipping.py::test_imperativeskip_on_xfail_test": "PASSED",
+    "testing/test_skipping.py::TestBooleanCondition::test_skipif": "PASSED",
+    "testing/test_skipping.py::TestBooleanCondition::test_skipif_noreason": "PASSED",
+    "testing/test_skipping.py::TestBooleanCondition::test_xfail": "PASSED",
+    "testing/test_skipping.py::test_xfail_item": "PASSED",
+    "testing/test_skipping.py::test_module_level_skip_error": "PASSED",
+    "testing/test_skipping.py::test_module_level_skip_with_allow_module_level": "PASSED",
+    "testing/test_skipping.py::test_invalid_skip_keyword_parameter": "PASSED",
+    "testing/test_skipping.py::test_mark_xfail_item": "PASSED",
+    "testing/test_skipping.py::test_summary_list_after_errors": "PASSED",
+    "testing/test_skipping.py::test_relpath_rootdir": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

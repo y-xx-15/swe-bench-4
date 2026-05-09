@@ -1,0 +1,48 @@
+{
+  "root_cause": "The `apart` function fails to handle nested substitutions and decomposition logic correctly when applied to expressions involving symbolic parameters. This is likely due to improper handling of edge cases in the decomposition algorithm, particularly when symbolic substitutions interact with the partial fraction decomposition logic.",
+  "affected_components": [
+    {
+      "file": "sympy/polys/partfrac.py",
+      "symbol": "apart",
+      "reason": "The `apart` function is directly responsible for partial fraction decomposition and is failing to handle nested substitutions and symbolic parameters correctly."
+    },
+    {
+      "file": "sympy/polys/tests/test_partfrac.py",
+      "symbol": "test_apart",
+      "reason": "This test exposes the failure of `apart` to handle symbolic parameters and nested substitutions correctly."
+    },
+    {
+      "file": "sympy/polys/tests/test_polytools.py",
+      "symbol": "test_div",
+      "reason": "This test highlights the failure in decomposition logic and nested substitution handling, which are core functionalities of `apart`."
+    }
+  ],
+  "failing_signal": "The failing assertions and recursion errors indicate that the `apart` function is unable to correctly decompose expressions involving symbolic parameters and nested substitutions. Specifically, the output of `apart` does not match the expected partial fraction decomposition, and in some cases, the function enters infinite recursion.",
+  "propagation_path": "The bug originates in the `apart` function's decomposition logic, which fails to account for edge cases involving symbolic parameters and nested substitutions. This leads to incorrect results or infinite recursion during decomposition. The issue propagates to tests like `test_apart` and `test_div`, where the incorrect behavior is exposed through failing assertions and recursion errors.",
+  "repair_constraint": "The `apart` function must correctly handle symbolic parameters and nested substitutions without entering infinite recursion or producing incorrect results. Existing functionality for simpler cases must remain intact.",
+  "suggested_repair_scope": [
+    "sympy/polys/partfrac.py",
+    "sympy/polys/tests/test_partfrac.py",
+    "sympy/polys/tests/test_polytools.py"
+  ],
+  "suspicious_symbols": [
+    "apart",
+    "apart_undetermined_coeffs",
+    "test_apart",
+    "test_div"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_div::core::apart decomposition logic",
+      "source_symbol": "test_div",
+      "validation_subject": "apart decomposition logic",
+      "why_it_matters": "The `apart` function must correctly decompose rational functions into partial fractions, as this is a core functionality used in symbolic computations."
+    },
+    {
+      "id": "test_div::core::nested substitution handling in apart",
+      "source_symbol": "test_div",
+      "validation_subject": "nested substitution handling in apart",
+      "why_it_matters": "The `apart` function must handle nested substitutions correctly to ensure accurate results when symbolic parameters are involved."
+    }
+  ]
+}

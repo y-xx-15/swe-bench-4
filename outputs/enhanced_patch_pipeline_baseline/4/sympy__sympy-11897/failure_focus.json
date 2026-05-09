@@ -1,0 +1,32 @@
+{
+  "original_test_identifiers": [
+    "test_latex_Piecewise"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_latex_Piecewise"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/printing/tests/test_latex.py:test_latex_functions",
+    "sympy/printing/tests/test_latex.py:test_latex_indexed",
+    "sympy/printing/tests/test_latex.py:test_latex_derivatives",
+    "sympy/printing/tests/test_latex.py:test_latex_FourierSeries",
+    "sympy/printing/tests/test_latex.py:test_latex_FormalPowerSeries"
+  ],
+  "failure_mode": "value_error",
+  "dominant_errors": [
+    "RecursionError",
+    "ValueError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_latex_Piecewise F",
+    "___________ sympy/printing/tests/test_latex.py:test_latex_functions ____________",
+    "____________ sympy/printing/tests/test_latex.py:test_latex_indexed _____________"
+  ],
+  "noise_ratio": 0.0015,
+  "target_test_tracebacks": {
+    "test_latex_Piecewise": "TARGET TEST: test_latex_Piecewise\n- snippet: test_latex_Piecewise F\n- snippet: ___________ sympy/printing/tests/test_latex.py:test_latex_functions ____________\n- snippet: ____________ sympy/printing/tests/test_latex.py:test_latex_indexed _____________\n- dominant_errors: RecursionError, ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_latex_Piecewise F\n  File \"/testbed/sympy/functions/special/error_functions.py\", line 1570, in eval\nRecursionError: maximum recursion depth exceeded in __instancecheck__\nRecursionError: maximum recursion depth exceeded in __instancecheck__\nRecursionError: maximum recursion depth exceeded in __instancecheck__\nValueError: Name node can't be used with 'False' constant\n___________ sympy/printing/tests/test_latex.py:test_latex_Piecewise ____________\n  File \"/testbed/sympy/printing/tests/test_latex.py\", line 870, in test_latex_Piecewise\nAssertionError\n tests finished: 96 passed, 1 failed, 2 expected to fail, 8 exceptions, "
+  }
+}

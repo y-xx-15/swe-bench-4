@@ -1,0 +1,27 @@
+```diff
+diff --git a/sympy/printing/ccode.py b/sympy/printing/ccode.py
+--- a/sympy/printing/ccode.py
++++ b/sympy/printing/ccode.py
+@@ -23,6 +23,7 @@ known_functions = {
+     "atan2": "atan2",
+     "exp": "exp",
+     "log": "log",
++    "sinc": None,  # Custom handling for sinc
+     "erf": "erf",
+     "sinh": "sinh",
+     "cosh": "cosh",
+@@ -248,6 +249,13 @@ class CCodePrinter(CodePrinter):
+         if expr.func.__name__ in self.known_functions:
+             cond_func = self.known_functions[expr.func.__name__]
+             if isinstance(cond_func, list):
++                # Special handling for sinc function
++                if expr.func.__name__ == "sinc":
++                    arg = self._print(expr.args[0])
++                    return (
++                        f"(({arg} != 0) ? (\n"
++                        f"   sin({arg})/{arg}\n"
++                        f")\n: (\n   1\n))")
+                 for cond, func in cond_func:
+                     if cond(*expr.args):
+                         return "%s(%s)" % (func, ", ".join(map(self._print, expr.args)))
+```

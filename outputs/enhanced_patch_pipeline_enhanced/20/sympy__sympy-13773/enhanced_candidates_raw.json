@@ -1,0 +1,177 @@
+[
+  {
+    "idea": {
+      "title": "scalar_operand_matmul_type_error",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Ensure that using a scalar as an operand in matrix multiplication raises a TypeError.",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "mixed_operand_type",
+      "target_tests": [
+        "test_sweb_enhanced_scalar_operand_matmul"
+      ],
+      "covers_original_tests": [
+        "test_matmul"
+      ],
+      "covers_obligations": [
+        "test_matmul::core"
+      ],
+      "target_source_symbol": "__matmul__",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "@ (",
+        "__matmul__",
+        "TypeError"
+      ],
+      "trigger_shape_tokens": [
+        "@",
+        "__matmul__",
+        "scalar_operand"
+      ],
+      "rationale": "This test directly targets the failure mode where a scalar operand is incorrectly allowed in matrix multiplication, reproducing the TypeError observed in the original failure. It differs from the original test by isolating the scalar operand case, providing more precise guidance for fixing the validation logic."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,8 @@\n+def test_sweb_enhanced_scalar_operand_matmul():\n+    a = Matrix([[1, 2], [3, 4]])\n+    \n+    # Ensure that using a scalar as the left operand raises a TypeError\n+    raises(TypeError, lambda: 2 @ a)\n+    \n+    # Ensure that using a scalar as the right operand raises a TypeError\n+    raises(TypeError, lambda: a @ 2)\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,8 @@\n+def test_sweb_enhanced_scalar_operand_matmul():\n+    a = Matrix([[1, 2], [3, 4]])\n+    \n+    # Ensure that using a scalar as the left operand raises a TypeError\n+    raises(TypeError, lambda: 2 @ a)\n+    \n+    # Ensure that using a scalar as the right operand raises a TypeError\n+    raises(TypeError, lambda: a @ 2)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_scalar_operand_matmul"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_scalar_operand_matmul"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": null,
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,8 @@\n+def test_sweb_enhanced_2():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+\n+    # Test matrix multiplication with a non-matrix type (list)\n+    raises(TypeError, lambda: a @ b)\n+    raises(TypeError, lambda: b @ a)\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,8 @@\n+def test_sweb_enhanced_2():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+\n+    # Test matrix multiplication with a non-matrix type (list)\n+    raises(TypeError, lambda: a @ b)\n+    raises(TypeError, lambda: b @ a)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_2"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_2"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": null,
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,9 @@\n+def test_sweb_enhanced_3():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = Matrix([[2, 3], [1, 2]])\n+\n+    # Test case where one operand is a list instead of a matrix\n+    raises(TypeError, lambda: a @ [[1, 2], [3, 4]])\n+\n+    # Test case where one operand is a dictionary instead of a matrix\n+    raises(TypeError, lambda: a @ {1: 2, 3: 4})\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,9 @@\n+def test_sweb_enhanced_3():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = Matrix([[2, 3], [1, 2]])\n+\n+    # Test case where one operand is a list instead of a matrix\n+    raises(TypeError, lambda: a @ [[1, 2], [3, 4]])\n+\n+    # Test case where one operand is a dictionary instead of a matrix\n+    raises(TypeError, lambda: a @ {1: 2, 3: 4})\n```",
+    "identifiers": [
+      "test_sweb_enhanced_3"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_3"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": null,
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,8 @@\n+def test_sweb_enhanced_4():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+    \n+    # Ensure TypeError is raised when attempting matrix multiplication with a list\n+    raises(TypeError, lambda: a @ b)\n+    raises(TypeError, lambda: b @ a)\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,8 @@\n+def test_sweb_enhanced_4():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+    \n+    # Ensure TypeError is raised when attempting matrix multiplication with a list\n+    raises(TypeError, lambda: a @ b)\n+    raises(TypeError, lambda: b @ a)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_4"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_4"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": null,
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,10 @@\n+def test_sweb_enhanced_5():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+\n+    # Attempting matrix multiplication with a list should raise a TypeError\n+    raises(TypeError, lambda: a @ b)\n+\n+    # Reverse operation should also raise a TypeError\n+    raises(TypeError, lambda: b @ a)\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,10 @@\n+def test_sweb_enhanced_5():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+\n+    # Attempting matrix multiplication with a list should raise a TypeError\n+    raises(TypeError, lambda: a @ b)\n+\n+    # Reverse operation should also raise a TypeError\n+    raises(TypeError, lambda: b @ a)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_5"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_5"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": null,
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,7 @@\n+def test_sweb_enhanced_6():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+\n+    raises(TypeError, lambda: a @ b)\n+    raises(TypeError, lambda: b @ a)\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,7 @@\n+def test_sweb_enhanced_6():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+\n+    raises(TypeError, lambda: a @ b)\n+    raises(TypeError, lambda: b @ a)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_6"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_6"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": null,
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,9 @@\n+def test_sweb_enhanced_7():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = Matrix([[2, 3], [1, 2]])\n+    c = [1, 2, 3]  # A list, not a matrix\n+\n+    # Attempting matrix multiplication with a non-matrix operand\n+    raises(TypeError, lambda: a @ c)\n+    raises(TypeError, lambda: c @ b)\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,9 @@\n+def test_sweb_enhanced_7():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = Matrix([[2, 3], [1, 2]])\n+    c = [1, 2, 3]  # A list, not a matrix\n+\n+    # Attempting matrix multiplication with a non-matrix operand\n+    raises(TypeError, lambda: a @ c)\n+    raises(TypeError, lambda: c @ b)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_7"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_7"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

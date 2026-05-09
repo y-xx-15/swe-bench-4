@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_coth"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_coth"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/functions/elementary/tests/test_hyperbolic.py:test_coth",
+    "test_coth"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "NameError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_coth E",
+    "test_coth_series ok",
+    "test_coth_rewrite ok"
+  ],
+  "noise_ratio": 0.0216,
+  "target_test_tracebacks": {
+    "test_coth": "TARGET TEST: test_coth\n- snippet: test_coth E\n- snippet: test_coth_series ok\n- snippet: test_coth_rewrite ok\n- dominant_errors: NameError\nWEAK TRACEBACK CONTEXT:\ntest_coth E\ntest_coth_series ok\ntest_coth_rewrite ok\n________ sympy/functions/elementary/tests/test_hyperbolic.py:test_coth _________\n  File \"/testbed/sympy/functions/elementary/tests/test_hyperbolic.py\", line 275, in test_coth\nNameError: name 'cotm' is not defined"
+  }
+}

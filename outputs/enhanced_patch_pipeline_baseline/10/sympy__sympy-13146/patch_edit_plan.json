@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/operations.py",
+      "action": "modify_region",
+      "justification": "The `AssocOp.flatten` method is responsible for combining terms in associative operations. The failure to simplify expressions involving fractional powers suggests that this method does not correctly identify and combine terms with equivalent fractional powers."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/operations.py",
+      "target_symbol": "AssocOp.flatten",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "obligation-1"
+      ],
+      "anchor_line_before": "        # apply associativity, no commutativity property is used",
+      "anchor_line_after": "        new_seq = []",
+      "replacement_block": "        # apply associativity, no commutativity property is used\n        new_seq = []\n        fractional_powers = {}\n        while seq:\n            o = seq.pop()\n            if o.__class__ is cls:  # classes must match exactly\n                seq.extend(o.args)\n            else:\n                # Check for fractional powers and combine equivalent terms\n                if o.is_Pow and o.exp.is_Rational:\n                    base, exp = o.base, o.exp\n                    if (base, exp) in fractional_powers:\n                        fractional_powers[(base, exp)] += o.coeff\n                    else:\n                        fractional_powers[(base, exp)] = o.coeff\n                else:\n                    new_seq.append(o)\n        # Add combined fractional powers back to the sequence\n        for (base, exp), coeff in fractional_powers.items():\n            if coeff != 0:\n                new_seq.append(coeff * base**exp)\n        # c_part, nc_part, order_symbols\n        return [], new_seq, None"
+    }
+  ]
+}

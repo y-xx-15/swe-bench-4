@@ -1,0 +1,20 @@
+{
+  "title": "Correct fractional power simplification",
+  "approach": "Update the `_eval_power` method in `Float` and `Number` classes to correctly handle fractional powers of negative numbers, ensuring mathematical equivalence by explicitly handling complex results when necessary.",
+  "edit_targets": [
+    "sympy/core/numbers.py::Float._eval_power",
+    "sympy/core/numbers.py::Number._eval_power"
+  ],
+  "dependency_files": [
+    "sympy/core/tests/test_numbers.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing the `_eval_power` methods in `Float` and `Number` classes is sufficient to address the bug, as these methods directly handle the power evaluation logic. No additional changes to other files or classes are required.",
+  "risks": [
+    "Potential regressions in other cases of power evaluation, especially for edge cases involving zero, infinity, or symbolic expressions."
+  ]
+}

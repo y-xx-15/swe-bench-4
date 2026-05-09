@@ -1,0 +1,13 @@
+```diff
+diff --git a/sympy/polys/domains/polynomialring.py b/sympy/polys/domains/polynomialring.py
+--- a/sympy/polys/domains/polynomialring.py
++++ b/sympy/polys/domains/polynomialring.py
+@@ -98,7 +98,8 @@
+     def from_PolynomialRing(K1, a, K0):
+         """Convert a polynomial to ``dtype``. """
+         try:
+-            return a.set_ring(K1.ring)
++            return a.set_ring(K1.ring) if hasattr(a, 'set_ring') else None
+         except (CoercionFailed, GeneratorsError):
+             return None
+```

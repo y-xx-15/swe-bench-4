@@ -1,0 +1,16 @@
+{
+  "title": "Handle infinity case in bell function",
+  "approach": "Modify the `bell.eval` method to explicitly handle the case where `n` is `S.Infinity` and return `S.Infinity` for this scenario.",
+  "edit_targets": [
+    "sympy/functions/combinatorial/numbers.py::bell.eval"
+  ],
+  "dependency_files": [
+    "sympy/functions/combinatorial/tests/test_comb_numbers.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing the `bell.eval` method should be sufficient to fix the bug, as the issue is isolated to the handling of the infinity case within this method. No changes to other files or methods are required.",
+  "risks": [
+    "Ensure that the change does not affect other valid inputs to the `bell` function, such as negative integers or symbolic expressions."
+  ]
+}

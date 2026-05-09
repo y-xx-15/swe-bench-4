@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "action": "modify_region",
+      "justification": "The `pytest_runtest_makereport` function contains the conditional logic responsible for skip location reporting. The bug lies in its unreachable branch for `item._store.get(skipped_by_mark_key, True)` when `--runxfail` is enabled, requiring a structural fix."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "src/_pytest/skipping.py",
+      "target_symbol": "pytest_runtest_makereport",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip_location_reporting",
+        "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip location reporting"
+      ],
+      "anchor_line_before": "    elif item.config.option.runxfail:",
+      "anchor_line_after": "    elif item._store.get(skipped_by_mark_key, True):",
+      "replacement_block": "    elif item.config.option.runxfail:\n        rep.outcome = \"skipped\"\n        rep.wasxfail = \"runxfail\"\n\n    if item._store.get(skipped_by_mark_key, True):\n        rep.outcome = \"skipped\"\n        rep.longrepr = item.reportinfo() + (\"unconditional skip\",)"
+    }
+  ]
+}

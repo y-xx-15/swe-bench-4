@@ -1,0 +1,47 @@
+{
+  "root_cause": "The behavior of `Matrix.hstack` and `Matrix.vstack` has changed in SymPy 1.1 when handling matrices with zero rows or columns, leading to incorrect shape calculations for horizontally stacked matrices with zero rows.",
+  "affected_components": [
+    {
+      "file": "sympy/matrices/sparse.py",
+      "symbol": "SparseMatrix",
+      "reason": "The `SparseMatrix` class is responsible for matrix operations, including stacking, and its behavior directly impacts the failing test."
+    },
+    {
+      "file": "sympy/matrices/tests/test_sparse.py",
+      "symbol": "test_sparse_matrix",
+      "reason": "The test `test_sparse_matrix` explicitly validates the behavior of matrix stacking, and its failure indicates the issue."
+    }
+  ],
+  "failing_signal": "The failing test `test_sparse_matrix` asserts that horizontally stacking zero-row matrices should result in a matrix with the correct number of columns, but the observed shape does not match the expected shape.",
+  "propagation_path": "The bug originates in the `SparseMatrix` implementation of stacking operations, where the handling of zero-row matrices does not correctly account for the total number of columns. This propagates to the test, which fails due to the incorrect shape.",
+  "repair_constraint": "The fix must ensure that horizontally and vertically stacking matrices with zero rows or columns produces the correct shape without introducing regressions in other matrix operations.",
+  "suggested_repair_scope": [
+    "sympy/matrices/sparse.py",
+    "sympy/matrices/tests/test_sparse.py"
+  ],
+  "suspicious_symbols": [
+    "SparseMatrix",
+    "Matrix.hstack",
+    "Matrix.vstack"
+  ],
+  "repair_obligations": [
+    {
+      "id": "obligation_1",
+      "source_symbol": "SparseMatrix",
+      "validation_subject": "Matrix.hstack",
+      "why_it_matters": "The `hstack` method must correctly calculate the shape of horizontally stacked matrices, including cases with zero rows."
+    },
+    {
+      "id": "obligation_2",
+      "source_symbol": "SparseMatrix",
+      "validation_subject": "Matrix.vstack",
+      "why_it_matters": "The `vstack` method must correctly calculate the shape of vertically stacked matrices, including cases with zero columns."
+    },
+    {
+      "id": "obligation_3",
+      "source_symbol": "test_sparse_matrix",
+      "validation_subject": "test_sparse_matrix",
+      "why_it_matters": "The test must validate the correct behavior of stacking operations, ensuring that the fix resolves the issue and prevents regressions."
+    }
+  ]
+}

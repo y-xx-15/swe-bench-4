@@ -1,0 +1,24 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/operations.py",
+      "action": "modify_region",
+      "justification": "The `AssocOp.flatten` method is responsible for handling symbolic equivalence and simplification. The failure to simplify fractional exponents stems from limitations in this method, which must be updated to correctly combine terms with equivalent fractional exponents."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/operations.py",
+      "target_symbol": "AssocOp.flatten",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_evalf_bugs::core",
+        "test_evalf_bugs::core::exponent_simplification",
+        "test_evalf_bugs::core::exponentiation_simplification"
+      ],
+      "anchor_line_before": "        # apply associativity, no commutativity property is used",
+      "anchor_line_after": "        new_seq = []",
+      "replacement_block": "        # apply associativity, no commutativity property is used\n        new_seq = []\n        fractional_terms = {}\n\n        while seq:\n            o = seq.pop()\n            if o.__class__ is cls:  # classes must match exactly\n                seq.extend(o.args)\n            else:\n                base, exp = o.as_base_exp() if hasattr(o, 'as_base_exp') else (None, None)\n                if base is not None and exp.is_Rational:\n                    if base in fractional_terms:\n                        fractional_terms[base] += exp\n                    else:\n                        fractional_terms[base] = exp\n                else:\n                    new_seq.append(o)\n\n        for base, exp in fractional_terms.items():\n            if exp != 0:\n                new_seq.append(base**exp)\n\n        # c_part, nc_part, order_symbols\n        return [], new_seq, None"
+    }
+  ]
+}

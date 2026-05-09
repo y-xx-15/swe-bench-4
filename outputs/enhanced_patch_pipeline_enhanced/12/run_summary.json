@@ -1,0 +1,191 @@
+[
+  {
+    "instance_id": "sympy__sympy-13043",
+    "repo": "sympy/sympy",
+    "model": "gpt-4o",
+    "pipeline_mode": "enhanced_guided",
+    "hide_original_test_patch_in_repair": false,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "enhanced_guided",
+    "original_test_identifiers": [
+      "test_decompose"
+    ],
+    "original_status_counts": {
+      "FAILED": 3,
+      "PASSED": 1,
+      "ERROR": 1
+    },
+    "original_failed_count": 4,
+    "original_passed_count": 1,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_decompose"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_decompose"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/integrals/tests/test_intpoly.py:test_polytope_integrate",
+        "sympy/integrals/tests/test_intpoly.py:test_decompose",
+        "test_decompose",
+        "test_polytope_integrate"
+      ],
+      "failure_mode": "assertion_error",
+      "dominant_errors": [
+        "RecursionError",
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_decompose F",
+        "test_polytope_integrate E",
+        "________ sympy/integrals/tests/test_intpoly.py:test_polytope_integrate _________"
+      ],
+      "noise_ratio": 0.0026,
+      "target_test_tracebacks": {
+        "test_decompose": "TARGET TEST: test_decompose\n- snippet: test_decompose F\n- snippet: test_polytope_integrate E\n- snippet: ________ sympy/integrals/tests/test_intpoly.py:test_polytope_integrate _________\n- dominant_errors: RecursionError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_decompose F\nRecursionError: maximum recursion depth exceeded while calling a Python object\n_____________ sympy/integrals/tests/test_intpoly.py:test_decompose _____________\n  File \"/testbed/sympy/integrals/tests/test_intpoly.py\", line 29, in test_decompose\nAssertionError\n tests finished: 1 passed, 1 failed, 1 expected to fail, 1 exceptions, "
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 5,
+      "keep_top_k": 3,
+      "attempt_budget": 3,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "assertion_error",
+      "noise_ratio": 0.0026,
+      "difficulty": "medium"
+    },
+    "adaptive_num_candidates": 5,
+    "adaptive_keep_top_k": 3,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 5,
+    "kept_enhanced_candidates": 2,
+    "enhanced_candidate_retention_rate": 0.4,
+    "enhanced_generation_attempts_total": 17,
+    "enhanced_generation_attempts_avg": 3.4,
+    "kept_enhanced_test_identifiers": [
+      "test_sweb_enhanced_decompose_order",
+      "test_sweb_enhanced_decompose_order_invariant"
+    ],
+    "enhanced_failed_test_identifiers": [
+      "test_sweb_enhanced_decompose_order",
+      "test_sweb_enhanced_decompose_order_invariant"
+    ],
+    "enhanced_failed_count": 2,
+    "generated_patch_nonempty": true,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 12,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_patch_apply_failed",
+    "generated_patch_feedback": "The previous patch was rejected because it did not satisfy the acceptance gate. Patch apply mode: fuzzy_apply. Baseline passed=1, failed=4. Candidate passed=1, failed=4. Hard failure signal: none. FAIL_TO_PASS tests still failing after patch: test_decompose. Your patch must make ALL of these tests pass, not just improve aggregate counts. Semantic oracle failed identifiers: test_sweb_enhanced_decompose_order, test_sweb_enhanced_decompose_order_invariant. Semantic oracle failure summaries: test_sweb_enhanced_decompose_order: AssertionError\n________________________________________________________________________________\n___ sympy/integrals/tests/test_intpoly.py:test_sweb_enhanced_decompose_order ___\n  File \"/testbed/sympy/integrals/tests/test_intpoly.py\", line 174, in test_sweb_enhanced_decompose_order\n    assert result == expected, f\"Expected {expected}, but got {result}\"\nAssertionError: Expected [2*y, y**2, x*y, 3*x*\n\n...[truncated 320 chars]... test_sweb_enhanced_decompose_order_invariant: AssertionError\n________________________________________________________________________________\n sympy/integrals/tests/test_intpoly.py:test_sweb_enhanced_decompose_order_invariant \n  File \"/testbed/sympy/integrals/tests/test_intpoly.py\", line 175, in test_sweb_enhanced_decompose_order_invariant\n    assert result == expected, f\"Expected {expected}, but got {result}\"\nAssertionError: Expected [5, 2*y\n\n...[truncated 340 chars]....  Target files: sympy/integrals/intpoly.py. Target symbols: decompose. Generate a new source-only unified diff that is closer to the exact file context and lands inside the target class body.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [
+      "test_sweb_enhanced_decompose_order",
+      "test_sweb_enhanced_decompose_order_invariant"
+    ],
+    "patch_analysis": {
+      "root_cause": "The `decompose` function in `sympy/integrals/intpoly.py` returns a list of monomials in arbitrary order when `separate=True`, which causes test failures due to order-sensitive assertions.",
+      "affected_components": [
+        {
+          "file": "sympy/integrals/intpoly.py",
+          "symbol": "decompose",
+          "reason": "The function directly returns an unordered list of monomials, which is the source of the test failures."
+        },
+        {
+          "file": "sympy/integrals/tests/test_intpoly.py",
+          "symbol": "test_decompose",
+          "reason": "The test validates the output of `decompose` and fails due to the unordered output."
+        }
+      ],
+      "failing_signal": "The test `test_decompose` fails with `AssertionError` because the output list of monomials is not in a deterministic order.",
+      "propagation_path": "The unordered list returned by `decompose` propagates to the test assertions, which expect a specific order, leading to failures.",
+      "repair_constraint": "The `decompose` function must continue to return the same monomials but in a deterministic order, ensuring compatibility with existing functionality.",
+      "suggested_repair_scope": [
+        "sympy/integrals/intpoly.py",
+        "sympy/integrals/tests/test_intpoly.py"
+      ],
+      "suspicious_symbols": [
+        "decompose",
+        "test_decompose"
+      ],
+      "repair_obligations": [
+        {
+          "id": "test_decompose::core",
+          "source_symbol": "test_decompose",
+          "validation_subject": "core",
+          "why_it_matters": "The test validates the correctness of the `decompose` function, and its failure indicates a mismatch between expected and actual behavior."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Sort decompose output deterministically",
+      "approach": "Modify the `decompose` function in `sympy/integrals/intpoly.py` to sort the list of monomials by degree and term order when `separate=True`. This ensures deterministic output while preserving the function's behavior.",
+      "edit_targets": [
+        "sympy/integrals/intpoly.py::decompose"
+      ],
+      "dependency_files": [
+        "sympy/integrals/tests/test_intpoly.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [
+        "negative_gating",
+        "top_of_function_side_path"
+      ],
+      "sufficiency_assessment": "Editing only the `decompose` function is sufficient to resolve the bug since the failure is caused by the unordered output of this function. Tests in `sympy/integrals/tests/test_intpoly.py` validate the fix.",
+      "risks": [
+        "Sorting may introduce performance overhead for large polynomials."
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/integrals/intpoly.py",
+          "action": "modify_region",
+          "justification": "The `decompose` function directly returns an unordered list of monomials when `separate=True`, causing test failures. This behavior must be fixed by sorting the list deterministically."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "sympy/integrals/intpoly.py",
+          "target_symbol": "decompose",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "test_decompose::core"
+          ],
+          "anchor_line_before": "        return list(poly_dict.values())",
+          "anchor_line_after": "    return poly_dict",
+          "replacement_block": "        return sorted(poly_dict.values(), key=lambda monom: (monom.as_expr().as_ordered_terms(), monom))\n    return poly_dict"
+        }
+      ]
+    },
+    "final_patch_attempted": true,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": true,
+    "final_patch_apply_mode": "fuzzy_apply",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 3,
+      "PASSED": 1,
+      "ERROR": 1
+    },
+    "final_failed_count": 4,
+    "final_passed_count": 1,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/integrals/tests/test_intpoly.py:test_polytope_integrate": "FAILED",
+      "sympy/integrals/tests/test_intpoly.py:test_decompose": "FAILED",
+      "test_decompose": "FAILED",
+      "test_best_origin": "PASSED",
+      "test_polytope_integrate": "ERROR"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

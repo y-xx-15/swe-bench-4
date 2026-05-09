@@ -1,0 +1,527 @@
+[
+  {
+    "idea": {
+      "title": "Matrix.col_insert assertion mismatch with shifted identity matrix",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the assertion error caused by incorrect column insertion behavior",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_col_insert_shifted_identity"
+      ],
+      "covers_original_tests": [
+        "test_col_insert"
+      ],
+      "covers_obligations": [
+        "test_col_insert::core"
+      ],
+      "target_source_symbol": "Matrix.col_insert",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "col_insert",
+        "identity_matrix",
+        "shifted_rows"
+      ],
+      "trigger_shape_tokens": [
+        "assertionerror",
+        "col_insert",
+        "Matrix.eye",
+        "Matrix.ones"
+      ],
+      "rationale": "This test reproduces the original failure by inserting columns into an identity matrix and verifying the resulting matrix structure. It directly exercises the same API path and exception semantics as the original failing test, but focuses on the specific issue of row shifting in the identity matrix, which was not explicitly isolated in the original test."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,12 @@\n+def test_sweb_enhanced_col_insert_shifted_identity():\n+    # Create a 4x4 identity matrix\n+    M = eye(4)\n+    # Create a 4x2 matrix of ones\n+    V = ones(4, 2)\n+    # Insert the columns of ones at position 2\n+    result = M.col_insert(2, V)\n+    # Expected matrix after insertion\n+    expected = Matrix([\n+        [1, 0, 1, 1, 0],\n+        [0, 1, 1, 1, 0],\n+        [0, 0, 1, 1, 1],\n+        [0, 0, 1, 1, 1]])\n+    assert result == expected\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,12 @@\n+def test_sweb_enhanced_col_insert_shifted_identity():\n+    # Create a 4x4 identity matrix\n+    M = eye(4)\n+    # Create a 4x2 matrix of ones\n+    V = ones(4, 2)\n+    # Insert the columns of ones at position 2\n+    result = M.col_insert(2, V)\n+    # Expected matrix after insertion\n+    expected = Matrix([\n+        [1, 0, 1, 1, 0],\n+        [0, 1, 1, 1, 0],\n+        [0, 0, 1, 1, 1],\n+        [0, 0, 1, 1, 1]])\n+    assert result == expected\n```",
+    "identifiers": [
+      "test_sweb_enhanced_col_insert_shifted_identity"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_col_insert_shifted_identity"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "evaluation produced an empty status_map; likely log_parse_failed or tests_not_collected",
+    "failing_identifiers": null,
+    "eval_status_map": {},
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_col_insert"
+    ],
+    "covered_obligations": [
+      "test_col_insert::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "Matrix column insertion alignment check",
+      "semantic_bucket": "structural_invariant",
+      "goal": "stress the invariant that inserted columns should align correctly without shifting existing columns",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_col_insert_alignment"
+      ],
+      "covers_original_tests": [
+        "test_col_insert"
+      ],
+      "covers_obligations": [
+        "test_col_insert::core"
+      ],
+      "target_source_symbol": "Matrix.col_insert",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Matrix.col_insert",
+        "ShapeError",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "Matrix.col_insert",
+        "self.rows",
+        "self.cols",
+        "other.rows",
+        "other.cols"
+      ],
+      "rationale": "This test explicitly verifies the alignment of inserted columns and ensures that the invariant of column positioning is maintained. It differs from the original test by focusing on the structural correctness of the resulting matrix after insertion, rather than just observing the output mismatch."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,11 @@\n+def test_sweb_enhanced_col_insert_alignment():\n+    # Create a 4x4 identity matrix\n+    M = eye(4)\n+    # Create a 4x2 matrix of ones\n+    V = ones(4, 2)\n+    # Insert V into M at column index 2\n+    result = M.col_insert(2, V)\n+    # Expected matrix after insertion\n+    expected = Matrix([\n+        [1, 0, 1, 1, 0],\n+        [0, 1, 1, 1, 0],\n+        [0, 0, 1, 1, 1],\n+        [0, 0, 1, 1, 0]\n+    ])\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,11 @@\n+def test_sweb_enhanced_col_insert_alignment():\n+    # Create a 4x4 identity matrix\n+    M = eye(4)\n+    # Create a 4x2 matrix of ones\n+    V = ones(4, 2)\n+    # Insert V into M at column index 2\n+    result = M.col_insert(2, V)\n+    # Expected matrix after insertion\n+    expected = Matrix([\n+        [1, 0, 1, 1, 0],\n+        [0, 1, 1, 1, 0],\n+        [0, 0, 1, 1, 1],\n+        [0, 0, 1, 1, 0]\n+    ])\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_col_insert_alignment"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_col_insert_alignment"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "evaluation produced an empty status_map; likely log_parse_failed or tests_not_collected",
+    "failing_identifiers": null,
+    "eval_status_map": {},
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_col_insert"
+    ],
+    "covered_obligations": [
+      "test_col_insert::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "Test column insertion with mismatched row dimensions",
+      "semantic_bucket": "direct_symptom",
+      "goal": "This test stresses the bug by attempting to insert a column matrix with mismatched row dimensions, which should trigger an assertion error due to invalid shape handling.",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_col_insert_mismatch"
+      ],
+      "covers_original_tests": [
+        "test_col_insert"
+      ],
+      "covers_obligations": [
+        "test_col_insert::core"
+      ],
+      "target_source_symbol": "Matrix.col_insert",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "col_insert",
+        "ShapeError",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "col_insert",
+        "rows",
+        "ShapeError"
+      ],
+      "rationale": "This test differs from the original failure by explicitly testing the validation of row dimensions during column insertion, which is a distinct obligation from the original test's focus on column alignment. It provides additional repair guidance by exposing the bug's failure to enforce row dimension checks."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,8 @@\n+def test_sweb_enhanced_col_insert_mismatch():\n+    # Test column insertion with mismatched row dimensions\n+    M = eye(4)\n+    V = ones(3, 1)  # Mismatched row dimensions\n+    try:\n+        M.col_insert(2, V)\n+    except ShapeError:\n+        pass  # Expected behavior\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,8 @@\n+def test_sweb_enhanced_col_insert_mismatch():\n+    # Test column insertion with mismatched row dimensions\n+    M = eye(4)\n+    V = ones(3, 1)  # Mismatched row dimensions\n+    try:\n+        M.col_insert(2, V)\n+    except ShapeError:\n+        pass  # Expected behavior\n```",
+    "identifiers": [
+      "test_sweb_enhanced_col_insert_mismatch"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_col_insert_mismatch"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "sympy/matrices/tests/test_commonmatrix.py:test_refine": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_jacobian2": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_limit": "FAILED",
+      "test__MinimalMatrix": "PASSED",
+      "test_vec": "PASSED",
+      "test_tolist": "PASSED",
+      "test_row_col_del": "PASSED",
+      "test_get_diag_blocks1": "PASSED",
+      "test_get_diag_blocks2": "PASSED",
+      "test_shape": "PASSED",
+      "test_reshape": "PASSED",
+      "test_row_col": "PASSED",
+      "test_row_join": "PASSED",
+      "test_col_join": "PASSED",
+      "test_row_insert": "PASSED",
+      "test_col_insert": "PASSED",
+      "test_extract": "PASSED",
+      "test_hstack": "PASSED",
+      "test_vstack": "PASSED",
+      "test_atoms": "PASSED",
+      "test_free_symbols": "PASSED",
+      "test_has": "PASSED",
+      "test_is_anti_symmetric": "PASSED",
+      "test_diagonal_symmetrical": "PASSED",
+      "test_is_hermitian": "PASSED",
+      "test_is_Identity": "PASSED",
+      "test_is_symbolic": "PASSED",
+      "test_is_upper": "PASSED",
+      "test_is_lower": "PASSED",
+      "test_is_square": "PASSED",
+      "test_is_symmetric": "PASSED",
+      "test_is_hessenberg": "PASSED",
+      "test_is_zero": "PASSED",
+      "test_values": "PASSED",
+      "test_applyfunc": "PASSED",
+      "test_adjoint": "PASSED",
+      "test_as_real_imag": "PASSED",
+      "test_conjugate": "PASSED",
+      "test_doit": "PASSED",
+      "test_evalf": "PASSED",
+      "test_expand": "PASSED",
+      "test_refine": "ERROR",
+      "test_replace": "PASSED",
+      "test_replace_map": "PASSED",
+      "test_simplify": "PASSED",
+      "test_subs": "PASSED",
+      "test_trace": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_permute": "PASSED",
+      "test_abs": "PASSED",
+      "test_add": "PASSED",
+      "test_multiplication": "PASSED",
+      "test_power": "PASSED",
+      "test_neg": "PASSED",
+      "test_sub": "PASSED",
+      "test_div": "PASSED",
+      "test_det": "PASSED",
+      "test_adjugate": "PASSED",
+      "test_cofactor_and_minors": "PASSED",
+      "test_charpoly": "PASSED",
+      "test_row_op": "PASSED",
+      "test_col_op": "PASSED",
+      "test_is_echelon": "PASSED",
+      "test_echelon_form": "PASSED",
+      "test_rref": "PASSED",
+      "test_eye": "PASSED",
+      "test_ones": "PASSED",
+      "test_zeros": "PASSED",
+      "test_diag": "PASSED",
+      "test_jordan_block": "PASSED",
+      "test_columnspace": "PASSED",
+      "test_rowspace": "PASSED",
+      "test_nullspace": "PASSED",
+      "test_eigenvals": "PASSED",
+      "test_eigenvects": "PASSED",
+      "test_left_eigenvects": "PASSED",
+      "test_diagonalize": "PASSED",
+      "test_is_diagonalizable": "PASSED",
+      "test_jordan_form": "PASSED",
+      "test_singular_values": "PASSED",
+      "test_integrate": "PASSED",
+      "test_jacobian2": "ERROR",
+      "test_limit": "ERROR"
+    },
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_col_insert"
+    ],
+    "covered_obligations": [
+      "test_col_insert::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test_col_insert_behavioral_consequence",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream matrix integrity after column insertion",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "state_consistency_check",
+      "target_tests": [
+        "test_sweb_enhanced_col_insert_integrity"
+      ],
+      "covers_original_tests": [
+        "test_col_insert"
+      ],
+      "covers_obligations": [
+        "test_col_insert::core"
+      ],
+      "target_source_symbol": "Matrix.col_insert",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "col_insert(",
+        "Matrix(",
+        "ShapeError",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "col_insert(",
+        "Matrix(",
+        "rows=",
+        "cols="
+      ],
+      "rationale": "This test extends the original failure by verifying that the matrix remains consistent and valid after column insertion. It checks for downstream consequences of the bug, such as incorrect matrix dimensions or misplaced elements, which were not explicitly validated in the original test."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,12 @@\n+def test_sweb_enhanced_col_insert_integrity():\n+    # Create a 4x4 identity matrix\n+    M = eye(4)\n+    # Create a 4x2 matrix of ones\n+    V = ones(4, 2)\n+    # Insert V into M at column index 2\n+    result = M.col_insert(2, V)\n+    # Verify the resulting matrix dimensions\n+    assert result.shape == (4, 6), \"Matrix dimensions are incorrect after column insertion\"\n+    # Verify that the inserted columns are correctly placed\n+    assert result[:, 2:4] == V, \"Inserted columns are not correctly placed in the matrix\"\n+    # Verify that the original columns remain intact\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,12 @@\n+def test_sweb_enhanced_col_insert_integrity():\n+    # Create a 4x4 identity matrix\n+    M = eye(4)\n+    # Create a 4x2 matrix of ones\n+    V = ones(4, 2)\n+    # Insert V into M at column index 2\n+    result = M.col_insert(2, V)\n+    # Verify the resulting matrix dimensions\n+    assert result.shape == (4, 6), \"Matrix dimensions are incorrect after column insertion\"\n+    # Verify that the inserted columns are correctly placed\n+    assert result[:, 2:4] == V, \"Inserted columns are not correctly placed in the matrix\"\n+    # Verify that the original columns remain intact\n```",
+    "identifiers": [
+      "test_sweb_enhanced_col_insert_integrity"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_col_insert_integrity"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "sympy/matrices/tests/test_commonmatrix.py:test_refine": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_jacobian2": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_limit": "FAILED",
+      "test__MinimalMatrix": "PASSED",
+      "test_vec": "PASSED",
+      "test_tolist": "PASSED",
+      "test_row_col_del": "PASSED",
+      "test_get_diag_blocks1": "PASSED",
+      "test_get_diag_blocks2": "PASSED",
+      "test_shape": "PASSED",
+      "test_reshape": "PASSED",
+      "test_row_col": "PASSED",
+      "test_row_join": "PASSED",
+      "test_col_join": "PASSED",
+      "test_row_insert": "PASSED",
+      "test_col_insert": "PASSED",
+      "test_extract": "PASSED",
+      "test_hstack": "PASSED",
+      "test_vstack": "PASSED",
+      "test_atoms": "PASSED",
+      "test_free_symbols": "PASSED",
+      "test_has": "PASSED",
+      "test_is_anti_symmetric": "PASSED",
+      "test_diagonal_symmetrical": "PASSED",
+      "test_is_hermitian": "PASSED",
+      "test_is_Identity": "PASSED",
+      "test_is_symbolic": "PASSED",
+      "test_is_upper": "PASSED",
+      "test_is_lower": "PASSED",
+      "test_is_square": "PASSED",
+      "test_is_symmetric": "PASSED",
+      "test_is_hessenberg": "PASSED",
+      "test_is_zero": "PASSED",
+      "test_values": "PASSED",
+      "test_applyfunc": "PASSED",
+      "test_adjoint": "PASSED",
+      "test_as_real_imag": "PASSED",
+      "test_conjugate": "PASSED",
+      "test_doit": "PASSED",
+      "test_evalf": "PASSED",
+      "test_expand": "PASSED",
+      "test_refine": "ERROR",
+      "test_replace": "PASSED",
+      "test_replace_map": "PASSED",
+      "test_simplify": "PASSED",
+      "test_subs": "PASSED",
+      "test_trace": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_permute": "PASSED",
+      "test_abs": "PASSED",
+      "test_add": "PASSED",
+      "test_multiplication": "PASSED",
+      "test_power": "PASSED",
+      "test_neg": "PASSED",
+      "test_sub": "PASSED",
+      "test_div": "PASSED",
+      "test_det": "PASSED",
+      "test_adjugate": "PASSED",
+      "test_cofactor_and_minors": "PASSED",
+      "test_charpoly": "PASSED",
+      "test_row_op": "PASSED",
+      "test_col_op": "PASSED",
+      "test_is_echelon": "PASSED",
+      "test_echelon_form": "PASSED",
+      "test_rref": "PASSED",
+      "test_eye": "PASSED",
+      "test_ones": "PASSED",
+      "test_zeros": "PASSED",
+      "test_diag": "PASSED",
+      "test_jordan_block": "PASSED",
+      "test_columnspace": "PASSED",
+      "test_rowspace": "PASSED",
+      "test_nullspace": "PASSED",
+      "test_eigenvals": "PASSED",
+      "test_eigenvects": "PASSED",
+      "test_left_eigenvects": "PASSED",
+      "test_diagonalize": "PASSED",
+      "test_is_diagonalizable": "PASSED",
+      "test_jordan_form": "PASSED",
+      "test_singular_values": "PASSED",
+      "test_integrate": "PASSED",
+      "test_jacobian2": "ERROR",
+      "test_limit": "ERROR"
+    },
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_col_insert"
+    ],
+    "covered_obligations": [
+      "test_col_insert::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test column insertion with mismatched dimensions",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the behavior of Matrix.col_insert when the inserted matrix has mismatched row dimensions",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_col_insert_mismatched_dimensions"
+      ],
+      "covers_original_tests": [
+        "test_col_insert"
+      ],
+      "covers_obligations": [
+        "test_col_insert::core"
+      ],
+      "target_source_symbol": "Matrix.col_insert",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Matrix.col_insert",
+        "ShapeError",
+        "rows",
+        "cols"
+      ],
+      "trigger_shape_tokens": [
+        "Matrix.col_insert",
+        "rows",
+        "cols",
+        "ShapeError"
+      ],
+      "rationale": "This test directly exercises the same API path (Matrix.col_insert) and exception semantics (ShapeError) as the original failure. It differs from the original test by explicitly testing the validation of row dimension mismatches, which is a distinct obligation within the same source symbol."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,9 @@\n+def test_sweb_enhanced_col_insert_mismatched_dimensions():\n+    M = eye(4)\n+    V = ones(3, 2)  # Mismatched row dimensions: M has 4 rows, V has 3 rows\n+    try:\n+        M.col_insert(2, V)\n+    except ShapeError as e:\n+        assert \"self and other must have the same number of rows\" in str(e)\n+    else:\n+        raise AssertionError(\"Expected ShapeError was not raised\")\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,9 @@\n+def test_sweb_enhanced_col_insert_mismatched_dimensions():\n+    M = eye(4)\n+    V = ones(3, 2)  # Mismatched row dimensions: M has 4 rows, V has 3 rows\n+    try:\n+        M.col_insert(2, V)\n+    except ShapeError as e:\n+        assert \"self and other must have the same number of rows\" in str(e)\n+    else:\n+        raise AssertionError(\"Expected ShapeError was not raised\")\n```",
+    "identifiers": [
+      "test_sweb_enhanced_col_insert_mismatched_dimensions"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_col_insert_mismatched_dimensions"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "sympy/matrices/tests/test_commonmatrix.py:test_refine": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_jacobian2": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_limit": "FAILED",
+      "test__MinimalMatrix": "PASSED",
+      "test_vec": "PASSED",
+      "test_tolist": "PASSED",
+      "test_row_col_del": "PASSED",
+      "test_get_diag_blocks1": "PASSED",
+      "test_get_diag_blocks2": "PASSED",
+      "test_shape": "PASSED",
+      "test_reshape": "PASSED",
+      "test_row_col": "PASSED",
+      "test_row_join": "PASSED",
+      "test_col_join": "PASSED",
+      "test_row_insert": "PASSED",
+      "test_col_insert": "PASSED",
+      "test_extract": "PASSED",
+      "test_hstack": "PASSED",
+      "test_vstack": "PASSED",
+      "test_atoms": "PASSED",
+      "test_free_symbols": "PASSED",
+      "test_has": "PASSED",
+      "test_is_anti_symmetric": "PASSED",
+      "test_diagonal_symmetrical": "PASSED",
+      "test_is_hermitian": "PASSED",
+      "test_is_Identity": "PASSED",
+      "test_is_symbolic": "PASSED",
+      "test_is_upper": "PASSED",
+      "test_is_lower": "PASSED",
+      "test_is_square": "PASSED",
+      "test_is_symmetric": "PASSED",
+      "test_is_hessenberg": "PASSED",
+      "test_is_zero": "PASSED",
+      "test_values": "PASSED",
+      "test_applyfunc": "PASSED",
+      "test_adjoint": "PASSED",
+      "test_as_real_imag": "PASSED",
+      "test_conjugate": "PASSED",
+      "test_doit": "PASSED",
+      "test_evalf": "PASSED",
+      "test_expand": "PASSED",
+      "test_refine": "ERROR",
+      "test_replace": "PASSED",
+      "test_replace_map": "PASSED",
+      "test_simplify": "PASSED",
+      "test_subs": "PASSED",
+      "test_trace": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_permute": "PASSED",
+      "test_abs": "PASSED",
+      "test_add": "PASSED",
+      "test_multiplication": "PASSED",
+      "test_power": "PASSED",
+      "test_neg": "PASSED",
+      "test_sub": "PASSED",
+      "test_div": "PASSED",
+      "test_det": "PASSED",
+      "test_adjugate": "PASSED",
+      "test_cofactor_and_minors": "PASSED",
+      "test_charpoly": "PASSED",
+      "test_row_op": "PASSED",
+      "test_col_op": "PASSED",
+      "test_is_echelon": "PASSED",
+      "test_echelon_form": "PASSED",
+      "test_rref": "PASSED",
+      "test_eye": "PASSED",
+      "test_ones": "PASSED",
+      "test_zeros": "PASSED",
+      "test_diag": "PASSED",
+      "test_jordan_block": "PASSED",
+      "test_columnspace": "PASSED",
+      "test_rowspace": "PASSED",
+      "test_nullspace": "PASSED",
+      "test_eigenvals": "PASSED",
+      "test_eigenvects": "PASSED",
+      "test_left_eigenvects": "PASSED",
+      "test_diagonalize": "PASSED",
+      "test_is_diagonalizable": "PASSED",
+      "test_jordan_form": "PASSED",
+      "test_singular_values": "PASSED",
+      "test_integrate": "PASSED",
+      "test_jacobian2": "ERROR",
+      "test_limit": "ERROR"
+    },
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_col_insert"
+    ],
+    "covered_obligations": [
+      "test_col_insert::core"
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "original_test_identifiers": [
+    "test_powers_Integer",
+    "test_issue_13890"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_powers_Integer",
+    "test_issue_13890"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/core/tests/test_numbers.py:test_powers_Integer",
+    "sympy/core/tests/test_numbers.py:test_issue_13890",
+    "test_powers_Integer",
+    "test_issue_13890"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_powers_Integer F",
+    "test_issue_13890 F",
+    "_____________ sympy/core/tests/test_numbers.py:test_powers_Integer _____________"
+  ],
+  "noise_ratio": 0.019,
+  "target_test_tracebacks": {
+    "test_powers_Integer": "TARGET TEST: test_powers_Integer\n- snippet: test_powers_Integer F\n- snippet: test_issue_13890 F\n- snippet: _____________ sympy/core/tests/test_numbers.py:test_powers_Integer _____________\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_powers_Integer F\n_____________ sympy/core/tests/test_numbers.py:test_powers_Integer _____________\n  File \"/testbed/sympy/core/tests/test_numbers.py\", line 1025, in test_powers_Integer\nAssertionError\nAssertionError\n tests finished: 82 passed, 2 failed, 1 skipped, 1 expected to fail, ",
+    "test_issue_13890": "TARGET TEST: test_issue_13890\n- snippet: test_powers_Integer F\n- snippet: test_issue_13890 F\n- snippet: _____________ sympy/core/tests/test_numbers.py:test_powers_Integer _____________\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_issue_13890 F\nAssertionError\n______________ sympy/core/tests/test_numbers.py:test_issue_13890 _______________\n  File \"/testbed/sympy/core/tests/test_numbers.py\", line 1208, in test_issue_13890\nAssertionError\n tests finished: 82 passed, 2 failed, 1 skipped, 1 expected to fail, "
+  }
+}

@@ -1,0 +1,158 @@
+[
+  {
+    "idea": {
+      "title": "sinc simplification via trigsimp",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the failure to simplify exponential forms into sinc(k)",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_sinc_simplification"
+      ],
+      "covers_original_tests": [
+        "test_sinc"
+      ],
+      "covers_obligations": [
+        "test_sinc::core"
+      ],
+      "target_source_symbol": "sympy.functions.elementary.trigonometric.trigsimp",
+      "target_validation_subject": "sinc(k) simplification",
+      "semantic_alignment_tokens": [
+        "sinc(",
+        "trigsimp(",
+        "exp(",
+        "sin(",
+        "cos("
+      ],
+      "trigger_shape_tokens": [
+        "exp(",
+        "I",
+        "k",
+        "trigsimp(",
+        "sin(",
+        "cos("
+      ],
+      "rationale": "This test directly exercises the failure to simplify the exponential representation of sinc(k) using trigsimp, which was not explicitly covered by the original test. It ensures the bug is exposed through the exact mathematical transformation expected in the original problem statement."
+    },
+    "patch": "diff --git a/sympy/functions/elementary/tests/test_trigonometric.py b/sympy/functions/elementary/tests/test_trigonometric.py\n--- a/sympy/functions/elementary/tests/test_trigonometric.py\n+++ b/sympy/functions/elementary/tests/test_trigonometric.py\n@@ -236,0 +236,8 @@\n+def test_sweb_enhanced_sinc_simplification():\n+    from sympy import symbols, I, exp, trigsimp, sinc\n+    k = symbols('k', real=True)\n+    f = 1 / (2 * k) * (-I * exp(I * k) + I * exp(-I * k))\n+    simplified = trigsimp(f)\n+    expected = sinc(k)\n+    assert simplified == expected, f\"Expected {expected}, but got {simplified}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/elementary/tests/test_trigonometric.py b/sympy/functions/elementary/tests/test_trigonometric.py\n--- a/sympy/functions/elementary/tests/test_trigonometric.py\n+++ b/sympy/functions/elementary/tests/test_trigonometric.py\n@@ -236,0 +236,8 @@\n+def test_sweb_enhanced_sinc_simplification():\n+    from sympy import symbols, I, exp, trigsimp, sinc\n+    k = symbols('k', real=True)\n+    f = 1 / (2 * k) * (-I * exp(I * k) + I * exp(-I * k))\n+    simplified = trigsimp(f)\n+    expected = sinc(k)\n+    assert simplified == expected, f\"Expected {expected}, but got {simplified}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sinc_simplification"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sinc_simplification"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_sinc_trig_identity_simplification",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior of trigsimp failing to simplify sinc expressions derived from exponential forms",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_sinc_trig_identity"
+      ],
+      "covers_original_tests": [
+        "test_sinc"
+      ],
+      "covers_obligations": [
+        "test_sinc::core"
+      ],
+      "target_source_symbol": "sympy.functions.elementary.trigonometric.trigsimp",
+      "target_validation_subject": "trigsimp",
+      "semantic_alignment_tokens": [
+        "trigsimp(",
+        "sin(",
+        "exp(",
+        "sinc("
+      ],
+      "trigger_shape_tokens": [
+        "trigsimp(",
+        "exp(",
+        "sin(",
+        "sinc("
+      ],
+      "rationale": "This test differs from the original failure by explicitly targeting the behavioral consequence of trigsimp failing to simplify expressions involving sinc. It uses a derived exponential form to validate the downstream impact of the bug, ensuring the test reproduces the failure while focusing on the expected simplification behavior."
+    },
+    "patch": "diff --git a/sympy/functions/elementary/tests/test_trigonometric.py b/sympy/functions/elementary/tests/test_trigonometric.py\n--- a/sympy/functions/elementary/tests/test_trigonometric.py\n+++ b/sympy/functions/elementary/tests/test_trigonometric.py\n@@ -236,0 +236,7 @@\n+def test_sweb_enhanced_sinc_trig_identity():\n+    from sympy import trigsimp, exp, I, sinc, pi\n+    k = Symbol('k', real=True)\n+    f = 1 / (2 * k) * (-I * exp(I * k) + I * exp(-I * k))\n+    simplified = trigsimp(f)\n+    assert simplified == sinc(k), f\"Expected {sinc(k)}, but got {simplified}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/elementary/tests/test_trigonometric.py b/sympy/functions/elementary/tests/test_trigonometric.py\n--- a/sympy/functions/elementary/tests/test_trigonometric.py\n+++ b/sympy/functions/elementary/tests/test_trigonometric.py\n@@ -236,0 +236,7 @@\n+def test_sweb_enhanced_sinc_trig_identity():\n+    from sympy import trigsimp, exp, I, sinc, pi\n+    k = Symbol('k', real=True)\n+    f = 1 / (2 * k) * (-I * exp(I * k) + I * exp(-I * k))\n+    simplified = trigsimp(f)\n+    assert simplified == sinc(k), f\"Expected {sinc(k)}, but got {simplified}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sinc_trig_identity"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sinc_trig_identity"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "sinc simplification via explicit exponential form",
+      "semantic_bucket": "structural_invariant",
+      "goal": "stress the failure to simplify expressions involving sinc(k) using explicit exponential forms",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_sinc_exponential"
+      ],
+      "covers_original_tests": [
+        "test_sinc"
+      ],
+      "covers_obligations": [
+        "test_sinc::core"
+      ],
+      "target_source_symbol": "sympy.functions.elementary.trigonometric.trigsimp",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "exp(",
+        "I",
+        "sinc(",
+        "trigsimp"
+      ],
+      "trigger_shape_tokens": [
+        "exp(",
+        "I",
+        "sinc(",
+        "trigsimp"
+      ],
+      "rationale": "This test explicitly constructs the sinc(k) expression using exponential terms, ensuring the bug is exposed through the failure to simplify the exponential form. It differs from the original test by focusing on the structural invariant that trigsimp should handle exponential representations correctly."
+    },
+    "patch": "diff --git a/sympy/functions/elementary/tests/test_trigonometric.py b/sympy/functions/elementary/tests/test_trigonometric.py\n@@ -236,0 +236,8 @@\n+def test_sweb_enhanced_sinc_exponential():\n+    from sympy import exp, I, trigsimp, symbols\n+    k = symbols('k', real=True)\n+    f = (1 / (2 * k)) * (-I * exp(I * k) + I * exp(-I * k))\n+    simplified = trigsimp(f)\n+    expected = sinc(k)\n+    assert simplified == expected, f\"Expected {expected}, but got {simplified}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/functions/elementary/tests/test_trigonometric.py b/sympy/functions/elementary/tests/test_trigonometric.py\n@@ -236,0 +236,8 @@\n+def test_sweb_enhanced_sinc_exponential():\n+    from sympy import exp, I, trigsimp, symbols\n+    k = symbols('k', real=True)\n+    f = (1 / (2 * k)) * (-I * exp(I * k) + I * exp(-I * k))\n+    simplified = trigsimp(f)\n+    expected = sinc(k)\n+    assert simplified == expected, f\"Expected {expected}, but got {simplified}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sinc_exponential"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sinc_exponential"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

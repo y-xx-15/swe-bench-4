@@ -1,0 +1,436 @@
+[
+  {
+    "idea": {
+      "title": "tuple-based float construction validation",
+      "semantic_bucket": "direct_symptom",
+      "goal": "ensure tuple-based float construction raises ValueError for invalid literals",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_tuple_float_invalid_literal"
+      ],
+      "covers_original_tests": [
+        "test_Float_from_tuple"
+      ],
+      "covers_obligations": [
+        "test_Float_from_tuple::core"
+      ],
+      "target_source_symbol": "sympy.core.numbers.Float",
+      "target_validation_subject": "tuple-based float construction",
+      "semantic_alignment_tokens": [
+        "tuple",
+        "Float",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "tuple",
+        "long",
+        "base 16",
+        "ValueError"
+      ],
+      "rationale": "This test directly targets the invalid literal handling in tuple-based float construction, which is the root cause of the ValueError. Unlike the original test, it isolates the tuple input validation logic, providing precise repair guidance for this specific obligation."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,5 @@\n+def test_sweb_enhanced_tuple_float_invalid_literal():\n+    # Test invalid literal in tuple-based float construction\n+    raises(ValueError, lambda: Float((0, 'invalid_literal', 0, 1)))\n+    raises(ValueError, lambda: Float((0, '1L', 0, 1)))  # Python 2-style long literal\n+    raises(ValueError, lambda: Float((0, '0x1', 0, 1)))  # Hexadecimal string\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,5 @@\n+def test_sweb_enhanced_tuple_float_invalid_literal():\n+    # Test invalid literal in tuple-based float construction\n+    raises(ValueError, lambda: Float((0, 'invalid_literal', 0, 1)))\n+    raises(ValueError, lambda: Float((0, '1L', 0, 1)))  # Python 2-style long literal\n+    raises(ValueError, lambda: Float((0, '0x1', 0, 1)))  # Hexadecimal string\n```",
+    "identifiers": [
+      "test_sweb_enhanced_tuple_float_invalid_literal"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_tuple_float_invalid_literal"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_tuple_float_invalid_literal"
+    ],
+    "eval_status_map": {
+      "sympy/core/tests/test_numbers.py:test_sweb_enhanced_tuple_float_invalid_literal": "FAILED",
+      "test_integers_cache": "PASSED",
+      "test_seterr": "PASSED",
+      "test_mod": "PASSED",
+      "test_divmod": "PASSED",
+      "test_igcd": "PASSED",
+      "test_igcd_lehmer": "PASSED",
+      "test_igcd2": "PASSED",
+      "test_ilcm": "PASSED",
+      "test_igcdex": "PASSED",
+      "test_Integer_new": "PASSED",
+      "test_Rational_new": "PASSED",
+      "test_Number_new": "PASSED",
+      "test_Rational_cmp": "PASSED",
+      "test_Float": "PASSED",
+      "test_float_mpf": "PASSED",
+      "test_Float_RealElement": "PASSED",
+      "test_Float_default_to_highprec_from_str": "PASSED",
+      "test_Float_eval": "PASSED",
+      "test_Float_issue_2107": "PASSED",
+      "test_Infinity": "PASSED",
+      "test_Infinity_2": "PASSED",
+      "test_Mul_Infinity_Zero": "PASSED",
+      "test_Div_By_Zero": "PASSED",
+      "test_Infinity_inequations": "PASSED",
+      "test_NaN": "PASSED",
+      "test_special_numbers": "PASSED",
+      "test_powers": "PASSED",
+      "test_integer_nthroot_overflow": "PASSED",
+      "test_isqrt": "PASSED",
+      "test_powers_Integer": "PASSED",
+      "test_powers_Rational": "PASSED",
+      "test_powers_Float": "PASSED",
+      "test_abs1": "PASSED",
+      "test_accept_int": "PASSED",
+      "test_dont_accept_str": "PASSED",
+      "test_int": "PASSED",
+      "test_long": "PASSED",
+      "test_real_bug": "PASSED",
+      "test_bug_sqrt": "PASSED",
+      "test_pi_Pi": "PASSED",
+      "test_no_len": "PASSED",
+      "test_issue_3321": "PASSED",
+      "test_issue_3692": "PASSED",
+      "test_issue_3423": "PASSED",
+      "test_issue_3449": "PASSED",
+      "test_Integer_factors": "PASSED",
+      "test_Rational_factors": "PASSED",
+      "test_issue_4107": "PASSED",
+      "test_IntegerInteger": "PASSED",
+      "test_Rational_gcd_lcm_cofactors": "PASSED",
+      "test_Float_gcd_lcm_cofactors": "PASSED",
+      "test_issue_4611": "PASSED",
+      "test_conversion_to_mpmath": "PASSED",
+      "test_relational": "PASSED",
+      "test_Integer_as_index": "PASSED",
+      "test_Rational_int": "PASSED",
+      "test_zoo": "PASSED",
+      "test_issue_4122": "PASSED",
+      "test_GoldenRatio_expand": "PASSED",
+      "test_as_content_primitive": "PASSED",
+      "test_hashing_sympy_integers": "PASSED",
+      "test_issue_4172": "PASSED",
+      "test_Catalan_EulerGamma_prec": "PASSED",
+      "test_Float_eq": "PASSED",
+      "test_int_NumberSymbols": "PASSED",
+      "test_issue_6640": "PASSED",
+      "test_issue_6349": "PASSED",
+      "test_mpf_norm": "PASSED",
+      "test_latex": "PASSED",
+      "test_issue_7742": "PASSED",
+      "test_simplify_AlgebraicNumber": "PASSED",
+      "test_Float_idempotence": "PASSED",
+      "test_comp": "PASSED",
+      "test_issue_9491": "PASSED",
+      "test_issue_10063": "PASSED",
+      "test_issue_10020": "PASSED",
+      "test_invert_numbers": "PASSED",
+      "test_mod_inverse": "PASSED",
+      "test_golden_ratio_rewrite_as_sqrt": "PASSED",
+      "test_comparisons_with_unknown_type": "PASSED",
+      "test_NumberSymbol_comparison": "PASSED",
+      "test_Integer_precision": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_Float_from_tuple"
+    ],
+    "covered_obligations": [
+      "test_Float_from_tuple::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "float tuple validation in mpf creation",
+      "semantic_bucket": "structural_invariant",
+      "goal": "stress the validation of tuple inputs for float creation, ensuring proper handling of hexadecimal literals",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_float_tuple_validation"
+      ],
+      "covers_original_tests": [
+        "test_Float_from_tuple"
+      ],
+      "covers_obligations": [
+        "test_Float_from_tuple::core"
+      ],
+      "target_source_symbol": "Float.__new__",
+      "target_validation_subject": "tuple input for float creation",
+      "semantic_alignment_tokens": [
+        "tuple",
+        "long",
+        "ValueError",
+        "invalid literal for int()"
+      ],
+      "trigger_shape_tokens": [
+        "tuple",
+        "long",
+        "hexadecimal"
+      ],
+      "rationale": "This idea focuses on the validation of tuple inputs containing hexadecimal literals during float creation, which is distinct from the original test's broader pickle compatibility issue. It adds repair guidance by isolating the tuple validation logic and ensuring proper handling of hexadecimal literals, which directly addresses the observed ValueError."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,6 @@\n+def test_sweb_enhanced_float_tuple_validation():\n+    # Test invalid hexadecimal literal in tuple input for Float creation\n+    raises(ValueError, lambda: Float((0, '1G', 0, 1)))\n+    # Test valid hexadecimal literal in tuple input for Float creation\n+    assert Float((0, '1A', 0, 1)) == Float(26)\n+    assert Float((1, '1A', 0, 1)) == Float(-26)\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,6 @@\n+def test_sweb_enhanced_float_tuple_validation():\n+    # Test invalid hexadecimal literal in tuple input for Float creation\n+    raises(ValueError, lambda: Float((0, '1G', 0, 1)))\n+    # Test valid hexadecimal literal in tuple input for Float creation\n+    assert Float((0, '1A', 0, 1)) == Float(26)\n+    assert Float((1, '1A', 0, 1)) == Float(-26)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_float_tuple_validation"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_float_tuple_validation"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_float_tuple_validation"
+    ],
+    "eval_status_map": {
+      "sympy/core/tests/test_numbers.py:test_sweb_enhanced_float_tuple_validation": "FAILED",
+      "test_integers_cache": "PASSED",
+      "test_seterr": "PASSED",
+      "test_mod": "PASSED",
+      "test_divmod": "PASSED",
+      "test_igcd": "PASSED",
+      "test_igcd_lehmer": "PASSED",
+      "test_igcd2": "PASSED",
+      "test_ilcm": "PASSED",
+      "test_igcdex": "PASSED",
+      "test_Integer_new": "PASSED",
+      "test_Rational_new": "PASSED",
+      "test_Number_new": "PASSED",
+      "test_Rational_cmp": "PASSED",
+      "test_Float": "PASSED",
+      "test_float_mpf": "PASSED",
+      "test_Float_RealElement": "PASSED",
+      "test_Float_default_to_highprec_from_str": "PASSED",
+      "test_Float_eval": "PASSED",
+      "test_Float_issue_2107": "PASSED",
+      "test_Infinity": "PASSED",
+      "test_Infinity_2": "PASSED",
+      "test_Mul_Infinity_Zero": "PASSED",
+      "test_Div_By_Zero": "PASSED",
+      "test_Infinity_inequations": "PASSED",
+      "test_NaN": "PASSED",
+      "test_special_numbers": "PASSED",
+      "test_powers": "PASSED",
+      "test_integer_nthroot_overflow": "PASSED",
+      "test_isqrt": "PASSED",
+      "test_powers_Integer": "PASSED",
+      "test_powers_Rational": "PASSED",
+      "test_powers_Float": "PASSED",
+      "test_abs1": "PASSED",
+      "test_accept_int": "PASSED",
+      "test_dont_accept_str": "PASSED",
+      "test_int": "PASSED",
+      "test_long": "PASSED",
+      "test_real_bug": "PASSED",
+      "test_bug_sqrt": "PASSED",
+      "test_pi_Pi": "PASSED",
+      "test_no_len": "PASSED",
+      "test_issue_3321": "PASSED",
+      "test_issue_3692": "PASSED",
+      "test_issue_3423": "PASSED",
+      "test_issue_3449": "PASSED",
+      "test_Integer_factors": "PASSED",
+      "test_Rational_factors": "PASSED",
+      "test_issue_4107": "PASSED",
+      "test_IntegerInteger": "PASSED",
+      "test_Rational_gcd_lcm_cofactors": "PASSED",
+      "test_Float_gcd_lcm_cofactors": "PASSED",
+      "test_issue_4611": "PASSED",
+      "test_conversion_to_mpmath": "PASSED",
+      "test_relational": "PASSED",
+      "test_Integer_as_index": "PASSED",
+      "test_Rational_int": "PASSED",
+      "test_zoo": "PASSED",
+      "test_issue_4122": "PASSED",
+      "test_GoldenRatio_expand": "PASSED",
+      "test_as_content_primitive": "PASSED",
+      "test_hashing_sympy_integers": "PASSED",
+      "test_issue_4172": "PASSED",
+      "test_Catalan_EulerGamma_prec": "PASSED",
+      "test_Float_eq": "PASSED",
+      "test_int_NumberSymbols": "PASSED",
+      "test_issue_6640": "PASSED",
+      "test_issue_6349": "PASSED",
+      "test_mpf_norm": "PASSED",
+      "test_latex": "PASSED",
+      "test_issue_7742": "PASSED",
+      "test_simplify_AlgebraicNumber": "PASSED",
+      "test_Float_idempotence": "PASSED",
+      "test_comp": "PASSED",
+      "test_issue_9491": "PASSED",
+      "test_issue_10063": "PASSED",
+      "test_issue_10020": "PASSED",
+      "test_invert_numbers": "PASSED",
+      "test_mod_inverse": "PASSED",
+      "test_golden_ratio_rewrite_as_sqrt": "PASSED",
+      "test_comparisons_with_unknown_type": "PASSED",
+      "test_NumberSymbol_comparison": "PASSED",
+      "test_Integer_precision": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_Float_from_tuple"
+    ],
+    "covered_obligations": [
+      "test_Float_from_tuple::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "pickle compatibility across Python versions",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior of loading pickled float-containing expressions across Python versions",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_pickle_load_float"
+      ],
+      "covers_original_tests": [
+        "test_Float_from_tuple"
+      ],
+      "covers_obligations": [
+        "test_Float_from_tuple::core"
+      ],
+      "target_source_symbol": "Float.__new__",
+      "target_validation_subject": "num[1] conversion logic",
+      "semantic_alignment_tokens": [
+        "pickle.loads",
+        "pickle.dumps",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "pickle.loads",
+        "pickle.dumps",
+        "long(num[1], 16)"
+      ],
+      "rationale": "This test exercises the downstream consequence of pickling and unpickling float-containing expressions across Python versions, which is distinct from the original test that directly validates tuple-to-Float conversion. It highlights the broader impact of the bug on serialization compatibility."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,10 @@\n+def test_sweb_enhanced_pickle_load_float():\n+    import pickle\n+    from sympy import Float\n+    \n+    # Create a Float object with a tuple that triggers the bug\n+    obj = Float((0, '1L', 0, 1))\n+    \n+    # Serialize and deserialize the object across Python versions\n+    serialized = pickle.dumps(obj, protocol=2)\n+    raises(ValueError, lambda: pickle.loads(serialized))\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,10 @@\n+def test_sweb_enhanced_pickle_load_float():\n+    import pickle\n+    from sympy import Float\n+    \n+    # Create a Float object with a tuple that triggers the bug\n+    obj = Float((0, '1L', 0, 1))\n+    \n+    # Serialize and deserialize the object across Python versions\n+    serialized = pickle.dumps(obj, protocol=2)\n+    raises(ValueError, lambda: pickle.loads(serialized))\n```",
+    "identifiers": [
+      "test_sweb_enhanced_pickle_load_float"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_pickle_load_float"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_pickle_load_float"
+    ],
+    "eval_status_map": {
+      "sympy/core/tests/test_numbers.py:test_sweb_enhanced_pickle_load_float": "FAILED",
+      "test_integers_cache": "PASSED",
+      "test_seterr": "PASSED",
+      "test_mod": "PASSED",
+      "test_divmod": "PASSED",
+      "test_igcd": "PASSED",
+      "test_igcd_lehmer": "PASSED",
+      "test_igcd2": "PASSED",
+      "test_ilcm": "PASSED",
+      "test_igcdex": "PASSED",
+      "test_Integer_new": "PASSED",
+      "test_Rational_new": "PASSED",
+      "test_Number_new": "PASSED",
+      "test_Rational_cmp": "PASSED",
+      "test_Float": "PASSED",
+      "test_float_mpf": "PASSED",
+      "test_Float_RealElement": "PASSED",
+      "test_Float_default_to_highprec_from_str": "PASSED",
+      "test_Float_eval": "PASSED",
+      "test_Float_issue_2107": "PASSED",
+      "test_Infinity": "PASSED",
+      "test_Infinity_2": "PASSED",
+      "test_Mul_Infinity_Zero": "PASSED",
+      "test_Div_By_Zero": "PASSED",
+      "test_Infinity_inequations": "PASSED",
+      "test_NaN": "PASSED",
+      "test_special_numbers": "PASSED",
+      "test_powers": "PASSED",
+      "test_integer_nthroot_overflow": "PASSED",
+      "test_isqrt": "PASSED",
+      "test_powers_Integer": "PASSED",
+      "test_powers_Rational": "PASSED",
+      "test_powers_Float": "PASSED",
+      "test_abs1": "PASSED",
+      "test_accept_int": "PASSED",
+      "test_dont_accept_str": "PASSED",
+      "test_int": "PASSED",
+      "test_long": "PASSED",
+      "test_real_bug": "PASSED",
+      "test_bug_sqrt": "PASSED",
+      "test_pi_Pi": "PASSED",
+      "test_no_len": "PASSED",
+      "test_issue_3321": "PASSED",
+      "test_issue_3692": "PASSED",
+      "test_issue_3423": "PASSED",
+      "test_issue_3449": "PASSED",
+      "test_Integer_factors": "PASSED",
+      "test_Rational_factors": "PASSED",
+      "test_issue_4107": "PASSED",
+      "test_IntegerInteger": "PASSED",
+      "test_Rational_gcd_lcm_cofactors": "PASSED",
+      "test_Float_gcd_lcm_cofactors": "PASSED",
+      "test_issue_4611": "PASSED",
+      "test_conversion_to_mpmath": "PASSED",
+      "test_relational": "PASSED",
+      "test_Integer_as_index": "PASSED",
+      "test_Rational_int": "PASSED",
+      "test_zoo": "PASSED",
+      "test_issue_4122": "PASSED",
+      "test_GoldenRatio_expand": "PASSED",
+      "test_as_content_primitive": "PASSED",
+      "test_hashing_sympy_integers": "PASSED",
+      "test_issue_4172": "PASSED",
+      "test_Catalan_EulerGamma_prec": "PASSED",
+      "test_Float_eq": "PASSED",
+      "test_int_NumberSymbols": "PASSED",
+      "test_issue_6640": "PASSED",
+      "test_issue_6349": "PASSED",
+      "test_mpf_norm": "PASSED",
+      "test_latex": "PASSED",
+      "test_issue_7742": "PASSED",
+      "test_simplify_AlgebraicNumber": "PASSED",
+      "test_Float_idempotence": "PASSED",
+      "test_comp": "PASSED",
+      "test_issue_9491": "PASSED",
+      "test_issue_10063": "PASSED",
+      "test_issue_10020": "PASSED",
+      "test_invert_numbers": "PASSED",
+      "test_mod_inverse": "PASSED",
+      "test_golden_ratio_rewrite_as_sqrt": "PASSED",
+      "test_comparisons_with_unknown_type": "PASSED",
+      "test_NumberSymbol_comparison": "PASSED",
+      "test_Integer_precision": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_Float_from_tuple"
+    ],
+    "covered_obligations": [
+      "test_Float_from_tuple::core"
+    ]
+  }
+]

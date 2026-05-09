@@ -1,0 +1,513 @@
+[
+  {
+    "idea": {
+      "title": "validate_blueprint_name_dots",
+      "semantic_bucket": "unspecified",
+      "goal": "ensure Blueprint constructor raises ValueError when name contains dots",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_blueprint_name_with_dots"
+      ],
+      "covers_original_tests": [
+        "test_dotted_name_not_allowed"
+      ],
+      "covers_obligations": [
+        "test_dotted_name_not_allowed::core"
+      ],
+      "target_source_symbol": "Blueprint.__init__",
+      "target_validation_subject": "name",
+      "semantic_alignment_tokens": [
+        "Blueprint(",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "Blueprint(",
+        "__init__",
+        "name",
+        "valueerror"
+      ],
+      "rationale": "This test directly targets the Blueprint constructor's validation of the 'name' parameter, ensuring that dots in the name trigger the expected ValueError. It differs from the original test by focusing on the constructor's argument validation boundary, providing additional repair guidance for the specific obligation to reject dotted names."
+    },
+    "patch": "diff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,6 @@\n+def test_sweb_enhanced_blueprint_name_with_dots():\n+    # Ensure that Blueprint constructor raises ValueError when name contains dots\n+    with pytest.raises(ValueError, match=\"Blueprint name should not contain dots\"):\n+        flask.Blueprint(\"invalid.name.with.dots\", __name__)\n+\n+\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,6 @@\n+def test_sweb_enhanced_blueprint_name_with_dots():\n+    # Ensure that Blueprint constructor raises ValueError when name contains dots\n+    with pytest.raises(ValueError, match=\"Blueprint name should not contain dots\"):\n+        flask.Blueprint(\"invalid.name.with.dots\", __name__)\n+\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_blueprint_name_with_dots"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blueprint_name_with_dots"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "validate_view_func_name_no_dots",
+      "semantic_bucket": "unspecified",
+      "goal": "ensure that view_func.__name__ does not contain dots, triggering ValueError if violated",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_view_func_name_dots"
+      ],
+      "covers_original_tests": [
+        "test_route_decorator_custom_endpoint_with_dots"
+      ],
+      "covers_obligations": [
+        "test_route_decorator_custom_endpoint_with_dots::view_func_name"
+      ],
+      "target_source_symbol": "Blueprint.add_url_rule",
+      "target_validation_subject": "view_func_name",
+      "semantic_alignment_tokens": [
+        "view_func.__name__",
+        "Blueprint",
+        "add_url_rule",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "view_func.__name__",
+        "Blueprint",
+        "view",
+        "function",
+        "name",
+        "should",
+        "not",
+        "contain",
+        "dots"
+      ],
+      "rationale": "This test directly targets the uncovered obligation to validate that the view function's name does not contain dots. It differs from the original test by explicitly constructing a view function with a dotted name and passing it to Blueprint.add_url_rule, ensuring the validation logic for view_func.__name__ is exercised."
+    },
+    "patch": "diff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,10 @@\n+def test_sweb_enhanced_view_func_name_dots(app):\n+    bp = flask.Blueprint(\"bp\", __name__)\n+\n+    def view_func_with_dots():\n+        return \"Invalid view function name\"\n+\n+    view_func_with_dots.__name__ = \"invalid.name\"\n+\n+    with pytest.raises(ValueError, match=\"Blueprint view function name should not contain dots\"):\n+        bp.add_url_rule(\"/\", view_func=view_func_with_dots)\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,10 @@\n+def test_sweb_enhanced_view_func_name_dots(app):\n+    bp = flask.Blueprint(\"bp\", __name__)\n+\n+    def view_func_with_dots():\n+        return \"Invalid view function name\"\n+\n+    view_func_with_dots.__name__ = \"invalid.name\"\n+\n+    with pytest.raises(ValueError, match=\"Blueprint view function name should not contain dots\"):\n+        bp.add_url_rule(\"/\", view_func=view_func_with_dots)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_view_func_name_dots"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_view_func_name_dots"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "custom endpoint with dot triggers ValueError",
+      "semantic_bucket": "unspecified",
+      "goal": "trigger ValueError when a custom endpoint name contains a dot",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_custom_endpoint_with_dot"
+      ],
+      "covers_original_tests": [
+        "test_route_decorator_custom_endpoint_with_dots"
+      ],
+      "covers_obligations": [
+        "test_route_decorator_custom_endpoint_with_dots::endpoint"
+      ],
+      "target_source_symbol": "Blueprint.add_url_rule",
+      "target_validation_subject": "endpoint",
+      "semantic_alignment_tokens": [
+        "endpoint=",
+        "add_url_rule",
+        "Blueprint(",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "endpoint=",
+        "Blueprint",
+        "add_url_rule",
+        "route(",
+        "dots"
+      ],
+      "rationale": "This test directly targets the 'endpoint' validation in Blueprint.add_url_rule by passing a custom endpoint name containing a dot. It differs from the original test by focusing solely on the endpoint argument, ensuring that the ValueError is raised for this specific validation obligation."
+    },
+    "patch": "diff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,9 @@\n+def test_sweb_enhanced_custom_endpoint_with_dot(app):\n+    bp = flask.Blueprint(\"test_bp\", __name__)\n+\n+    def view_func():\n+        return \"test\"\n+\n+    with pytest.raises(ValueError, match=\"Blueprint endpoints should not contain dots\"):\n+        bp.add_url_rule(\"/test\", endpoint=\"invalid.endpoint\", view_func=view_func)\n+\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,9 @@\n+def test_sweb_enhanced_custom_endpoint_with_dot(app):\n+    bp = flask.Blueprint(\"test_bp\", __name__)\n+\n+    def view_func():\n+        return \"test\"\n+\n+    with pytest.raises(ValueError, match=\"Blueprint endpoints should not contain dots\"):\n+        bp.add_url_rule(\"/test\", endpoint=\"invalid.endpoint\", view_func=view_func)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_custom_endpoint_with_dot"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_custom_endpoint_with_dot"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "reject_blueprint_name_with_dot",
+      "semantic_bucket": "unspecified",
+      "goal": "ensure Blueprint constructor raises ValueError when name contains a dot",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_reject_blueprint_name_with_dot"
+      ],
+      "covers_original_tests": [
+        "test_dotted_name_not_allowed"
+      ],
+      "covers_obligations": [
+        "test_dotted_name_not_allowed::core"
+      ],
+      "target_source_symbol": "Blueprint.__init__",
+      "target_validation_subject": "name",
+      "semantic_alignment_tokens": [
+        "Blueprint(",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "Blueprint(",
+        "Blueprint",
+        "__init__",
+        "valueerror"
+      ],
+      "rationale": "This test directly targets the Blueprint constructor's validation of the 'name' parameter, ensuring it raises a ValueError when the name contains a dot. Unlike the original test, which only checks for the presence of a ValueError, this test explicitly isolates the constructor's behavior, providing clearer repair guidance for the validation logic."
+    },
+    "patch": "diff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,6 @@\n+def test_sweb_enhanced_reject_blueprint_name_with_dot():\n+    # Ensure Blueprint constructor raises ValueError when name contains a dot\n+    with pytest.raises(ValueError, match=\"Blueprint names should not contain dots\"):\n+        flask.Blueprint(\"invalid.name\", __name__)\n+\n+    # Ensure valid names do not raise an error\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,6 @@\n+def test_sweb_enhanced_reject_blueprint_name_with_dot():\n+    # Ensure Blueprint constructor raises ValueError when name contains a dot\n+    with pytest.raises(ValueError, match=\"Blueprint names should not contain dots\"):\n+        flask.Blueprint(\"invalid.name\", __name__)\n+\n+    # Ensure valid names do not raise an error\n```",
+    "identifiers": [
+      "test_sweb_enhanced_reject_blueprint_name_with_dot"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_reject_blueprint_name_with_dot"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "blueprint_name_with_dot",
+      "semantic_bucket": "unspecified",
+      "goal": "stress the validation of blueprint names containing dots to ensure they raise ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_blueprint_name_with_dot"
+      ],
+      "covers_original_tests": [
+        "test_dotted_name_not_allowed"
+      ],
+      "covers_obligations": [
+        "test_dotted_name_not_allowed::core"
+      ],
+      "target_source_symbol": "Blueprint.__init__",
+      "target_validation_subject": "name",
+      "semantic_alignment_tokens": [
+        "blueprint(",
+        "valueerror"
+      ],
+      "trigger_shape_tokens": [
+        "Blueprint(",
+        "Blueprint",
+        "__init__",
+        "blueprint(",
+        "valueerror"
+      ],
+      "rationale": "This test directly targets the validation of the 'name' parameter in Blueprint.__init__, which is distinct from endpoint-related validation in add_url_rule. It ensures that the bug is exposed when a dot is present in the blueprint name, aligning with the original failure but focusing on the constructor-level obligation."
+    },
+    "patch": "diff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,6 @@\n+def test_sweb_enhanced_blueprint_name_with_dot(app):\n+    with pytest.raises(ValueError, match=\"Blueprint names should not contain dots\"):\n+        flask.Blueprint(\"invalid.name\", __name__)\n+\n+    with pytest.raises(ValueError, match=\"Blueprint names should not contain dots\"):\n+        flask.Blueprint(\"another.invalid.name\", __name__)\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,6 @@\n+def test_sweb_enhanced_blueprint_name_with_dot(app):\n+    with pytest.raises(ValueError, match=\"Blueprint names should not contain dots\"):\n+        flask.Blueprint(\"invalid.name\", __name__)\n+\n+    with pytest.raises(ValueError, match=\"Blueprint names should not contain dots\"):\n+        flask.Blueprint(\"another.invalid.name\", __name__)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_blueprint_name_with_dot"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blueprint_name_with_dot"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "reject_blueprint_name_with_dots",
+      "semantic_bucket": "unspecified",
+      "goal": "stress the validation of blueprint names to ensure dots are rejected, reproducing the ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_blueprint_name_with_dots"
+      ],
+      "covers_original_tests": [
+        "test_dotted_name_not_allowed"
+      ],
+      "covers_obligations": [
+        "test_dotted_name_not_allowed::core"
+      ],
+      "target_source_symbol": "Blueprint.__init__",
+      "target_validation_subject": "name",
+      "semantic_alignment_tokens": [
+        "blueprint(",
+        "valueerror"
+      ],
+      "trigger_shape_tokens": [
+        "Blueprint(",
+        "Blueprint",
+        "__init__",
+        "blueprint(",
+        "valueerror"
+      ],
+      "rationale": "This test directly targets the validation of the 'name' parameter in Blueprint.__init__, which is the core obligation of the original test. It differs from the original by explicitly focusing on the boundary condition of a name containing a dot, ensuring the ValueError is raised as expected."
+    },
+    "patch": "diff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,6 @@\n+def test_sweb_enhanced_blueprint_nested_name_with_dots(app):\n+    # Test that a nested blueprint name containing dots raises a ValueError\n+    parent_bp = flask.Blueprint(\"parent\", __name__)\n+    with pytest.raises(ValueError):\n+        parent_bp.register_blueprint(flask.Blueprint(\"child.with.dots\", __name__))\n+\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,6 @@\n+def test_sweb_enhanced_blueprint_nested_name_with_dots(app):\n+    # Test that a nested blueprint name containing dots raises a ValueError\n+    parent_bp = flask.Blueprint(\"parent\", __name__)\n+    with pytest.raises(ValueError):\n+        parent_bp.register_blueprint(flask.Blueprint(\"child.with.dots\", __name__))\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_blueprint_nested_name_with_dots"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blueprint_nested_name_with_dots"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "reject_blueprint_endpoint_with_dots",
+      "semantic_bucket": "unspecified",
+      "goal": "ensure that endpoints with dots in their names are rejected with a ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_reject_blueprint_endpoint_with_dots"
+      ],
+      "covers_original_tests": [
+        "test_route_decorator_custom_endpoint_with_dots"
+      ],
+      "covers_obligations": [
+        "test_route_decorator_custom_endpoint_with_dots::endpoint"
+      ],
+      "target_source_symbol": "Blueprint.add_url_rule",
+      "target_validation_subject": "endpoint",
+      "semantic_alignment_tokens": [
+        "endpoint=",
+        "add_url_rule",
+        "Blueprint(",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "endpoint=",
+        "Blueprint",
+        "add_url_rule",
+        "should",
+        "not",
+        "contain",
+        "dots"
+      ],
+      "rationale": "This idea focuses on the specific obligation to validate that endpoint names passed to Blueprint.add_url_rule do not contain dots. It differs from the original test by directly targeting the endpoint validation logic in isolation, rather than testing it indirectly through a route decorator."
+    },
+    "patch": "diff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,8 @@\n+def test_sweb_enhanced_reject_blueprint_endpoint_with_dots(app):\n+    bp = flask.Blueprint(\"test_bp\", __name__)\n+\n+    def view_func():\n+        return \"test\"\n+\n+    with pytest.raises(ValueError, match=\"Blueprint endpoints should not contain dots\"):\n+        bp.add_url_rule(\"/test\", endpoint=\"invalid.endpoint\", view_func=view_func)\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,8 @@\n+def test_sweb_enhanced_reject_blueprint_endpoint_with_dots(app):\n+    bp = flask.Blueprint(\"test_bp\", __name__)\n+\n+    def view_func():\n+        return \"test\"\n+\n+    with pytest.raises(ValueError, match=\"Blueprint endpoints should not contain dots\"):\n+        bp.add_url_rule(\"/test\", endpoint=\"invalid.endpoint\", view_func=view_func)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_reject_blueprint_endpoint_with_dots"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_reject_blueprint_endpoint_with_dots"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_blueprint_name_with_dot",
+      "semantic_bucket": "unspecified",
+      "goal": "stress validation for blueprint name containing forbidden token (dot)",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_blueprint_name_with_dot"
+      ],
+      "covers_original_tests": [
+        "test_dotted_name_not_allowed"
+      ],
+      "covers_obligations": [
+        "test_dotted_name_not_allowed::core"
+      ],
+      "target_source_symbol": "Blueprint.__init__",
+      "target_validation_subject": "name",
+      "semantic_alignment_tokens": [
+        "Blueprint(",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "Blueprint(",
+        "__init__",
+        "name",
+        "valueerror"
+      ],
+      "rationale": "This test directly targets the validation of the 'name' argument in the Blueprint constructor, which is distinct from endpoint-related validation in add_url_rule. It reproduces the original failure mode by explicitly passing a name containing a dot, ensuring the bug signal is preserved."
+    },
+    "patch": "diff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,7 @@\n+def test_sweb_enhanced_blueprint_nested_name_with_dot(app):\n+    # Test nested blueprint registration with a name containing a dot\n+    parent = flask.Blueprint(\"parent\", __name__)\n+    with pytest.raises(ValueError, match=\"Blueprint names should not contain dots\"):\n+        child = flask.Blueprint(\"parent.child\", __name__)\n+        parent.register_blueprint(child)\n+    app.register_blueprint(parent)\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,7 @@\n+def test_sweb_enhanced_blueprint_nested_name_with_dot(app):\n+    # Test nested blueprint registration with a name containing a dot\n+    parent = flask.Blueprint(\"parent\", __name__)\n+    with pytest.raises(ValueError, match=\"Blueprint names should not contain dots\"):\n+        child = flask.Blueprint(\"parent.child\", __name__)\n+        parent.register_blueprint(child)\n+    app.register_blueprint(parent)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_blueprint_nested_name_with_dot"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blueprint_nested_name_with_dot"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "blueprint_name_with_dot_raises_value_error",
+      "semantic_bucket": "unspecified",
+      "goal": "ensure that a ValueError is raised when a Blueprint name contains a dot",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_blueprint_name_with_dot"
+      ],
+      "covers_original_tests": [
+        "test_dotted_name_not_allowed"
+      ],
+      "covers_obligations": [
+        "test_dotted_name_not_allowed::core"
+      ],
+      "target_source_symbol": "Blueprint.__init__",
+      "target_validation_subject": "name",
+      "semantic_alignment_tokens": [
+        "Blueprint(",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "Blueprint(",
+        "Blueprint",
+        "__init__",
+        "valueerror"
+      ],
+      "rationale": "This test directly targets the Blueprint constructor's validation of the 'name' parameter, ensuring that a dot in the name triggers a ValueError. It differs from the original test by explicitly focusing on the boundary condition of the 'name' argument, providing clearer guidance on the validation logic required."
+    },
+    "patch": "diff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,6 @@\n+def test_sweb_enhanced_blueprint_name_with_dot_boundary(app):\n+    # Test boundary condition: single dot in the name\n+    with pytest.raises(ValueError, match=\"Blueprint name should not contain dots\"):\n+        flask.Blueprint(\".\", __name__)\n+\n+    # Test boundary condition: name starts with a dot\n+    with pytest.raises(ValueError, match=\"Blueprint name should not contain dots\"):\n+        flask.Blueprint(\".start\", __name__)\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,6 @@\n+def test_sweb_enhanced_blueprint_name_with_dot_boundary(app):\n+    # Test boundary condition: single dot in the name\n+    with pytest.raises(ValueError, match=\"Blueprint name should not contain dots\"):\n+        flask.Blueprint(\".\", __name__)\n+\n+    # Test boundary condition: name starts with a dot\n+    with pytest.raises(ValueError, match=\"Blueprint name should not contain dots\"):\n+        flask.Blueprint(\".start\", __name__)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_blueprint_name_with_dot_boundary"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blueprint_name_with_dot_boundary"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "reject_view_function_name_with_dots",
+      "semantic_bucket": "unspecified",
+      "goal": "stress the validation of view function names to ensure they do not contain dots, which should raise a ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_reject_view_function_name_with_dots"
+      ],
+      "covers_original_tests": [
+        "test_route_decorator_custom_endpoint_with_dots"
+      ],
+      "covers_obligations": [
+        "test_route_decorator_custom_endpoint_with_dots::view_func_name"
+      ],
+      "target_source_symbol": "Blueprint.add_url_rule",
+      "target_validation_subject": "view_func_name",
+      "semantic_alignment_tokens": [
+        "view_func.__name__",
+        "Blueprint",
+        "add_url_rule",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "view_func.__name__",
+        "__name__",
+        "Blueprint",
+        "add_url_rule"
+      ],
+      "rationale": "This idea focuses on the validation of the view function name, which is distinct from endpoint validation. It ensures that the view function's `__name__` attribute does not contain dots, which is a separate obligation within the same source symbol."
+    },
+    "patch": "diff --git a/tests/test_basic.py b/tests/test_basic.py\n--- a/tests/test_basic.py\n+++ b/tests/test_basic.py\n@@ -288,0 +288,10 @@\n+def test_sweb_enhanced_reject_view_function_name_with_dots(app):\n+    bp = flask.Blueprint(\"bp\", __name__)\n+\n+    def my_func_with_dot_in_name():\n+        return \"Invalid\"\n+\n+    my_func_with_dot_in_name.__name__ = \"invalid.name\"\n+\n+    with pytest.raises(ValueError):\n+        bp.add_url_rule(\"/\", view_func=my_func_with_dot_in_name)\ndiff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,10 @@\n+def test_sweb_enhanced_reject_view_function_name_with_dots_in_blueprint(app):\n+    bp = flask.Blueprint(\"test_bp\", __name__)\n+\n+    def invalid_func():\n+        return \"Invalid\"\n+\n+    invalid_func.__name__ = \"invalid.name\"\n+\n+    with pytest.raises(ValueError):\n+        bp.add_url_rule(\"/test\", view_func=invalid_func)\n",
+    "raw_response": "```diff\ndiff --git a/tests/test_basic.py b/tests/test_basic.py\n--- a/tests/test_basic.py\n+++ b/tests/test_basic.py\n@@ -288,0 +288,10 @@\n+def test_sweb_enhanced_reject_view_function_name_with_dots(app):\n+    bp = flask.Blueprint(\"bp\", __name__)\n+\n+    def my_func_with_dot_in_name():\n+        return \"Invalid\"\n+\n+    my_func_with_dot_in_name.__name__ = \"invalid.name\"\n+\n+    with pytest.raises(ValueError):\n+        bp.add_url_rule(\"/\", view_func=my_func_with_dot_in_name)\ndiff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -274,0 +274,10 @@\n+def test_sweb_enhanced_reject_view_function_name_with_dots_in_blueprint(app):\n+    bp = flask.Blueprint(\"test_bp\", __name__)\n+\n+    def invalid_func():\n+        return \"Invalid\"\n+\n+    invalid_func.__name__ = \"invalid.name\"\n+\n+    with pytest.raises(ValueError):\n+        bp.add_url_rule(\"/test\", view_func=invalid_func)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_reject_view_function_name_with_dots",
+      "test_sweb_enhanced_reject_view_function_name_with_dots_in_blueprint"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_reject_view_function_name_with_dots",
+      "test_sweb_enhanced_reject_view_function_name_with_dots_in_blueprint"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

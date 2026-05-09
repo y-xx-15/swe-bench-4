@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_sparse_matrix"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_sparse_matrix"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/matrices/tests/test_sparse.py:test_sparse_matrix",
+    "test_sparse_matrix"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_sparse_matrix F",
+    "____________ sympy/matrices/tests/test_sparse.py:test_sparse_matrix ____________",
+    "File \"/testbed/sympy/matrices/tests/test_sparse.py\", line 31, in test_sparse_matrix"
+  ],
+  "noise_ratio": 0.0063,
+  "target_test_tracebacks": {
+    "test_sparse_matrix": "TARGET TEST: test_sparse_matrix\n- snippet: test_sparse_matrix F\n- snippet: ____________ sympy/matrices/tests/test_sparse.py:test_sparse_matrix ____________\n- snippet: File \"/testbed/sympy/matrices/tests/test_sparse.py\", line 31, in test_sparse_matrix\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_sparse_matrix F\ntest_errors ok\n____________ sympy/matrices/tests/test_sparse.py:test_sparse_matrix ____________\n  File \"/testbed/sympy/matrices/tests/test_sparse.py\", line 31, in test_sparse_matrix\nAssertionError\n============= tests finished: 10 passed, 1 failed, in 0.29 seconds ============="
+  }
+}

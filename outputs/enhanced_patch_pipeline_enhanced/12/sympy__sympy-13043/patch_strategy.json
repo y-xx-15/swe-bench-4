@@ -1,0 +1,19 @@
+{
+  "title": "Sort decompose output deterministically",
+  "approach": "Modify the `decompose` function in `sympy/integrals/intpoly.py` to sort the list of monomials by degree and term order when `separate=True`. This ensures deterministic output while preserving the function's behavior.",
+  "edit_targets": [
+    "sympy/integrals/intpoly.py::decompose"
+  ],
+  "dependency_files": [
+    "sympy/integrals/tests/test_intpoly.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing only the `decompose` function is sufficient to resolve the bug since the failure is caused by the unordered output of this function. Tests in `sympy/integrals/tests/test_intpoly.py` validate the fix.",
+  "risks": [
+    "Sorting may introduce performance overhead for large polynomials."
+  ]
+}

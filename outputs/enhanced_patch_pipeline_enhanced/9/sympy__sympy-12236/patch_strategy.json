@@ -1,0 +1,21 @@
+{
+  "title": "Fix apart decomposition with symbolic parameters",
+  "approach": "Update the `apart` function to correctly handle symbolic parameters and nested substitutions by improving the decomposition logic. This involves modifying the `apart` function in `sympy/polys/partfrac.py` to account for edge cases where symbolic parameters interact with partial fraction decomposition. Additionally, ensure that nested substitutions are processed correctly by introducing checks and adjustments to the decomposition algorithm.",
+  "edit_targets": [
+    "sympy/polys/partfrac.py::apart",
+    "sympy/polys/partfrac.py::apart_undetermined_coeffs"
+  ],
+  "dependency_files": [
+    "sympy/polys/tests/test_partfrac.py",
+    "sympy/polys/tests/test_polytools.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing only the `apart` and `apart_undetermined_coeffs` functions in `sympy/polys/partfrac.py` is sufficient to address the issue because these functions directly handle partial fraction decomposition and symbolic parameter processing. The changes will ensure that decomposition logic and nested substitution handling are corrected. No additional edits to other files or helper functions are required, as the tests in `test_partfrac.py` and `test_polytools.py` already validate the affected functionality comprehensively.",
+  "risks": [
+    "Potential regressions in existing functionality of `apart` for simpler cases, such as non-symbolic inputs or straightforward decompositions. Ensure that existing test cases for these scenarios continue to pass."
+  ]
+}

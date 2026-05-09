@@ -1,0 +1,170 @@
+[
+  {
+    "idea": {
+      "target_validation_subject": "core",
+      "covers_obligations": [
+        "test_matmul::core::core"
+      ]
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,8 @@\n+def test_sweb_enhanced_2():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+\n+    # Test matrix multiplication with a non-matrix type (list)\n+    raises(TypeError, lambda: a @ b)\n+    raises(TypeError, lambda: b @ a)\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,8 @@\n+def test_sweb_enhanced_2():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+\n+    # Test matrix multiplication with a non-matrix type (list)\n+    raises(TypeError, lambda: a @ b)\n+    raises(TypeError, lambda: b @ a)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_2"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_2"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_matmul is not semantically aligned with its original failure path. Expected source symbol 'test_matmul' and alignment tokens [], but the current content targets 'unknown' with tokens []. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_matmul"
+    ],
+    "covered_obligations": []
+  },
+  {
+    "idea": {
+      "target_validation_subject": "core",
+      "covers_obligations": [
+        "test_matmul::core::core"
+      ]
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,9 @@\n+def test_sweb_enhanced_3():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = Matrix([[2, 3], [1, 2]])\n+\n+    # Test case where one operand is a list instead of a matrix\n+    raises(TypeError, lambda: a @ [[1, 2], [3, 4]])\n+\n+    # Test case where one operand is a dictionary instead of a matrix\n+    raises(TypeError, lambda: a @ {1: 2, 3: 4})\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,9 @@\n+def test_sweb_enhanced_3():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = Matrix([[2, 3], [1, 2]])\n+\n+    # Test case where one operand is a list instead of a matrix\n+    raises(TypeError, lambda: a @ [[1, 2], [3, 4]])\n+\n+    # Test case where one operand is a dictionary instead of a matrix\n+    raises(TypeError, lambda: a @ {1: 2, 3: 4})\n```",
+    "identifiers": [
+      "test_sweb_enhanced_3"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_3"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_matmul is not semantically aligned with its original failure path. Expected source symbol 'test_matmul' and alignment tokens [], but the current content targets 'unknown' with tokens []. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_matmul"
+    ],
+    "covered_obligations": []
+  },
+  {
+    "idea": {
+      "target_validation_subject": "core",
+      "covers_obligations": [
+        "test_matmul::core::core"
+      ]
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,8 @@\n+def test_sweb_enhanced_4():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+    \n+    # Ensure TypeError is raised when attempting matrix multiplication with a list\n+    raises(TypeError, lambda: a @ b)\n+    raises(TypeError, lambda: b @ a)\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,8 @@\n+def test_sweb_enhanced_4():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+    \n+    # Ensure TypeError is raised when attempting matrix multiplication with a list\n+    raises(TypeError, lambda: a @ b)\n+    raises(TypeError, lambda: b @ a)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_4"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_4"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_matmul is not semantically aligned with its original failure path. Expected source symbol 'test_matmul' and alignment tokens [], but the current content targets 'unknown' with tokens []. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_matmul"
+    ],
+    "covered_obligations": []
+  },
+  {
+    "idea": {
+      "target_validation_subject": "core",
+      "covers_obligations": [
+        "test_matmul::core::core"
+      ]
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,10 @@\n+def test_sweb_enhanced_5():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+\n+    # Attempting matrix multiplication with a list should raise a TypeError\n+    raises(TypeError, lambda: a @ b)\n+\n+    # Reverse operation should also raise a TypeError\n+    raises(TypeError, lambda: b @ a)\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,10 @@\n+def test_sweb_enhanced_5():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+\n+    # Attempting matrix multiplication with a list should raise a TypeError\n+    raises(TypeError, lambda: a @ b)\n+\n+    # Reverse operation should also raise a TypeError\n+    raises(TypeError, lambda: b @ a)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_5"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_5"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_matmul is not semantically aligned with its original failure path. Expected source symbol 'test_matmul' and alignment tokens [], but the current content targets 'unknown' with tokens []. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_matmul"
+    ],
+    "covered_obligations": []
+  },
+  {
+    "idea": {
+      "target_validation_subject": "core",
+      "covers_obligations": [
+        "test_matmul::core::core"
+      ]
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,7 @@\n+def test_sweb_enhanced_6():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+\n+    raises(TypeError, lambda: a @ b)\n+    raises(TypeError, lambda: b @ a)\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,7 @@\n+def test_sweb_enhanced_6():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = [1, 2]\n+\n+    raises(TypeError, lambda: a @ b)\n+    raises(TypeError, lambda: b @ a)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_6"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_6"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_matmul is not semantically aligned with its original failure path. Expected source symbol 'test_matmul' and alignment tokens [], but the current content targets 'unknown' with tokens []. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_matmul"
+    ],
+    "covered_obligations": []
+  },
+  {
+    "idea": {
+      "target_validation_subject": "core",
+      "covers_obligations": [
+        "test_matmul::core::core"
+      ]
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,9 @@\n+def test_sweb_enhanced_7():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = Matrix([[2, 3], [1, 2]])\n+    c = [1, 2, 3]  # A list, not a matrix\n+\n+    # Attempting matrix multiplication with a non-matrix operand\n+    raises(TypeError, lambda: a @ c)\n+    raises(TypeError, lambda: c @ b)\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,9 @@\n+def test_sweb_enhanced_7():\n+    a = Matrix([[1, 2], [3, 4]])\n+    b = Matrix([[2, 3], [1, 2]])\n+    c = [1, 2, 3]  # A list, not a matrix\n+\n+    # Attempting matrix multiplication with a non-matrix operand\n+    raises(TypeError, lambda: a @ c)\n+    raises(TypeError, lambda: c @ b)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_7"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_7"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_matmul is not semantically aligned with its original failure path. Expected source symbol 'test_matmul' and alignment tokens [], but the current content targets 'unknown' with tokens []. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_matmul"
+    ],
+    "covered_obligations": []
+  }
+]

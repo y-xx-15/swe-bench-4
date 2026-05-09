@@ -1,0 +1,37 @@
+{
+  "original_test_identifiers": [
+    "test_Identity"
+  ],
+  "status_map": {
+    "sympy/matrices/expressions/tests/test_matexpr.py:test_Identity": "FAILED",
+    "test_shape": "PASSED",
+    "test_matexpr": "PASSED",
+    "test_subs": "PASSED",
+    "test_ZeroMatrix": "PASSED",
+    "test_ZeroMatrix_doit": "PASSED",
+    "test_Identity": "FAILED",
+    "test_Identity_doit": "PASSED",
+    "test_addition": "PASSED",
+    "test_multiplication": "PASSED",
+    "test_MatPow": "PASSED",
+    "test_MatrixSymbol": "PASSED",
+    "test_dense_conversion": "PASSED",
+    "test_free_symbols": "PASSED",
+    "test_zero_matmul": "PASSED",
+    "test_matadd_simplify": "PASSED",
+    "test_matmul_simplify": "PASSED",
+    "test_invariants": "PASSED",
+    "test_indexing": "PASSED",
+    "test_single_indexing": "PASSED",
+    "test_MatrixElement_commutative": "PASSED",
+    "test_MatrixSymbol_determinant": "PASSED",
+    "test_MatrixElement_diff": "PASSED",
+    "test_MatrixElement_doit": "PASSED",
+    "test_identity_powers": "PASSED",
+    "test_Zero_power": "PASSED",
+    "test_matrixelement_diff": "PASSED"
+  },
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/sympy__sympy-12419/test_output.txt",
+  "timed_out": false,
+  "error": null
+}

@@ -1,0 +1,24 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/matrices/sparse.py",
+      "action": "modify_region",
+      "justification": "The `SparseMatrix.hstack` method is directly responsible for the incorrect shape computation when horizontally stacking matrices with zero rows. This method must be updated to correctly handle the column dimensions of such matrices."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/matrices/sparse.py",
+      "target_symbol": "SparseMatrix.hstack",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_sparse_matrix::core::shape",
+        "test_sweb_enhanced_hstack_shape_mismatch",
+        "test_sweb_enhanced_sparse_matrix_hstack_shape"
+      ],
+      "anchor_line_before": "        cols = sum(arg.cols for arg in args)",
+      "anchor_line_after": "        return cls._new(rows, cols, data)",
+      "replacement_block": "        cols = sum(arg.cols for arg in args)\n        if rows == 0:\n            # Special case: all matrices have zero rows\n            data = {}\n        else:\n            data = {}\n            for i, arg in enumerate(args):\n                for (row, col), value in arg._smat.items():\n                    data[(row, col + sum(a.cols for a in args[:i]))] = value\n        return cls._new(rows, cols, data)"
+    }
+  ]
+}

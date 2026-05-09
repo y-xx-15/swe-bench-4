@@ -1,0 +1,35 @@
+{
+  "original_test_identifiers": [
+    "test_mod",
+    "test_mod_inverse"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_mod"
+  ],
+  "inactive_fail_to_pass_identifiers": [
+    "test_mod_inverse"
+  ],
+  "failing_tests_sample": [
+    "sympy/core/tests/test_numbers.py:test_powers_Integer",
+    "sympy/core/tests/test_numbers.py:test_powers_Rational",
+    "sympy/core/tests/test_numbers.py:test_simplify_AlgebraicNumber",
+    "sympy/core/tests/test_numbers.py:test_mod",
+    "test_mod"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "RecursionError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_mod F",
+    "test_mod_inverse ok",
+    "_____________ sympy/core/tests/test_numbers.py:test_powers_Integer _____________"
+  ],
+  "noise_ratio": 0.0009,
+  "target_test_tracebacks": {
+    "test_mod": "TARGET TEST: test_mod\n- snippet: test_mod F\n- snippet: test_mod_inverse ok\n- snippet: _____________ sympy/core/tests/test_numbers.py:test_powers_Integer _____________\n- dominant_errors: RecursionError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_mod F\ntest_mod_inverse ok\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\n__________________ sympy/core/tests/test_numbers.py:test_mod ___________________\n  File \"/testbed/sympy/core/tests/test_numbers.py\", line 132, in test_mod\nAssertionError\n tests finished: 77 passed, 1 failed, 1 expected to fail, 3 exceptions, ",
+    "test_mod_inverse": "TARGET TEST: test_mod_inverse\n- snippet: test_mod F\n- snippet: test_mod_inverse ok\n- snippet: _____________ sympy/core/tests/test_numbers.py:test_powers_Integer _____________\n- dominant_errors: RecursionError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_mod_inverse ok\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\nAssertionError\n tests finished: 77 passed, 1 failed, 1 expected to fail, 3 exceptions, "
+  }
+}

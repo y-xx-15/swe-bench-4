@@ -1,0 +1,31 @@
+{
+  "original_test_identifiers": [
+    "test_evalf_bugs"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_evalf_bugs"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/core/tests/test_evalf.py:test_evalf_logs",
+    "sympy/core/tests/test_evalf.py:test_evalf_trig",
+    "sympy/core/tests/test_evalf.py:test_evalf_ramanujan",
+    "sympy/core/tests/test_evalf.py:test_evalf_integer_parts",
+    "sympy/core/tests/test_evalf.py:test_issue_4956_5204"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "RecursionError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_evalf_bugs F",
+    "________________ sympy/core/tests/test_evalf.py:test_evalf_logs ________________",
+    "________________ sympy/core/tests/test_evalf.py:test_evalf_trig ________________"
+  ],
+  "noise_ratio": 0.0004,
+  "target_test_tracebacks": {
+    "test_evalf_bugs": "TARGET TEST: test_evalf_bugs\n- snippet: test_evalf_bugs F\n- snippet: ________________ sympy/core/tests/test_evalf.py:test_evalf_logs ________________\n- snippet: ________________ sympy/core/tests/test_evalf.py:test_evalf_trig ________________\n- dominant_errors: RecursionError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_evalf_bugs F\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\n  File \"/testbed/sympy/functions/special/error_functions.py\", line 1561, in eval\nRecursionError: maximum recursion depth exceeded in comparison\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded in comparison\n________________ sympy/core/tests/test_evalf.py:test_evalf_bugs ________________\n  File \"/testbed/sympy/core/tests/test_evalf.py\", line 231, in test_evalf_bugs\nAssertionError\n tests finished: 37 passed, 1 failed, 2 expected to fail, 8 exceptions, "
+  }
+}

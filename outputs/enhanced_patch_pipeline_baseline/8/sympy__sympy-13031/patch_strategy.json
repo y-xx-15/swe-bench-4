@@ -1,0 +1,17 @@
+{
+  "title": "Fix Matrix stacking with zero rows or columns",
+  "approach": "Modify the `Matrix.hstack` and `Matrix.vstack` methods to correctly handle matrices with zero rows or columns by ensuring the resulting shape is calculated based on the total number of columns or rows, even if some matrices have zero dimensions.",
+  "edit_targets": [
+    "sympy/matrices/sparse.py::SparseMatrix.row_join",
+    "sympy/matrices/sparse.py::SparseMatrix.col_join"
+  ],
+  "dependency_files": [
+    "sympy/matrices/tests/test_sparse.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing the `row_join` and `col_join` methods in `SparseMatrix` should be sufficient to fix the issue, as these methods are responsible for implementing the behavior of `Matrix.hstack` and `Matrix.vstack`. However, tests in `test_sparse.py` should be updated or added to validate the fix.",
+  "risks": [
+    "Potential regressions in other stacking operations involving non-zero dimensions, which must be tested thoroughly."
+  ]
+}

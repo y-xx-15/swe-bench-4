@@ -1,0 +1,16 @@
+{
+  "title": "Fix Identity matrix total sum calculation",
+  "approach": "Override the `_eval_sum` method in the `Identity` class to correctly compute the total sum of elements by leveraging the known structure of the identity matrix.",
+  "edit_targets": [
+    "sympy/matrices/expressions/matexpr.py::Identity"
+  ],
+  "dependency_files": [
+    "sympy/matrices/expressions/tests/test_matexpr.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing the `Identity` class to include a custom `_eval_sum` method should be sufficient, as the issue is isolated to the summation logic for identity matrices. No other files or classes need modification.",
+  "risks": [
+    "Ensure that the fix does not inadvertently affect other matrix operations or properties, such as element-wise access or matrix multiplication."
+  ]
+}

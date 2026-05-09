@@ -1,0 +1,395 @@
+[
+  {
+    "idea": {
+      "title": "test sequence rendering behavior",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream rendering behavior of sequences with escaped brackets",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_sequence_rendering"
+      ],
+      "covers_original_tests": [
+        "test_latex_sequences"
+      ],
+      "covers_obligations": [
+        "test_latex_sequences::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter",
+      "target_validation_subject": "sequence rendering",
+      "semantic_alignment_tokens": [
+        "SeqFormula(",
+        "latex(",
+        "escaped brackets"
+      ],
+      "trigger_shape_tokens": [
+        "SeqFormula(",
+        "n**2",
+        "latex(",
+        "escaped brackets"
+      ],
+      "rationale": "This test focuses on the downstream rendering behavior of sequences with escaped brackets, which is distinct from the original test that primarily checks the direct symptom of the bug. By targeting the rendering behavior, it provides additional repair guidance to ensure the fix addresses the broader impact of the bug."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,8 @@\n+def test_sweb_enhanced_sequence_rendering():\n+    from sympy import SeqFormula, latex, oo\n+    n = symbols('n', integer=True)\n+    seq = SeqFormula(n**2, (n, 0, oo))\n+    expected_latex = r'\\left[0, 1, 4, 9, \\ldots\\right]'\n+    assert latex(seq) == expected_latex, f\"Expected: {expected_latex}, but got: {latex(seq)}\"\n+\n+    # Additional check for escaped brackets\n+    assert r'\\[' not in latex(seq) and r'\\]' not in latex(seq), \"Latex output contains escaped brackets, which is incorrect.\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,8 @@\n+def test_sweb_enhanced_sequence_rendering():\n+    from sympy import SeqFormula, latex, oo\n+    n = symbols('n', integer=True)\n+    seq = SeqFormula(n**2, (n, 0, oo))\n+    expected_latex = r'\\left[0, 1, 4, 9, \\ldots\\right]'\n+    assert latex(seq) == expected_latex, f\"Expected: {expected_latex}, but got: {latex(seq)}\"\n+\n+    # Additional check for escaped brackets\n+    assert r'\\[' not in latex(seq) and r'\\]' not in latex(seq), \"Latex output contains escaped brackets, which is incorrect.\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sequence_rendering"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sequence_rendering"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_latex_sequences is not semantically aligned with its original failure path. Expected source symbol 'test_latex_sequences' and alignment tokens ['valueerror', 'assertionerror'], but the current content targets 'sympy.printing.latex.LatexPrinter' with tokens ['SeqFormula(', 'latex(', 'escaped brackets']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_latex_sequences"
+    ],
+    "covered_obligations": [
+      "test_latex_sequences::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test_latex_sequences_invalid_bracket_escaping",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect backslash-escaping of square brackets in LaTeX rendering for sequences",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_invalid_bracket_escaping"
+      ],
+      "covers_original_tests": [
+        "test_latex_sequences"
+      ],
+      "covers_obligations": [
+        "test_latex_sequences::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_SeqFormula",
+      "target_validation_subject": "LaTeX rendering of SeqFormula",
+      "semantic_alignment_tokens": [
+        "SeqFormula",
+        "latex",
+        "brackets",
+        "escaped"
+      ],
+      "trigger_shape_tokens": [
+        "SeqFormula",
+        "n**2",
+        "escaped brackets"
+      ],
+      "rationale": "This test directly reproduces the failure observed in the original test_latex_sequences by constructing a SeqFormula object and verifying its LaTeX rendering. It focuses on the specific issue of backslash-escaped square brackets, which was not explicitly isolated in the original test. This provides clearer guidance for repairing the buggy behavior."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +189,7 @@\n+def test_sweb_enhanced_seqformula_finite_range():\n+    from sympy import SeqFormula, latex, oo\n+    s = SeqFormula(n**2, (n, 0, 3))\n+    expected_latex = r'\\left[0, 1, 4, 9\\right]'\n+    assert latex(s) == expected_latex, f\"Expected {expected_latex}, but got {latex(s)}\"\n+\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +189,7 @@\n+def test_sweb_enhanced_seqformula_finite_range():\n+    from sympy import SeqFormula, latex, oo\n+    s = SeqFormula(n**2, (n, 0, 3))\n+    expected_latex = r'\\left[0, 1, 4, 9\\right]'\n+    assert latex(s) == expected_latex, f\"Expected {expected_latex}, but got {latex(s)}\"\n+\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_seqformula_finite_range"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_seqformula_finite_range"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_latex_sequences is not semantically aligned with its original failure path. Expected source symbol 'test_latex_sequences' and alignment tokens ['valueerror', 'assertionerror'], but the current content targets 'sympy.printing.latex.LatexPrinter._print_SeqFormula' with tokens ['SeqFormula', 'latex', 'brackets', 'escaped']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_latex_sequences"
+    ],
+    "covered_obligations": [
+      "test_latex_sequences::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test_latex_sequences_value_error_on_invalid_mode",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the ValueError raised when an invalid mode is passed to LatexPrinter settings",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_invalid_mode"
+      ],
+      "covers_original_tests": [
+        "test_latex_sequences"
+      ],
+      "covers_obligations": [
+        "test_latex_sequences::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter",
+      "target_validation_subject": "settings.mode",
+      "semantic_alignment_tokens": [
+        "valueerror",
+        "mode",
+        "settings"
+      ],
+      "trigger_shape_tokens": [
+        "mode",
+        "settings",
+        "valueerror"
+      ],
+      "rationale": "This test directly exercises the validation logic for the 'mode' setting in LatexPrinter, which is a sibling obligation to the original test_latex_sequences failure. It ensures that invalid modes raise the correct exception (ValueError), aligning with the original failure's exception semantics and extending coverage to a specific validation subject."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,7 @@\n+def test_sweb_enhanced_invalid_mode():\n+    from sympy.printing.latex import LatexPrinter\n+    invalid_mode = \"unsupported_mode\"\n+    try:\n+        LatexPrinter(settings={\"mode\": invalid_mode})\n+    except ValueError as e:\n+        assert str(e) == \"'mode' must be one of 'inline', 'plain', 'equation' or 'equation*'\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,7 @@\n+def test_sweb_enhanced_invalid_mode():\n+    from sympy.printing.latex import LatexPrinter\n+    invalid_mode = \"unsupported_mode\"\n+    try:\n+        LatexPrinter(settings={\"mode\": invalid_mode})\n+    except ValueError as e:\n+        assert str(e) == \"'mode' must be one of 'inline', 'plain', 'equation' or 'equation*'\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_invalid_mode"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_invalid_mode"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "sympy/printing/tests/test_latex.py:test_latex_indexed": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_derivatives": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_FourierSeries": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_FormalPowerSeries": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_matrix_with_functions": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_NDimArray": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_issue_8470": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_issue_13559": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_TensorProduct_printing": "FAILED",
+      "test_printmethod": "PASSED",
+      "test_latex_basic": "PASSED",
+      "test_latex_builtins": "PASSED",
+      "test_latex_SingularityFunction": "PASSED",
+      "test_latex_cycle": "PASSED",
+      "test_latex_permutation": "PASSED",
+      "test_latex_Float": "PASSED",
+      "test_latex_vector_expressions": "PASSED",
+      "test_latex_symbols": "PASSED",
+      "test_latex_functions": "PASSED",
+      "test_hyper_printing": "PASSED",
+      "test_latex_bessel": "PASSED",
+      "test_latex_fresnel": "PASSED",
+      "test_latex_brackets": "PASSED",
+      "test_latex_indexed": "ERROR",
+      "test_latex_derivatives": "ERROR",
+      "test_latex_subs": "PASSED",
+      "test_latex_integrals": "PASSED",
+      "test_latex_sets": "PASSED",
+      "test_latex_Range": "PASSED",
+      "test_latex_sequences": "PASSED",
+      "test_latex_FourierSeries": "ERROR",
+      "test_latex_FormalPowerSeries": "ERROR",
+      "test_latex_intervals": "PASSED",
+      "test_latex_AccumuBounds": "PASSED",
+      "test_latex_emptyset": "PASSED",
+      "test_latex_commutator": "PASSED",
+      "test_latex_union": "PASSED",
+      "test_latex_symmetric_difference": "PASSED",
+      "test_latex_Complement": "PASSED",
+      "test_latex_Complexes": "PASSED",
+      "test_latex_productset": "PASSED",
+      "test_latex_Naturals": "PASSED",
+      "test_latex_Naturals0": "PASSED",
+      "test_latex_Integers": "PASSED",
+      "test_latex_ImageSet": "PASSED",
+      "test_latex_ConditionSet": "PASSED",
+      "test_latex_ComplexRegion": "PASSED",
+      "test_latex_Contains": "PASSED",
+      "test_latex_sum": "PASSED",
+      "test_latex_product": "PASSED",
+      "test_latex_limits": "PASSED",
+      "test_issue_3568": "PASSED",
+      "test_latex": "PASSED",
+      "test_latex_dict": "PASSED",
+      "test_latex_list": "PASSED",
+      "test_latex_rational": "PASSED",
+      "test_latex_inverse": "PASSED",
+      "test_latex_DiracDelta": "PASSED",
+      "test_latex_Heaviside": "PASSED",
+      "test_latex_KroneckerDelta": "PASSED",
+      "test_latex_LeviCivita": "PASSED",
+      "test_mode": "PASSED",
+      "test_latex_Piecewise": "PASSED",
+      "test_latex_Matrix": "PASSED",
+      "test_latex_matrix_with_functions": "ERROR",
+      "test_latex_NDimArray": "ERROR",
+      "test_latex_mul_symbol": "PASSED",
+      "test_latex_issue_4381": "PASSED",
+      "test_latex_issue_4576": "PASSED",
+      "test_latex_pow_fraction": "PASSED",
+      "test_noncommutative": "PASSED",
+      "test_latex_order": "PASSED",
+      "test_latex_Lambda": "PASSED",
+      "test_latex_PolyElement": "PASSED",
+      "test_latex_FracElement": "PASSED",
+      "test_latex_Poly": "PASSED",
+      "test_latex_ComplexRootOf": "PASSED",
+      "test_latex_RootSum": "PASSED",
+      "test_settings": "PASSED",
+      "test_latex_numbers": "PASSED",
+      "test_latex_euler": "PASSED",
+      "test_lamda": "PASSED",
+      "test_custom_symbol_names": "PASSED",
+      "test_matAdd": "PASSED",
+      "test_matMul": "PASSED",
+      "test_latex_MatrixSlice": "PASSED",
+      "test_latex_RandomDomain": "PASSED",
+      "test_PrettyPoly": "PASSED",
+      "test_integral_transforms": "PASSED",
+      "test_PolynomialRingBase": "PASSED",
+      "test_categories": "PASSED",
+      "test_Modules": "PASSED",
+      "test_QuotientRing": "PASSED",
+      "test_Tr": "PASSED",
+      "test_Adjoint": "PASSED",
+      "test_Hadamard": "PASSED",
+      "test_ZeroMatrix": "PASSED",
+      "test_boolean_args_order": "PASSED",
+      "test_imaginary": "PASSED",
+      "test_builtins_without_args": "PASSED",
+      "test_latex_greek_functions": "PASSED",
+      "test_translate": "PASSED",
+      "test_other_symbols": "PASSED",
+      "test_modifiers": "PASSED",
+      "test_greek_symbols": "PASSED",
+      "test_builtin_no_args": "PASSED",
+      "test_issue_6853": "PASSED",
+      "test_Mul": "PASSED",
+      "test_Pow": "PASSED",
+      "test_issue_7180": "PASSED",
+      "test_issue_8409": "PASSED",
+      "test_issue_8470": "ERROR",
+      "test_issue_7117": "PASSED",
+      "test_issue_2934": "PASSED",
+      "test_issue_10489": "PASSED",
+      "test_issue_12886": "PASSED",
+      "test_issue_13559": "ERROR",
+      "test_issue_13651": "PASSED",
+      "test_latex_UnevaluatedExpr": "PASSED",
+      "test_MatrixElement_printing": "PASSED",
+      "test_Quaternion_latex_printing": "PASSED",
+      "test_TensorProduct_printing": "ERROR",
+      "test_WedgeProduct_printing": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_latex_sequences"
+    ],
+    "covered_obligations": [
+      "test_latex_sequences::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test_sequence_latex_rendering_behavioral_consequence",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream rendering behavior of sequences in markdown cells to ensure proper LaTeX output without backslash-escaped brackets",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_sequence_rendering"
+      ],
+      "covers_original_tests": [
+        "test_latex_sequences"
+      ],
+      "covers_obligations": [
+        "test_latex_sequences::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_SeqFormula",
+      "target_validation_subject": "sequence_latex_output",
+      "semantic_alignment_tokens": [
+        "SeqFormula",
+        "latex",
+        "brackets",
+        "markdown"
+      ],
+      "trigger_shape_tokens": [
+        "SeqFormula",
+        "n**2",
+        "latex",
+        "brackets"
+      ],
+      "rationale": "This test focuses on the downstream behavioral consequence of the bug by verifying that the LaTeX output for sequences renders correctly in markdown cells. Unlike the original test, which primarily checks the direct symptom of the bug (backslash-escaped brackets), this test ensures that the output integrates seamlessly into markdown rendering, providing additional repair guidance for downstream usage scenarios."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +189,8 @@\n+def test_sweb_enhanced_sequence_rendering_markdown():\n+    from sympy import SeqFormula, latex, oo\n+    n = symbols('n', integer=True)\n+    seq = SeqFormula(n**2, (n, 0, oo))\n+    expected_latex = r'\\left[0, 1, 4, 9, \\ldots\\right]'\n+    assert latex(seq) == expected_latex\n+    assert not r'\\left\\\\[' in latex(seq), \"LaTeX output contains escaped brackets, which breaks markdown rendering\"\n+    assert not r'\\right\\\\]' in latex(seq), \"LaTeX output contains escaped brackets, which breaks markdown rendering\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +189,8 @@\n+def test_sweb_enhanced_sequence_rendering_markdown():\n+    from sympy import SeqFormula, latex, oo\n+    n = symbols('n', integer=True)\n+    seq = SeqFormula(n**2, (n, 0, oo))\n+    expected_latex = r'\\left[0, 1, 4, 9, \\ldots\\right]'\n+    assert latex(seq) == expected_latex\n+    assert not r'\\left\\\\[' in latex(seq), \"LaTeX output contains escaped brackets, which breaks markdown rendering\"\n+    assert not r'\\right\\\\]' in latex(seq), \"LaTeX output contains escaped brackets, which breaks markdown rendering\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sequence_rendering_markdown"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sequence_rendering_markdown"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_latex_sequences is not semantically aligned with its original failure path. Expected source symbol 'test_latex_sequences' and alignment tokens ['valueerror', 'assertionerror'], but the current content targets 'sympy.printing.latex.LatexPrinter._print_SeqFormula' with tokens ['SeqFormula', 'latex', 'brackets', 'markdown']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_latex_sequences"
+    ],
+    "covered_obligations": [
+      "test_latex_sequences::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test_latex_sequences_value_error_on_invalid_mode",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect exception behavior when an invalid mode is passed to LatexPrinter",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_invalid_mode"
+      ],
+      "covers_original_tests": [
+        "test_latex_sequences"
+      ],
+      "covers_obligations": [
+        "test_latex_sequences::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter",
+      "target_validation_subject": "mode",
+      "semantic_alignment_tokens": [
+        "valueerror",
+        "mode",
+        "invalid"
+      ],
+      "trigger_shape_tokens": [
+        "mode",
+        "valueerror",
+        "invalid"
+      ],
+      "rationale": "This test directly targets the same source symbol and validation subject as the original failure path, focusing on the invalid 'mode' argument that triggers a ValueError. It differs from the original test by isolating the specific validation of 'mode' and ensuring the exception type aligns with the expected behavior."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,6 @@\n+def test_sweb_enhanced_invalid_mode_boundary():\n+    from sympy.printing.latex import LatexPrinter\n+    invalid_mode = \"unsupported_mode\"\n+    try:\n+        LatexPrinter(settings={\"mode\": invalid_mode})\n+    except ValueError as e:\n+        assert \"mode\" in str(e) and invalid_mode in str(e), \"Error message should mention the invalid mode\"\n+    else:\n+        assert False, \"Expected ValueError for invalid mode\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,6 @@\n+def test_sweb_enhanced_invalid_mode_boundary():\n+    from sympy.printing.latex import LatexPrinter\n+    invalid_mode = \"unsupported_mode\"\n+    try:\n+        LatexPrinter(settings={\"mode\": invalid_mode})\n+    except ValueError as e:\n+        assert \"mode\" in str(e) and invalid_mode in str(e), \"Error message should mention the invalid mode\"\n+    else:\n+        assert False, \"Expected ValueError for invalid mode\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_invalid_mode_boundary"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_invalid_mode_boundary"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "evaluation produced an empty status_map; likely log_parse_failed or tests_not_collected",
+    "failing_identifiers": null,
+    "eval_status_map": {},
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_latex_sequences"
+    ],
+    "covered_obligations": [
+      "test_latex_sequences::core"
+    ]
+  }
+]

@@ -1,0 +1,318 @@
+[
+  {
+    "instance_id": "sympy__sympy-14308",
+    "repo": "sympy/sympy",
+    "model": "gpt-4o",
+    "pipeline_mode": "baseline_only",
+    "hide_original_test_patch_in_repair": true,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "baseline_fallback",
+    "original_test_identifiers": [
+      "test_issue_12675",
+      "test_pretty_print_unicode"
+    ],
+    "original_status_counts": {
+      "FAILED": 7,
+      "PASSED": 113,
+      "ERROR": 3
+    },
+    "original_failed_count": 10,
+    "original_passed_count": 113,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_issue_12675",
+        "test_pretty_print_unicode"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_issue_12675",
+        "test_pretty_print_unicode"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/printing/pretty/tests/test_pretty.py:test_pretty_geometry",
+        "sympy/printing/pretty/tests/test_pretty.py:test_issue_8292",
+        "sympy/printing/pretty/tests/test_pretty.py:test_issue_8344",
+        "sympy/printing/pretty/tests/test_pretty.py:test_issue_12675",
+        "sympy/vector/tests/test_printing.py:test_pretty_print_unicode"
+      ],
+      "failure_mode": "value_error",
+      "dominant_errors": [
+        "ValueError",
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_issue_12675 F",
+        "test_pretty_print_unicode F",
+        "_______ sympy/printing/pretty/tests/test_pretty.py:test_pretty_geometry ________"
+      ],
+      "noise_ratio": 0.0207,
+      "target_test_tracebacks": {
+        "test_issue_12675": "TARGET TEST: test_issue_12675\n- snippet: test_issue_12675 F\n- snippet: test_pretty_print_unicode F\n- snippet: _______ sympy/printing/pretty/tests/test_pretty.py:test_pretty_geometry ________\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_issue_12675 F\nValueError: Name node can't be used with 'False' constant\nValueError: Name node can't be used with 'False' constant\n_________ sympy/printing/pretty/tests/test_pretty.py:test_issue_12675 __________\n  File \"/testbed/sympy/printing/pretty/tests/test_pretty.py\", line 6104, in test_issue_12675\nAssertionError\nAssertionError\n tests finished: 115 passed, 2 failed, 1 expected to fail, ",
+        "test_pretty_print_unicode": "TARGET TEST: test_pretty_print_unicode\n- snippet: test_issue_12675 F\n- snippet: test_pretty_print_unicode F\n- snippet: _______ sympy/printing/pretty/tests/test_pretty.py:test_pretty_geometry ________\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_pretty_print_unicode F\nValueError: Name node can't be used with 'False' constant\nValueError: Name node can't be used with 'False' constant\nAssertionError\n________ sympy/vector/tests/test_printing.py:test_pretty_print_unicode _________\n  File \"/testbed/sympy/vector/tests/test_printing.py\", line 135, in test_pretty_print_unicode\nAssertionError\n tests finished: 115 passed, 2 failed, 1 expected to fail, "
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 5,
+      "keep_top_k": 3,
+      "attempt_budget": 3,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "value_error",
+      "noise_ratio": 0.0207,
+      "difficulty": "medium"
+    },
+    "adaptive_num_candidates": 5,
+    "adaptive_keep_top_k": 3,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 0,
+    "kept_enhanced_candidates": 0,
+    "enhanced_candidate_retention_rate": 0.0,
+    "enhanced_generation_attempts_total": 0,
+    "enhanced_generation_attempts_avg": 0.0,
+    "kept_enhanced_test_identifiers": [],
+    "enhanced_failed_test_identifiers": [],
+    "enhanced_failed_count": 0,
+    "generated_patch_nonempty": true,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 9,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_patch_apply_failed",
+    "generated_patch_feedback": "The previous patch was rejected because it did not satisfy the acceptance gate. Patch apply mode: fuzzy_apply. Baseline passed=113, failed=10. Candidate passed=113, failed=10. Hard failure signal: none. FAIL_TO_PASS tests still failing after patch: test_issue_12675, test_pretty_print_unicode. Your patch must make ALL of these tests pass, not just improve aggregate counts. Semantic oracle failed identifiers: none. Semantic oracle failure summaries: none.  Target files: sympy/printing/pretty/pretty.py. Target symbols: PrettyPrinter._print_BasisDependent. Generate a new source-only unified diff that is closer to the exact file context and lands inside the target class body.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The pretty printing logic for vectors does not correctly handle the formatting of basis-dependent components, leading to incorrect alignment and rendering issues.",
+      "affected_components": [
+        {
+          "file": "sympy/printing/pretty/pretty.py",
+          "symbol": "PrettyPrinter._print_BasisDependent",
+          "reason": "This method is responsible for pretty printing basis-dependent components, which are central to the observed failure."
+        },
+        {
+          "file": "sympy/vector/tests/test_printing.py",
+          "symbol": "test_pretty_print_unicode",
+          "reason": "This test directly validates the pretty printing of vectors and fails due to the incorrect formatting."
+        }
+      ],
+      "failing_signal": "The failing assertions indicate that the rendered output for vectors is misaligned and improperly formatted, particularly for basis-dependent components.",
+      "propagation_path": "The bug originates in the `_print_BasisDependent` method, which fails to correctly format vector components. This incorrect formatting propagates to the rendering logic, resulting in misaligned and improperly formatted output during pretty printing.",
+      "repair_constraint": "The fix must ensure that the alignment and formatting of vector components are correct while preserving the ability to handle complex expressions involving basis-dependent components.",
+      "suggested_repair_scope": [
+        "sympy/printing/pretty/pretty.py",
+        "sympy/vector/tests/test_printing.py"
+      ],
+      "suspicious_symbols": [
+        "PrettyPrinter._print_BasisDependent",
+        "test_pretty_print_unicode"
+      ],
+      "repair_obligations": [
+        {
+          "id": "alignment_preservation",
+          "source_symbol": "PrettyPrinter._print_BasisDependent",
+          "validation_subject": "vector components",
+          "why_it_matters": "Correct alignment ensures that the rendered output is visually accurate and adheres to mathematical conventions."
+        },
+        {
+          "id": "unicode_support",
+          "source_symbol": "PrettyPrinter._print_BasisDependent",
+          "validation_subject": "unicode rendering",
+          "why_it_matters": "Unicode rendering is essential for proper display of mathematical symbols in pretty printing."
+        },
+        {
+          "id": "test_validation",
+          "source_symbol": "test_pretty_print_unicode",
+          "validation_subject": "test assertions",
+          "why_it_matters": "The test must pass to confirm that the fix resolves the formatting issues without introducing regressions."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Fix vector pretty printing alignment",
+      "approach": "Adjust the `_print_BasisDependent` method to ensure proper alignment and formatting of vector components during pretty printing. Specifically, handle the baseline calculation and newline adjustments to center the output correctly.",
+      "edit_targets": [
+        "sympy/printing/pretty/pretty.py::PrettyPrinter._print_BasisDependent"
+      ],
+      "dependency_files": [
+        "sympy/vector/tests/test_printing.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [
+        "negative_gating",
+        "top_of_function_side_path"
+      ],
+      "sufficiency_assessment": "Editing `_print_BasisDependent` should be sufficient to fix the alignment and formatting issues. Test cases in `sympy/vector/tests/test_printing.py` will validate the fix.",
+      "risks": [
+        "Potential misalignment of other vector-related pretty printing outputs if the baseline adjustment logic is incorrect."
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/printing/pretty/pretty.py",
+          "action": "modify_region",
+          "justification": "The `_print_BasisDependent` method is directly responsible for the pretty printing of basis-dependent components, which is the root cause of the observed misalignment and formatting issues."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "sympy/printing/pretty/pretty.py",
+          "target_symbol": "PrettyPrinter._print_BasisDependent",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "alignment_preservation",
+            "unicode_support"
+          ],
+          "anchor_line_before": "        from sympy.vector import Vector",
+          "anchor_line_after": "        if not self._use_unicode:",
+          "replacement_block": "        from sympy.vector import Vector\n\n        if not self._use_unicode:\n            raise NotImplementedError(\"ASCII pretty printing of BasisDependent is not implemented\")\n\n        if expr == expr.zero:\n            return prettyForm(expr.zero._pretty_form)\n\n        o1 = []\n        vectstrs = []\n        if isinstance(expr, Vector):\n            items = expr.separate().items()\n        else:\n            items = [(0, expr)]\n\n        for system, vect in items:\n            inneritems = list(vect.components.items())\n            inneritems.sort(key=lambda x: x[0].__str__())\n            for k, v in inneritems:\n                if v == 1:\n                    o1.append(k._pretty_form)\n                elif v == -1:\n                    o1.append(u\"(-1) \" + k._pretty_form)\n                else:\n                    arg_str = self._print(v).parens()[0]\n                    o1.append(arg_str + ' ' + k._pretty_form)\n                vectstrs.append(k._pretty_form)\n\n        if o1[0].startswith(u\" + \"):\n            o1[0] = o1[0][3:]\n        elif o1[0].startswith(\" \"):\n            o1[0] = o1[0][1:]\n\n        # Adjust alignment and baseline centering\n        max_length = max(len(line) for line in o1)\n        centered_lines = [line.center(max_length) for line in o1]\n        return prettyForm(u\"\\n\".join(centered_lines))"
+        }
+      ]
+    },
+    "final_patch_attempted": true,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": true,
+    "final_patch_apply_mode": "fuzzy_apply",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 7,
+      "PASSED": 113,
+      "ERROR": 3
+    },
+    "final_failed_count": 10,
+    "final_passed_count": 113,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/printing/pretty/tests/test_pretty.py:test_pretty_geometry": "FAILED",
+      "sympy/printing/pretty/tests/test_pretty.py:test_issue_8292": "FAILED",
+      "sympy/printing/pretty/tests/test_pretty.py:test_issue_8344": "FAILED",
+      "sympy/printing/pretty/tests/test_pretty.py:test_issue_12675": "FAILED",
+      "sympy/vector/tests/test_printing.py:test_pretty_print_unicode": "FAILED",
+      "test_pretty_ascii_str": "PASSED",
+      "test_pretty_unicode_str": "PASSED",
+      "test_upretty_greek": "PASSED",
+      "test_upretty_multiindex": "PASSED",
+      "test_upretty_sub_super": "PASSED",
+      "test_upretty_subs_missing_in_24": "PASSED",
+      "test_upretty_modifiers": "PASSED",
+      "test_pretty_Cycle": "PASSED",
+      "test_pretty_basic": "PASSED",
+      "test_negative_fractions": "PASSED",
+      "test_issue_5524": "PASSED",
+      "test_pretty_ordering": "PASSED",
+      "test_EulerGamma": "PASSED",
+      "test_GoldenRatio": "PASSED",
+      "test_pretty_relational": "PASSED",
+      "test_Assignment": "PASSED",
+      "test_AugmentedAssignment": "PASSED",
+      "test_issue_7117": "PASSED",
+      "test_pretty_rational": "PASSED",
+      "test_pretty_functions": "PASSED",
+      "test_pretty_sqrt": "PASSED",
+      "test_pretty_sqrt_char_knob": "PASSED",
+      "test_pretty_sqrt_longsymbol_no_sqrt_char": "PASSED",
+      "test_pretty_KroneckerDelta": "PASSED",
+      "test_pretty_product": "PASSED",
+      "test_pretty_lambda": "PASSED",
+      "test_pretty_order": "PASSED",
+      "test_pretty_derivatives": "PASSED",
+      "test_pretty_integrals": "PASSED",
+      "test_pretty_matrix": "PASSED",
+      "test_pretty_ndim_arrays": "PASSED",
+      "test_tensor_TensorProduct": "PASSED",
+      "test_diffgeom_print_WedgeProduct": "PASSED",
+      "test_Adjoint": "PASSED",
+      "test_pretty_Trace_issue_9044": "PASSED",
+      "test_MatrixExpressions": "PASSED",
+      "test_pretty_dotproduct": "PASSED",
+      "test_pretty_piecewise": "PASSED",
+      "test_pretty_ITE": "PASSED",
+      "test_pretty_seq": "PASSED",
+      "test_any_object_in_sequence": "PASSED",
+      "test_print_builtin_set": "PASSED",
+      "test_pretty_sets": "PASSED",
+      "test_pretty_SetExpr": "PASSED",
+      "test_pretty_ImageSet": "PASSED",
+      "test_pretty_ConditionSet": "PASSED",
+      "test_pretty_ComplexRegion": "PASSED",
+      "test_pretty_Union_issue_10414": "PASSED",
+      "test_pretty_Intersection_issue_10414": "PASSED",
+      "test_ProductSet_paranthesis": "PASSED",
+      "test_ProductSet_prod_char_issue_10413": "PASSED",
+      "test_pretty_sequences": "PASSED",
+      "test_pretty_FourierSeries": "PASSED",
+      "test_pretty_FormalPowerSeries": "PASSED",
+      "test_pretty_limits": "PASSED",
+      "test_pretty_ComplexRootOf": "PASSED",
+      "test_pretty_RootSum": "PASSED",
+      "test_GroebnerBasis": "PASSED",
+      "test_pretty_Boolean": "PASSED",
+      "test_pretty_Domain": "PASSED",
+      "test_pretty_prec": "PASSED",
+      "test_pprint": "PASSED",
+      "test_pretty_class": "PASSED",
+      "test_pretty_no_wrap_line": "PASSED",
+      "test_settings": "PASSED",
+      "test_pretty_sum": "PASSED",
+      "test_units": "PASSED",
+      "test_pretty_Subs": "PASSED",
+      "test_gammas": "PASSED",
+      "test_beta": "PASSED",
+      "test_function_subclass_different_name": "PASSED",
+      "test_SingularityFunction": "PASSED",
+      "test_deltas": "PASSED",
+      "test_hyper": "PASSED",
+      "test_meijerg": "PASSED",
+      "test_noncommutative": "PASSED",
+      "test_pretty_special_functions": "PASSED",
+      "test_pretty_geometry": "ERROR",
+      "test_expint": "PASSED",
+      "test_elliptic_functions": "PASSED",
+      "test_RandomDomain": "PASSED",
+      "test_PrettyPoly": "PASSED",
+      "test_issue_6285": "PASSED",
+      "test_issue_6359": "PASSED",
+      "test_issue_6739": "PASSED",
+      "test_complicated_symbol_unchanged": "PASSED",
+      "test_categories": "PASSED",
+      "test_PrettyModules": "PASSED",
+      "test_QuotientRing": "PASSED",
+      "test_Homomorphism": "PASSED",
+      "test_Tr": "PASSED",
+      "test_pretty_Add": "PASSED",
+      "test_issue_7179": "PASSED",
+      "test_issue_7180": "PASSED",
+      "test_pretty_Complement": "PASSED",
+      "test_pretty_SymmetricDifference": "PASSED",
+      "test_pretty_Contains": "PASSED",
+      "test_issue_8292": "ERROR",
+      "test_issue_4335": "PASSED",
+      "test_issue_8344": "ERROR",
+      "test_issue_6324": "PASSED",
+      "test_issue_7927": "PASSED",
+      "test_issue_6134": "PASSED",
+      "test_issue_9877": "PASSED",
+      "test_issue_13651": "PASSED",
+      "test_pretty_primenu": "PASSED",
+      "test_pretty_primeomega": "PASSED",
+      "test_pretty_Mod": "PASSED",
+      "test_issue_11801": "PASSED",
+      "test_pretty_UnevaluatedExpr": "PASSED",
+      "test_issue_10472": "PASSED",
+      "test_MatrixElement_printing": "PASSED",
+      "test_issue_12675": "FAILED",
+      "test_MatrixSymbol_printing": "PASSED",
+      "test_degree_printing": "PASSED",
+      "test_str_printing": "PASSED",
+      "test_pretty_print_unicode": "FAILED",
+      "test_latex_printing": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

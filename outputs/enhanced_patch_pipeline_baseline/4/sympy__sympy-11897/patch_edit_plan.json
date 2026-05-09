@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/latex.py",
+      "action": "modify_region",
+      "justification": "The `_print_Mul` method in `LatexPrinter` is directly responsible for rendering multiplication and fractions in LaTeX. The observed inconsistencies in the LaTeX output arise from its logic, and it must be updated to ensure proper parentheses wrapping and consistent fraction formatting."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/latex.py",
+      "target_symbol": "LatexPrinter._print_Mul",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "obligation_1"
+      ],
+      "anchor_line_before": "        include_parens = False",
+      "anchor_line_after": "        if _coeff_isneg(expr):",
+      "replacement_block": "        include_parens = False\n        if _coeff_isneg(expr):\n            expr = -expr\n            tex = \"- \"\n            if expr.is_Add:\n                tex += \"(\"\n                include_parens = True\n        else:\n            tex = \"\"\n\n        from sympy.simplify import fraction\n        numer, denom = fraction(expr, exact=True)\n\n        # Handle fractions explicitly\n        if denom != 1:\n            numer_tex = self._print(numer)\n            denom_tex = self._print(denom)\n            if numer.is_Add or numer.is_Mul:\n                numer_tex = r\"\\left(%s\\right)\" % numer_tex\n            if denom.is_Add or denom.is_Mul:\n                denom_tex = r\"\\left(%s\\right)\" % denom_tex\n            return r\"\\frac{%s}{%s}\" % (numer_tex, denom_tex)\n\n        separator = self._settings['mul_symbol_latex']\n        numbersep = self._settings['mul_symbol_latex_numbers']\n\n        def convert(expr):\n            if not expr.is_Mul:\n                return str(self._print(expr))\n            else:\n                _tex = last_term_tex = \"\"\n\n                if self.order not in ('old', 'none'):\n                    args = expr.as_ordered_factors()\n                else:\n                    args = expr.args\n\n                for i, term in enumerate(args):\n                    term_tex = self._print(term)\n\n                    if self._needs_mul_brackets(term, first=(i == 0),\n                                                last=(i == len(args) - 1)):\n                        term_tex = r\"\\left(%s\\right)\" % term_tex\n\n                    if _between_two_numbers_p[0].search(last_term_tex) and \\\n                            _between_two_numbers_p[1].match(term_tex):\n                        # between two numbers\n                        _tex += numbersep\n                    elif _tex:\n                        _tex += separator\n\n                    _tex += term_tex\n                    last_term_tex = term_tex\n                return _tex\n\n        tex += convert(expr)\n        if include_parens:\n            tex += \")\"\n        return tex"
+    }
+  ]
+}

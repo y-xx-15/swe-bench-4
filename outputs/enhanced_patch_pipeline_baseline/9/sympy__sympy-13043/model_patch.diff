@@ -1,0 +1,9 @@
+--- a/sympy/integrals/intpoly.py
++++ b/sympy/integrals/intpoly.py
+@@ -593,5 +593,5 @@
+         poly_dict[0] = expr
+ 
+     if separate:
+-        return list(poly_dict.values())
++        return [monom[1] for monom in sorted(degrees, key=lambda x: (x[0], x[1]))]
+     return poly_dict

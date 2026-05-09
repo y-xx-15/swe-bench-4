@@ -1,0 +1,187 @@
+[
+  {
+    "instance_id": "sympy__sympy-13480",
+    "repo": "sympy/sympy",
+    "model": "gpt-4o",
+    "pipeline_mode": "enhanced_guided",
+    "hide_original_test_patch_in_repair": false,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "baseline_fallback",
+    "original_test_identifiers": [
+      "test_coth"
+    ],
+    "original_status_counts": {
+      "FAILED": 1,
+      "PASSED": 43,
+      "ERROR": 1
+    },
+    "original_failed_count": 2,
+    "original_passed_count": 43,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_coth"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_coth"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/functions/elementary/tests/test_hyperbolic.py:test_coth",
+        "test_coth"
+      ],
+      "failure_mode": "assertion_error",
+      "dominant_errors": [
+        "NameError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_coth E",
+        "test_coth_series ok",
+        "test_coth_rewrite ok"
+      ],
+      "noise_ratio": 0.0216,
+      "target_test_tracebacks": {
+        "test_coth": "TARGET TEST: test_coth\n- snippet: test_coth E\n- snippet: test_coth_series ok\n- snippet: test_coth_rewrite ok\n- dominant_errors: NameError\nWEAK TRACEBACK CONTEXT:\ntest_coth E\ntest_coth_series ok\ntest_coth_rewrite ok\n________ sympy/functions/elementary/tests/test_hyperbolic.py:test_coth _________\n  File \"/testbed/sympy/functions/elementary/tests/test_hyperbolic.py\", line 275, in test_coth\nNameError: name 'cotm' is not defined"
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 5,
+      "keep_top_k": 3,
+      "attempt_budget": 3,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "assertion_error",
+      "noise_ratio": 0.0216,
+      "difficulty": "medium"
+    },
+    "adaptive_num_candidates": 5,
+    "adaptive_keep_top_k": 3,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 5,
+    "kept_enhanced_candidates": 0,
+    "enhanced_candidate_retention_rate": 0.0,
+    "enhanced_generation_attempts_total": 18,
+    "enhanced_generation_attempts_avg": 3.6,
+    "kept_enhanced_test_identifiers": [],
+    "enhanced_failed_test_identifiers": [],
+    "enhanced_failed_count": 0,
+    "generated_patch_nonempty": false,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 2,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_not_generated",
+    "generated_patch_feedback": null,
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The variable 'cotm' is referenced in the 'coth.eval' method but is not defined anywhere in the method or its scope.",
+      "affected_components": [
+        {
+          "file": "sympy/functions/elementary/hyperbolic.py",
+          "symbol": "coth.eval",
+          "reason": "The 'eval' method of the 'coth' class directly references 'cotm', which leads to a NameError."
+        }
+      ],
+      "failing_signal": "The traceback indicates a NameError due to the undefined variable 'cotm' when evaluating certain integral values for coth(log(tan(x))).",
+      "propagation_path": "When 'coth.eval' is called, it attempts to evaluate the expression using 'cotm', which is not defined, causing a NameError that propagates to the user.",
+      "repair_constraint": "The 'eval' method must correctly handle all cases, including when 'cotm' is expected to be used, without introducing new errors or altering the mathematical correctness of the 'coth' function.",
+      "suggested_repair_scope": [
+        "sympy/functions/elementary/hyperbolic.py"
+      ],
+      "suspicious_symbols": [
+        "coth.eval",
+        "cotm"
+      ],
+      "repair_obligations": [
+        {
+          "id": "undefined-variable-cotm",
+          "source_symbol": "coth.eval",
+          "validation_subject": "cotm",
+          "why_it_matters": "The variable 'cotm' is referenced but not defined, leading to a runtime error. It must either be defined or removed to ensure the method executes correctly."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Fix undefined variable 'cotm' in coth.eval",
+      "approach": "Define 'cotm' within the 'eval' method of the 'coth' class before its usage, ensuring it is initialized correctly based on the context.",
+      "edit_targets": [
+        "sympy/functions/elementary/hyperbolic.py::coth.eval"
+      ],
+      "dependency_files": [],
+      "structural_rules": [],
+      "forbidden_patterns": [],
+      "sufficiency_assessment": "Editing the 'coth.eval' method is sufficient as the issue is localized to the undefined variable 'cotm'. No additional files or symbols need modification.",
+      "risks": [
+        "Ensure 'cotm' is defined correctly to avoid introducing mathematical inaccuracies or further runtime errors."
+      ]
+    },
+    "patch_edit_plan": null,
+    "final_patch_attempted": false,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": false,
+    "final_patch_apply_mode": "no_patch",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 1,
+      "PASSED": 43,
+      "ERROR": 1
+    },
+    "final_failed_count": 2,
+    "final_passed_count": 43,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/functions/elementary/tests/test_hyperbolic.py:test_coth": "FAILED",
+      "test_sinh": "PASSED",
+      "test_sinh_series": "PASSED",
+      "test_cosh": "PASSED",
+      "test_cosh_series": "PASSED",
+      "test_tanh": "PASSED",
+      "test_tanh_series": "PASSED",
+      "test_coth": "ERROR",
+      "test_coth_series": "PASSED",
+      "test_csch": "PASSED",
+      "test_csch_series": "PASSED",
+      "test_sech": "PASSED",
+      "test_sech_series": "PASSED",
+      "test_asinh": "PASSED",
+      "test_asinh_rewrite": "PASSED",
+      "test_asinh_series": "PASSED",
+      "test_acosh": "PASSED",
+      "test_acosh_rewrite": "PASSED",
+      "test_acosh_series": "PASSED",
+      "test_asech": "PASSED",
+      "test_asech_series": "PASSED",
+      "test_asech_rewrite": "PASSED",
+      "test_acsch": "PASSED",
+      "test_acsch_infinities": "PASSED",
+      "test_acsch_rewrite": "PASSED",
+      "test_atanh": "PASSED",
+      "test_atanh_rewrite": "PASSED",
+      "test_atanh_series": "PASSED",
+      "test_acoth": "PASSED",
+      "test_acoth_rewrite": "PASSED",
+      "test_acoth_series": "PASSED",
+      "test_inverses": "PASSED",
+      "test_leading_term": "PASSED",
+      "test_complex": "PASSED",
+      "test_complex_2899": "PASSED",
+      "test_simplifications": "PASSED",
+      "test_issue_4136": "PASSED",
+      "test_sinh_rewrite": "PASSED",
+      "test_cosh_rewrite": "PASSED",
+      "test_tanh_rewrite": "PASSED",
+      "test_coth_rewrite": "PASSED",
+      "test_csch_rewrite": "PASSED",
+      "test_sech_rewrite": "PASSED",
+      "test_derivs": "PASSED",
+      "test_sinh_expansion": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "title": "Handle Python 2-style long literals in Float tuple construction",
+  "approach": "Modify the Float class in sympy/core/numbers.py to detect and handle Python 2-style long literals (e.g., strings with a trailing 'L') during tuple-based float construction. Specifically, strip the 'L' suffix from the mantissa string before attempting conversion to an integer. This ensures compatibility with Python 3 unpickling logic. Additionally, enhance test coverage in sympy/core/tests/test_numbers.py to validate tuple-based float construction, input validation, and unpickling behavior.",
+  "edit_targets": [
+    "sympy/core/numbers.py::Float.__new__"
+  ],
+  "dependency_files": [
+    "sympy/core/tests/test_numbers.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing Float.__new__ is sufficient to address the issue because it directly handles tuple-based float construction, including the conversion of the mantissa (num[1]). The enhanced tests in sympy/core/tests/test_numbers.py validate all required obligations: tuple-based float construction, tuple input for float creation, and num[1] conversion logic. No changes to other classes or modules are necessary.",
+  "risks": [
+    "Ensure that stripping the 'L' suffix does not inadvertently affect valid hexadecimal strings or other numeric formats. Verify that the fix does not introduce regressions in other numeric operations or unpickling scenarios."
+  ]
+}

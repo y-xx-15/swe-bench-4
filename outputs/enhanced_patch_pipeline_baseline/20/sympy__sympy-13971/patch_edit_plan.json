@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/latex.py",
+      "action": "modify_region",
+      "justification": "The LatexPrinter class is responsible for generating LaTeX output, including sequences. The current implementation incorrectly escapes square brackets in sequences, causing rendering issues in Markdown cells."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/latex.py",
+      "target_symbol": "LatexPrinter._print_SeqFormula",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "obligation_1"
+      ],
+      "anchor_line_before": "        return '\\\\left[' + self._print(expr.formula) + '\\\\right]'",
+      "anchor_line_after": "        return '\\\\left[' + self._print(expr.formula) + '\\\\right]'",
+      "replacement_block": "        return '[' + self._print(expr.formula) + ']'"
+    }
+  ]
+}

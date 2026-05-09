@@ -1,0 +1,29 @@
+{
+  "root_cause": "A conditional branch in `pytest_runtest_makereport` under the `--runxfail` flag prevents the correction logic for `rep.longrepr` to point to the item definition from executing.",
+  "affected_components": [
+    {
+      "file": "src/_pytest/skipping.py",
+      "symbol": "pytest_runtest_makereport",
+      "reason": "This hook is responsible for generating the test report, including the location of skipped tests."
+    }
+  ],
+  "failing_signal": "The skip location reported in the test output points to `src/_pytest/skipping.py:238` instead of the test item definition.",
+  "propagation_path": "When `--runxfail` is enabled, the branch `elif item.config.option.runxfail` in `pytest_runtest_makereport` consumes the chain, preventing the later correction block for `rep.longrepr` (which adjusts the location to the item definition) from executing.",
+  "repair_constraint": "The `--runxfail` flag must continue to handle xfail-specific behavior without interfering with skip location reporting.",
+  "suggested_repair_scope": [
+    "src/_pytest/skipping.py"
+  ],
+  "suspicious_symbols": [
+    "pytest_runtest_makereport",
+    "rep.longrepr",
+    "item.reportinfo"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_xfail_run_with_skip_mark[test_input1-expected1]::core::skip_location_reporting",
+      "source_symbol": "pytest_runtest_makereport",
+      "validation_subject": "skip_location_reporting",
+      "why_it_matters": "This obligation ensures that skipped tests report their location correctly, which is critical for debugging and test traceability."
+    }
+  ]
+}

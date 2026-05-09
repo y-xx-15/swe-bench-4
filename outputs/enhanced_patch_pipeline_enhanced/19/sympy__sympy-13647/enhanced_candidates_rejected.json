@@ -1,0 +1,301 @@
+[
+  {
+    "idea": {
+      "title": "test_col_insert_with_mismatched_row_counts",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Ensure that Matrix.col_insert() raises an AssertionError when the number of rows in the inserted matrix does not match the number of rows in the target matrix.",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_col_insert_with_mismatched_row_counts"
+      ],
+      "covers_original_tests": [
+        "test_col_insert"
+      ],
+      "covers_obligations": [
+        "test_col_insert::core"
+      ],
+      "target_source_symbol": "Matrix.col_insert",
+      "target_validation_subject": "row_count_validation",
+      "semantic_alignment_tokens": [
+        "col_insert(",
+        "ShapeError",
+        "rows"
+      ],
+      "trigger_shape_tokens": [
+        "col_insert(",
+        "self.rows",
+        "other.rows"
+      ],
+      "rationale": "This test directly targets the row count validation in Matrix.col_insert(), which is a key part of the observed failure. Unlike the original test, which may focus on general insertion behavior, this test explicitly triggers the ShapeError obligation by providing mismatched row counts, ensuring that this specific validation branch is exercised."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,7 @@\n+def test_sweb_enhanced_col_insert_with_mismatched_row_counts():\n+    M = eye(3)\n+    V = ones(4, 1)  # Mismatched row count: M has 3 rows, V has 4 rows\n+    try:\n+        M.col_insert(1, V)\n+    except ShapeError:\n+        pass  # Expected behavior: ShapeError should be raised\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,7 @@\n+def test_sweb_enhanced_col_insert_with_mismatched_row_counts():\n+    M = eye(3)\n+    V = ones(4, 1)  # Mismatched row count: M has 3 rows, V has 4 rows\n+    try:\n+        M.col_insert(1, V)\n+    except ShapeError:\n+        pass  # Expected behavior: ShapeError should be raised\n```",
+    "identifiers": [
+      "test_sweb_enhanced_col_insert_with_mismatched_row_counts"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_col_insert_with_mismatched_row_counts"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "sympy/matrices/tests/test_commonmatrix.py:test_refine": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_jacobian2": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_limit": "FAILED",
+      "test__MinimalMatrix": "PASSED",
+      "test_vec": "PASSED",
+      "test_tolist": "PASSED",
+      "test_row_col_del": "PASSED",
+      "test_get_diag_blocks1": "PASSED",
+      "test_get_diag_blocks2": "PASSED",
+      "test_shape": "PASSED",
+      "test_reshape": "PASSED",
+      "test_row_col": "PASSED",
+      "test_row_join": "PASSED",
+      "test_col_join": "PASSED",
+      "test_row_insert": "PASSED",
+      "test_col_insert": "PASSED",
+      "test_extract": "PASSED",
+      "test_hstack": "PASSED",
+      "test_vstack": "PASSED",
+      "test_atoms": "PASSED",
+      "test_free_symbols": "PASSED",
+      "test_has": "PASSED",
+      "test_is_anti_symmetric": "PASSED",
+      "test_diagonal_symmetrical": "PASSED",
+      "test_is_hermitian": "PASSED",
+      "test_is_Identity": "PASSED",
+      "test_is_symbolic": "PASSED",
+      "test_is_upper": "PASSED",
+      "test_is_lower": "PASSED",
+      "test_is_square": "PASSED",
+      "test_is_symmetric": "PASSED",
+      "test_is_hessenberg": "PASSED",
+      "test_is_zero": "PASSED",
+      "test_values": "PASSED",
+      "test_applyfunc": "PASSED",
+      "test_adjoint": "PASSED",
+      "test_as_real_imag": "PASSED",
+      "test_conjugate": "PASSED",
+      "test_doit": "PASSED",
+      "test_evalf": "PASSED",
+      "test_expand": "PASSED",
+      "test_refine": "ERROR",
+      "test_replace": "PASSED",
+      "test_replace_map": "PASSED",
+      "test_simplify": "PASSED",
+      "test_subs": "PASSED",
+      "test_trace": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_permute": "PASSED",
+      "test_abs": "PASSED",
+      "test_add": "PASSED",
+      "test_multiplication": "PASSED",
+      "test_power": "PASSED",
+      "test_neg": "PASSED",
+      "test_sub": "PASSED",
+      "test_div": "PASSED",
+      "test_det": "PASSED",
+      "test_adjugate": "PASSED",
+      "test_cofactor_and_minors": "PASSED",
+      "test_charpoly": "PASSED",
+      "test_row_op": "PASSED",
+      "test_col_op": "PASSED",
+      "test_is_echelon": "PASSED",
+      "test_echelon_form": "PASSED",
+      "test_rref": "PASSED",
+      "test_eye": "PASSED",
+      "test_ones": "PASSED",
+      "test_zeros": "PASSED",
+      "test_diag": "PASSED",
+      "test_jordan_block": "PASSED",
+      "test_columnspace": "PASSED",
+      "test_rowspace": "PASSED",
+      "test_nullspace": "PASSED",
+      "test_eigenvals": "PASSED",
+      "test_eigenvects": "PASSED",
+      "test_left_eigenvects": "PASSED",
+      "test_diagonalize": "PASSED",
+      "test_is_diagonalizable": "PASSED",
+      "test_jordan_form": "PASSED",
+      "test_singular_values": "PASSED",
+      "test_integrate": "PASSED",
+      "test_jacobian2": "ERROR",
+      "test_limit": "ERROR"
+    },
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_col_insert"
+    ],
+    "covered_obligations": [
+      "test_col_insert::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test_col_insert_behavioral_consequence",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream matrix integrity after column insertion",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "state_consistency_check",
+      "target_tests": [
+        "test_sweb_enhanced_col_insert_behavior"
+      ],
+      "covers_original_tests": [
+        "test_col_insert"
+      ],
+      "covers_obligations": [
+        "test_col_insert::core"
+      ],
+      "target_source_symbol": "Matrix.col_insert",
+      "target_validation_subject": "matrix_integrity",
+      "semantic_alignment_tokens": [
+        "col_insert(",
+        "ShapeError",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "col_insert(",
+        "rows",
+        "cols"
+      ],
+      "rationale": "This test verifies that the matrix integrity is preserved after column insertion, focusing on downstream effects such as row alignment and data consistency. It differs from the original test by validating the correctness of the entire matrix structure post-operation, rather than just the immediate insertion behavior."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,11 @@\n+def test_sweb_enhanced_col_insert_behavior():\n+    # Create a 4x4 identity matrix\n+    M = eye(4)\n+    # Create a 4x2 matrix of ones\n+    V = ones(4, 2)\n+    # Insert the columns at position 2\n+    result = M.col_insert(2, V)\n+    # Verify the entire matrix structure post-insertion\n+    expected = Matrix([\n+        [1, 0, 1, 1, 0],\n+        [0, 1, 1, 1, 0],\n+        [0, 0, 1, 1, 1],\n+        [0, 0, 1, 1, 1]])\n+    assert result == expected\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,11 @@\n+def test_sweb_enhanced_col_insert_behavior():\n+    # Create a 4x4 identity matrix\n+    M = eye(4)\n+    # Create a 4x2 matrix of ones\n+    V = ones(4, 2)\n+    # Insert the columns at position 2\n+    result = M.col_insert(2, V)\n+    # Verify the entire matrix structure post-insertion\n+    expected = Matrix([\n+        [1, 0, 1, 1, 0],\n+        [0, 1, 1, 1, 0],\n+        [0, 0, 1, 1, 1],\n+        [0, 0, 1, 1, 1]])\n+    assert result == expected\n```",
+    "identifiers": [
+      "test_sweb_enhanced_col_insert_behavior"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_col_insert_behavior"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "evaluation produced an empty status_map; likely log_parse_failed or tests_not_collected",
+    "failing_identifiers": null,
+    "eval_status_map": {},
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_col_insert"
+    ],
+    "covered_obligations": [
+      "test_col_insert::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "Matrix.col_insert column alignment invariant",
+      "semantic_bucket": "structural_invariant",
+      "goal": "stress the invariant that inserted columns should align correctly with existing matrix rows",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_col_insert_alignment"
+      ],
+      "covers_original_tests": [
+        "test_col_insert"
+      ],
+      "covers_obligations": [
+        "test_col_insert::core"
+      ],
+      "target_source_symbol": "Matrix.col_insert",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Matrix.col_insert",
+        "ShapeError",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "Matrix.col_insert",
+        "rows",
+        "cols",
+        "pos",
+        "other"
+      ],
+      "rationale": "This test explicitly checks the structural invariant that inserted columns must align correctly with existing rows, which is distinct from the original test's focus on general insertion behavior. It ensures that the bug is exposed through a specific misalignment scenario, reproducing the AssertionError failure mode."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,9 @@\n+def test_sweb_enhanced_col_insert_alignment():\n+    # Test for column alignment invariant in Matrix.col_insert\n+    M = eye(4)\n+    V = ones(3, 2)  # Mismatched number of rows\n+    try:\n+        M.col_insert(2, V)\n+    except ShapeError:\n+        pass  # Expected behavior\n+    else:\n+        assert False, \"Matrix.col_insert should raise ShapeError for row misalignment\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +246,9 @@\n+def test_sweb_enhanced_col_insert_alignment():\n+    # Test for column alignment invariant in Matrix.col_insert\n+    M = eye(4)\n+    V = ones(3, 2)  # Mismatched number of rows\n+    try:\n+        M.col_insert(2, V)\n+    except ShapeError:\n+        pass  # Expected behavior\n+    else:\n+        assert False, \"Matrix.col_insert should raise ShapeError for row misalignment\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_col_insert_alignment"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_col_insert_alignment"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "evaluation produced an empty status_map; likely log_parse_failed or tests_not_collected",
+    "failing_identifiers": null,
+    "eval_status_map": {},
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_col_insert"
+    ],
+    "covered_obligations": [
+      "test_col_insert::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "Matrix column insertion with shifted identity matrix",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream matrix behavior when column insertion causes row misalignment",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_col_insert_shift"
+      ],
+      "covers_original_tests": [
+        "test_col_insert"
+      ],
+      "covers_obligations": [
+        "test_col_insert::core"
+      ],
+      "target_source_symbol": "Matrix.col_insert",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "col_insert(",
+        "Matrix(",
+        "ShapeError"
+      ],
+      "trigger_shape_tokens": [
+        "col_insert(",
+        "Matrix(",
+        "rows",
+        "cols"
+      ],
+      "rationale": "This test focuses on the downstream behavior of the matrix after column insertion, specifically checking if the identity matrix remains intact and correctly aligned. It differs from the original test by explicitly verifying the structural integrity of the identity matrix post-insertion, which was not directly validated in the original test."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,12 @@\n+def test_sweb_enhanced_col_insert_shift():\n+    # Create a 4x4 identity matrix\n+    M = eye(4)\n+    # Create a 4x2 matrix of ones\n+    V = ones(4, 2)\n+    # Insert the matrix of ones at column index 2\n+    result = M.col_insert(2, V)\n+    # Verify the expected structure of the resulting matrix\n+    expected = Matrix([\n+        [1, 0, 1, 1, 0],\n+        [0, 1, 1, 1, 0],\n+        [0, 0, 1, 1, 1],\n+        [0, 0, 1, 1, 0],\n+    ])\n+    assert result == expected\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,12 @@\n+def test_sweb_enhanced_col_insert_shift():\n+    # Create a 4x4 identity matrix\n+    M = eye(4)\n+    # Create a 4x2 matrix of ones\n+    V = ones(4, 2)\n+    # Insert the matrix of ones at column index 2\n+    result = M.col_insert(2, V)\n+    # Verify the expected structure of the resulting matrix\n+    expected = Matrix([\n+        [1, 0, 1, 1, 0],\n+        [0, 1, 1, 1, 0],\n+        [0, 0, 1, 1, 1],\n+        [0, 0, 1, 1, 0],\n+    ])\n+    assert result == expected\n```",
+    "identifiers": [
+      "test_sweb_enhanced_col_insert_shift"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_col_insert_shift"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_col_insert is not semantically aligned with its original failure path. Expected source symbol 'test_col_insert' and alignment tokens ['assertionerror'], but the current content targets 'Matrix.col_insert' with tokens ['col_insert(', 'Matrix(', 'ShapeError']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_col_insert"
+    ],
+    "covered_obligations": [
+      "test_col_insert::core"
+    ]
+  }
+]

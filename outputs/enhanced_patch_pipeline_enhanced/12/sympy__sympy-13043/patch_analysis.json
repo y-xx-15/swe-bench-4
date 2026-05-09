@@ -1,0 +1,34 @@
+{
+  "root_cause": "The `decompose` function in `sympy/integrals/intpoly.py` returns a list of monomials in arbitrary order when `separate=True`, which causes test failures due to order-sensitive assertions.",
+  "affected_components": [
+    {
+      "file": "sympy/integrals/intpoly.py",
+      "symbol": "decompose",
+      "reason": "The function directly returns an unordered list of monomials, which is the source of the test failures."
+    },
+    {
+      "file": "sympy/integrals/tests/test_intpoly.py",
+      "symbol": "test_decompose",
+      "reason": "The test validates the output of `decompose` and fails due to the unordered output."
+    }
+  ],
+  "failing_signal": "The test `test_decompose` fails with `AssertionError` because the output list of monomials is not in a deterministic order.",
+  "propagation_path": "The unordered list returned by `decompose` propagates to the test assertions, which expect a specific order, leading to failures.",
+  "repair_constraint": "The `decompose` function must continue to return the same monomials but in a deterministic order, ensuring compatibility with existing functionality.",
+  "suggested_repair_scope": [
+    "sympy/integrals/intpoly.py",
+    "sympy/integrals/tests/test_intpoly.py"
+  ],
+  "suspicious_symbols": [
+    "decompose",
+    "test_decompose"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_decompose::core",
+      "source_symbol": "test_decompose",
+      "validation_subject": "core",
+      "why_it_matters": "The test validates the correctness of the `decompose` function, and its failure indicates a mismatch between expected and actual behavior."
+    }
+  ]
+}

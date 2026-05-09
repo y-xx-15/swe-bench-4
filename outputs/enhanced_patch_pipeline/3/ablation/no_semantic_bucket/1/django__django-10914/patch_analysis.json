@@ -1,0 +1,34 @@
+{
+  "root_cause": "The default value of FILE_UPLOAD_PERMISSIONS is set to None in django/conf/global_settings.py. This causes inconsistencies in file permissions for uploaded files, as the tempfile.NamedTemporaryFile + os.rename sequence defaults to 0o600 permissions on some systems.",
+  "affected_components": [
+    {
+      "file": "django/conf/global_settings.py",
+      "symbol": "FILE_UPLOAD_PERMISSIONS",
+      "reason": "This setting determines the default file permissions for uploaded files. Its current value of None leads to inconsistent behavior across systems."
+    },
+    {
+      "file": "tests/test_utils/tests.py",
+      "symbol": "test_override_file_upload_permissions",
+      "reason": "This test explicitly checks the behavior of FILE_UPLOAD_PERMISSIONS and fails due to the default value being None."
+    }
+  ],
+  "failing_signal": "The test_override_file_upload_permissions test fails with an AssertionError because the expected file permission (0o644) does not match the actual permission (0o600).",
+  "propagation_path": "The FILE_UPLOAD_PERMISSIONS setting is None by default, which causes the tempfile module to apply its default permissions (0o600) when creating temporary files. This behavior propagates to the final uploaded file permissions, leading to the test failure.",
+  "repair_constraint": "The default value of FILE_UPLOAD_PERMISSIONS must ensure consistent and secure file permissions across all systems, while maintaining backward compatibility for existing configurations.",
+  "suggested_repair_scope": [
+    "django/conf/global_settings.py",
+    "tests/test_utils/tests.py"
+  ],
+  "suspicious_symbols": [
+    "FILE_UPLOAD_PERMISSIONS",
+    "test_override_file_upload_permissions"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_override_file_upload_permissions (test_utils.tests.OverrideSettingsTests)::core::FILE_UPLOAD_PERMISSIONS",
+      "source_symbol": "FILE_UPLOAD_PERMISSIONS",
+      "validation_subject": "FILE_UPLOAD_PERMISSIONS",
+      "why_it_matters": "This obligation ensures that the default file permissions for uploaded files are consistent and meet the expectations of the test case."
+    }
+  ]
+}

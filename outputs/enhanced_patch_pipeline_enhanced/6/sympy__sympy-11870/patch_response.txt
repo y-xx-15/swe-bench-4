@@ -1,0 +1,19 @@
+```diff
+diff --git a/sympy/functions/elementary/trigonometric.py b/sympy/functions/elementary/trigonometric.py
+--- a/sympy/functions/elementary/trigonometric.py
++++ b/sympy/functions/elementary/trigonometric.py
+@@ -373,7 +373,13 @@
+     def _eval_rewrite_as_exp(self, arg):
+         I = S.ImaginaryUnit
+         if isinstance(arg, TrigonometricFunction) or isinstance(arg, HyperbolicFunction):
+             arg = arg.func(arg.args[0]).rewrite(exp)
++        # Simplify expressions involving exponential terms into trigonometric identities
++        if arg.is_Add:
++            terms = arg.as_ordered_terms()
++            if len(terms) == 2 and terms[0].is_Mul and terms[1].is_Mul:
++                coeff1, exp1 = terms[0].as_two_terms()
++                coeff2, exp2 = terms[1].as_two_terms()
++                if exp1 == exp(-I * coeff1) and exp2 == exp(I * coeff1):
++                    return sin(coeff1)
+         return (exp(arg*I) - exp(-arg*I)) / (2*I)
+```

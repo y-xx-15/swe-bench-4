@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/latex.py",
+      "action": "modify_region",
+      "justification": "The `_print_SeqFormula` method in this file directly controls the LaTeX rendering of sequences, including the improper escaping of square brackets. Modifying this method is necessary to fix the issue."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/latex.py",
+      "target_symbol": "LatexPrinter._print_SeqFormula",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_latex_sequences::core::sequence_bracket_escape",
+        "test_latex_sequences::core::SeqFormula LaTeX rendering"
+      ],
+      "anchor_line_before": "        return r\"\\left[\" + self._print(expr.formula) + r\", \\ldots\\right]\"",
+      "anchor_line_after": "        return r\"[\" + self._print(expr.formula) + r\", \\ldots ]\"",
+      "replacement_block": "        return r\"[\" + self._print(expr.formula) + r\", \\ldots ]\""
+    }
+  ]
+}

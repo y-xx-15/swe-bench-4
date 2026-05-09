@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/ccode.py",
+      "action": "modify_region",
+      "justification": "The `CCodePrinter` class needs to be updated to include the `sinc` function in its `known_functions` dictionary to ensure proper translation of `sinc` into valid C code."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/ccode.py",
+      "target_symbol": "known_functions",
+      "replacement_mode": "insert_after_anchor",
+      "covers_obligations": [
+        "add_sinc_to_known_functions"
+      ],
+      "anchor_line_before": "    \"Abs\": [(lambda x: not x.is_integer, \"fabs\")],",
+      "anchor_line_after": "    \"gamma\": \"tgamma\",",
+      "replacement_block": "    \"Abs\": [(lambda x: not x.is_integer, \"fabs\")],\n    \"sinc\": [(lambda x: True, \"((x != 0) ? (sin(x)/x) : 1)\")],\n    \"gamma\": \"tgamma\","
+    }
+  ]
+}

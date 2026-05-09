@@ -1,0 +1,16 @@
+{
+  "title": "Fix hstack shape computation for zero-row matrices",
+  "approach": "Update the `hstack` implementation in the `SparseMatrix` class to correctly compute the resulting shape when horizontally stacking matrices with zero rows. Ensure that the column dimensions of all input matrices are summed, even when the row count is zero.",
+  "edit_targets": [
+    "sympy/matrices/sparse.py::SparseMatrix.hstack"
+  ],
+  "dependency_files": [
+    "sympy/matrices/tests/test_sparse.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing the `SparseMatrix.hstack` method is sufficient to address the issue because the bug is isolated to the shape computation logic within this method. No changes are required in other parts of the `SparseMatrix` class or its dependencies.",
+  "risks": [
+    "Potential regressions in other use cases of `hstack`, such as matrices with non-zero rows or mixed dimensions. Thorough testing is required to ensure correctness."
+  ]
+}

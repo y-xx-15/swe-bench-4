@@ -1,0 +1,335 @@
+[
+  {
+    "idea": {
+      "title": "test power simplification with negative fractional base",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that the power simplification logic correctly handles negative fractional bases and raises an AssertionError when the result is incorrect.",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_power_simplification"
+      ],
+      "covers_original_tests": [
+        "test_powers_Integer"
+      ],
+      "covers_obligations": [
+        "test_powers_Integer::core"
+      ],
+      "target_source_symbol": "test_powers_Integer",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "assertionerror"
+      ],
+      "rationale": "This test directly exercises the same source symbol and failure mode as the original test_powers_Integer, but introduces a new input case with a negative fractional base to ensure the power simplification logic is robust against such inputs. This provides additional repair guidance by exposing a specific edge case that may not have been covered in the original test."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,8 @@\n+def test_sweb_enhanced_power_simplification():\n+    x = Symbol(\"x\")\n+    e = (-x/4 - S(1)/12)**x - 1\n+    f = simplify(e)\n+    a = S(-7)/5  # Negative fractional base\n+    assert abs(e.subs(x, a).evalf() - f.subs(x, a).evalf()) < 1e-15, \\\n+        \"Power simplification failed for negative fractional base\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,8 @@\n+def test_sweb_enhanced_power_simplification():\n+    x = Symbol(\"x\")\n+    e = (-x/4 - S(1)/12)**x - 1\n+    f = simplify(e)\n+    a = S(-7)/5  # Negative fractional base\n+    assert abs(e.subs(x, a).evalf() - f.subs(x, a).evalf()) < 1e-15, \\\n+        \"Power simplification failed for negative fractional base\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_power_simplification"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_power_simplification"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_integers_cache": "PASSED",
+      "test_seterr": "PASSED",
+      "test_mod": "PASSED",
+      "test_divmod": "PASSED",
+      "test_igcd": "PASSED",
+      "test_igcd_lehmer": "PASSED",
+      "test_igcd2": "PASSED",
+      "test_ilcm": "PASSED",
+      "test_igcdex": "PASSED",
+      "test_Integer_new": "PASSED",
+      "test_Rational_new": "PASSED",
+      "test_Number_new": "PASSED",
+      "test_Rational_cmp": "PASSED",
+      "test_Float": "PASSED",
+      "test_float_mpf": "PASSED",
+      "test_Float_RealElement": "PASSED",
+      "test_Float_default_to_highprec_from_str": "PASSED",
+      "test_Float_eval": "PASSED",
+      "test_Float_issue_2107": "PASSED",
+      "test_Float_from_tuple": "PASSED",
+      "test_Infinity": "PASSED",
+      "test_Infinity_2": "PASSED",
+      "test_Mul_Infinity_Zero": "PASSED",
+      "test_Div_By_Zero": "PASSED",
+      "test_Infinity_inequations": "PASSED",
+      "test_NaN": "PASSED",
+      "test_special_numbers": "PASSED",
+      "test_powers": "PASSED",
+      "test_integer_nthroot_overflow": "PASSED",
+      "test_isqrt": "PASSED",
+      "test_powers_Integer": "PASSED",
+      "test_powers_Rational": "PASSED",
+      "test_powers_Float": "PASSED",
+      "test_abs1": "PASSED",
+      "test_accept_int": "PASSED",
+      "test_dont_accept_str": "PASSED",
+      "test_int": "PASSED",
+      "test_long": "PASSED",
+      "test_real_bug": "PASSED",
+      "test_bug_sqrt": "PASSED",
+      "test_pi_Pi": "PASSED",
+      "test_no_len": "PASSED",
+      "test_issue_3321": "PASSED",
+      "test_issue_3692": "PASSED",
+      "test_issue_3423": "PASSED",
+      "test_issue_3449": "PASSED",
+      "test_Integer_factors": "PASSED",
+      "test_Rational_factors": "PASSED",
+      "test_issue_4107": "PASSED",
+      "test_IntegerInteger": "PASSED",
+      "test_Rational_gcd_lcm_cofactors": "PASSED",
+      "test_Float_gcd_lcm_cofactors": "PASSED",
+      "test_issue_4611": "PASSED",
+      "test_conversion_to_mpmath": "PASSED",
+      "test_relational": "PASSED",
+      "test_Integer_as_index": "PASSED",
+      "test_Rational_int": "PASSED",
+      "test_zoo": "PASSED",
+      "test_issue_4122": "PASSED",
+      "test_GoldenRatio_expand": "PASSED",
+      "test_as_content_primitive": "PASSED",
+      "test_hashing_sympy_integers": "PASSED",
+      "test_issue_4172": "PASSED",
+      "test_Catalan_EulerGamma_prec": "PASSED",
+      "test_Float_eq": "PASSED",
+      "test_int_NumberSymbols": "PASSED",
+      "test_issue_6640": "PASSED",
+      "test_issue_6349": "PASSED",
+      "test_mpf_norm": "PASSED",
+      "test_latex": "PASSED",
+      "test_issue_7742": "PASSED",
+      "test_simplify_AlgebraicNumber": "PASSED",
+      "test_Float_idempotence": "PASSED",
+      "test_comp": "PASSED",
+      "test_issue_9491": "PASSED",
+      "test_issue_10063": "PASSED",
+      "test_issue_10020": "PASSED",
+      "test_invert_numbers": "PASSED",
+      "test_mod_inverse": "PASSED",
+      "test_golden_ratio_rewrite_as_sqrt": "PASSED",
+      "test_comparisons_with_unknown_type": "PASSED",
+      "test_NumberSymbol_comparison": "PASSED",
+      "test_Integer_precision": "PASSED"
+    },
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_powers_Integer"
+    ],
+    "covered_obligations": [
+      "test_powers_Integer::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "Test Integer power simplification with specific edge case",
+      "semantic_bucket": "direct_symptom",
+      "goal": "To verify that the simplification of fractional powers involving negative bases does not produce incorrect results or raise an AssertionError.",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_fractional_power_simplification"
+      ],
+      "covers_original_tests": [
+        "test_powers_Integer"
+      ],
+      "covers_obligations": [
+        "test_powers_Integer::core"
+      ],
+      "target_source_symbol": "sympy.core.numbers.Number",
+      "target_validation_subject": "simplification of fractional powers",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "simplify(",
+        "subs(",
+        "Symbol(",
+        "Fractional powers"
+      ],
+      "trigger_shape_tokens": [
+        "simplify(",
+        "subs(",
+        "Symbol(",
+        "Fractional powers"
+      ],
+      "rationale": "This test directly targets the same failure mode (AssertionError) as the original test 'test_powers_Integer' by reproducing the bug in the simplification of fractional powers with negative bases. It uses a specific edge case to ensure the bug is exposed and provides additional repair guidance by focusing on the specific behavior of the simplify function when handling fractional powers."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,8 @@\n+def test_sweb_enhanced_negative_base_fractional_power():\n+    x = Symbol(\"x\")\n+    e = (-x/3 - S(1)/9)**(Rational(3, 2)) - 1\n+    f = simplify(e)\n+    a = S(4)/3\n+    assert abs(e.subs(x, a).evalf() - f.subs(x, a).evalf()) < 1e-15, \\\n+        \"Simplification of fractional powers with negative bases produced incorrect results\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,8 @@\n+def test_sweb_enhanced_negative_base_fractional_power():\n+    x = Symbol(\"x\")\n+    e = (-x/3 - S(1)/9)**(Rational(3, 2)) - 1\n+    f = simplify(e)\n+    a = S(4)/3\n+    assert abs(e.subs(x, a).evalf() - f.subs(x, a).evalf()) < 1e-15, \\\n+        \"Simplification of fractional powers with negative bases produced incorrect results\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_negative_base_fractional_power"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_negative_base_fractional_power"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_integers_cache": "PASSED",
+      "test_seterr": "PASSED",
+      "test_mod": "PASSED",
+      "test_divmod": "PASSED",
+      "test_igcd": "PASSED",
+      "test_igcd_lehmer": "PASSED",
+      "test_igcd2": "PASSED",
+      "test_ilcm": "PASSED",
+      "test_igcdex": "PASSED",
+      "test_Integer_new": "PASSED",
+      "test_Rational_new": "PASSED",
+      "test_Number_new": "PASSED",
+      "test_Rational_cmp": "PASSED",
+      "test_Float": "PASSED",
+      "test_float_mpf": "PASSED",
+      "test_Float_RealElement": "PASSED",
+      "test_Float_default_to_highprec_from_str": "PASSED",
+      "test_Float_eval": "PASSED",
+      "test_Float_issue_2107": "PASSED",
+      "test_Float_from_tuple": "PASSED",
+      "test_Infinity": "PASSED",
+      "test_Infinity_2": "PASSED",
+      "test_Mul_Infinity_Zero": "PASSED",
+      "test_Div_By_Zero": "PASSED",
+      "test_Infinity_inequations": "PASSED",
+      "test_NaN": "PASSED",
+      "test_special_numbers": "PASSED",
+      "test_powers": "PASSED",
+      "test_integer_nthroot_overflow": "PASSED",
+      "test_isqrt": "PASSED",
+      "test_powers_Integer": "PASSED",
+      "test_powers_Rational": "PASSED",
+      "test_powers_Float": "PASSED",
+      "test_abs1": "PASSED",
+      "test_accept_int": "PASSED",
+      "test_dont_accept_str": "PASSED",
+      "test_int": "PASSED",
+      "test_long": "PASSED",
+      "test_real_bug": "PASSED",
+      "test_bug_sqrt": "PASSED",
+      "test_pi_Pi": "PASSED",
+      "test_no_len": "PASSED",
+      "test_issue_3321": "PASSED",
+      "test_issue_3692": "PASSED",
+      "test_issue_3423": "PASSED",
+      "test_issue_3449": "PASSED",
+      "test_Integer_factors": "PASSED",
+      "test_Rational_factors": "PASSED",
+      "test_issue_4107": "PASSED",
+      "test_IntegerInteger": "PASSED",
+      "test_Rational_gcd_lcm_cofactors": "PASSED",
+      "test_Float_gcd_lcm_cofactors": "PASSED",
+      "test_issue_4611": "PASSED",
+      "test_conversion_to_mpmath": "PASSED",
+      "test_relational": "PASSED",
+      "test_Integer_as_index": "PASSED",
+      "test_Rational_int": "PASSED",
+      "test_zoo": "PASSED",
+      "test_issue_4122": "PASSED",
+      "test_GoldenRatio_expand": "PASSED",
+      "test_as_content_primitive": "PASSED",
+      "test_hashing_sympy_integers": "PASSED",
+      "test_issue_4172": "PASSED",
+      "test_Catalan_EulerGamma_prec": "PASSED",
+      "test_Float_eq": "PASSED",
+      "test_int_NumberSymbols": "PASSED",
+      "test_issue_6640": "PASSED",
+      "test_issue_6349": "PASSED",
+      "test_mpf_norm": "PASSED",
+      "test_latex": "PASSED",
+      "test_issue_7742": "PASSED",
+      "test_simplify_AlgebraicNumber": "PASSED",
+      "test_Float_idempotence": "PASSED",
+      "test_comp": "PASSED",
+      "test_issue_9491": "PASSED",
+      "test_issue_10063": "PASSED",
+      "test_issue_10020": "PASSED",
+      "test_invert_numbers": "PASSED",
+      "test_mod_inverse": "PASSED",
+      "test_golden_ratio_rewrite_as_sqrt": "PASSED",
+      "test_comparisons_with_unknown_type": "PASSED",
+      "test_NumberSymbol_comparison": "PASSED",
+      "test_Integer_precision": "PASSED"
+    },
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_powers_Integer"
+    ],
+    "covered_obligations": [
+      "test_powers_Integer::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test power simplification with complex results",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior of power simplification when complex results are involved",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_power_complex_result"
+      ],
+      "covers_original_tests": [
+        "test_powers_Integer",
+        "test_issue_13890"
+      ],
+      "covers_obligations": [
+        "test_powers_Integer::core",
+        "test_issue_13890::core"
+      ],
+      "target_source_symbol": "sympy.core.numbers.Float._eval_power",
+      "target_validation_subject": "complex power simplification",
+      "semantic_alignment_tokens": [
+        "simplify",
+        "subs",
+        "complex",
+        "N(",
+        "mpf_pow"
+      ],
+      "trigger_shape_tokens": [
+        "simplify(",
+        "subs(",
+        "N(",
+        "mpf_pow"
+      ],
+      "rationale": "This test extends the original failure by explicitly verifying the behavior of power simplification when the result involves complex numbers. The original tests focused on specific cases of incorrect simplification, but this test ensures that the downstream behavior of complex results is also validated, providing additional repair guidance for handling complex power cases."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,10 @@\n+def test_sweb_enhanced_power_complex_result():\n+    x = Symbol(\"x\")\n+    e = (-x/4 - S(1)/12)**x - 1\n+    f = simplify(e)\n+    a = S(9)/5\n+    # Validate that the numerical evaluation of the simplified expression matches the original\n+    assert abs(N(e.subs(x, a)) - N(f.subs(x, a))) < 1e-15, (\n+        f\"Mismatch in complex power simplification: \"\n+        f\"N(e)={N(e.subs(x, a))}, N(f)={N(f.subs(x, a))}\"\n+    )\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,10 @@\n+def test_sweb_enhanced_power_complex_result():\n+    x = Symbol(\"x\")\n+    e = (-x/4 - S(1)/12)**x - 1\n+    f = simplify(e)\n+    a = S(9)/5\n+    # Validate that the numerical evaluation of the simplified expression matches the original\n+    assert abs(N(e.subs(x, a)) - N(f.subs(x, a))) < 1e-15, (\n+        f\"Mismatch in complex power simplification: \"\n+        f\"N(e)={N(e.subs(x, a))}, N(f)={N(f.subs(x, a))}\"\n+    )\n```",
+    "identifiers": [
+      "test_sweb_enhanced_power_complex_result"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_power_complex_result"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_powers_Integer is not semantically aligned with its original failure path. Expected source symbol 'test_powers_Integer' and alignment tokens ['assertionerror'], but the current content targets 'sympy.core.numbers.Float._eval_power' with tokens ['simplify', 'subs', 'complex', 'N(', 'mpf_pow']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_powers_Integer",
+      "test_issue_13890"
+    ],
+    "covered_obligations": [
+      "test_powers_Integer::core",
+      "test_issue_13890::core"
+    ]
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "idea": {
+      "title": "test derivative and float formatting in combination",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the interaction between derivative handling and float formatting to ensure both are correctly processed together",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_derivative_float_combination"
+      ],
+      "covers_original_tests": [
+        "test_Derivative"
+      ],
+      "covers_obligations": [
+        "test_Derivative::core"
+      ],
+      "target_source_symbol": "sympy.printing.mathematica.MCodePrinter",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Derivative(",
+        "Float(",
+        "D[",
+        "*^"
+      ],
+      "trigger_shape_tokens": [
+        "Derivative(",
+        "Float(",
+        "D[",
+        "*^"
+      ],
+      "rationale": "This test combines the handling of derivatives and floats with exponents, which were previously tested separately. It ensures that the fix correctly addresses the interaction of these two features, providing additional repair guidance by exposing any overlooked edge cases in their combined behavior."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_mathematica.py b/sympy/printing/tests/test_mathematica.py\n--- a/sympy/printing/tests/test_mathematica.py\n+++ b/sympy/printing/tests/test_mathematica.py\n@@ -1,5 +1,6 @@\n from sympy.core import (S, pi, oo, symbols, Function,\n-                        Rational, Integer, Tuple)\n+                        Rational, Integer, Tuple, Derivative)\n+from sympy.core.numbers import Float\n from sympy.integrals import Integral\n from sympy.concrete import Sum\n from sympy.functions import exp, sin, cos\n@@ -74,6 +75,15 @@ def test_Integral():\n         \"{y, -Infinity, Infinity}]]\"\n \n \n+def test_sweb_enhanced_derivative_float_combination():\n+    expr = Derivative(Float('1.0e-4') * sin(x), x)\n+    expected = \"Hold[D[1.0*^-4*Sin[x], x]]\"\n+    assert mcode(expr) == expected\n+\n+    expr = Derivative(Float('2.5e3') * cos(x)**2, x, 2)\n+    expected = \"Hold[D[2.5*^3*Cos[x]^2, x, x]]\"\n+    assert mcode(expr) == expected\n+\n def test_Sum():\n     assert mcode(Sum(sin(x), (x, 0, 10))) == \"Hold[Sum[Sin[x], {x, 0, 10}]]\"\n     assert mcode(Sum(exp(-x**2 - y**2),\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_mathematica.py b/sympy/printing/tests/test_mathematica.py\n--- a/sympy/printing/tests/test_mathematica.py\n+++ b/sympy/printing/tests/test_mathematica.py\n@@ -1,5 +1,6 @@\n from sympy.core import (S, pi, oo, symbols, Function,\n-                        Rational, Integer, Tuple)\n+                        Rational, Integer, Tuple, Derivative)\n+from sympy.core.numbers import Float\n from sympy.integrals import Integral\n from sympy.concrete import Sum\n from sympy.functions import exp, sin, cos\n@@ -74,6 +75,15 @@ def test_Integral():\n         \"{y, -Infinity, Infinity}]]\"\n \n \n+def test_sweb_enhanced_derivative_float_combination():\n+    expr = Derivative(Float('1.0e-4') * sin(x), x)\n+    expected = \"Hold[D[1.0*^-4*Sin[x], x]]\"\n+    assert mcode(expr) == expected\n+\n+    expr = Derivative(Float('2.5e3') * cos(x)**2, x, 2)\n+    expected = \"Hold[D[2.5*^3*Cos[x]^2, x, x]]\"\n+    assert mcode(expr) == expected\n+\n def test_Sum():\n     assert mcode(Sum(sin(x), (x, 0, 10))) == \"Hold[Sum[Sin[x], {x, 0, 10}]]\"\n     assert mcode(Sum(exp(-x**2 - y**2),\n```",
+    "identifiers": [
+      "test_sweb_enhanced_derivative_float_combination"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_derivative_float_combination"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_Derivative is not semantically aligned with its original failure path. Expected source symbol 'test_Derivative' and alignment tokens ['assertionerror'], but the current content targets 'sympy.printing.mathematica.MCodePrinter' with tokens ['Derivative(', 'Float(', 'D[', '*^']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_Derivative"
+    ],
+    "covered_obligations": [
+      "test_Derivative::core"
+    ]
+  }
+]

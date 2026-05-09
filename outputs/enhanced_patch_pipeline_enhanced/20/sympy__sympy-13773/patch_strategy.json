@@ -1,0 +1,19 @@
+{
+  "title": "Restrict __matmul__ to matrix operands",
+  "approach": "Modify the `__matmul__` method in the `MatrixArithmetic` class to validate that both operands are matrices. If either operand is not a matrix, raise a `TypeError`. This ensures compliance with expected matrix multiplication behavior.",
+  "edit_targets": [
+    "sympy/matrices/common.py::MatrixArithmetic.__matmul__"
+  ],
+  "dependency_files": [
+    "sympy/matrices/tests/test_commonmatrix.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing the `__matmul__` method in `MatrixArithmetic` is sufficient to enforce the matrix-only constraint for the `@` operator. No changes are required in other methods or classes, as the validation logic will be localized to this method.",
+  "risks": [
+    "Potential regressions if existing code relies on scalar operands being allowed in `@`. Ensure thorough testing to confirm no unintended side effects."
+  ]
+}

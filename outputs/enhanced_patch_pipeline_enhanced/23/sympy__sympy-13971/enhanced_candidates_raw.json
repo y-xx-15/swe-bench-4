@@ -1,0 +1,351 @@
+[
+  {
+    "idea": {
+      "title": "test_latex_sequences_value_error_on_bracket_escape",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect backslash-escaping of square brackets in sequence output, reproducing the ValueError observed in the original failure",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_latex_sequences"
+      ],
+      "covers_original_tests": [
+        "test_latex_sequences"
+      ],
+      "covers_obligations": [
+        "test_latex_sequences::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_SeqFormula",
+      "target_validation_subject": "sequence_bracket_escape",
+      "semantic_alignment_tokens": [
+        "SeqFormula(",
+        "latex(",
+        "bracket_escape"
+      ],
+      "trigger_shape_tokens": [
+        "SeqFormula(",
+        "n**2",
+        "latex(",
+        "bracket_escape"
+      ],
+      "rationale": "This test directly reproduces the original failure by constructing a sequence formula with square brackets and verifying the LaTeX output. It differs from the original test by explicitly targeting the bracket-escaping behavior, which is the root cause of the observed ValueError. This provides more focused repair guidance for the validation subject."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +189,6 @@\n+def test_sweb_enhanced_latex_sequences():\n+    from sympy import SeqFormula, latex, oo\n+    n = symbols('n', integer=True)\n+    seq = SeqFormula(n**2, (n, 0, oo))\n+    expected_latex = r'\\left[0, 1, 4, 9, \\ldots\\right]'\n+    assert latex(seq) == expected_latex\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +189,6 @@\n+def test_sweb_enhanced_latex_sequences():\n+    from sympy import SeqFormula, latex, oo\n+    n = symbols('n', integer=True)\n+    seq = SeqFormula(n**2, (n, 0, oo))\n+    expected_latex = r'\\left[0, 1, 4, 9, \\ldots\\right]'\n+    assert latex(seq) == expected_latex\n```",
+    "identifiers": [
+      "test_sweb_enhanced_latex_sequences"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_latex_sequences"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test sequence rendering behavior",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream rendering behavior of sequences with escaped brackets",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_sequence_rendering"
+      ],
+      "covers_original_tests": [
+        "test_latex_sequences"
+      ],
+      "covers_obligations": [
+        "test_latex_sequences::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter",
+      "target_validation_subject": "sequence rendering",
+      "semantic_alignment_tokens": [
+        "SeqFormula(",
+        "latex(",
+        "escaped brackets"
+      ],
+      "trigger_shape_tokens": [
+        "SeqFormula(",
+        "n**2",
+        "latex(",
+        "escaped brackets"
+      ],
+      "rationale": "This test focuses on the downstream rendering behavior of sequences with escaped brackets, which is distinct from the original test that primarily checks the direct symptom of the bug. By targeting the rendering behavior, it provides additional repair guidance to ensure the fix addresses the broader impact of the bug."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,8 @@\n+def test_sweb_enhanced_sequence_rendering():\n+    from sympy import SeqFormula, latex, oo\n+    n = symbols('n', integer=True)\n+    seq = SeqFormula(n**2, (n, 0, oo))\n+    expected_latex = r'\\left[0, 1, 4, 9, \\ldots\\right]'\n+    assert latex(seq) == expected_latex, f\"Expected: {expected_latex}, but got: {latex(seq)}\"\n+\n+    # Additional check for escaped brackets\n+    assert r'\\[' not in latex(seq) and r'\\]' not in latex(seq), \"Latex output contains escaped brackets, which is incorrect.\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,8 @@\n+def test_sweb_enhanced_sequence_rendering():\n+    from sympy import SeqFormula, latex, oo\n+    n = symbols('n', integer=True)\n+    seq = SeqFormula(n**2, (n, 0, oo))\n+    expected_latex = r'\\left[0, 1, 4, 9, \\ldots\\right]'\n+    assert latex(seq) == expected_latex, f\"Expected: {expected_latex}, but got: {latex(seq)}\"\n+\n+    # Additional check for escaped brackets\n+    assert r'\\[' not in latex(seq) and r'\\]' not in latex(seq), \"Latex output contains escaped brackets, which is incorrect.\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sequence_rendering"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sequence_rendering"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_latex_sequences_invalid_bracket_escaping",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect backslash-escaping of square brackets in SeqFormula LaTeX rendering",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_invalid_bracket_escaping"
+      ],
+      "covers_original_tests": [
+        "test_latex_sequences"
+      ],
+      "covers_obligations": [
+        "test_latex_sequences::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter",
+      "target_validation_subject": "SeqFormula LaTeX rendering",
+      "semantic_alignment_tokens": [
+        "SeqFormula",
+        "latex",
+        "escaped brackets",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "SeqFormula",
+        "n**2",
+        "escaped brackets"
+      ],
+      "rationale": "This test directly reproduces the original failure by invoking SeqFormula rendering with a specific input that triggers the incorrect backslash-escaping of square brackets. It aligns with the original failure path and exception semantics, exposing the same ValueError behavior."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,9 @@\n+def test_sweb_enhanced_invalid_bracket_escaping():\n+    from sympy import SeqFormula, latex, oo\n+    n = symbols('n', integer=True)\n+    seq = SeqFormula(n**2, (n, 0, oo))\n+    expected_latex = r'\\left[0, 1, 4, 9, \\ldots\\right]'\n+    actual_latex = latex(seq)\n+    assert actual_latex == expected_latex, (\n+        f\"Expected LaTeX output '{expected_latex}', but got '{actual_latex}'\"\n+    )\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,9 @@\n+def test_sweb_enhanced_invalid_bracket_escaping():\n+    from sympy import SeqFormula, latex, oo\n+    n = symbols('n', integer=True)\n+    seq = SeqFormula(n**2, (n, 0, oo))\n+    expected_latex = r'\\left[0, 1, 4, 9, \\ldots\\right]'\n+    actual_latex = latex(seq)\n+    assert actual_latex == expected_latex, (\n+        f\"Expected LaTeX output '{expected_latex}', but got '{actual_latex}'\"\n+    )\n```",
+    "identifiers": [
+      "test_sweb_enhanced_invalid_bracket_escaping"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_invalid_bracket_escaping"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_latex_sequences_invalid_bracket_escaping",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect backslash-escaping of square brackets in LaTeX rendering for sequences",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_invalid_bracket_escaping"
+      ],
+      "covers_original_tests": [
+        "test_latex_sequences"
+      ],
+      "covers_obligations": [
+        "test_latex_sequences::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_SeqFormula",
+      "target_validation_subject": "LaTeX rendering of SeqFormula",
+      "semantic_alignment_tokens": [
+        "SeqFormula",
+        "latex",
+        "brackets",
+        "escaped"
+      ],
+      "trigger_shape_tokens": [
+        "SeqFormula",
+        "n**2",
+        "escaped brackets"
+      ],
+      "rationale": "This test directly reproduces the failure observed in the original test_latex_sequences by constructing a SeqFormula object and verifying its LaTeX rendering. It focuses on the specific issue of backslash-escaped square brackets, which was not explicitly isolated in the original test. This provides clearer guidance for repairing the buggy behavior."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +189,7 @@\n+def test_sweb_enhanced_seqformula_finite_range():\n+    from sympy import SeqFormula, latex, oo\n+    s = SeqFormula(n**2, (n, 0, 3))\n+    expected_latex = r'\\left[0, 1, 4, 9\\right]'\n+    assert latex(s) == expected_latex, f\"Expected {expected_latex}, but got {latex(s)}\"\n+\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +189,7 @@\n+def test_sweb_enhanced_seqformula_finite_range():\n+    from sympy import SeqFormula, latex, oo\n+    s = SeqFormula(n**2, (n, 0, 3))\n+    expected_latex = r'\\left[0, 1, 4, 9\\right]'\n+    assert latex(s) == expected_latex, f\"Expected {expected_latex}, but got {latex(s)}\"\n+\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_seqformula_finite_range"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_seqformula_finite_range"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_latex_sequences_value_error_on_invalid_mode",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the ValueError raised when an invalid mode is passed to LatexPrinter settings",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_invalid_mode"
+      ],
+      "covers_original_tests": [
+        "test_latex_sequences"
+      ],
+      "covers_obligations": [
+        "test_latex_sequences::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter",
+      "target_validation_subject": "settings.mode",
+      "semantic_alignment_tokens": [
+        "valueerror",
+        "mode",
+        "settings"
+      ],
+      "trigger_shape_tokens": [
+        "mode",
+        "settings",
+        "valueerror"
+      ],
+      "rationale": "This test directly exercises the validation logic for the 'mode' setting in LatexPrinter, which is a sibling obligation to the original test_latex_sequences failure. It ensures that invalid modes raise the correct exception (ValueError), aligning with the original failure's exception semantics and extending coverage to a specific validation subject."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,7 @@\n+def test_sweb_enhanced_invalid_mode():\n+    from sympy.printing.latex import LatexPrinter\n+    invalid_mode = \"unsupported_mode\"\n+    try:\n+        LatexPrinter(settings={\"mode\": invalid_mode})\n+    except ValueError as e:\n+        assert str(e) == \"'mode' must be one of 'inline', 'plain', 'equation' or 'equation*'\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,7 @@\n+def test_sweb_enhanced_invalid_mode():\n+    from sympy.printing.latex import LatexPrinter\n+    invalid_mode = \"unsupported_mode\"\n+    try:\n+        LatexPrinter(settings={\"mode\": invalid_mode})\n+    except ValueError as e:\n+        assert str(e) == \"'mode' must be one of 'inline', 'plain', 'equation' or 'equation*'\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_invalid_mode"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_invalid_mode"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_sequence_latex_rendering_behavioral_consequence",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream rendering behavior of sequences in markdown cells to ensure proper LaTeX output without backslash-escaped brackets",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_sequence_rendering"
+      ],
+      "covers_original_tests": [
+        "test_latex_sequences"
+      ],
+      "covers_obligations": [
+        "test_latex_sequences::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_SeqFormula",
+      "target_validation_subject": "sequence_latex_output",
+      "semantic_alignment_tokens": [
+        "SeqFormula",
+        "latex",
+        "brackets",
+        "markdown"
+      ],
+      "trigger_shape_tokens": [
+        "SeqFormula",
+        "n**2",
+        "latex",
+        "brackets"
+      ],
+      "rationale": "This test focuses on the downstream behavioral consequence of the bug by verifying that the LaTeX output for sequences renders correctly in markdown cells. Unlike the original test, which primarily checks the direct symptom of the bug (backslash-escaped brackets), this test ensures that the output integrates seamlessly into markdown rendering, providing additional repair guidance for downstream usage scenarios."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +189,8 @@\n+def test_sweb_enhanced_sequence_rendering_markdown():\n+    from sympy import SeqFormula, latex, oo\n+    n = symbols('n', integer=True)\n+    seq = SeqFormula(n**2, (n, 0, oo))\n+    expected_latex = r'\\left[0, 1, 4, 9, \\ldots\\right]'\n+    assert latex(seq) == expected_latex\n+    assert not r'\\left\\\\[' in latex(seq), \"LaTeX output contains escaped brackets, which breaks markdown rendering\"\n+    assert not r'\\right\\\\]' in latex(seq), \"LaTeX output contains escaped brackets, which breaks markdown rendering\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +189,8 @@\n+def test_sweb_enhanced_sequence_rendering_markdown():\n+    from sympy import SeqFormula, latex, oo\n+    n = symbols('n', integer=True)\n+    seq = SeqFormula(n**2, (n, 0, oo))\n+    expected_latex = r'\\left[0, 1, 4, 9, \\ldots\\right]'\n+    assert latex(seq) == expected_latex\n+    assert not r'\\left\\\\[' in latex(seq), \"LaTeX output contains escaped brackets, which breaks markdown rendering\"\n+    assert not r'\\right\\\\]' in latex(seq), \"LaTeX output contains escaped brackets, which breaks markdown rendering\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sequence_rendering_markdown"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sequence_rendering_markdown"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_latex_sequences_value_error_on_invalid_mode",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect exception behavior when an invalid mode is passed to LatexPrinter",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_invalid_mode"
+      ],
+      "covers_original_tests": [
+        "test_latex_sequences"
+      ],
+      "covers_obligations": [
+        "test_latex_sequences::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter",
+      "target_validation_subject": "mode",
+      "semantic_alignment_tokens": [
+        "valueerror",
+        "mode",
+        "invalid"
+      ],
+      "trigger_shape_tokens": [
+        "mode",
+        "valueerror",
+        "invalid"
+      ],
+      "rationale": "This test directly targets the same source symbol and validation subject as the original failure path, focusing on the invalid 'mode' argument that triggers a ValueError. It differs from the original test by isolating the specific validation of 'mode' and ensuring the exception type aligns with the expected behavior."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,6 @@\n+def test_sweb_enhanced_invalid_mode_boundary():\n+    from sympy.printing.latex import LatexPrinter\n+    invalid_mode = \"unsupported_mode\"\n+    try:\n+        LatexPrinter(settings={\"mode\": invalid_mode})\n+    except ValueError as e:\n+        assert \"mode\" in str(e) and invalid_mode in str(e), \"Error message should mention the invalid mode\"\n+    else:\n+        assert False, \"Expected ValueError for invalid mode\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -189,0 +190,6 @@\n+def test_sweb_enhanced_invalid_mode_boundary():\n+    from sympy.printing.latex import LatexPrinter\n+    invalid_mode = \"unsupported_mode\"\n+    try:\n+        LatexPrinter(settings={\"mode\": invalid_mode})\n+    except ValueError as e:\n+        assert \"mode\" in str(e) and invalid_mode in str(e), \"Error message should mention the invalid mode\"\n+    else:\n+        assert False, \"Expected ValueError for invalid mode\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_invalid_mode_boundary"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_invalid_mode_boundary"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

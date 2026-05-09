@@ -1,0 +1,30 @@
+{
+  "original_test_identifiers": [
+    "test_decompose"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_decompose"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/integrals/tests/test_intpoly.py:test_polytope_integrate",
+    "sympy/integrals/tests/test_intpoly.py:test_decompose",
+    "test_decompose",
+    "test_polytope_integrate"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "RecursionError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_decompose F",
+    "test_polytope_integrate E",
+    "________ sympy/integrals/tests/test_intpoly.py:test_polytope_integrate _________"
+  ],
+  "noise_ratio": 0.0026,
+  "target_test_tracebacks": {
+    "test_decompose": "TARGET TEST: test_decompose\n- snippet: test_decompose F\n- snippet: test_polytope_integrate E\n- snippet: ________ sympy/integrals/tests/test_intpoly.py:test_polytope_integrate _________\n- dominant_errors: RecursionError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_decompose F\nRecursionError: maximum recursion depth exceeded while calling a Python object\n_____________ sympy/integrals/tests/test_intpoly.py:test_decompose _____________\n  File \"/testbed/sympy/integrals/tests/test_intpoly.py\", line 29, in test_decompose\nAssertionError\n tests finished: 1 passed, 1 failed, 1 expected to fail, 1 exceptions, "
+  }
+}

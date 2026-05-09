@@ -1,0 +1,30 @@
+{
+  "original_test_identifiers": [
+    "test_Mul_does_not_cancel_infinities"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_Mul_does_not_cancel_infinities"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/core/tests/test_arit.py:test_div",
+    "sympy/core/tests/test_arit.py:test_pow",
+    "sympy/core/tests/test_arit.py:test_Add_is_negative_positive",
+    "sympy/core/tests/test_arit.py:test_Add_is_nonpositive_nonnegative",
+    "sympy/core/tests/test_arit.py:test_Pow_is_integer"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_Mul_does_not_cancel_infinities F",
+    "____________________ sympy/core/tests/test_arit.py:test_div ____________________",
+    "____________________ sympy/core/tests/test_arit.py:test_pow ____________________"
+  ],
+  "noise_ratio": 0.0237,
+  "target_test_tracebacks": {
+    "test_Mul_does_not_cancel_infinities": "TARGET TEST: test_Mul_does_not_cancel_infinities\n- snippet: test_Mul_does_not_cancel_infinities F\n- snippet: ____________________ sympy/core/tests/test_arit.py:test_div ____________________\n- snippet: ____________________ sympy/core/tests/test_arit.py:test_pow ____________________\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_Mul_does_not_cancel_infinities F\n______ sympy/core/tests/test_arit.py:test_Mul_does_not_cancel_infinities _______\n  File \"/testbed/sympy/core/tests/test_arit.py\", line 1942, in test_Mul_does_not_cancel_infinities\nAssertionError\n tests finished: 63 passed, 1 failed, 3 expected to fail, 15 exceptions, "
+  }
+}

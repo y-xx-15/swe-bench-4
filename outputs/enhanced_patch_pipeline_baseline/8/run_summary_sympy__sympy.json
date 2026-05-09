@@ -1,0 +1,210 @@
+[
+  {
+    "instance_id": "sympy__sympy-13031",
+    "repo": "sympy/sympy",
+    "model": "gpt-4o",
+    "pipeline_mode": "baseline_only",
+    "hide_original_test_patch_in_repair": true,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "baseline_fallback",
+    "original_test_identifiers": [
+      "test_sparse_matrix"
+    ],
+    "original_status_counts": {
+      "FAILED": 2,
+      "PASSED": 9
+    },
+    "original_failed_count": 2,
+    "original_passed_count": 9,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_sparse_matrix"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_sparse_matrix"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/matrices/tests/test_sparse.py:test_sparse_matrix",
+        "test_sparse_matrix"
+      ],
+      "failure_mode": "assertion_error",
+      "dominant_errors": [
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_sparse_matrix F",
+        "____________ sympy/matrices/tests/test_sparse.py:test_sparse_matrix ____________",
+        "File \"/testbed/sympy/matrices/tests/test_sparse.py\", line 31, in test_sparse_matrix"
+      ],
+      "noise_ratio": 0.0063,
+      "target_test_tracebacks": {
+        "test_sparse_matrix": "TARGET TEST: test_sparse_matrix\n- snippet: test_sparse_matrix F\n- snippet: ____________ sympy/matrices/tests/test_sparse.py:test_sparse_matrix ____________\n- snippet: File \"/testbed/sympy/matrices/tests/test_sparse.py\", line 31, in test_sparse_matrix\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_sparse_matrix F\ntest_errors ok\n____________ sympy/matrices/tests/test_sparse.py:test_sparse_matrix ____________\n  File \"/testbed/sympy/matrices/tests/test_sparse.py\", line 31, in test_sparse_matrix\nAssertionError\n============= tests finished: 10 passed, 1 failed, in 0.29 seconds ============="
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 3,
+      "keep_top_k": 2,
+      "attempt_budget": 3,
+      "bucket_limit": 3,
+      "template_limit": 3,
+      "failure_mode": "assertion_error",
+      "noise_ratio": 0.0063,
+      "difficulty": "low"
+    },
+    "adaptive_num_candidates": 3,
+    "adaptive_keep_top_k": 2,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 0,
+    "kept_enhanced_candidates": 0,
+    "enhanced_candidate_retention_rate": 0.0,
+    "enhanced_generation_attempts_total": 0,
+    "enhanced_generation_attempts_avg": 0.0,
+    "kept_enhanced_test_identifiers": [],
+    "enhanced_failed_test_identifiers": [],
+    "enhanced_failed_count": 0,
+    "generated_patch_nonempty": true,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 6,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_no_metric_improvement",
+    "generated_patch_feedback": "The previous patch was rejected because it did not satisfy the acceptance gate. Patch apply mode: clean_apply. Baseline passed=9, failed=2. Candidate passed=9, failed=2. Hard failure signal: none. CRITICAL: the previous patch applied cleanly but had ZERO effect on test counts — the fix is unreachable or incorrect. Common causes: (1) your new code was inserted inside an `elif` chain that is bypassed by an earlier branch (e.g., `elif item.config.option.runxfail: pass` prevents later `elif` blocks from running) — check if an existing `elif` block needs to become a standalone `if`; (2) the wrong function/method was edited; (3) the condition in the existing branch already covers this case incorrectly. Rethink the control flow structure rather than re-inserting the same logic. FAIL_TO_PASS tests still failing after patch: test_sparse_matrix. Your patch must make ALL of these tests pass, not just improve aggregate counts. Semantic oracle failed identifiers: none. Semantic oracle failure summaries: none.  Target files: sympy/matrices/sparse.py, sympy/matrices/sparse.py. Target symbols: SparseMatrix.row_join, SparseMatrix.col_join. Generate a new source-only unified diff that is closer to the exact file context and lands inside the target class body.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The behavior of `Matrix.hstack` and `Matrix.vstack` has changed in SymPy 1.1 when handling matrices with zero rows or columns, leading to incorrect shape calculations for horizontally stacked matrices with zero rows.",
+      "affected_components": [
+        {
+          "file": "sympy/matrices/sparse.py",
+          "symbol": "SparseMatrix",
+          "reason": "The `SparseMatrix` class is responsible for matrix operations, including stacking, and its behavior directly impacts the failing test."
+        },
+        {
+          "file": "sympy/matrices/tests/test_sparse.py",
+          "symbol": "test_sparse_matrix",
+          "reason": "The test `test_sparse_matrix` explicitly validates the behavior of matrix stacking, and its failure indicates the issue."
+        }
+      ],
+      "failing_signal": "The failing test `test_sparse_matrix` asserts that horizontally stacking zero-row matrices should result in a matrix with the correct number of columns, but the observed shape does not match the expected shape.",
+      "propagation_path": "The bug originates in the `SparseMatrix` implementation of stacking operations, where the handling of zero-row matrices does not correctly account for the total number of columns. This propagates to the test, which fails due to the incorrect shape.",
+      "repair_constraint": "The fix must ensure that horizontally and vertically stacking matrices with zero rows or columns produces the correct shape without introducing regressions in other matrix operations.",
+      "suggested_repair_scope": [
+        "sympy/matrices/sparse.py",
+        "sympy/matrices/tests/test_sparse.py"
+      ],
+      "suspicious_symbols": [
+        "SparseMatrix",
+        "Matrix.hstack",
+        "Matrix.vstack"
+      ],
+      "repair_obligations": [
+        {
+          "id": "obligation_1",
+          "source_symbol": "SparseMatrix",
+          "validation_subject": "Matrix.hstack",
+          "why_it_matters": "The `hstack` method must correctly calculate the shape of horizontally stacked matrices, including cases with zero rows."
+        },
+        {
+          "id": "obligation_2",
+          "source_symbol": "SparseMatrix",
+          "validation_subject": "Matrix.vstack",
+          "why_it_matters": "The `vstack` method must correctly calculate the shape of vertically stacked matrices, including cases with zero columns."
+        },
+        {
+          "id": "obligation_3",
+          "source_symbol": "test_sparse_matrix",
+          "validation_subject": "test_sparse_matrix",
+          "why_it_matters": "The test must validate the correct behavior of stacking operations, ensuring that the fix resolves the issue and prevents regressions."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Fix Matrix stacking with zero rows or columns",
+      "approach": "Modify the `Matrix.hstack` and `Matrix.vstack` methods to correctly handle matrices with zero rows or columns by ensuring the resulting shape is calculated based on the total number of columns or rows, even if some matrices have zero dimensions.",
+      "edit_targets": [
+        "sympy/matrices/sparse.py::SparseMatrix.row_join",
+        "sympy/matrices/sparse.py::SparseMatrix.col_join"
+      ],
+      "dependency_files": [
+        "sympy/matrices/tests/test_sparse.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [],
+      "sufficiency_assessment": "Editing the `row_join` and `col_join` methods in `SparseMatrix` should be sufficient to fix the issue, as these methods are responsible for implementing the behavior of `Matrix.hstack` and `Matrix.vstack`. However, tests in `test_sparse.py` should be updated or added to validate the fix.",
+      "risks": [
+        "Potential regressions in other stacking operations involving non-zero dimensions, which must be tested thoroughly."
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/matrices/sparse.py",
+          "action": "modify_region",
+          "justification": "The `SparseMatrix.row_join` method is responsible for horizontally stacking matrices, and it needs to be updated to correctly handle cases where matrices have zero rows."
+        },
+        {
+          "target_file": "sympy/matrices/sparse.py",
+          "action": "modify_region",
+          "justification": "The `SparseMatrix.col_join` method is responsible for vertically stacking matrices, and it needs to be updated to correctly handle cases where matrices have zero columns."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "sympy/matrices/sparse.py",
+          "target_symbol": "SparseMatrix.row_join",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "obligation_1"
+          ],
+          "anchor_line_before": "        if not self:",
+          "anchor_line_after": "            raise ShapeError()",
+          "replacement_block": "        if not self:\n            return type(self)(other)\n        A, B = self, other\n        if not A.rows == B.rows:\n            raise ShapeError()\n        if A.rows == 0:\n            return type(self)(0, A.cols + B.cols, {})\n        A = A.copy()\n        if not isinstance(B, SparseMatrix):\n            k = 0\n            b = B._mat\n            for i in range(B.rows):\n                for j in range(B.cols):\n                    if b[k]:\n                        A._smat[(i, j + A.cols)] = b[k]\n                    k += 1\n        else:\n            for (i, j), v in B._smat.items():\n                A._smat[(i, j + A.cols)] = v\n        A.cols += B.cols\n        return A"
+        },
+        {
+          "target_file": "sympy/matrices/sparse.py",
+          "target_symbol": "SparseMatrix.col_join",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "obligation_2"
+          ],
+          "anchor_line_before": "        if not self:",
+          "anchor_line_after": "            raise ShapeError()",
+          "replacement_block": "        if not self:\n            return type(self)(other)\n        A, B = self, other\n        if not A.cols == B.cols:\n            raise ShapeError()\n        if A.cols == 0:\n            return type(self)(A.rows + B.rows, 0, {})\n        A = A.copy()\n        if not isinstance(B, SparseMatrix):\n            k = 0\n            b = B._mat\n            for i in range(B.rows):\n                for j in range(B.cols):\n                    if b[k]:\n                        A._smat[(i + A.rows, j)] = b[k]\n                    k += 1\n        else:\n            for (i, j), v in B._smat.items():\n                A._smat[(i + A.rows, j)] = v\n        A.rows += B.rows\n        return A"
+        }
+      ]
+    },
+    "final_patch_attempted": true,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": true,
+    "final_patch_apply_mode": "clean_apply",
+    "final_patch_cleanly_applied": true,
+    "clean_apply_ratio": 1.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 2,
+      "PASSED": 9
+    },
+    "final_failed_count": 2,
+    "final_passed_count": 9,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/matrices/tests/test_sparse.py:test_sparse_matrix": "FAILED",
+      "test_sparse_matrix": "FAILED",
+      "test_transpose": "PASSED",
+      "test_trace": "PASSED",
+      "test_CL_RL": "PASSED",
+      "test_add": "PASSED",
+      "test_errors": "PASSED",
+      "test_len": "PASSED",
+      "test_sparse_zeros_sparse_eye": "PASSED",
+      "test_copyin": "PASSED",
+      "test_sparse_solve": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/matrices/expressions/matexpr.py",
+      "action": "modify_region",
+      "justification": "The Identity class defines the behavior of identity matrices, including summation logic. The bug is isolated to the incorrect computation of the total sum of elements in an identity matrix, which must be fixed within this class."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/matrices/expressions/matexpr.py",
+      "target_symbol": "Identity",
+      "replacement_mode": "insert_after_anchor",
+      "covers_obligations": [
+        "obligation_1"
+      ],
+      "anchor_line_before": "    is_Identity = True",
+      "anchor_line_after": "    def __new__(cls, n):",
+      "replacement_block": "    is_Identity = True\n\n    def _eval_sum(self, *symbols):\n        if len(symbols) == 2:\n            i, j = symbols\n            if i != j:\n                return S.Zero\n            return self.rows\n        elif len(symbols) == 1:\n            return self.rows\n        raise NotImplementedError(\"Summation over more than two indices is not supported.\")\n\n    def __new__(cls, n):"
+    }
+  ]
+}

@@ -1,0 +1,215 @@
+[
+  {
+    "instance_id": "sympy__sympy-11400",
+    "repo": "sympy/sympy",
+    "model": "gpt-4o",
+    "pipeline_mode": "baseline_only",
+    "hide_original_test_patch_in_repair": true,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "baseline_fallback",
+    "original_test_identifiers": [
+      "test_ccode_Relational",
+      "test_ccode_sinc"
+    ],
+    "original_status_counts": {
+      "FAILED": 4,
+      "PASSED": 29
+    },
+    "original_failed_count": 4,
+    "original_passed_count": 29,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_ccode_Relational",
+        "test_ccode_sinc"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_ccode_Relational",
+        "test_ccode_sinc"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/printing/tests/test_ccode.py:test_ccode_Relational",
+        "sympy/printing/tests/test_ccode.py:test_ccode_sinc",
+        "test_ccode_Relational",
+        "test_ccode_sinc"
+      ],
+      "failure_mode": "assertion_error",
+      "dominant_errors": [
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_ccode_Relational F",
+        "test_ccode_sinc F",
+        "___________ sympy/printing/tests/test_ccode.py:test_ccode_Relational ___________"
+      ],
+      "noise_ratio": 0.0166,
+      "target_test_tracebacks": {
+        "test_ccode_Relational": "TARGET TEST: test_ccode_Relational\n- snippet: test_ccode_Relational F\n- snippet: test_ccode_sinc F\n- snippet: ___________ sympy/printing/tests/test_ccode.py:test_ccode_Relational ___________\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_ccode_Relational F\n___________ sympy/printing/tests/test_ccode.py:test_ccode_Relational ___________\n  File \"/testbed/sympy/printing/tests/test_ccode.py\", line 125, in test_ccode_Relational\nAssertionError\nAssertionError\n============= tests finished: 30 passed, 2 failed, in 0.15 seconds =============",
+        "test_ccode_sinc": "TARGET TEST: test_ccode_sinc\n- snippet: test_ccode_Relational F\n- snippet: test_ccode_sinc F\n- snippet: ___________ sympy/printing/tests/test_ccode.py:test_ccode_Relational ___________\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_ccode_sinc F\nAssertionError\n______________ sympy/printing/tests/test_ccode.py:test_ccode_sinc ______________\n  File \"/testbed/sympy/printing/tests/test_ccode.py\", line 178, in test_ccode_sinc\nAssertionError\n============= tests finished: 30 passed, 2 failed, in 0.15 seconds ============="
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 5,
+      "keep_top_k": 3,
+      "attempt_budget": 3,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "assertion_error",
+      "noise_ratio": 0.0166,
+      "difficulty": "medium"
+    },
+    "adaptive_num_candidates": 5,
+    "adaptive_keep_top_k": 3,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 0,
+    "kept_enhanced_candidates": 0,
+    "enhanced_candidate_retention_rate": 0.0,
+    "enhanced_generation_attempts_total": 0,
+    "enhanced_generation_attempts_avg": 0.0,
+    "kept_enhanced_test_identifiers": [],
+    "enhanced_failed_test_identifiers": [],
+    "enhanced_failed_count": 0,
+    "generated_patch_nonempty": true,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 6,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_no_metric_improvement",
+    "generated_patch_feedback": "The previous patch was rejected because it did not satisfy the acceptance gate. Patch apply mode: clean_apply. Baseline passed=29, failed=4. Candidate passed=29, failed=4. Hard failure signal: none. CRITICAL: the previous patch applied cleanly but had ZERO effect on test counts — the fix is unreachable or incorrect. Common causes: (1) your new code was inserted inside an `elif` chain that is bypassed by an earlier branch (e.g., `elif item.config.option.runxfail: pass` prevents later `elif` blocks from running) — check if an existing `elif` block needs to become a standalone `if`; (2) the wrong function/method was edited; (3) the condition in the existing branch already covers this case incorrectly. Rethink the control flow structure rather than re-inserting the same logic. FAIL_TO_PASS tests still failing after patch: test_ccode_Relational, test_ccode_sinc. Your patch must make ALL of these tests pass, not just improve aggregate counts. Semantic oracle failed identifiers: none. Semantic oracle failure summaries: none.  Target files: sympy/printing/ccode.py. Target symbols: known_functions. Generate a new source-only unified diff that is closer to the exact file context and lands inside the target class body.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The `sinc` function is not included in the `known_functions` dictionary of the `CCodePrinter` class, so it is treated as unsupported and not translated into valid C code.",
+      "affected_components": [
+        {
+          "file": "sympy/printing/ccode.py",
+          "symbol": "CCodePrinter",
+          "reason": "The `CCodePrinter` class is responsible for converting SymPy expressions into C code, and its `known_functions` dictionary determines the mapping of SymPy functions to C functions."
+        },
+        {
+          "file": "sympy/printing/tests/test_ccode.py",
+          "symbol": "test_ccode_sinc",
+          "reason": "The test `test_ccode_sinc` explicitly checks the behavior of `ccode` when applied to the `sinc` function, and it fails due to the missing implementation."
+        }
+      ],
+      "failing_signal": "The `ccode` function outputs a comment indicating that `sinc` is not supported in C, instead of generating valid C code.",
+      "propagation_path": "When `ccode(sinc(x))` is called, the `CCodePrinter` class attempts to look up `sinc` in its `known_functions` dictionary. Since `sinc` is not present, it falls back to a default behavior that marks the function as unsupported, leading to the observed failure.",
+      "repair_constraint": "The `sinc` function must be correctly translated into valid C code, ensuring compatibility with the C standard library or an equivalent implementation.",
+      "suggested_repair_scope": [
+        "sympy/printing/ccode.py",
+        "sympy/printing/tests/test_ccode.py"
+      ],
+      "suspicious_symbols": [
+        "CCodePrinter",
+        "known_functions",
+        "test_ccode_sinc"
+      ],
+      "repair_obligations": [
+        {
+          "id": "add_sinc_to_known_functions",
+          "source_symbol": "CCodePrinter",
+          "validation_subject": "known_functions",
+          "why_it_matters": "The `known_functions` dictionary is the mechanism by which SymPy functions are mapped to their C equivalents. Adding `sinc` here ensures it is properly translated."
+        },
+        {
+          "id": "validate_sinc_translation",
+          "source_symbol": "test_ccode_sinc",
+          "validation_subject": "ccode(sinc(x))",
+          "why_it_matters": "The test ensures that the `ccode` function correctly handles the `sinc` function and generates valid C code."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Add sinc support to CCodePrinter",
+      "approach": "Extend the `known_functions` dictionary in the `CCodePrinter` class to include a mapping for the `sinc` function. Use a `Piecewise` representation to handle the special case where the input is zero, as `sinc(0)` is defined to be 1.",
+      "edit_targets": [
+        "sympy/printing/ccode.py::CCodePrinter"
+      ],
+      "dependency_files": [
+        "sympy/printing/tests/test_ccode.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [],
+      "sufficiency_assessment": "Editing the `CCodePrinter` class to include `sinc` in the `known_functions` dictionary is sufficient for the repair. However, the test file `test_ccode.py` should be inspected to ensure proper test coverage for the `sinc` function.",
+      "risks": [
+        "Ensure that the generated C code for `sinc` is valid and compatible with the C standard library or equivalent implementations. Incorrect handling of edge cases like `sinc(0)` could lead to runtime errors."
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/printing/ccode.py",
+          "action": "modify_region",
+          "justification": "The `CCodePrinter` class needs to be updated to include the `sinc` function in its `known_functions` dictionary to ensure proper translation of `sinc` into valid C code."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "sympy/printing/ccode.py",
+          "target_symbol": "known_functions",
+          "replacement_mode": "insert_after_anchor",
+          "covers_obligations": [
+            "add_sinc_to_known_functions"
+          ],
+          "anchor_line_before": "    \"Abs\": [(lambda x: not x.is_integer, \"fabs\")],",
+          "anchor_line_after": "    \"gamma\": \"tgamma\",",
+          "replacement_block": "    \"Abs\": [(lambda x: not x.is_integer, \"fabs\")],\n    \"sinc\": [(lambda x: True, \"((x != 0) ? (sin(x)/x) : 1)\")],\n    \"gamma\": \"tgamma\","
+        }
+      ]
+    },
+    "final_patch_attempted": true,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": true,
+    "final_patch_apply_mode": "clean_apply",
+    "final_patch_cleanly_applied": true,
+    "clean_apply_ratio": 1.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 4,
+      "PASSED": 29
+    },
+    "final_failed_count": 4,
+    "final_passed_count": 29,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/printing/tests/test_ccode.py:test_ccode_Relational": "FAILED",
+      "sympy/printing/tests/test_ccode.py:test_ccode_sinc": "FAILED",
+      "test_printmethod": "PASSED",
+      "test_ccode_sqrt": "PASSED",
+      "test_ccode_Pow": "PASSED",
+      "test_ccode_constants_mathh": "PASSED",
+      "test_ccode_constants_other": "PASSED",
+      "test_ccode_Rational": "PASSED",
+      "test_ccode_Integer": "PASSED",
+      "test_ccode_functions": "PASSED",
+      "test_ccode_inline_function": "PASSED",
+      "test_ccode_exceptions": "PASSED",
+      "test_ccode_user_functions": "PASSED",
+      "test_ccode_boolean": "PASSED",
+      "test_ccode_Relational": "FAILED",
+      "test_ccode_Piecewise": "PASSED",
+      "test_ccode_sinc": "FAILED",
+      "test_ccode_Piecewise_deep": "PASSED",
+      "test_ccode_ITE": "PASSED",
+      "test_ccode_settings": "PASSED",
+      "test_ccode_Indexed": "PASSED",
+      "test_ccode_Indexed_without_looking_for_contraction": "PASSED",
+      "test_ccode_loops_matrix_vector": "PASSED",
+      "test_dummy_loops": "PASSED",
+      "test_ccode_loops_add": "PASSED",
+      "test_ccode_loops_multiple_contractions": "PASSED",
+      "test_ccode_loops_addfactor": "PASSED",
+      "test_ccode_loops_multiple_terms": "PASSED",
+      "test_dereference_printing": "PASSED",
+      "test_Matrix_printing": "PASSED",
+      "test_ccode_reserved_words": "PASSED",
+      "test_ccode_sign": "PASSED",
+      "test_ccode_Assignment": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

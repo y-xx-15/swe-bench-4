@@ -1,0 +1,289 @@
+[
+  {
+    "idea": {
+      "title": "test Integer power simplification mismatch",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect simplification behavior for Integer powers leading to assertion errors",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_Integer_power_simplification"
+      ],
+      "covers_original_tests": [
+        "test_powers_Integer"
+      ],
+      "covers_obligations": [
+        "test_powers_Integer::core"
+      ],
+      "target_source_symbol": "sympy.core.numbers.Integer",
+      "target_validation_subject": "power_simplification",
+      "semantic_alignment_tokens": [
+        "Integer(",
+        "simplify(",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "Integer(",
+        "**",
+        "simplify(",
+        "assertionerror"
+      ],
+      "rationale": "This test directly exercises the Integer power simplification logic, reproducing the assertion error observed in test_powers_Integer. It focuses on the specific mismatch in simplification behavior for Integer powers, which was not explicitly isolated in the original test."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,8 @@\n+def test_sweb_enhanced_Integer_power_simplification():\n+    from sympy import Integer, Rational, simplify\n+    # Test case to reproduce the power simplification mismatch\n+    base = Integer(-8)\n+    exponent = Rational(2, 5)\n+    simplified = simplify(base**exponent)\n+    assert simplified == 2*(-1)**Rational(2, 5)*2**Rational(1, 5), \\\n+        f\"Unexpected simplification: {simplified}\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,8 @@\n+def test_sweb_enhanced_Integer_power_simplification():\n+    from sympy import Integer, Rational, simplify\n+    # Test case to reproduce the power simplification mismatch\n+    base = Integer(-8)\n+    exponent = Rational(2, 5)\n+    simplified = simplify(base**exponent)\n+    assert simplified == 2*(-1)**Rational(2, 5)*2**Rational(1, 5), \\\n+        f\"Unexpected simplification: {simplified}\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Integer_power_simplification"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Integer_power_simplification"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_Integer_power_simplification"
+    ],
+    "eval_status_map": {
+      "sympy/core/tests/test_numbers.py:test_sweb_enhanced_Integer_power_simplification": "FAILED",
+      "test_integers_cache": "PASSED",
+      "test_seterr": "PASSED",
+      "test_mod": "PASSED",
+      "test_divmod": "PASSED",
+      "test_igcd": "PASSED",
+      "test_igcd_lehmer": "PASSED",
+      "test_igcd2": "PASSED",
+      "test_ilcm": "PASSED",
+      "test_igcdex": "PASSED",
+      "test_Integer_new": "PASSED",
+      "test_Rational_new": "PASSED",
+      "test_Number_new": "PASSED",
+      "test_Rational_cmp": "PASSED",
+      "test_Float": "PASSED",
+      "test_float_mpf": "PASSED",
+      "test_Float_RealElement": "PASSED",
+      "test_Float_default_to_highprec_from_str": "PASSED",
+      "test_Float_eval": "PASSED",
+      "test_Float_issue_2107": "PASSED",
+      "test_Float_from_tuple": "PASSED",
+      "test_Infinity": "PASSED",
+      "test_Infinity_2": "PASSED",
+      "test_Mul_Infinity_Zero": "PASSED",
+      "test_Div_By_Zero": "PASSED",
+      "test_Infinity_inequations": "PASSED",
+      "test_NaN": "PASSED",
+      "test_special_numbers": "PASSED",
+      "test_powers": "PASSED",
+      "test_integer_nthroot_overflow": "PASSED",
+      "test_isqrt": "PASSED",
+      "test_powers_Integer": "PASSED",
+      "test_powers_Rational": "PASSED",
+      "test_powers_Float": "PASSED",
+      "test_abs1": "PASSED",
+      "test_accept_int": "PASSED",
+      "test_dont_accept_str": "PASSED",
+      "test_int": "PASSED",
+      "test_long": "PASSED",
+      "test_real_bug": "PASSED",
+      "test_bug_sqrt": "PASSED",
+      "test_pi_Pi": "PASSED",
+      "test_no_len": "PASSED",
+      "test_issue_3321": "PASSED",
+      "test_issue_3692": "PASSED",
+      "test_issue_3423": "PASSED",
+      "test_issue_3449": "PASSED",
+      "test_Integer_factors": "PASSED",
+      "test_Rational_factors": "PASSED",
+      "test_issue_4107": "PASSED",
+      "test_IntegerInteger": "PASSED",
+      "test_Rational_gcd_lcm_cofactors": "PASSED",
+      "test_Float_gcd_lcm_cofactors": "PASSED",
+      "test_issue_4611": "PASSED",
+      "test_conversion_to_mpmath": "PASSED",
+      "test_relational": "PASSED",
+      "test_Integer_as_index": "PASSED",
+      "test_Rational_int": "PASSED",
+      "test_zoo": "PASSED",
+      "test_issue_4122": "PASSED",
+      "test_GoldenRatio_expand": "PASSED",
+      "test_as_content_primitive": "PASSED",
+      "test_hashing_sympy_integers": "PASSED",
+      "test_issue_4172": "PASSED",
+      "test_Catalan_EulerGamma_prec": "PASSED",
+      "test_Float_eq": "PASSED",
+      "test_int_NumberSymbols": "PASSED",
+      "test_issue_6640": "PASSED",
+      "test_issue_6349": "PASSED",
+      "test_mpf_norm": "PASSED",
+      "test_latex": "PASSED",
+      "test_issue_7742": "PASSED",
+      "test_simplify_AlgebraicNumber": "PASSED",
+      "test_Float_idempotence": "PASSED",
+      "test_comp": "PASSED",
+      "test_issue_9491": "PASSED",
+      "test_issue_10063": "PASSED",
+      "test_issue_10020": "PASSED",
+      "test_invert_numbers": "PASSED",
+      "test_mod_inverse": "PASSED",
+      "test_golden_ratio_rewrite_as_sqrt": "PASSED",
+      "test_comparisons_with_unknown_type": "PASSED",
+      "test_NumberSymbol_comparison": "PASSED",
+      "test_Integer_precision": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_powers_Integer"
+    ],
+    "covered_obligations": [
+      "test_powers_Integer::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test fractional power simplification mismatch",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect simplification of fractional powers leading to assertion error",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_fractional_power_simplification"
+      ],
+      "covers_original_tests": [
+        "test_issue_13890"
+      ],
+      "covers_obligations": [
+        "test_issue_13890::core"
+      ],
+      "target_source_symbol": "test_issue_13890",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "assertionerror"
+      ],
+      "rationale": "This test directly reproduces the failure observed in test_issue_13890 by using the same symbolic expression and substitution values that lead to the assertion error. It ensures the bug is exposed through the same API path and semantics as the original failure."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,7 @@\n+def test_sweb_enhanced_fractional_power_simplification():\n+    x = Symbol(\"x\")\n+    e = (-x/4 - S(1)/12)**x - 1\n+    f = simplify(e)\n+    a = S(9)/5\n+    assert abs(e.subs(x, a).evalf() - f.subs(x, a).evalf()) < 1e-15, \\\n+        \"Simplification mismatch for fractional powers with substitution.\"\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -232,0 +232,7 @@\n+def test_sweb_enhanced_fractional_power_simplification():\n+    x = Symbol(\"x\")\n+    e = (-x/4 - S(1)/12)**x - 1\n+    f = simplify(e)\n+    a = S(9)/5\n+    assert abs(e.subs(x, a).evalf() - f.subs(x, a).evalf()) < 1e-15, \\\n+        \"Simplification mismatch for fractional powers with substitution.\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_fractional_power_simplification"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_fractional_power_simplification"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_fractional_power_simplification"
+    ],
+    "eval_status_map": {
+      "sympy/core/tests/test_numbers.py:test_sweb_enhanced_fractional_power_simplification": "FAILED",
+      "test_integers_cache": "PASSED",
+      "test_seterr": "PASSED",
+      "test_mod": "PASSED",
+      "test_divmod": "PASSED",
+      "test_igcd": "PASSED",
+      "test_igcd_lehmer": "PASSED",
+      "test_igcd2": "PASSED",
+      "test_ilcm": "PASSED",
+      "test_igcdex": "PASSED",
+      "test_Integer_new": "PASSED",
+      "test_Rational_new": "PASSED",
+      "test_Number_new": "PASSED",
+      "test_Rational_cmp": "PASSED",
+      "test_Float": "PASSED",
+      "test_float_mpf": "PASSED",
+      "test_Float_RealElement": "PASSED",
+      "test_Float_default_to_highprec_from_str": "PASSED",
+      "test_Float_eval": "PASSED",
+      "test_Float_issue_2107": "PASSED",
+      "test_Float_from_tuple": "PASSED",
+      "test_Infinity": "PASSED",
+      "test_Infinity_2": "PASSED",
+      "test_Mul_Infinity_Zero": "PASSED",
+      "test_Div_By_Zero": "PASSED",
+      "test_Infinity_inequations": "PASSED",
+      "test_NaN": "PASSED",
+      "test_special_numbers": "PASSED",
+      "test_powers": "PASSED",
+      "test_integer_nthroot_overflow": "PASSED",
+      "test_isqrt": "PASSED",
+      "test_powers_Integer": "PASSED",
+      "test_powers_Rational": "PASSED",
+      "test_powers_Float": "PASSED",
+      "test_abs1": "PASSED",
+      "test_accept_int": "PASSED",
+      "test_dont_accept_str": "PASSED",
+      "test_int": "PASSED",
+      "test_long": "PASSED",
+      "test_real_bug": "PASSED",
+      "test_bug_sqrt": "PASSED",
+      "test_pi_Pi": "PASSED",
+      "test_no_len": "PASSED",
+      "test_issue_3321": "PASSED",
+      "test_issue_3692": "PASSED",
+      "test_issue_3423": "PASSED",
+      "test_issue_3449": "PASSED",
+      "test_Integer_factors": "PASSED",
+      "test_Rational_factors": "PASSED",
+      "test_issue_4107": "PASSED",
+      "test_IntegerInteger": "PASSED",
+      "test_Rational_gcd_lcm_cofactors": "PASSED",
+      "test_Float_gcd_lcm_cofactors": "PASSED",
+      "test_issue_4611": "PASSED",
+      "test_conversion_to_mpmath": "PASSED",
+      "test_relational": "PASSED",
+      "test_Integer_as_index": "PASSED",
+      "test_Rational_int": "PASSED",
+      "test_zoo": "PASSED",
+      "test_issue_4122": "PASSED",
+      "test_GoldenRatio_expand": "PASSED",
+      "test_as_content_primitive": "PASSED",
+      "test_hashing_sympy_integers": "PASSED",
+      "test_issue_4172": "PASSED",
+      "test_Catalan_EulerGamma_prec": "PASSED",
+      "test_Float_eq": "PASSED",
+      "test_int_NumberSymbols": "PASSED",
+      "test_issue_6640": "PASSED",
+      "test_issue_6349": "PASSED",
+      "test_mpf_norm": "PASSED",
+      "test_latex": "PASSED",
+      "test_issue_7742": "PASSED",
+      "test_simplify_AlgebraicNumber": "PASSED",
+      "test_Float_idempotence": "PASSED",
+      "test_comp": "PASSED",
+      "test_issue_9491": "PASSED",
+      "test_issue_10063": "PASSED",
+      "test_issue_10020": "PASSED",
+      "test_invert_numbers": "PASSED",
+      "test_mod_inverse": "PASSED",
+      "test_golden_ratio_rewrite_as_sqrt": "PASSED",
+      "test_comparisons_with_unknown_type": "PASSED",
+      "test_NumberSymbol_comparison": "PASSED",
+      "test_Integer_precision": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_issue_13890"
+    ],
+    "covered_obligations": [
+      "test_issue_13890::core"
+    ]
+  }
+]

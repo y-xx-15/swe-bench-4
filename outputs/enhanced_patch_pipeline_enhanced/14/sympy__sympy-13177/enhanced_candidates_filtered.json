@@ -1,0 +1,147 @@
+[
+  {
+    "idea": {
+      "title": "Mod with non-integer base triggers incorrect modulo result",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect behavior of Mod when the base is non-integer, causing assertion_error",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_mod_non_integer_base"
+      ],
+      "covers_original_tests": [
+        "test_mod"
+      ],
+      "covers_obligations": [
+        "test_mod::core"
+      ],
+      "target_source_symbol": "Mod.eval",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Mod(",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "Mod(",
+        "non_integer_base"
+      ],
+      "rationale": "The original test_mod does not explicitly test the behavior of Mod when the base is non-integer, which is the root cause of the bug. This test directly targets the buggy validation logic in Mod.eval, ensuring the bug is exposed and fixed."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -231,0 +231,7 @@\n+def test_sweb_enhanced_mod_non_integer_base():\n+    from sympy import Mod, Float\n+    x = Float(1.5)\n+    result = Mod(x**2, x)\n+    expected = Float(0)  # Mod(x**2, x) should be 0 for any x\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/core/tests/test_numbers.py b/sympy/core/tests/test_numbers.py\n--- a/sympy/core/tests/test_numbers.py\n+++ b/sympy/core/tests/test_numbers.py\n@@ -231,0 +231,7 @@\n+def test_sweb_enhanced_mod_non_integer_base():\n+    from sympy import Mod, Float\n+    x = Float(1.5)\n+    result = Mod(x**2, x)\n+    expected = Float(0)  # Mod(x**2, x) should be 0 for any x\n+    assert result == expected, f\"Expected {expected}, but got {result}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_mod_non_integer_base"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_mod_non_integer_base"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_mod_non_integer_base"
+    ],
+    "eval_status_map": {
+      "sympy/core/tests/test_numbers.py:test_powers_Integer": "FAILED",
+      "sympy/core/tests/test_numbers.py:test_powers_Rational": "FAILED",
+      "sympy/core/tests/test_numbers.py:test_simplify_AlgebraicNumber": "FAILED",
+      "sympy/core/tests/test_numbers.py:test_mod_inverse": "FAILED",
+      "sympy/core/tests/test_numbers.py:test_sweb_enhanced_mod_non_integer_base": "FAILED",
+      "test_integers_cache": "PASSED",
+      "test_seterr": "PASSED",
+      "test_mod": "PASSED",
+      "test_divmod": "PASSED",
+      "test_igcd": "PASSED",
+      "test_igcd_lehmer": "PASSED",
+      "test_igcd2": "PASSED",
+      "test_ilcm": "PASSED",
+      "test_igcdex": "PASSED",
+      "test_Integer_new": "PASSED",
+      "test_Rational_new": "PASSED",
+      "test_Number_new": "PASSED",
+      "test_Rational_cmp": "PASSED",
+      "test_Float": "PASSED",
+      "test_float_mpf": "PASSED",
+      "test_Float_RealElement": "PASSED",
+      "test_Float_default_to_highprec_from_str": "PASSED",
+      "test_Float_eval": "PASSED",
+      "test_Float_issue_2107": "PASSED",
+      "test_Infinity": "PASSED",
+      "test_Infinity_2": "PASSED",
+      "test_Mul_Infinity_Zero": "PASSED",
+      "test_Div_By_Zero": "PASSED",
+      "test_Infinity_inequations": "PASSED",
+      "test_NaN": "PASSED",
+      "test_special_numbers": "PASSED",
+      "test_powers": "PASSED",
+      "test_integer_nthroot_overflow": "PASSED",
+      "test_isqrt": "PASSED",
+      "test_powers_Integer": "ERROR",
+      "test_powers_Rational": "ERROR",
+      "test_powers_Float": "PASSED",
+      "test_abs1": "PASSED",
+      "test_accept_int": "PASSED",
+      "test_dont_accept_str": "PASSED",
+      "test_int": "PASSED",
+      "test_long": "PASSED",
+      "test_real_bug": "PASSED",
+      "test_bug_sqrt": "PASSED",
+      "test_pi_Pi": "PASSED",
+      "test_no_len": "PASSED",
+      "test_issue_3321": "PASSED",
+      "test_issue_3692": "PASSED",
+      "test_issue_3423": "PASSED",
+      "test_issue_3449": "PASSED",
+      "test_Integer_factors": "PASSED",
+      "test_Rational_factors": "PASSED",
+      "test_issue_4107": "PASSED",
+      "test_IntegerInteger": "PASSED",
+      "test_Rational_gcd_lcm_cofactors": "PASSED",
+      "test_Float_gcd_lcm_cofactors": "PASSED",
+      "test_issue_4611": "PASSED",
+      "test_conversion_to_mpmath": "PASSED",
+      "test_relational": "PASSED",
+      "test_Integer_as_index": "PASSED",
+      "test_Rational_int": "PASSED",
+      "test_zoo": "PASSED",
+      "test_issue_4122": "PASSED",
+      "test_GoldenRatio_expand": "PASSED",
+      "test_as_content_primitive": "PASSED",
+      "test_hashing_sympy_integers": "PASSED",
+      "test_issue_4172": "PASSED",
+      "test_Catalan_EulerGamma_prec": "PASSED",
+      "test_Float_eq": "PASSED",
+      "test_int_NumberSymbols": "PASSED",
+      "test_issue_6640": "PASSED",
+      "test_issue_6349": "PASSED",
+      "test_mpf_norm": "PASSED",
+      "test_latex": "PASSED",
+      "test_issue_7742": "PASSED",
+      "test_simplify_AlgebraicNumber": "ERROR",
+      "test_Float_idempotence": "PASSED",
+      "test_comp": "PASSED",
+      "test_issue_9491": "PASSED",
+      "test_issue_10063": "PASSED",
+      "test_issue_10020": "PASSED",
+      "test_invert_numbers": "PASSED",
+      "test_mod_inverse": "ERROR",
+      "test_golden_ratio_rewrite_as_sqrt": "PASSED",
+      "test_comparisons_with_unknown_type": "PASSED",
+      "test_NumberSymbol_comparison": "PASSED"
+    },
+    "generation_attempts": 1,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_mod"
+    ],
+    "covered_obligations": [
+      "test_mod::core"
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/mod.py",
+      "action": "modify_region",
+      "justification": "The `Mod.eval` method contains the logic for evaluating modulo operations and fails to enforce integer constraints on the base of power expressions. This is the root cause of the bug."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/mod.py",
+      "target_symbol": "Mod.eval",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_mod::core"
+      ],
+      "anchor_line_before": "            if (p == q or p == -q or",
+      "anchor_line_after": "                    p.is_Pow and p.exp.is_Integer and p.base == q or",
+      "replacement_block": "            if (p == q or p == -q or\n                    p.is_Pow and p.exp.is_Integer and p.base == q and p.base.is_integer or"
+    }
+  ]
+}

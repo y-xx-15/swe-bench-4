@@ -1,0 +1,16 @@
+--- a/sympy/printing/mathematica.py
++++ b/sympy/printing/mathematica.py
+@@ -50,6 +50,13 @@
+ 
+     _number_symbols = set()
+     _not_supported = set()
++
++    def _print_Derivative(self, expr):
++        return "D[%s]" % (self.stringify(expr.args, ", "))
++
++    def _print_Float(self, expr):
++        res = str(expr)
++        return res.replace('e', '*^')
+ 
+     def __init__(self, settings={}):
+         """Register function mappings supplied by user"""

@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/integrals/intpoly.py",
+      "action": "modify_region",
+      "justification": "The `decompose` function in `intpoly.py` directly returns a list of monomials in arbitrary order when `separate=True`, which is the root cause of the test failure. The function must be modified to ensure deterministic ordering of the returned list."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/integrals/intpoly.py",
+      "target_symbol": "decompose__branch_tail",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "ensure_deterministic_ordering"
+      ],
+      "anchor_line_before": "    if separate:",
+      "anchor_line_after": "        return list(poly_dict.values())",
+      "replacement_block": "    if separate:\n        return [monom[1] for monom in sorted(degrees, key=lambda x: (x[0], x[1]))]"
+    }
+  ]
+}

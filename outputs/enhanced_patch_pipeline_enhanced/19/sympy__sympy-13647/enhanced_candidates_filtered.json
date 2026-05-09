@@ -1,0 +1,147 @@
+[
+  {
+    "idea": {
+      "title": "test_col_insert_behavioral_consequence",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress downstream matrix integrity after column insertion",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "state_consistency_check",
+      "target_tests": [
+        "test_sweb_enhanced_col_insert_integrity"
+      ],
+      "covers_original_tests": [
+        "test_col_insert"
+      ],
+      "covers_obligations": [
+        "test_col_insert::core"
+      ],
+      "target_source_symbol": "Matrix.col_insert",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Matrix.col_insert",
+        "ShapeError",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "Matrix.col_insert",
+        "rows",
+        "cols"
+      ],
+      "rationale": "This test verifies that the matrix retains its expected shape and integrity after column insertion, which is a downstream consequence of the original bug. It differs from the original test by focusing on the structural correctness of the resulting matrix rather than the immediate output of the insertion operation."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,8 @@\n+def test_sweb_enhanced_col_insert_integrity():\n+    # Create a 4x4 identity matrix\n+    M = eye(4)\n+    # Insert a column of ones at position 2\n+    V = ones(4, 1)\n+    result = M.col_insert(2, V)\n+    # Verify the resulting matrix has the correct shape and integrity\n+    assert result == Matrix([[1, 0, 1, 0, 0], [0, 1, 1, 0, 0], [0, 0, 1, 1, 0], [0, 0, 1, 0, 1]])\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/tests/test_commonmatrix.py b/sympy/matrices/tests/test_commonmatrix.py\n--- a/sympy/matrices/tests/test_commonmatrix.py\n+++ b/sympy/matrices/tests/test_commonmatrix.py\n@@ -245,0 +245,8 @@\n+def test_sweb_enhanced_col_insert_integrity():\n+    # Create a 4x4 identity matrix\n+    M = eye(4)\n+    # Insert a column of ones at position 2\n+    V = ones(4, 1)\n+    result = M.col_insert(2, V)\n+    # Verify the resulting matrix has the correct shape and integrity\n+    assert result == Matrix([[1, 0, 1, 0, 0], [0, 1, 1, 0, 0], [0, 0, 1, 1, 0], [0, 0, 1, 0, 1]])\n```",
+    "identifiers": [
+      "test_sweb_enhanced_col_insert_integrity"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_col_insert_integrity"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_col_insert_integrity"
+    ],
+    "eval_status_map": {
+      "sympy/matrices/tests/test_commonmatrix.py:test_refine": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_jacobian2": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_limit": "FAILED",
+      "sympy/matrices/tests/test_commonmatrix.py:test_sweb_enhanced_col_insert_integrity": "FAILED",
+      "test__MinimalMatrix": "PASSED",
+      "test_vec": "PASSED",
+      "test_tolist": "PASSED",
+      "test_row_col_del": "PASSED",
+      "test_get_diag_blocks1": "PASSED",
+      "test_get_diag_blocks2": "PASSED",
+      "test_shape": "PASSED",
+      "test_reshape": "PASSED",
+      "test_row_col": "PASSED",
+      "test_row_join": "PASSED",
+      "test_col_join": "PASSED",
+      "test_row_insert": "PASSED",
+      "test_col_insert": "PASSED",
+      "test_extract": "PASSED",
+      "test_hstack": "PASSED",
+      "test_vstack": "PASSED",
+      "test_atoms": "PASSED",
+      "test_free_symbols": "PASSED",
+      "test_has": "PASSED",
+      "test_is_anti_symmetric": "PASSED",
+      "test_diagonal_symmetrical": "PASSED",
+      "test_is_hermitian": "PASSED",
+      "test_is_Identity": "PASSED",
+      "test_is_symbolic": "PASSED",
+      "test_is_upper": "PASSED",
+      "test_is_lower": "PASSED",
+      "test_is_square": "PASSED",
+      "test_is_symmetric": "PASSED",
+      "test_is_hessenberg": "PASSED",
+      "test_is_zero": "PASSED",
+      "test_values": "PASSED",
+      "test_applyfunc": "PASSED",
+      "test_adjoint": "PASSED",
+      "test_as_real_imag": "PASSED",
+      "test_conjugate": "PASSED",
+      "test_doit": "PASSED",
+      "test_evalf": "PASSED",
+      "test_expand": "PASSED",
+      "test_refine": "ERROR",
+      "test_replace": "PASSED",
+      "test_replace_map": "PASSED",
+      "test_simplify": "PASSED",
+      "test_subs": "PASSED",
+      "test_trace": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_permute": "PASSED",
+      "test_abs": "PASSED",
+      "test_add": "PASSED",
+      "test_multiplication": "PASSED",
+      "test_power": "PASSED",
+      "test_neg": "PASSED",
+      "test_sub": "PASSED",
+      "test_div": "PASSED",
+      "test_det": "PASSED",
+      "test_adjugate": "PASSED",
+      "test_cofactor_and_minors": "PASSED",
+      "test_charpoly": "PASSED",
+      "test_row_op": "PASSED",
+      "test_col_op": "PASSED",
+      "test_is_echelon": "PASSED",
+      "test_echelon_form": "PASSED",
+      "test_rref": "PASSED",
+      "test_eye": "PASSED",
+      "test_ones": "PASSED",
+      "test_zeros": "PASSED",
+      "test_diag": "PASSED",
+      "test_jordan_block": "PASSED",
+      "test_columnspace": "PASSED",
+      "test_rowspace": "PASSED",
+      "test_nullspace": "PASSED",
+      "test_eigenvals": "PASSED",
+      "test_eigenvects": "PASSED",
+      "test_left_eigenvects": "PASSED",
+      "test_diagonalize": "PASSED",
+      "test_is_diagonalizable": "PASSED",
+      "test_jordan_form": "PASSED",
+      "test_singular_values": "PASSED",
+      "test_integrate": "PASSED",
+      "test_jacobian2": "ERROR",
+      "test_limit": "ERROR"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_col_insert"
+    ],
+    "covered_obligations": [
+      "test_col_insert::core"
+    ]
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "title": "Simplify exponential to trig identities in trigsimp",
+  "approach": "Extend the `trigsimp` function to recognize exponential representations of trigonometric functions and simplify them back to their corresponding trigonometric identities. This involves modifying the `_eval_rewrite_as_exp` methods for `sin` and `cos` to include logic for reverse simplification and ensuring `trigsimp` calls these methods appropriately.",
+  "edit_targets": [
+    "sympy/functions/elementary/trigonometric.py::sin._eval_rewrite_as_exp",
+    "sympy/functions/elementary/trigonometric.py::cos._eval_rewrite_as_exp",
+    "sympy/simplify/simplify.py::trigsimp"
+  ],
+  "dependency_files": [
+    "sympy/functions/elementary/tests/test_trigonometric.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing the `_eval_rewrite_as_exp` methods for `sin` and `cos` alone is not sufficient because the `trigsimp` function must be updated to invoke these methods during simplification. Additionally, tests in `test_trigonometric.py` must verify the correctness of the changes.",
+  "risks": [
+    "Potential regressions in existing trigonometric simplifications if the new logic interferes with other cases handled by `trigsimp`.",
+    "Incorrect handling of edge cases where exponential forms do not correspond to standard trigonometric identities."
+  ]
+}

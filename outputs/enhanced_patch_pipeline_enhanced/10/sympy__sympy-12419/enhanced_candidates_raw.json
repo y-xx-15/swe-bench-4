@@ -1,0 +1,153 @@
+[
+  {
+    "idea": {
+      "title": "validate_total_sum_identity_matrix",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect total sum calculation of an identity matrix, which triggers an assertion error",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_validate_total_sum_identity_matrix"
+      ],
+      "covers_original_tests": [
+        "test_Identity"
+      ],
+      "covers_obligations": [
+        "test_Identity::core"
+      ],
+      "target_source_symbol": "test_Identity",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "Identity",
+        "Sum",
+        "total sum"
+      ],
+      "trigger_shape_tokens": [
+        "assertionerror",
+        "Identity",
+        "Sum",
+        "total sum"
+      ],
+      "rationale": "This test directly reproduces the original failure by validating the total sum of an identity matrix. It aligns with the original failure path and exception semantics, ensuring the bug is exposed in the same way as the original test."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_matexpr.py b/sympy/matrices/expressions/tests/test_matexpr.py\n--- a/sympy/matrices/expressions/tests/test_matexpr.py\n+++ b/sympy/matrices/expressions/tests/test_matexpr.py\n@@ -284,0 +284,9 @@\n+def test_sweb_enhanced_validate_total_sum_identity_matrix():\n+    n = symbols('n', integer=True, positive=True)\n+    i, j = symbols('i j', integer=True)\n+    In = Identity(n)\n+\n+    # Validate the total sum of the identity matrix\n+    total_sum = Sum(Sum(In[i, j], (i, 0, n-1)), (j, 0, n-1)).doit()\n+    assert total_sum == n, f\"Expected total sum to be {n}, but got {total_sum}\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/expressions/tests/test_matexpr.py b/sympy/matrices/expressions/tests/test_matexpr.py\n--- a/sympy/matrices/expressions/tests/test_matexpr.py\n+++ b/sympy/matrices/expressions/tests/test_matexpr.py\n@@ -284,0 +284,9 @@\n+def test_sweb_enhanced_validate_total_sum_identity_matrix():\n+    n = symbols('n', integer=True, positive=True)\n+    i, j = symbols('i j', integer=True)\n+    In = Identity(n)\n+\n+    # Validate the total sum of the identity matrix\n+    total_sum = Sum(Sum(In[i, j], (i, 0, n-1)), (j, 0, n-1)).doit()\n+    assert total_sum == n, f\"Expected total sum to be {n}, but got {total_sum}\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_validate_total_sum_identity_matrix"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_validate_total_sum_identity_matrix"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test sum of all elements in refined identity matrix",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "stress the downstream behavior of summing all elements in a refined identity matrix, which should equal 'n' but currently returns 0",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_sum_identity_elements"
+      ],
+      "covers_original_tests": [
+        "test_Identity"
+      ],
+      "covers_obligations": [
+        "test_Identity::core"
+      ],
+      "target_source_symbol": "Identity",
+      "target_validation_subject": "sum_of_elements",
+      "semantic_alignment_tokens": [
+        "Identity",
+        "refine",
+        "Sum",
+        "MatrixSymbol"
+      ],
+      "trigger_shape_tokens": [
+        "Identity",
+        "refine",
+        "Sum",
+        "MatrixSymbol"
+      ],
+      "rationale": "This test focuses on the downstream behavior of summing all elements in a refined identity matrix, which differs from the original test that primarily checks the identity matrix's diagonal sum. It provides additional repair guidance by exposing a specific behavioral consequence of the bug."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_matexpr.py b/sympy/matrices/expressions/tests/test_matexpr.py\n--- a/sympy/matrices/expressions/tests/test_matexpr.py\n+++ b/sympy/matrices/expressions/tests/test_matexpr.py\n@@ -284,0 +284,9 @@\n+def test_sweb_enhanced_sum_identity_elements():\n+    n = symbols('n', integer=True, positive=True)\n+    i, j = symbols('i j', integer=True)\n+    M = MatrixSymbol('M', n, n)\n+\n+    with assuming(Q.orthogonal(M)):\n+        refined_identity = refine((M.T * M).doit())\n+\n+    assert Sum(Sum(refined_identity[i, j], (i, 0, n-1)), (j, 0, n-1)).subs(n, 3).doit() == 3\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/expressions/tests/test_matexpr.py b/sympy/matrices/expressions/tests/test_matexpr.py\n--- a/sympy/matrices/expressions/tests/test_matexpr.py\n+++ b/sympy/matrices/expressions/tests/test_matexpr.py\n@@ -284,0 +284,10 @@\n+def test_sweb_enhanced_sum_identity_elements():\n+    n = symbols('n', integer=True, positive=True)\n+    i, j = symbols('i j', integer=True)\n+    M = MatrixSymbol('M', n, n)\n+\n+    with assuming(Q.orthogonal(M)):\n+        refined_identity = refine((M.T * M).doit())\n+\n+    assert Sum(Sum(refined_identity[i, j], (i, 0, n-1)), (j, 0, n-1)).subs(n, 3).doit() == 3\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sum_identity_elements"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sum_identity_elements"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "identity_matrix_sum_bug",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the incorrect sum calculation of elements in an identity matrix, which currently returns 0 instead of n",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_identity_matrix_sum"
+      ],
+      "covers_original_tests": [
+        "test_Identity"
+      ],
+      "covers_obligations": [
+        "test_Identity::core"
+      ],
+      "target_source_symbol": "test_Identity",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Identity(",
+        "Sum(",
+        "doit"
+      ],
+      "trigger_shape_tokens": [
+        "Identity(",
+        "Sum(",
+        "doit"
+      ],
+      "rationale": "This test directly reproduces the bug by summing all elements of an identity matrix and asserting the expected result (n). It differs from the original test by explicitly focusing on the total sum of elements rather than other identity matrix properties, providing a precise signal for the specific bug."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_matexpr.py b/sympy/matrices/expressions/tests/test_matexpr.py\n--- a/sympy/matrices/expressions/tests/test_matexpr.py\n+++ b/sympy/matrices/expressions/tests/test_matexpr.py\n@@ -284,0 +284,8 @@\n+def test_sweb_enhanced_identity_matrix_sum():\n+    n = symbols('n', integer=True, positive=True)\n+    i, j = symbols('i j', integer=True)\n+    In = Identity(n)\n+    total_sum = Sum(Sum(In[i, j], (i, 0, n-1)), (j, 0, n-1)).doit()\n+    assert total_sum == n, f\"Expected total sum to be {n}, but got {total_sum}\"\n+\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/matrices/expressions/tests/test_matexpr.py b/sympy/matrices/expressions/tests/test_matexpr.py\n--- a/sympy/matrices/expressions/tests/test_matexpr.py\n+++ b/sympy/matrices/expressions/tests/test_matexpr.py\n@@ -284,0 +284,8 @@\n+def test_sweb_enhanced_identity_matrix_sum():\n+    n = symbols('n', integer=True, positive=True)\n+    i, j = symbols('i j', integer=True)\n+    In = Identity(n)\n+    total_sum = Sum(Sum(In[i, j], (i, 0, n-1)), (j, 0, n-1)).doit()\n+    assert total_sum == n, f\"Expected total sum to be {n}, but got {total_sum}\"\n+\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_identity_matrix_sum"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_identity_matrix_sum"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

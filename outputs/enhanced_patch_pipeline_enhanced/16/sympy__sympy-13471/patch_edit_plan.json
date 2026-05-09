@@ -1,0 +1,24 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/numbers.py",
+      "action": "modify_region",
+      "justification": "The failure occurs in the `Float` class's `__new__` method, specifically when handling tuple-based float construction. The mantissa (`num[1]`) from Python 2 pickled data includes a trailing 'L', which must be stripped to ensure compatibility with Python 3 unpickling logic."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/numbers.py",
+      "target_symbol": "Float.__new__",
+      "replacement_mode": "insert_before_anchor",
+      "covers_obligations": [
+        "tuple-based_float_construction",
+        "tuple_input_for_float_creation",
+        "num1_conversion_logic"
+      ],
+      "anchor_line_before": "        elif isinstance(num, (SYMPY_INTS, Integer)):",
+      "anchor_line_after": "            num = str(num)  # faster than mlib.from_int",
+      "replacement_block": "        elif isinstance(num, tuple) and len(num) == 3 and isinstance(num[1], str):\n            # Handle Python 2-style long literals in the mantissa\n            num = list(num)\n            if num[1].endswith('L'):\n                num[1] = num[1][:-1]\n            num = tuple(num)\n        elif isinstance(num, (SYMPY_INTS, Integer)):\n            num = str(num)  # faster than mlib.from_int"
+    }
+  ]
+}

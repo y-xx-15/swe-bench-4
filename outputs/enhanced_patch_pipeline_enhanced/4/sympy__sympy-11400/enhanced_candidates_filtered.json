@@ -1,0 +1,186 @@
+[
+  {
+    "idea": {
+      "title": "Relational operator assertion in ccode",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the assertion error caused by incorrect handling of Relational operators in ccode",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_Relational"
+      ],
+      "covers_original_tests": [
+        "test_ccode_Relational"
+      ],
+      "covers_obligations": [
+        "test_ccode_Relational::core"
+      ],
+      "target_source_symbol": "sympy.printing.ccode.ccode",
+      "target_validation_subject": "Relational operator handling",
+      "semantic_alignment_tokens": [
+        "ccode(",
+        "Relational(",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "Relational(",
+        "ccode(",
+        "assertionerror"
+      ],
+      "rationale": "This test directly exercises the Relational operator handling in ccode, which is the root cause of the original failure. It reproduces the assertion error observed in test_ccode_Relational by using a Relational expression that triggers the buggy behavior. Unlike the original test, this enhanced test isolates the failure to the specific validation subject, providing clearer guidance for repair."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,8 @@\n+def test_sweb_enhanced_Relational():\n+    from sympy import Eq, Ne\n+    # Test for equality (==) and inequality (!=) handling in ccode\n+    expr_eq = Eq(x, 0)\n+    expr_ne = Ne(x, 0)\n+    assert ccode(expr_eq) == \"x == 0\"\n+    assert ccode(expr_ne) == \"x != 0\"\n+\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,8 @@\n+def test_sweb_enhanced_Relational():\n+    from sympy import Eq, Ne\n+    # Test for equality (==) and inequality (!=) handling in ccode\n+    expr_eq = Eq(x, 0)\n+    expr_ne = Ne(x, 0)\n+    assert ccode(expr_eq) == \"x == 0\"\n+    assert ccode(expr_ne) == \"x != 0\"\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Relational"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Relational"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_Relational"
+    ],
+    "eval_status_map": {
+      "sympy/printing/tests/test_ccode.py:test_sweb_enhanced_Relational": "FAILED",
+      "test_printmethod": "PASSED",
+      "test_ccode_sqrt": "PASSED",
+      "test_ccode_Pow": "PASSED",
+      "test_ccode_constants_mathh": "PASSED",
+      "test_ccode_constants_other": "PASSED",
+      "test_ccode_Rational": "PASSED",
+      "test_ccode_Integer": "PASSED",
+      "test_ccode_functions": "PASSED",
+      "test_ccode_inline_function": "PASSED",
+      "test_ccode_exceptions": "PASSED",
+      "test_ccode_user_functions": "PASSED",
+      "test_ccode_boolean": "PASSED",
+      "test_ccode_Piecewise": "PASSED",
+      "test_ccode_Piecewise_deep": "PASSED",
+      "test_ccode_ITE": "PASSED",
+      "test_ccode_settings": "PASSED",
+      "test_ccode_Indexed": "PASSED",
+      "test_ccode_Indexed_without_looking_for_contraction": "PASSED",
+      "test_ccode_loops_matrix_vector": "PASSED",
+      "test_dummy_loops": "PASSED",
+      "test_ccode_loops_add": "PASSED",
+      "test_ccode_loops_multiple_contractions": "PASSED",
+      "test_ccode_loops_addfactor": "PASSED",
+      "test_ccode_loops_multiple_terms": "PASSED",
+      "test_dereference_printing": "PASSED",
+      "test_Matrix_printing": "PASSED",
+      "test_ccode_reserved_words": "PASSED",
+      "test_ccode_sign": "PASSED",
+      "test_ccode_Assignment": "PASSED",
+      "test_ccode_For": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_ccode_Relational"
+    ],
+    "covered_obligations": [
+      "test_ccode_Relational::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "test ccode sinc function handling",
+      "semantic_bucket": "direct_symptom",
+      "goal": "stress the buggy behavior of ccode when handling the sinc function",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_ccode_sinc"
+      ],
+      "covers_original_tests": [
+        "test_ccode_sinc"
+      ],
+      "covers_obligations": [
+        "test_ccode_sinc::core"
+      ],
+      "target_source_symbol": "sympy.printing.ccode.ccode",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "ccode",
+        "sinc(",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "ccode",
+        "sinc(",
+        "assertionerror"
+      ],
+      "rationale": "This test directly exercises the ccode function with the sinc function, reproducing the original failure mode (AssertionError). It differs from the original test by explicitly targeting the buggy handling of the sinc function and verifying the correct behavior after the fix."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,9 @@\n+def test_sweb_enhanced_ccode_sinc_zero():\n+    from sympy import sinc\n+    # Test the edge case where the argument to sinc is exactly zero\n+    expr = sinc(0)\n+    assert ccode(expr) == (\n+            \"((0 != 0) ? (\\n\"\n+            \"   sin(0)/0\\n\"\n+            \")\\n\"\n+            \": (\\n   1\\n))\")\n",
+    "raw_response": "```diff\ndiff --git a/sympy/printing/tests/test_ccode.py b/sympy/printing/tests/test_ccode.py\n--- a/sympy/printing/tests/test_ccode.py\n+++ b/sympy/printing/tests/test_ccode.py\n@@ -247,0 +247,9 @@\n+def test_sweb_enhanced_ccode_sinc_zero():\n+    from sympy import sinc\n+    # Test the edge case where the argument to sinc is exactly zero\n+    expr = sinc(0)\n+    assert ccode(expr) == (\n+            \"((0 != 0) ? (\\n\"\n+            \"   sin(0)/0\\n\"\n+            \")\\n\"\n+            \": (\\n   1\\n))\")\n```",
+    "identifiers": [
+      "test_sweb_enhanced_ccode_sinc_zero"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_ccode_sinc_zero"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_ccode_sinc_zero"
+    ],
+    "eval_status_map": {
+      "sympy/printing/tests/test_ccode.py:test_sweb_enhanced_ccode_sinc_zero": "FAILED",
+      "test_printmethod": "PASSED",
+      "test_ccode_sqrt": "PASSED",
+      "test_ccode_Pow": "PASSED",
+      "test_ccode_constants_mathh": "PASSED",
+      "test_ccode_constants_other": "PASSED",
+      "test_ccode_Rational": "PASSED",
+      "test_ccode_Integer": "PASSED",
+      "test_ccode_functions": "PASSED",
+      "test_ccode_inline_function": "PASSED",
+      "test_ccode_exceptions": "PASSED",
+      "test_ccode_user_functions": "PASSED",
+      "test_ccode_boolean": "PASSED",
+      "test_ccode_Piecewise": "PASSED",
+      "test_ccode_Piecewise_deep": "PASSED",
+      "test_ccode_ITE": "PASSED",
+      "test_ccode_settings": "PASSED",
+      "test_ccode_Indexed": "PASSED",
+      "test_ccode_Indexed_without_looking_for_contraction": "PASSED",
+      "test_ccode_loops_matrix_vector": "PASSED",
+      "test_dummy_loops": "PASSED",
+      "test_ccode_loops_add": "PASSED",
+      "test_ccode_loops_multiple_contractions": "PASSED",
+      "test_ccode_loops_addfactor": "PASSED",
+      "test_ccode_loops_multiple_terms": "PASSED",
+      "test_dereference_printing": "PASSED",
+      "test_Matrix_printing": "PASSED",
+      "test_ccode_reserved_words": "PASSED",
+      "test_ccode_sign": "PASSED",
+      "test_ccode_Assignment": "PASSED",
+      "test_ccode_For": "PASSED"
+    },
+    "generation_attempts": 4,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_ccode_sinc"
+    ],
+    "covered_obligations": [
+      "test_ccode_sinc::core"
+    ]
+  }
+]

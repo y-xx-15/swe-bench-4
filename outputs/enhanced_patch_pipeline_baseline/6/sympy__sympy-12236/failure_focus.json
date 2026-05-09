@@ -1,0 +1,31 @@
+{
+  "original_test_identifiers": [
+    "test_div"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_div"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/polys/tests/test_partfrac.py:test_apart",
+    "sympy/polys/tests/test_partfrac.py:test_apart_extension",
+    "sympy/polys/tests/test_polytools.py:test_sturm",
+    "sympy/polys/tests/test_polytools.py:test_factor",
+    "sympy/polys/tests/test_polytools.py:test_intervals"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "RecursionError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_div F",
+    "________________ sympy/polys/tests/test_partfrac.py:test_apart _________________",
+    "___________ sympy/polys/tests/test_partfrac.py:test_apart_extension ____________"
+  ],
+  "noise_ratio": 0.0004,
+  "target_test_tracebacks": {
+    "test_div": "TARGET TEST: test_div\n- snippet: test_div F\n- snippet: ________________ sympy/polys/tests/test_partfrac.py:test_apart _________________\n- snippet: ___________ sympy/polys/tests/test_partfrac.py:test_apart_extension ____________\n- dominant_errors: RecursionError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_div F\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded in comparison\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded in comparison\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded in __instancecheck__\nRecursionError: maximum recursion depth exceeded while calling a Python object\n_________________ sympy/polys/tests/test_polytools.py:test_div _________________\n  File \"/testbed/sympy/polys/tests/test_polytools.py\", line 1705, in test_div\nAssertionError\n tests finished: 136 passed, 1 failed, 4 expected to fail, 8 exceptions, "
+  }
+}

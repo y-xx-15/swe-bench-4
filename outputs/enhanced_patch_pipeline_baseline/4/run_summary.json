@@ -1,0 +1,298 @@
+[
+  {
+    "instance_id": "sympy__sympy-11897",
+    "repo": "sympy/sympy",
+    "model": "gpt-4o",
+    "pipeline_mode": "baseline_only",
+    "hide_original_test_patch_in_repair": true,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "baseline_fallback",
+    "original_test_identifiers": [
+      "test_latex_Piecewise"
+    ],
+    "original_status_counts": {
+      "FAILED": 10,
+      "PASSED": 95,
+      "ERROR": 8
+    },
+    "original_failed_count": 18,
+    "original_passed_count": 95,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_latex_Piecewise"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_latex_Piecewise"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/printing/tests/test_latex.py:test_latex_functions",
+        "sympy/printing/tests/test_latex.py:test_latex_indexed",
+        "sympy/printing/tests/test_latex.py:test_latex_derivatives",
+        "sympy/printing/tests/test_latex.py:test_latex_FourierSeries",
+        "sympy/printing/tests/test_latex.py:test_latex_FormalPowerSeries"
+      ],
+      "failure_mode": "value_error",
+      "dominant_errors": [
+        "RecursionError",
+        "ValueError",
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_latex_Piecewise F",
+        "___________ sympy/printing/tests/test_latex.py:test_latex_functions ____________",
+        "____________ sympy/printing/tests/test_latex.py:test_latex_indexed _____________"
+      ],
+      "noise_ratio": 0.0015,
+      "target_test_tracebacks": {
+        "test_latex_Piecewise": "TARGET TEST: test_latex_Piecewise\n- snippet: test_latex_Piecewise F\n- snippet: ___________ sympy/printing/tests/test_latex.py:test_latex_functions ____________\n- snippet: ____________ sympy/printing/tests/test_latex.py:test_latex_indexed _____________\n- dominant_errors: RecursionError, ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_latex_Piecewise F\n  File \"/testbed/sympy/functions/special/error_functions.py\", line 1570, in eval\nRecursionError: maximum recursion depth exceeded in __instancecheck__\nRecursionError: maximum recursion depth exceeded in __instancecheck__\nRecursionError: maximum recursion depth exceeded in __instancecheck__\nValueError: Name node can't be used with 'False' constant\n___________ sympy/printing/tests/test_latex.py:test_latex_Piecewise ____________\n  File \"/testbed/sympy/printing/tests/test_latex.py\", line 870, in test_latex_Piecewise\nAssertionError\n tests finished: 96 passed, 1 failed, 2 expected to fail, 8 exceptions, "
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 7,
+      "keep_top_k": 4,
+      "attempt_budget": 3,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "value_error",
+      "noise_ratio": 0.0015,
+      "difficulty": "high"
+    },
+    "adaptive_num_candidates": 7,
+    "adaptive_keep_top_k": 4,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 0,
+    "kept_enhanced_candidates": 0,
+    "enhanced_candidate_retention_rate": 0.0,
+    "enhanced_generation_attempts_total": 0,
+    "enhanced_generation_attempts_avg": 0.0,
+    "kept_enhanced_test_identifiers": [],
+    "enhanced_failed_test_identifiers": [],
+    "enhanced_failed_count": 0,
+    "generated_patch_nonempty": false,
+    "generated_patch_error": "Generated Python source is not syntactically valid at sympy/printing/latex.py:408: unexpected indent.",
+    "generated_patch_attempts": 6,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_not_generated",
+    "generated_patch_feedback": "Generated Python source is not syntactically valid at sympy/printing/latex.py:408: unexpected indent.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The LaTeX printer mishandles certain cases of fractions and parentheses, leading to inconsistencies with the pretty printer. Specifically, the `_print_Mul` method in `LatexPrinter` does not properly account for the need to distribute denominators or wrap terms in parentheses when required.",
+      "affected_components": [
+        {
+          "file": "sympy/printing/latex.py",
+          "symbol": "LatexPrinter._print_Mul",
+          "reason": "This method is responsible for rendering multiplication and fractions in LaTeX, and the observed inconsistencies arise from its logic."
+        },
+        {
+          "file": "sympy/printing/tests/test_latex.py",
+          "symbol": "test_latex_basic",
+          "reason": "This test case directly verifies the LaTeX output for expressions involving fractions and parentheses, and it fails due to the observed inconsistencies."
+        }
+      ],
+      "failing_signal": "The LaTeX output for certain expressions (e.g., `1/(x + y)/2`) does not match the expected format, causing assertion failures in tests like `test_latex_basic`.",
+      "propagation_path": "The `_print_Mul` method generates incorrect LaTeX output for fractions by failing to properly wrap terms in parentheses or distribute denominators. This incorrect output propagates to the `latex` function, which is then compared against expected results in test cases, leading to assertion failures.",
+      "repair_constraint": "The LaTeX printer must produce output that is consistent with the pretty printer, while adhering to LaTeX syntax and ensuring readability.",
+      "suggested_repair_scope": [
+        "sympy/printing/latex.py",
+        "sympy/printing/tests/test_latex.py"
+      ],
+      "suspicious_symbols": [
+        "LatexPrinter._print_Mul",
+        "LatexPrinter._needs_mul_brackets"
+      ],
+      "repair_obligations": [
+        {
+          "id": "obligation_1",
+          "source_symbol": "LatexPrinter._print_Mul",
+          "validation_subject": "test_latex_basic",
+          "why_it_matters": "This method directly affects how fractions and multiplication are rendered in LaTeX, and its behavior must align with the expected output verified by the test case."
+        },
+        {
+          "id": "obligation_2",
+          "source_symbol": "LatexPrinter._needs_mul_brackets",
+          "validation_subject": "test_latex_basic",
+          "why_it_matters": "This helper method determines whether terms need to be wrapped in parentheses, which is critical for ensuring correct LaTeX syntax and consistency with the pretty printer."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Ensure consistent fraction handling in LaTeX printer",
+      "approach": "Modify the `_print_Mul` method in `LatexPrinter` to ensure proper parentheses wrapping and consistent fraction formatting. Specifically, adjust the logic for handling denominators and wrapping terms in parentheses when necessary.",
+      "edit_targets": [
+        "sympy/printing/latex.py::LatexPrinter._print_Mul"
+      ],
+      "dependency_files": [
+        "sympy/printing/latex.py::LatexPrinter._needs_mul_brackets",
+        "sympy/printing/tests/test_latex.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [
+        "negative_gating",
+        "top_of_function_side_path"
+      ],
+      "sufficiency_assessment": "Editing `_print_Mul` should be sufficient to resolve the inconsistency, as it directly handles the LaTeX rendering of multiplication and fractions. However, `_needs_mul_brackets` may require inspection to ensure it correctly identifies cases needing parentheses.",
+      "risks": [
+        "Potential regressions in LaTeX output for other expressions involving fractions or multiplication."
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/printing/latex.py",
+          "action": "modify_region",
+          "justification": "The `_print_Mul` method in `LatexPrinter` is directly responsible for rendering multiplication and fractions in LaTeX. The observed inconsistencies in the LaTeX output arise from its logic, and it must be updated to ensure proper parentheses wrapping and consistent fraction formatting."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "sympy/printing/latex.py",
+          "target_symbol": "LatexPrinter._print_Mul",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "obligation_1"
+          ],
+          "anchor_line_before": "        include_parens = False",
+          "anchor_line_after": "        if _coeff_isneg(expr):",
+          "replacement_block": "        include_parens = False\n        if _coeff_isneg(expr):\n            expr = -expr\n            tex = \"- \"\n            if expr.is_Add:\n                tex += \"(\"\n                include_parens = True\n        else:\n            tex = \"\"\n\n        from sympy.simplify import fraction\n        numer, denom = fraction(expr, exact=True)\n\n        # Handle fractions explicitly\n        if denom != 1:\n            numer_tex = self._print(numer)\n            denom_tex = self._print(denom)\n            if numer.is_Add or numer.is_Mul:\n                numer_tex = r\"\\left(%s\\right)\" % numer_tex\n            if denom.is_Add or denom.is_Mul:\n                denom_tex = r\"\\left(%s\\right)\" % denom_tex\n            return r\"\\frac{%s}{%s}\" % (numer_tex, denom_tex)\n\n        separator = self._settings['mul_symbol_latex']\n        numbersep = self._settings['mul_symbol_latex_numbers']\n\n        def convert(expr):\n            if not expr.is_Mul:\n                return str(self._print(expr))\n            else:\n                _tex = last_term_tex = \"\"\n\n                if self.order not in ('old', 'none'):\n                    args = expr.as_ordered_factors()\n                else:\n                    args = expr.args\n\n                for i, term in enumerate(args):\n                    term_tex = self._print(term)\n\n                    if self._needs_mul_brackets(term, first=(i == 0),\n                                                last=(i == len(args) - 1)):\n                        term_tex = r\"\\left(%s\\right)\" % term_tex\n\n                    if _between_two_numbers_p[0].search(last_term_tex) and \\\n                            _between_two_numbers_p[1].match(term_tex):\n                        # between two numbers\n                        _tex += numbersep\n                    elif _tex:\n                        _tex += separator\n\n                    _tex += term_tex\n                    last_term_tex = term_tex\n                return _tex\n\n        tex += convert(expr)\n        if include_parens:\n            tex += \")\"\n        return tex"
+        }
+      ]
+    },
+    "final_patch_attempted": false,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": false,
+    "final_patch_apply_mode": "no_patch",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 9,
+      "PASSED": 96,
+      "ERROR": 7
+    },
+    "final_failed_count": 16,
+    "final_passed_count": 96,
+    "original_passed_count_improvement": 1,
+    "original_failed_count_reduction": 2,
+    "final_status_map": {
+      "sympy/printing/tests/test_latex.py:test_latex_functions": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_indexed": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_derivatives": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_FormalPowerSeries": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_matrix_with_functions": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_NDimArray": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_issue_8470": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_Piecewise": "FAILED",
+      "test_printmethod": "PASSED",
+      "test_latex_basic": "PASSED",
+      "test_latex_builtins": "PASSED",
+      "test_latex_SingularityFunction": "PASSED",
+      "test_latex_cycle": "PASSED",
+      "test_latex_permutation": "PASSED",
+      "test_latex_Float": "PASSED",
+      "test_latex_symbols": "PASSED",
+      "test_latex_functions": "ERROR",
+      "test_hyper_printing": "PASSED",
+      "test_latex_bessel": "PASSED",
+      "test_latex_fresnel": "PASSED",
+      "test_latex_brackets": "PASSED",
+      "test_latex_indexed": "ERROR",
+      "test_latex_derivatives": "ERROR",
+      "test_latex_subs": "PASSED",
+      "test_latex_integrals": "PASSED",
+      "test_latex_sets": "PASSED",
+      "test_latex_Range": "PASSED",
+      "test_latex_sequences": "PASSED",
+      "test_latex_FourierSeries": "PASSED",
+      "test_latex_FormalPowerSeries": "ERROR",
+      "test_latex_intervals": "PASSED",
+      "test_latex_AccumuBounds": "PASSED",
+      "test_latex_emptyset": "PASSED",
+      "test_latex_commutator": "PASSED",
+      "test_latex_union": "PASSED",
+      "test_latex_symmetric_difference": "PASSED",
+      "test_latex_Complement": "PASSED",
+      "test_latex_Complexes": "PASSED",
+      "test_latex_productset": "PASSED",
+      "test_latex_Naturals": "PASSED",
+      "test_latex_Naturals0": "PASSED",
+      "test_latex_Integers": "PASSED",
+      "test_latex_ImageSet": "PASSED",
+      "test_latex_ConditionSet": "PASSED",
+      "test_latex_ComplexRegion": "PASSED",
+      "test_latex_Contains": "PASSED",
+      "test_latex_sum": "PASSED",
+      "test_latex_product": "PASSED",
+      "test_latex_limits": "PASSED",
+      "test_issue_3568": "PASSED",
+      "test_latex": "PASSED",
+      "test_latex_dict": "PASSED",
+      "test_latex_list": "PASSED",
+      "test_latex_rational": "PASSED",
+      "test_latex_inverse": "PASSED",
+      "test_latex_DiracDelta": "PASSED",
+      "test_latex_Heaviside": "PASSED",
+      "test_latex_KroneckerDelta": "PASSED",
+      "test_latex_LeviCivita": "PASSED",
+      "test_mode": "PASSED",
+      "test_latex_Piecewise": "FAILED",
+      "test_latex_Matrix": "PASSED",
+      "test_latex_matrix_with_functions": "ERROR",
+      "test_latex_NDimArray": "ERROR",
+      "test_latex_mul_symbol": "PASSED",
+      "test_latex_issue_4381": "PASSED",
+      "test_latex_issue_4576": "PASSED",
+      "test_latex_pow_fraction": "PASSED",
+      "test_noncommutative": "PASSED",
+      "test_latex_order": "PASSED",
+      "test_latex_Lambda": "PASSED",
+      "test_latex_PolyElement": "PASSED",
+      "test_latex_FracElement": "PASSED",
+      "test_latex_Poly": "PASSED",
+      "test_latex_ComplexRootOf": "PASSED",
+      "test_latex_RootSum": "PASSED",
+      "test_settings": "PASSED",
+      "test_latex_numbers": "PASSED",
+      "test_lamda": "PASSED",
+      "test_custom_symbol_names": "PASSED",
+      "test_matAdd": "PASSED",
+      "test_matMul": "PASSED",
+      "test_latex_MatrixSlice": "PASSED",
+      "test_latex_RandomDomain": "PASSED",
+      "test_PrettyPoly": "PASSED",
+      "test_integral_transforms": "PASSED",
+      "test_PolynomialRingBase": "PASSED",
+      "test_categories": "PASSED",
+      "test_Modules": "PASSED",
+      "test_QuotientRing": "PASSED",
+      "test_Tr": "PASSED",
+      "test_Adjoint": "PASSED",
+      "test_Hadamard": "PASSED",
+      "test_ZeroMatrix": "PASSED",
+      "test_boolean_args_order": "PASSED",
+      "test_imaginary": "PASSED",
+      "test_builtins_without_args": "PASSED",
+      "test_latex_greek_functions": "PASSED",
+      "test_translate": "PASSED",
+      "test_other_symbols": "PASSED",
+      "test_modifiers": "PASSED",
+      "test_greek_symbols": "PASSED",
+      "test_builtin_no_args": "PASSED",
+      "test_issue_6853": "PASSED",
+      "test_Mul": "PASSED",
+      "test_Pow": "PASSED",
+      "test_issue_7180": "PASSED",
+      "test_issue_8409": "PASSED",
+      "test_issue_8470": "ERROR",
+      "test_issue_7117": "PASSED",
+      "test_issue_2934": "PASSED",
+      "test_issue_10489": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

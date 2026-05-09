@@ -1,0 +1,19 @@
+{
+  "title": "deterministic_decompose_order",
+  "approach": "Modify the `decompose()` function in `intpoly.py` to sort the list of monomials by degree and lexicographic order when `separate=True`.",
+  "edit_targets": [
+    "sympy/integrals/intpoly.py::decompose"
+  ],
+  "dependency_files": [
+    "sympy/integrals/tests/test_intpoly.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [
+    "negative_gating",
+    "top_of_function_side_path"
+  ],
+  "sufficiency_assessment": "Editing the `decompose()` function alone is sufficient to ensure deterministic ordering of monomials. Test cases in `test_intpoly.py` will validate the correctness of the fix.",
+  "risks": [
+    "Potential performance overhead due to sorting, especially for large polynomials."
+  ]
+}

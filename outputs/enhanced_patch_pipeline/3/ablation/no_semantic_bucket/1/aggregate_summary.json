@@ -1,0 +1,19 @@
+{
+  "pipeline_mode": "enhanced_guided",
+  "instances_total": 4,
+  "instances_resolved": 4,
+  "instance_resolution_rate": 1.0,
+  "clean_apply_ratio": 1.0,
+  "enhanced_candidate_retention_rate": 0.4782608695652174,
+  "original_failed_count_total": 146,
+  "final_failed_count_total": 139,
+  "original_passed_count_total": 255,
+  "final_passed_count_total": 260,
+  "original_passed_count_improvement_total": 5,
+  "original_failed_count_reduction_total": 7,
+  "enhanced_failed_count_total": 11,
+  "adaptive_num_candidates_avg": 5.75,
+  "adaptive_keep_top_k_avg": 3.25,
+  "baseline_fallback_instances": 0,
+  "enhanced_guided_instances": 4
+}
