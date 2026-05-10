@@ -456,6 +456,130 @@ input:focus {
   padding: 24px 26px;
 }
 
+.detail-heading {
+  margin-top: 24px;
+}
+
+.test-list {
+  display: grid;
+  gap: 10px;
+}
+
+.patch-workspace {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: var(--grid-gap);
+  width: min(100%, var(--content-max));
+  margin-inline: auto;
+  align-items: start;
+}
+
+.patch-workspace.single-patch {
+  grid-template-columns: 1fr;
+}
+
+.patch-workspace.single-patch .patch-nav {
+  display: none;
+}
+
+.patch-content {
+  min-width: 0;
+}
+
+.patch-nav {
+  position: sticky;
+  top: 96px;
+  max-height: calc(100vh - 128px);
+  overflow: auto;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.patch-selector {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.test-list-item,
+.patch-list-item {
+  width: 100%;
+  min-height: 72px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fbfd;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+
+.patch-list-item {
+  min-height: 76px;
+  background: #f8fbfd;
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.test-list-item:hover {
+  border-color: rgba(22, 122, 127, 0.45);
+  background: #eef8f8;
+}
+
+.patch-list-item:hover {
+  border-color: rgba(22, 122, 127, 0.45);
+  background: #eef8f8;
+}
+
+.test-list-item.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 4px 0 0 var(--accent);
+}
+
+.patch-list-item.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 4px 0 0 var(--accent);
+}
+
+.test-list-item strong,
+.test-list-item span,
+.patch-list-item strong,
+.patch-list-item span {
+  display: block;
+}
+
+.test-list-item strong,
+.patch-list-item strong {
+  font-size: 14px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.test-list-item span,
+.patch-list-item span {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.patch-list-item span {
+  color: var(--muted);
+}
+
+.empty-state {
+  margin: 0;
+  padding: 14px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 dl {
   display: grid;
   gap: 18px;
@@ -594,6 +718,7 @@ pre code {
 @media (max-width: 980px) {
   .hero,
   .workspace,
+  .patch-workspace,
   .patch-layout,
   .comparison-layout,
   .test-metrics {
@@ -608,6 +733,11 @@ pre code {
   .workspace .summary,
   .workspace .code-card {
     grid-column: auto;
+  }
+
+  .patch-nav {
+    position: static;
+    max-height: none;
   }
 }
 

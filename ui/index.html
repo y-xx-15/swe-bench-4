@@ -78,7 +78,10 @@
 
         <div class="workspace">
           <aside class="summary">
-            <h3>用例信息</h3>
+            <h3>保留用例</h3>
+            <div class="test-list" id="test-list" aria-label="保留增强测试用例列表"></div>
+
+            <h3 class="detail-heading">当前用例信息</h3>
             <dl>
               <div>
                 <dt>覆盖原始测试</dt>
@@ -112,13 +115,19 @@
       </section>
 
       <section class="section patch-section view" id="patch">
-        <div class="comparison-layout">
-          <article class="code-card compare-card">
-            <div class="code-head">
-              <span>修复前代码</span>
-              <span class="badge danger">before</span>
-            </div>
-            <pre><code id="before-code">class Printable:
+        <div class="patch-workspace single-patch" id="patch-workspace">
+          <aside class="patch-nav">
+            <div class="patch-selector" id="patch-list" aria-label="补丁版本列表"></div>
+          </aside>
+
+          <div class="patch-content">
+            <div class="comparison-layout">
+              <article class="code-card compare-card">
+                <div class="code-head">
+                  <span>修复前代码</span>
+                  <span class="badge danger">before</span>
+                </div>
+                <pre><code id="before-code">class Printable:
     """
     The default implementation of printing for SymPy objects.
     """
@@ -127,14 +136,14 @@
     def __str__(self):
         from sympy.printing.str import sstr
         return sstr(self, order=None)</code></pre>
-          </article>
+              </article>
 
-          <article class="code-card compare-card">
-            <div class="code-head">
-              <span>修复后代码</span>
-              <span class="badge success">after</span>
-            </div>
-            <pre><code id="after-code">class Printable:
+              <article class="code-card compare-card">
+                <div class="code-head">
+                  <span>修复后代码</span>
+                  <span class="badge success">after</span>
+                </div>
+                <pre><code id="after-code">class Printable:
     """
     The default implementation of printing for SymPy objects.
     """
@@ -144,16 +153,16 @@
     def __str__(self):
         from sympy.printing.str import sstr
         return sstr(self, order=None)</code></pre>
-          </article>
-        </div>
-
-        <div class="patch-layout">
-          <article class="code-card patch-card">
-            <div class="code-head">
-              <span>model_patch.diff</span>
-              <span class="badge success" id="patch-status">accepted</span>
+              </article>
             </div>
-            <pre><code id="patch-code">--- a/sympy/core/_print_helpers.py
+
+            <div class="patch-layout">
+              <article class="code-card patch-card">
+                <div class="code-head">
+                  <span>model_patch.diff</span>
+                  <span class="badge success" id="patch-status">accepted</span>
+                </div>
+                <pre><code id="patch-code">--- a/sympy/core/_print_helpers.py
 +++ b/sympy/core/_print_helpers.py
 @@ -17,8 +17,8 @@
      This also adds support for LaTeX printing in jupyter notebooks.
@@ -166,21 +175,23 @@
      def __str__(self):
          from sympy.printing.str import sstr
          return sstr(self, order=None)</code></pre>
-          </article>
+              </article>
 
-          <aside class="validation">
-            <h3>最终验证</h3>
-            <div class="result-grid">
-              <div><strong id="resolved-state">resolved</strong><span>修复成功</span></div>
-              <div><strong id="passed-count">22</strong><span>通过测试</span></div>
-              <div><strong id="failed-count">0</strong><span>失败测试</span></div>
-              <div><strong id="apply-mode">clean</strong><span>补丁可应用</span></div>
+              <aside class="validation">
+                <h3>最终验证</h3>
+                <div class="result-grid">
+                  <div><strong id="resolved-state">resolved</strong><span>修复成功</span></div>
+                  <div><strong id="passed-count">22</strong><span>通过测试</span></div>
+                  <div><strong id="failed-count">0</strong><span>失败测试</span></div>
+                  <div><strong id="apply-mode">clean</strong><span>补丁可应用</span></div>
+                </div>
+                <p id="analysis-text">
+                  根因分析表明 Printable 未定义 <code>__slots__</code>，导致 Symbol 实例可见 <code>__dict__</code>。
+                  添加空 slots 后，结构不变式恢复，原始失败测试与增强测试均可通过。
+                </p>
+              </aside>
             </div>
-            <p id="analysis-text">
-              根因分析表明 Printable 未定义 <code>__slots__</code>，导致 Symbol 实例可见 <code>__dict__</code>。
-              添加空 slots 后，结构不变式恢复，原始失败测试与增强测试均可通过。
-            </p>
-          </aside>
+          </div>
         </div>
       </section>
     </main>
