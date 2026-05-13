@@ -1,0 +1,17 @@
+{
+  "title": "Add MatrixSymbol handling to _EvaluatorPrinter._preprocess",
+  "approach": "Modify the _preprocess method in _EvaluatorPrinter class (sympy/utilities/lambdify.py) to handle MatrixSymbol similarly to Symbol. Add an isinstance check for MatrixSymbol that applies the same dummification logic: when dummify=True or when the MatrixSymbol's name is not a valid Python identifier, replace it with a Dummy symbol and update the expression accordingly. This ensures that MatrixSymbol arguments with curly braces in their names (e.g., '{v}') are properly converted to valid Python identifiers in the generated lambda code.",
+  "edit_targets": [
+    "sympy/utilities/lambdify.py::_EvaluatorPrinter::_preprocess"
+  ],
+  "dependency_files": [
+    "sympy/matrices/expressions/matexpr.py::MatrixSymbol"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing only the _preprocess method in sympy/utilities/lambdify.py is sufficient to fix both repair obligations: (1) test_curly_matrix_symbol::core::MatrixSymbol name handling with dummify=True - the fix adds proper handling for MatrixSymbol similar to Symbol, applying dummification when needed; (2) test_curly_matrix_symbol::core::callable_return_value - once the syntax error is fixed by proper dummification, the lambdified function will return the correct matrix value. No changes to MatrixSymbol itself are needed since it already has a 'name' attribute that can be checked via _argrepr.",
+  "risks": [
+    "Potential name collision if a Dummy is used but the expression still references the original MatrixSymbol - mitigated by using _subexpr to replace the original in the expression",
+    "Breaking existing behavior for MatrixSymbol with valid identifiers - mitigated by only applying dummification when dummify=True or when the identifier is not safe"
+  ]
+}

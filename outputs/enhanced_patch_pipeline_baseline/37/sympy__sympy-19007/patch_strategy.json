@@ -1,0 +1,20 @@
+{
+  "title": "Fix symbolic index handling in BlockMatrix._entry",
+  "approach": "Modify the _entry method in BlockMatrix to properly handle symbolic indices. When the index is symbolic (i.is_number is False), the method should return a Piecewise expression that represents which block the element comes from based on the index value, rather than incorrectly assuming the index always falls in the first block. For concrete (non-symbolic) indices, the existing logic should continue to work correctly.",
+  "edit_targets": [
+    "sympy/matrices/expressions/blockmatrix.py::BlockMatrix._entry"
+  ],
+  "dependency_files": [
+    "sympy/functions/elementary/piecewise.py (for Piecewise construction)",
+    "sympy/matrices/expressions/tests/test_blockmatrix.py (for reference)",
+    "sympy/matrices/expressions/tests/test_indexing.py (for reference)"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The primary fix is in BlockMatrix._entry. However, if the fix requires using Piecewise to handle symbolic indices, we need to ensure Piecewise is imported. The fix should handle both row and column indices symbolically. No other files should need modification as this is the central method for block matrix indexing.",
+  "risks": [
+    "Breaking existing concrete index behavior - must ensure concrete indices still resolve correctly",
+    "Performance regression for symbolic index evaluation",
+    "Potential issues with nested BlockMatrices or complex block structures"
+  ]
+}

@@ -1,0 +1,247 @@
+[
+  {
+    "idea": {
+      "title": "Sum pretty print alignment with Add expression",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that Sum with Add function aligns terms correctly in pretty print output",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_sum_alignment"
+      ],
+      "covers_original_tests": [
+        "test_pretty_sum"
+      ],
+      "covers_obligations": [
+        "test_pretty_sum::core"
+      ],
+      "target_source_symbol": "sympy.printing.pretty.pretty.PrettyPrinter._print_Sum",
+      "target_validation_subject": "baseline_alignment_computation",
+      "semantic_alignment_tokens": [
+        "ValueError",
+        "AssertionError",
+        "baseline"
+      ],
+      "trigger_shape_tokens": [
+        "prettyF.baseline",
+        "baseline adjustment",
+        "alignment"
+      ],
+      "rationale": "The original test_pretty_sum fails with ValueError and AssertionError when printing Sum(x, (x, 1, oo)) + 3. The bug is in the baseline alignment calculation in _print_Sum when the summed function is an Add expression. This test directly exercises the alignment computation by checking that the pretty-printed output has properly aligned terms - the x and +3 should appear on the same horizontal line. On buggy code, this triggers ValueError or AssertionError due to incorrect baseline calculation. On fixed code, the terms align correctly and the test passes."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -4979,5 +4979,34 @@ def test_imaginary_unit():\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n \n     raises(TypeError, lambda: pretty(I, imaginary_unit=I))\n     raises(ValueError, lambda: pretty(I, imaginary_unit=\"kkk\"))\n+\n+\n+def test_sweb_enhanced_sum_alignment():\n+    # Test for issue 16503: Bad centering for Sum pretty print\n+    # When Sum is added to another expression, the terms should align properly.\n+    # The bug is in baseline alignment calculation in _print_Sum.\n+    # This test checks alignment from a different angle than test_pretty_sum:\n+    # we verify that the terms in Sum(x, (x, 1, oo)) + 3 appear on the same\n+    # horizontal line (i.e., the 'x' and '+ 3' should be aligned).\n+    \n+    expr = Sum(x, (x, 1, oo)) + 3\n+    result = upretty(expr)\n+    \n+    # Split into lines and check that 'x' and '3' appear on the same line\n+    lines = result.split('\\n')\n+    \n+    # Find lines containing 'x' (the summed variable) and '3' (the added constant)\n+    x_line = None\n+    three_line = None\n+    for i, line in enumerate(lines):\n+        if 'x' in line and '=' not in line:  # exclude the x=1 line\n+            x_line = i\n+        if '3' in line:\n+            three_line = i\n+    \n+    # The bug causes misalignment - x and 3 appear on different lines\n+    # After fix, they should be on the same line\n+    assert x_line is not None and three_line is not None, \"Could not find x or 3 in output\"\n+    assert x_line == three_line, \"Sum terms are misaligned: x and +3 should be on the same line\"\n",
+    "raw_response": "\n\nLooking at this task, I need to create an enhanced test that:\n1. Fails on the buggy code (triggers the same bug as `test_pretty_sum`)\n2. Passes on the fixed code\n3. Uses a different observation angle than the original test\n4. Specifically tests the baseline alignment computation\n\nLet me examine the bug more closely. The issue is that when printing `Sum(x, (x, 1, oo)) + 3`, the terms `x` and `+ 3` are misaligned. The original test checks specific string outputs, but I should test the alignment from a different angle.\n\nLet me create a test that checks the visual alignment by examining the printed output structure:\n```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -4979,3 +4979,27 @@ def test_imaginary_unit():\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n \n     raises(TypeError, lambda: pretty(I, imaginary_unit=I))\n     raises(ValueError, lambda: pretty(I, imaginary_unit=\"kkk\"))\n+\n+\n+def test_sweb_enhanced_sum_alignment():\n+    # Test for issue 16503: Bad centering for Sum pretty print\n+    # When Sum is added to another expression, the terms should align properly.\n+    # The bug is in baseline alignment calculation in _print_Sum.\n+    # This test checks alignment from a different angle than test_pretty_sum:\n+    # we verify that the terms in Sum(x, (x, 1, oo)) + 3 appear on the same\n+    # horizontal line (i.e., the 'x' and '+ 3' should be aligned).\n+    \n+    expr = Sum(x, (x, 1, oo)) + 3\n+    result = upretty(expr)\n+    \n+    # Split into lines and check that 'x' and '3' appear on the same line\n+    lines = result.split('\\n')\n+    \n+    # Find lines containing 'x' (the summed variable) and '3' (the added constant)\n+    x_line = None\n+    three_line = None\n+    for i, line in enumerate(lines):\n+        if 'x' in line and '=' not in line:  # exclude the x=1 line\n+            x_line = i\n+        if '3' in line:\n+            three_line = i\n+    \n+    # The bug causes misalignment - x and 3 appear on different lines\n+    # After fix, they should be on the same line\n+    assert x_line is not None and three_line is not None, \"Could not find x or 3 in output\"\n+    assert x_line == three_line, \"Sum terms are misaligned: x and +3 should be on the same line\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sum_alignment"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sum_alignment"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Sum pretty print alignment with added expression triggers ValueError",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Test that Sum with Add expression triggers ValueError in pretty printing baseline calculation",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_sum_alignment_valueerror"
+      ],
+      "covers_original_tests": [
+        "test_pretty_sum"
+      ],
+      "covers_obligations": [
+        "test_pretty_sum::core"
+      ],
+      "target_source_symbol": "sympy.printing.pretty.pretty.PrettyPrinter._print_Sum",
+      "target_validation_subject": "baseline calculation for Sum with Add function",
+      "semantic_alignment_tokens": [
+        "ValueError",
+        "Name node can't be used with 'False' constant",
+        "_print_Sum",
+        "baseline"
+      ],
+      "trigger_shape_tokens": [
+        "Sum(x, (x, 1, oo)) + 3",
+        "prettyForm",
+        "baseline"
+      ],
+      "rationale": "The original test_pretty_sum checks the final output string but doesn't explicitly trigger the ValueError that occurs during baseline calculation when Sum function contains an Add expression. This test directly constructs Sum(x, (x, 1, oo)) + 3 which triggers the ValueError 'Name node can't be used with False constant' in the baseline adjustment code path, exposing the root cause of the centering bug rather than just the symptom."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -4857,5 +4857,18 @@ def test_imaginary_unit():\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n \n     raises(TypeError, lambda: pretty(I, imaginary_unit=I))\n     raises(ValueError, lambda: pretty(I, imaginary_unit=\"kkk\"))\n+\n+\n+def test_sweb_enhanced_sum_alignment_valueerror():\n+    # Test that Sum with Add expression triggers ValueError in baseline calculation\n+    # The bug is in _print_Sum baseline calculation when Sum is combined with Add\n+    # This reproduces the issue: Sum(x, (x, 1, oo)) + 3 should have aligned x and + 3\n+    # On buggy code, this triggers: ValueError: Name node can't be used with 'False' constant\n+    expr = Sum(x, (x, 1, oo)) + 3\n+    # This should not raise ValueError - the baseline calculation should handle Add in Sum\n+    result = upretty(expr)\n+    # Verify the result is a non-empty string (basic sanity check)\n+    assert isinstance(result, str)\n+    assert len(result) > 0\n",
+    "raw_response": "\n\nLooking at the problem, I need to create an enhanced test that:\n1. Triggers the ValueError that occurs during baseline calculation when Sum contains an Add expression\n2. Uses `Sum(x, (x, 1, oo)) + 3` as specified in the trigger shape\n3. Fails on the buggy code (with ValueError) and passes after the fix\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -4857,3 +4857,14 @@ def test_imaginary_unit():\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n \n     raises(TypeError, lambda: pretty(I, imaginary_unit=I))\n     raises(ValueError, lambda: pretty(I, imaginary_unit=\"kkk\"))\n+\n+\n+def test_sweb_enhanced_sum_alignment_valueerror():\n+    # Test that Sum with Add expression triggers ValueError in baseline calculation\n+    # The bug is in _print_Sum baseline calculation when Sum is combined with Add\n+    # This reproduces the issue: Sum(x, (x, 1, oo)) + 3 should have aligned x and + 3\n+    # On buggy code, this triggers: ValueError: Name node can't be used with 'False' constant\n+    expr = Sum(x, (x, 1, oo)) + 3\n+    # This should not raise ValueError - the baseline calculation should handle Add in Sum\n+    result = upretty(expr)\n+    # Verify the result is a non-empty string (basic sanity check)\n+    assert isinstance(result, str)\n+    assert len(result) > 0\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sum_alignment_valueerror"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sum_alignment_valueerror"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Sum pretty print centering with addition operand",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Test that Sum pretty printing correctly centers the function when combined with addition, triggering the ValueError about Name node with False constant",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_sum_centering"
+      ],
+      "covers_original_tests": [
+        "test_pretty_sum"
+      ],
+      "covers_obligations": [
+        "test_pretty_sum::core"
+      ],
+      "target_source_symbol": "sympy.printing.pretty.pretty.PrettyPrinter._print_Sum",
+      "target_validation_subject": "alignment of Sum function with addition operand",
+      "semantic_alignment_tokens": [
+        "Sum",
+        "pprint",
+        "alignment",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "Sum(x, (x, 1, oo)) + 3",
+        "pretty printing",
+        "baseline"
+      ],
+      "rationale": "This test directly exercises the failing scenario from the bug report: Sum(x, (x, 1, oo)) + 3. The original test_pretty_sum fails with ValueError when trying to print this expression. The test verifies that the pretty printer correctly handles the baseline alignment when a Sum is added to another expression, which is the core issue causing the ValueError about 'Name node can't be used with False constant'. This is distinct from the original test because it specifically targets the alignment calculation path that triggers the ValueError."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -4851,3 +4851,19 @@ def test_imaginary_unit():\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n \n+\n+def test_sweb_enhanced_sum_centering():\n+    # Test for issue where Sum + constant has misaligned pretty printing\n+    # The x and + 3 should be aligned in: Sum(x, (x, 1, oo)) + 3\n+    # This triggers the ValueError about 'Name node can't be used with False constant'\n+    # in the buggy code due to incorrect baseline alignment calculation\n+    expr = Sum(x, (x, 1, oo)) + 3\n+    result = upretty(expr)\n+    lines = result.split('\\n')\n+    # The sum expression and the +3 should be vertically aligned\n+    # Find the line with 'x' from Sum and the line with '+' from addition\n+    x_line = None\n+    plus_line = None\n+    for i, line in enumerate(lines):\n+        if 'x' in line and '=' in line:\n+            x_line = i\n+        if '+' in line and '3' in line:\n+            plus_line = i\n+    # Both should exist and be aligned (same column for the key content)\n+    assert x_line is not None, \"Sum variable not found in output\"\n+    assert plus_line is not None, \"Addition operand not found in output\"\n+    # The x from Sum and the + from addition should be at similar horizontal position\n+    # Check that the '+' is not significantly to the right of 'x'\n+    x_pos = lines[x_line].find('x') if 'x' in lines[x_line] else 0\n+    plus_pos = lines[plus_line].find('+')\n+    # Allow small difference but not the large offset seen in buggy output\n+    assert abs(x_pos - plus_pos) <= 1, \\\n+        f\"Sum and addition not aligned: x at {x_pos}, + at {plus_pos}\"\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Tests the Sum pretty print centering bug (the `x` and `+ 3` should be aligned in `Sum(x, (x, 1, oo)) + 3`)\n2. Uses a different angle than the original test\n3. Must FAIL on the buggy code and PASS after the fix\n\nThe bug causes a ValueError when trying to print `Sum(x, (x, 1, oo)) + 3` due to incorrect baseline alignment calculations. Let me create a test that specifically targets this scenario.\n\n```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -4851,3 +4851,19 @@ def test_imaginary_unit():\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n \n+\n+def test_sweb_enhanced_sum_centering():\n+    # Test for issue where Sum + constant has misaligned pretty printing\n+    # The x and + 3 should be aligned in: Sum(x, (x, 1, oo)) + 3\n+    # This triggers the ValueError about 'Name node can't be used with False constant'\n+    # in the buggy code due to incorrect baseline alignment calculation\n+    expr = Sum(x, (x, 1, oo)) + 3\n+    result = upretty(expr)\n+    lines = result.split('\\n')\n+    # The sum expression and the +3 should be vertically aligned\n+    # Find the line with 'x' from Sum and the line with '+' from addition\n+    x_line = None\n+    plus_line = None\n+    for i, line in enumerate(lines):\n+        if 'x' in line and '=' in line:\n+            x_line = i\n+        if '+' in line and '3' in line:\n+            plus_line = i\n+    # Both should exist and be aligned (same column for the key content)\n+    assert x_line is not None, \"Sum variable not found in output\"\n+    assert plus_line is not None, \"Addition operand not found in output\"\n+    # The x from Sum and the + from addition should be at similar horizontal position\n+    # Check that the '+' is not significantly to the right of 'x'\n+    x_pos = lines[x_line].find('x') if 'x' in lines[x_line] else 0\n+    plus_pos = lines[plus_line].find('+')\n+    # Allow small difference but not the large offset seen in buggy output\n+    assert abs(x_pos - plus_pos) <= 1, \\\n+        f\"Sum and addition not aligned: x at {x_pos}, + at {plus_pos}\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sum_centering"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sum_centering"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Sum pretty print term alignment with addition",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that Sum pretty printing correctly aligns terms when the Sum is added to another expression",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_sum_alignment"
+      ],
+      "covers_original_tests": [
+        "test_pretty_sum"
+      ],
+      "covers_obligations": [
+        "test_pretty_sum::core"
+      ],
+      "target_source_symbol": "sympy.printing.pretty.pretty.PrettyPrinter._print_Sum",
+      "target_validation_subject": "alignment of function term with sum sign when Sum is added to another expression",
+      "semantic_alignment_tokens": [
+        "Sum",
+        "pretty",
+        "_print_Sum",
+        "pprint"
+      ],
+      "trigger_shape_tokens": [
+        "Sum(x, (x, 1, oo)) + 3",
+        "pprint(Sum(...) + ...)"
+      ],
+      "rationale": "The original test_pretty_sum fails because the alignment between the summed term (x) and the added expression (+3) is incorrect. This test directly verifies that when a Sum is combined with addition, the pretty-printed output shows proper vertical alignment of terms. The bug manifests as misaligned output where 'x' and '+ 3' appear at different vertical positions. This test differs from the original by explicitly checking the alignment property rather than relying on string matching of the entire output."
+    },
+    "patch": "Looking at the problem, I need to create an enhanced test that:\n1. Tests the Sum pretty printing alignment issue (the bug is that `x` and `+ 3` are misaligned when `Sum(x, (x, 1, oo)) + 3` is printed)\n2. Uses a different observation angle than the original test\n3. Must FAIL on the buggy code and PASS after the fix\n\nLet me first examine the test file to understand the structure and find where to add the new test.\n<minimax:tool_call>\n<invoke name=\"grep\">\n<parameter name=\"path\">/testbed/sympy/printing/pretty/tests/test_pretty.py</parameter>\n<parameter name=\"pattern\">def test_pretty_sum</parameter>\n</invoke>\n</minimax:tool_call>\n",
+    "raw_response": "\n\nLooking at the problem, I need to create an enhanced test that:\n1. Tests the Sum pretty printing alignment issue (the bug is that `x` and `+ 3` are misaligned when `Sum(x, (x, 1, oo)) + 3` is printed)\n2. Uses a different observation angle than the original test\n3. Must FAIL on the buggy code and PASS after the fix\n\nLet me first examine the test file to understand the structure and find where to add the new test.\n<minimax:tool_call>\n<invoke name=\"grep\">\n<parameter name=\"path\">/testbed/sympy/printing/pretty/tests/test_pretty.py</parameter>\n<parameter name=\"pattern\">def test_pretty_sum</parameter>\n</invoke>\n</minimax:tool_call>",
+    "identifiers": [],
+    "enhanced_identifiers": [],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Sum pretty print baseline adjustment with Add operand",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that Sum expression combined with Add (e.g., Sum + 3) produces correctly centered output without ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_sum_centering_add"
+      ],
+      "covers_original_tests": [
+        "test_pretty_sum"
+      ],
+      "covers_obligations": [
+        "test_pretty_sum::core"
+      ],
+      "target_source_symbol": "sympy.printing.pretty.pretty.PrettyPrinter._print_Sum",
+      "target_validation_subject": "baseline calculation for Sum combined with Add",
+      "semantic_alignment_tokens": [
+        "Sum",
+        "_print_Sum",
+        "baseline",
+        "prettyForm"
+      ],
+      "trigger_shape_tokens": [
+        "Sum(",
+        "+",
+        "pprint",
+        "baseline"
+      ],
+      "rationale": "The original test_pretty_sum fails with ValueError when printing Sum(x, (x, 1, oo)) + 3. This test directly exercises the same code path - the _print_Sum method's baseline adjustment logic when the Sum function is combined with an Add expression. The test verifies that the baseline calculation produces valid output without raising ValueError: 'Name node can't be used with False constant'. This is distinct from the original test because it focuses specifically on the baseline adjustment bug that causes the ValueError, rather than just checking the visual output alignment."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -319,2 +319,29 @@ def test_imaginary_unit():\n     raises(TypeError, lambda: pretty(I, imaginary_unit=I))\n     raises(ValueError, lambda: pretty(I, imaginary_unit=\"kkk\"))\n+\n+\n+def test_sweb_enhanced_sum_centering_add():\n+    # Test for issue 16503: Bad centering for Sum pretty print\n+    # When Sum is combined with Add (e.g., Sum + 3), the baseline calculation\n+    # in _print_Sum must correctly center the Sum without raising ValueError.\n+    # This test specifically targets the baseline adjustment logic that fails\n+    # when Sum is an operand in an Add expression.\n+    from sympy.printing.pretty.pretty import PrettyPrinter\n+    \n+    # Create a Sum expression combined with Add\n+    expr = Sum(x, (x, 1, oo)) + 3\n+    \n+    # Get the pretty printer and directly call _print_Sum to test\n+    # the baseline calculation path\n+    printer = PrettyPrinter()\n+    \n+    # This should not raise ValueError: \"Name node can't be used with 'False' constant\"\n+    # The bug is in the baseline calculation when Sum is combined with Add\n+    result = printer.doprint(expr)\n+    \n+    # Verify the output is valid (non-empty string)\n+    assert isinstance(result, str)\n+    assert len(result) > 0\n+    # The Sum and the + 3 should both be visible in the output\n+    assert '3' in result\n+    assert 'x' in result\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Triggers the same bug as `test_pretty_sum` (bad centering for Sum pretty print)\n2. Uses a different observation angle - specifically testing the baseline calculation when Sum is combined with Add\n3. Must FAIL on the buggy code and PASS after the fix\n\nLet me first examine the exact failure to understand what triggers the bug:\n\n```python\n# The bug is triggered when printing Sum(x, (x, 1, oo)) + 3\n# The baseline calculation in _print_Sum causes ValueError\n```\n\nNow I'll create the enhanced test:\n```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -319,0 +320,25 @@ def test_imaginary_unit():\n     raises(TypeError, lambda: pretty(I, imaginary_unit=I))\n     raises(ValueError, lambda: pretty(I, imaginary_unit=\"kkk\"))\n+\n+\n+def test_sweb_enhanced_sum_centering_add():\n+    # Test for issue 16503: Bad centering for Sum pretty print\n+    # When Sum is combined with Add (e.g., Sum + 3), the baseline calculation\n+    # in _print_Sum must correctly center the Sum without raising ValueError.\n+    # This test specifically targets the baseline adjustment logic that fails\n+    # when Sum is an operand in an Add expression.\n+    from sympy.printing.pretty.pretty import PrettyPrinter\n+    \n+    # Create a Sum expression combined with Add\n+    expr = Sum(x, (x, 1, oo)) + 3\n+    \n+    # Get the pretty printer and directly call _print_Sum to test\n+    # the baseline calculation path\n+    printer = PrettyPrinter()\n+    \n+    # This should not raise ValueError: \"Name node can't be used with 'False' constant\"\n+    # The bug is in the baseline calculation when Sum is combined with Add\n+    result = printer.doprint(expr)\n+    \n+    # Verify the output is valid (non-empty string)\n+    assert isinstance(result, str)\n+    assert len(result) > 0\n+    # The Sum and the + 3 should both be visible in the output\n+    assert '3' in result\n+    assert 'x' in result\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sum_centering_add"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sum_centering_add"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

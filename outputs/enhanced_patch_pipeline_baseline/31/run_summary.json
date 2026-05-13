@@ -1,0 +1,294 @@
+[
+  {
+    "instance_id": "sympy__sympy-16106",
+    "repo": "sympy/sympy",
+    "model": "minimax-m2.5",
+    "pipeline_mode": "baseline_only",
+    "hide_original_test_patch_in_repair": true,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "baseline_fallback",
+    "original_test_identifiers": [
+      "test_print_IndexedBase"
+    ],
+    "original_status_counts": {
+      "FAILED": 21,
+      "PASSED": 55
+    },
+    "original_failed_count": 21,
+    "original_passed_count": 55,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_print_IndexedBase"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_print_IndexedBase"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/printing/tests/test_mathml.py:test_print_intervals",
+        "sympy/printing/tests/test_mathml.py:test_print_Abs",
+        "sympy/printing/tests/test_mathml.py:test_print_Determinant",
+        "sympy/printing/tests/test_mathml.py:test_mat_delim_print",
+        "sympy/printing/tests/test_mathml.py:test_print_set_frozenset"
+      ],
+      "failure_mode": "assertion_error",
+      "dominant_errors": [
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_print_IndexedBase F",
+        "___________ sympy/printing/tests/test_mathml.py:test_print_intervals ___________",
+        "Traceback (most recent call last):"
+      ],
+      "noise_ratio": 0.0045,
+      "target_test_tracebacks": {
+        "test_print_IndexedBase": "TARGET TEST: test_print_IndexedBase\n- snippet: test_print_IndexedBase F\n- snippet: ___________ sympy/printing/tests/test_mathml.py:test_print_intervals ___________\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_print_IndexedBase F\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\n__________ sympy/printing/tests/test_mathml.py:test_print_IndexedBase __________"
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 7,
+      "keep_top_k": 4,
+      "attempt_budget": 4,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "assertion_error",
+      "noise_ratio": 0.0045,
+      "difficulty": "high"
+    },
+    "adaptive_num_candidates": 7,
+    "adaptive_keep_top_k": 4,
+    "adaptive_attempt_budget": 4,
+    "enhanced_candidates_total": 0,
+    "kept_enhanced_candidates": 0,
+    "enhanced_candidate_retention_rate": 0.0,
+    "enhanced_generation_attempts_total": 0,
+    "enhanced_generation_attempts_avg": 0.0,
+    "kept_enhanced_test_identifiers": [],
+    "enhanced_failed_test_identifiers": [],
+    "enhanced_failed_count": 0,
+    "generated_patch_nonempty": false,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 9,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_not_generated",
+    "generated_patch_feedback": "The patch did not target the expected file sympy/printing/mathml.py.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The MathML printer lacks handlers for `Indexed` and `IndexedBase` classes. When printing an `Indexed` object, the printer falls back to `_print_Basic` which attempts to iterate over the object directly (`for arg in e:`), but `Indexed` objects are not directly iterable, causing a TypeError.",
+      "affected_components": [
+        {
+          "file": "sympy/printing/mathml.py",
+          "symbol": "MathMLContentPrinter",
+          "reason": "Missing _print_Indexed and _print_IndexedBase methods to handle indexed expressions"
+        },
+        {
+          "file": "sympy/printing/mathml.py",
+          "symbol": "MathMLPresentationPrinter",
+          "reason": "Missing _print_Indexed and _print_IndexedBase methods to handle indexed expressions"
+        },
+        {
+          "file": "sympy/printing/mathml.py",
+          "symbol": "_print_Basic",
+          "reason": "Fallback method that incorrectly assumes all objects are iterable via `for arg in e`"
+        }
+      ],
+      "failing_signal": "TypeError: 'Indexed' object is not iterable when calling sympy.printing.mathml(sympy.IndexedBase(a)[b])",
+      "propagation_path": "1. User calls mathml(IndexedBase(a)[b])\n2. Printer._print finds no _print_Indexed method\n3. Falls back to _print_Basic\n4. _print_Basic tries `for arg in e:` which iterates the object directly\n5. Indexed is not iterable, raises TypeError",
+      "repair_constraint": "The fix must add proper handlers for Indexed and IndexedBase that use e.args or e.base/e.indices rather than trying to iterate the object directly. The output must be valid MathML that represents the indexed expression.",
+      "suggested_repair_scope": [
+        "sympy/printing/mathml.py"
+      ],
+      "suspicious_symbols": [
+        "Indexed",
+        "IndexedBase",
+        "_print_Basic",
+        "MathMLContentPrinter",
+        "MathMLPresentationPrinter"
+      ],
+      "repair_obligations": [
+        {
+          "id": "RO-1",
+          "source_symbol": "MathMLContentPrinter",
+          "validation_subject": "_print_Indexed method",
+          "why_it_matters": "Content MathML needs a handler for Indexed expressions to avoid falling back to _print_Basic which tries to iterate the non-iterable Indexed object"
+        },
+        {
+          "id": "RO-2",
+          "source_symbol": "MathMLContentPrinter",
+          "validation_subject": "_print_IndexedBase method",
+          "why_it_matters": "Content MathML needs a handler for IndexedBase to properly print the base symbol of indexed expressions"
+        },
+        {
+          "id": "RO-3",
+          "source_symbol": "MathMLPresentationPrinter",
+          "validation_subject": "_print_Indexed method",
+          "why_it_matters": "Presentation MathML needs a handler for Indexed expressions to avoid falling back to _print_Basic which tries to iterate the non-iterable Indexed object"
+        },
+        {
+          "id": "RO-4",
+          "source_symbol": "MathMLPresentationPrinter",
+          "validation_subject": "_print_IndexedBase method",
+          "why_it_matters": "Presentation MathML needs a handler for IndexedBase to properly print the base symbol of indexed expressions"
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Add MathML printers for Indexed and IndexedBase",
+      "approach": "Add _print_Indexed and _print_IndexedBase methods to both MathMLContentPrinter and MathMLPresentationPrinter classes. These methods should properly access the base and indices via e.base and e.indices rather than trying to iterate the object directly. For presentation MathML, use <msub> elements to represent subscript notation. For content MathML, use appropriate constructs like <selector> or similar.",
+      "edit_targets": [
+        "sympy/printing/mathml.py::MathMLContentPrinter",
+        "sympy/printing/mathml.py::MathMLPresentationPrinter"
+      ],
+      "dependency_files": [
+        "sympy/tensor/indexed.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [],
+      "sufficiency_assessment": "The fix requires adding handlers to both MathMLContentPrinter and MathMLPresentationPrinter classes. The Indexed class has .base and .indices attributes that should be used instead of trying to iterate the object. No other files need modification as this is a self-contained printer issue.",
+      "risks": [
+        "Ensure the generated MathML is valid and follows the MathML specification",
+        "Handle multiple indices correctly (e.g., a[i,j] or a[i][j])",
+        "Ensure backward compatibility with existing MathML output"
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/printing/mathml.py::MathMLContentPrinter",
+          "action": "modify_region",
+          "justification": "Missing _print_Indexed and _print_IndexedBase methods cause fallback to _print_Basic which tries to iterate non-iterable Indexed object, raising TypeError"
+        },
+        {
+          "target_file": "sympy/printing/mathml.py::MathMLPresentationPrinter",
+          "action": "modify_region",
+          "justification": "Missing _print_Indexed and _print_IndexedBase methods cause fallback to _print_Basic which tries to iterate non-iterable Indexed object, raising TypeError"
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "sympy/printing/mathml.py",
+          "target_symbol": "MathMLContentPrinter",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "RO-1",
+            "RO-2"
+          ],
+          "anchor_line_before": "    printmethod = \"_mathml_content\"",
+          "anchor_line_after": "    def mathml_tag(self, e):",
+          "replacement_block": "    printmethod = \"_mathml_content\"\n\n    def _print_IndexedBase(self, e):\n        base = self._print(e.base)\n        return base\n\n    def _print_Indexed(self, e):\n        base = self._print(e.base)\n        indices = [self._print(i) for i in e.indices]\n        x = self.dom.createElement('apply')\n        selector = self.dom.createElement('selector')\n        x.appendChild(selector)\n        x.appendChild(base)\n        for idx in indices:\n            x.appendChild(idx)\n        return x\n\n    def mathml_tag(self, e):"
+        },
+        {
+          "target_file": "sympy/printing/mathml.py",
+          "target_symbol": "MathMLPresentationPrinter",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "RO-3",
+            "RO-4"
+          ],
+          "anchor_line_before": "    printmethod = \"_mathml_presentation\"",
+          "anchor_line_after": "    def mathml_tag(self, e):",
+          "replacement_block": "    printmethod = \"_mathml_presentation\"\n\n    def _print_IndexedBase(self, e):\n        base = self._print(e.base)\n        return base\n\n    def _print_Indexed(self, e):\n        base = self._print(e.base)\n        indices = [self._print(i) for i in e.indices]\n        x = self.dom.createElement('msub')\n        x.appendChild(base)\n        if len(indices) == 1:\n            x.appendChild(indices[0])\n        else:\n            row = self.dom.createElement('mrow')\n            for idx in indices:\n                if row.childNodes.length > 0:\n                    sep = self.dom.createElement('mo')\n                    sep.appendChild(self.dom.createTextNode(','))\n                    row.appendChild(sep)\n                row.appendChild(idx)\n            x.appendChild(row)\n        return x\n\n    def mathml_tag(self, e):"
+        }
+      ]
+    },
+    "final_patch_attempted": false,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": false,
+    "final_patch_apply_mode": "no_patch",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 21,
+      "PASSED": 55
+    },
+    "final_failed_count": 21,
+    "final_passed_count": 55,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/printing/tests/test_mathml.py:test_print_intervals": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_Abs": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_Determinant": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_mat_delim_print": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_set_frozenset": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_FiniteSet": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_SetOp": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_floor": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_ceiling": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_IndexedBase": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_Indexed": "FAILED",
+      "test_mathml_printer": "PASSED",
+      "test_content_printmethod": "PASSED",
+      "test_content_mathml_core": "PASSED",
+      "test_content_mathml_functions": "PASSED",
+      "test_content_mathml_limits": "PASSED",
+      "test_content_mathml_integrals": "PASSED",
+      "test_content_mathml_matrices": "PASSED",
+      "test_content_mathml_sums": "PASSED",
+      "test_content_mathml_tuples": "PASSED",
+      "test_content_mathml_add": "PASSED",
+      "test_content_mathml_Rational": "PASSED",
+      "test_content_mathml_constants": "PASSED",
+      "test_content_mathml_trig": "PASSED",
+      "test_content_mathml_relational": "PASSED",
+      "test_content_symbol": "PASSED",
+      "test_content_mathml_greek": "PASSED",
+      "test_content_mathml_order": "PASSED",
+      "test_content_settings": "PASSED",
+      "test_presentation_printmethod": "PASSED",
+      "test_presentation_mathml_core": "PASSED",
+      "test_presentation_mathml_functions": "PASSED",
+      "test_print_derivative": "PASSED",
+      "test_presentation_mathml_limits": "PASSED",
+      "test_presentation_mathml_integrals": "PASSED",
+      "test_presentation_mathml_matrices": "PASSED",
+      "test_presentation_mathml_sums": "PASSED",
+      "test_presentation_mathml_add": "PASSED",
+      "test_presentation_mathml_Rational": "PASSED",
+      "test_presentation_mathml_constants": "PASSED",
+      "test_presentation_mathml_trig": "PASSED",
+      "test_presentation_mathml_relational": "PASSED",
+      "test_presentation_symbol": "PASSED",
+      "test_presentation_mathml_greek": "PASSED",
+      "test_presentation_mathml_order": "PASSED",
+      "test_print_intervals": "FAILED",
+      "test_print_tuples": "PASSED",
+      "test_print_re_im": "PASSED",
+      "test_print_Abs": "FAILED",
+      "test_print_Determinant": "FAILED",
+      "test_presentation_settings": "PASSED",
+      "test_toprettyxml_hooking": "PASSED",
+      "test_print_domains": "PASSED",
+      "test_print_expression_with_minus": "PASSED",
+      "test_print_AssocOp": "PASSED",
+      "test_print_basic": "PASSED",
+      "test_mat_delim_print": "FAILED",
+      "test_ln_notation_print": "PASSED",
+      "test_mul_symbol_print": "PASSED",
+      "test_print_lerchphi": "PASSED",
+      "test_print_polylog": "PASSED",
+      "test_print_set_frozenset": "FAILED",
+      "test_print_FiniteSet": "FAILED",
+      "test_print_SetOp": "FAILED",
+      "test_print_logic": "PASSED",
+      "test_root_notation_print": "PASSED",
+      "test_fold_frac_powers_print": "PASSED",
+      "test_fold_short_frac_print": "PASSED",
+      "test_print_factorials": "PASSED",
+      "test_print_floor": "FAILED",
+      "test_print_ceiling": "FAILED",
+      "test_print_Lambda": "PASSED",
+      "test_print_conjugate": "PASSED",
+      "test_print_matrix_symbol": "PASSED",
+      "test_print_random_symbol": "PASSED",
+      "test_print_IndexedBase": "FAILED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

@@ -1,0 +1,11 @@
+
+
+Looking at the bug, I need to find the `_print_Poly` method in `sympy/printing/latex.py` and fix it to use the same term ordering as the str and pretty printers.
+
+Let me first find the exact location of the `_print_Poly` method in the latex.py file:
+<minimax:tool_call>
+<invoke name="grep">
+<parameter name="pattern">def _print_Poly</parameter>
+<parameter name="path">/testbed/sympy/printing/latex.py</parameter>
+</invoke>
+</minimax:tool_call>

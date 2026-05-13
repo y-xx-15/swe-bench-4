@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/polys/polyoptions.py",
+      "action": "modify_region",
+      "justification": "The Domain class's preprocess() method contains the regex that rejects 'RR[y,z]' and similar valid domain specifications. The _re_polynomial pattern only matches ground domains Z/ZZ/Q/QQ, so RR[y,z] falls through all checks and raises OptionError."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/polys/polyoptions.py",
+      "target_symbol": "Domain",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "1",
+        "2"
+      ],
+      "anchor_line_before": "    _re_polynomial = re.compile(r\"^(Z|ZZ|Q|QQ)\\[(.+)\\]$)\")",
+      "anchor_line_after": "    @classmethod",
+      "replacement_block": "    _re_polynomial = re.compile(r\"^(Z|ZZ|Q|QQ|R|RR|C|CC)\\[(.+)\\]$)\")\n    _re_fraction = re.compile(r\"^(Z|ZZ|Q|QQ)\\((.+)\\)$\")\n    _re_algebraic = re.compile(r\"^(Q|QQ)\\ <(.+)\\>$\")\n\n    @classmethod\n    def preprocess(cls, domain):\n        if isinstance(domain, sympy.polys.domains.Domain):\n            return domain\n        elif hasattr(domain, 'to_domain'):\n            return domain.to_domain()\n        elif isinstance(domain, string_types):\n            if domain in ['Z', 'ZZ']:\n                return sympy.polys.domains.ZZ\n\n            if domain in ['Q', 'QQ']:\n                return sympy.polys.domains.QQ\n\n            if domain == 'EX':\n                return sympy.polys.domains.EX\n\n            r = cls._re_realfield.match(domain)\n\n            if r is not None:\n                _, _, prec = r.groups()\n\n                if prec is None:\n                    return sympy.polys.domains.RR\n                else:\n                    return sympy.polys.domains.RealField(int(prec))\n\n            r = cls._re_complexfield.match(domain)\n\n            if r is not None:\n                _, _, prec = r.groups()\n\n                if prec is None:\n                    return sympy.polys.domains.CC\n                else:\n                    return sympy.polys.domains.ComplexField(int(prec))\n\n            r = cls._re_polynomial.match(domain)\n\n            if r is not None:\n                ground, gens = r.groups()\n\n                if ground in ['Z', 'ZZ']:\n                    return sympy.polys.domains.ZZ.poly_ring(*gens.split(','))\n                elif ground in ['Q', 'QQ']:\n                    return sympy.polys.domains.QQ.poly_ring(*gens.split(','))\n                elif ground in ['R', 'RR']:\n                    return sympy.polys.domains.RR.poly_ring(*gens.split(','))\n                elif ground in ['C', 'CC']:\n                    return sympy.polys.domains.CC.poly_ring(*gens.split(','))\n\n            r = cls._re_fraction.match(domain)\n\n            if r is not None:\n                ground, gens = r.groups()\n\n                if ground in ['Z', 'ZZ']:\n                    return sympy.polys.domains.ZZ.fraction_field(*gens.split(','))\n                elif ground in ['Q', 'QQ']:\n                    return sympy.polys.domains.QQ.fraction_field(*gens.split(','))\n\n            r = cls._re_algebraic.match(domain)\n\n            if r is not None:\n                ground, gens = r.groups()\n\n                if ground == 'Q':\n                    return sympy.polys.domains.QQ.algebraic_field(*gens.split(','))\n\n        raise OptionError('expected a valid domain specification, got %s' % domain)"
+    }
+  ]
+}

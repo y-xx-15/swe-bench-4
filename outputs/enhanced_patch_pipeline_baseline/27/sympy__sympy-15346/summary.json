@@ -1,0 +1,216 @@
+{
+  "instance_id": "sympy__sympy-15346",
+  "repo": "sympy/sympy",
+  "model": "minimax-m2.5",
+  "pipeline_mode": "baseline_only",
+  "hide_original_test_patch_in_repair": true,
+  "disable_semantic_bucket_guidance": false,
+  "disable_enhanced_test_filtering": false,
+  "repair_mode": "baseline_fallback",
+  "original_test_identifiers": [
+    "test_issue_15129_trigsimp_methods"
+  ],
+  "original_status_counts": {
+    "FAILED": 2,
+    "PASSED": 22
+  },
+  "original_failed_count": 2,
+  "original_passed_count": 22,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_issue_15129_trigsimp_methods"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_issue_15129_trigsimp_methods"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods",
+      "test_issue_15129_trigsimp_methods"
+    ],
+    "failure_mode": "assertion_error",
+    "dominant_errors": [
+      "AssertionError"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "test_issue_15129_trigsimp_methods F",
+      "___ sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods ____",
+      "Traceback (most recent call last):"
+    ],
+    "noise_ratio": 0.0058,
+    "target_test_tracebacks": {
+      "test_issue_15129_trigsimp_methods": "TARGET TEST: test_issue_15129_trigsimp_methods\n- snippet: test_issue_15129_trigsimp_methods F\n- snippet: ___ sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods ____\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_issue_15129_trigsimp_methods F\n___ sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods ____\nTraceback (most recent call last):\n  File \"/testbed/sympy/simplify/tests/test_trigsimp.py\", line 367, in test_issue_15129_trigsimp_methods\nAssertionError\n== tests finished: 23 passed, 1 failed, 1 expected to fail, in 74.48 seconds ==="
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 3,
+    "keep_top_k": 2,
+    "attempt_budget": 3,
+    "bucket_limit": 3,
+    "template_limit": 3,
+    "failure_mode": "assertion_error",
+    "noise_ratio": 0.0058,
+    "difficulty": "low"
+  },
+  "adaptive_num_candidates": 3,
+  "adaptive_keep_top_k": 2,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 0,
+  "kept_enhanced_candidates": 0,
+  "enhanced_candidate_retention_rate": 0.0,
+  "enhanced_generation_attempts_total": 0,
+  "enhanced_generation_attempts_avg": 0.0,
+  "kept_enhanced_test_identifiers": [],
+  "enhanced_failed_test_identifiers": [],
+  "enhanced_failed_count": 0,
+  "generated_patch_nonempty": false,
+  "generated_patch_error": "anchor_line_before was not found before anchor_line_after in the target file.",
+  "generated_patch_attempts": 6,
+  "generated_patch_accepted": false,
+  "generated_patch_acceptance_reason": "rejected_not_generated",
+  "generated_patch_feedback": "anchor_line_before was not found before anchor_line_after in the target file.",
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [],
+  "patch_analysis": {
+    "root_cause": "The trigsimp function fails to simplify sin/cos expressions with Rational arguments because the pattern matching in __trigsimp does not properly handle Rational arguments. Specifically, when sin/cos have Rational arguments like Rational(1, 50), the code fails to recognize and apply trigonometric identities like cos(a-b) = cos(a)cos(b) + sin(a)sin(b).",
+    "affected_components": [
+      {
+        "file": "sympy/simplify/trigsimp.py",
+        "symbol": "__trigsimp",
+        "reason": "Main recursive trig simplification function that applies pattern matching. It fails to match patterns when arguments are Rational numbers instead of symbols."
+      },
+      {
+        "file": "sympy/simplify/trigsimp.py",
+        "symbol": "_trigsimp",
+        "reason": "Entry point that checks if expression has trigonometric functions using expr.has(*_trigs), which may not properly detect Rational-containing trig expressions"
+      },
+      {
+        "file": "sympy/simplify/trigsimp.py",
+        "symbol": "matchers_add",
+        "reason": "Contains patterns like c*cos(a)*cos(b) + c*sin(a)*sin(b) -> cos(a-b) that fail to match when a,b are Rational"
+      }
+    ],
+    "failing_signal": "AssertionError in test_issue_15129_trigsimp_methods - the test expects sin(Rational(1,50))*sin(Rational(1,25)) + cos(Rational(1,50))*cos(Rational(1,25)) to simplify to cos(Rational(1,50) - Rational(1,25)) but it remains unchanged",
+    "propagation_path": "When trigsimp is called on an Add expression containing sin/cos with Rational arguments, the pattern matching in __trigsimp fails to find matches because the Wild patterns (a,b,c,d) don't capture Rational arguments properly, or the _dotrig check fails. The expression is returned unchanged.",
+    "repair_constraint": "The fix must preserve all existing trigsimp behavior for symbolic arguments while adding support for Rational arguments. The mathematical identity cos(a-b) = cos(a)cos(b) + sin(a)sin(b) must work for Rational arguments.",
+    "suggested_repair_scope": [
+      "sympy/simplify/trigsimp.py"
+    ],
+    "suspicious_symbols": [
+      "__trigsimp",
+      "_trigsimp",
+      "_dotrig",
+      "matchers_add",
+      "matchers_identity",
+      "TrigonometricFunction",
+      "HyperbolicFunction"
+    ],
+    "repair_obligations": [
+      {
+        "id": "oblig_1",
+        "source_symbol": "__trigsimp",
+        "validation_subject": "sin(Rational(1,50))*sin(Rational(1,25)) + cos(Rational(1,50))*cos(Rational(1,25))",
+        "why_it_matters": "This expression should simplify to cos(Rational(1,50) - Rational(1,25)) using the identity cos(a-b)=cos(a)cos(b)+sin(a)sin(b)"
+      },
+      {
+        "id": "oblig_2",
+        "source_symbol": "_dotrig",
+        "validation_subject": "expressions with Rational trig arguments",
+        "why_it_matters": "The _dotrig helper must correctly identify that both operands have trigonometric functions of the same type"
+      },
+      {
+        "id": "oblig_3",
+        "source_symbol": "matchers_add",
+        "validation_subject": "c*cos(a)*cos(b) + c*sin(a)*sin(b) pattern",
+        "why_it_matters": "This pattern must match when a and b are Rational numbers, not just symbols"
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Fix _dotrig to handle Add expressions with mixed trig functions",
+    "approach": "The bug is in the `_dotrig` helper function which checks if two expressions have the same types of trigonometric functions. It currently compares `a.func == b.func`, which fails for Add expressions containing different trig functions (sin vs cos). For the pattern `c*cos(a)*cos(b) + c*sin(a)*sin(b) + d` against an expression like `sin(r1)*sin(r2) + cos(r1)*cos(r2)`, the pattern's func is Add but the expression's func is also Add, so `a.func == b.func` passes. However, the inner check `a.has(TrigonometricFunction) and b.has(TrigonometricFunction)` returns True for both, but doesn't verify that BOTH sin AND cos are present in the pattern match. The fix should modify `_dotrig` to properly check if the expression contains the necessary trig function types for the pattern to match.",
+    "edit_targets": [
+      "sympy/simplify/trigsimp.py::_dotrig"
+    ],
+    "dependency_files": [
+      "sympy/simplify/trigsimp.py",
+      "sympy/simplify/tests/test_trigsimp.py"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [],
+    "sufficiency_assessment": "The primary fix in `_dotrig` should be sufficient because it controls whether pattern matching is even attempted. Once `_dotrig` correctly identifies that an Add containing both sin and cos terms can match a pattern requiring both sin and cos, the existing pattern matching logic in `__trigsimp` should handle the rest. The matchers_add patterns already contain the correct transformations like `c*cos(a)*cos(b) + c*sin(a)*sin(b) + d -> cos(a-b)*c + d`.",
+    "risks": [
+      "Changing _dotrig could affect other trigsimp patterns - need to ensure it doesn't cause false positives that match patterns inappropriately",
+      "The fix must preserve existing behavior for symbolic arguments"
+    ]
+  },
+  "patch_edit_plan": {
+    "coverage_check": [
+      {
+        "target_file": "sympy/simplify/trigsimp.py",
+        "action": "modify_region",
+        "justification": "The _dotrig function is the root cause - it incorrectly rejects valid pattern matches when comparing Add expressions with different inner trig function types. The fix must allow pattern matching to proceed when both expression and pattern contain the required trig functions (sin and cos for the cos(a-b) identity)."
+      }
+    ],
+    "edits": [
+      {
+        "target_file": "sympy/simplify/trigsimp.py",
+        "target_symbol": "_dotrig",
+        "replacement_mode": "replace_span",
+        "covers_obligations": [
+          "oblig_1",
+          "oblig_2",
+          "oblig_3"
+        ],
+        "anchor_line_before": "def _dotrig(a, b):",
+        "anchor_line_after": "def _dotrig(a, b):",
+        "replacement_block": "def _dotrig(a, b):\n    \"\"\"Helper to tell whether ``a`` and ``b`` have the same sorts\n    of symbols in them -- no need to test hyperbolic patterns against\n    expressions that have no hyperbolics in them.\"\"\"\n    if a.func == b.func:\n        # For Add expressions, check if both contain the same types of\n        # trig functions (sin/cos or sinh/cosh). This allows patterns like\n        # c*cos(a)*cos(b) + c*sin(a)*sin(b) to match expressions with\n        # Rational arguments.\n        if a.is_Add and b.is_Add:\n            a_trigs = {w.func for w in a.atoms(TrigonometricFunction, HyperbolicFunction)}\n            b_trigs = {w.func for w in b.atoms(TrigonometricFunction, HyperbolicFunction)}\n            return a_trigs and b_trigs and a_trigs == b_trigs\n        return (\n            a.has(TrigonometricFunction) and b.has(TrigonometricFunction) or\n            a.has(HyperbolicFunction) and b.has(HyperbolicFunction))\n    return False\n"
+      }
+    ]
+  },
+  "final_patch_attempted": false,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": false,
+  "final_patch_apply_mode": "no_patch",
+  "final_patch_cleanly_applied": false,
+  "clean_apply_ratio": 0.0,
+  "resolved": false,
+  "final_resolved": false,
+  "final_status_counts": {
+    "FAILED": 2,
+    "PASSED": 22
+  },
+  "final_failed_count": 2,
+  "final_passed_count": 22,
+  "original_passed_count_improvement": 0,
+  "original_failed_count_reduction": 0,
+  "final_status_map": {
+    "sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods": "FAILED",
+    "test_trigsimp1": "PASSED",
+    "test_trigsimp1a": "PASSED",
+    "test_trigsimp2": "PASSED",
+    "test_issue_4373": "PASSED",
+    "test_trigsimp3": "PASSED",
+    "test_issue_4661": "PASSED",
+    "test_issue_4494": "PASSED",
+    "test_issue_5948": "PASSED",
+    "test_issue_4775": "PASSED",
+    "test_issue_4280": "PASSED",
+    "test_issue_3210": "PASSED",
+    "test_trigsimp_issues": "PASSED",
+    "test_trigsimp_issue_2515": "PASSED",
+    "test_trigsimp_issue_3826": "PASSED",
+    "test_trigsimp_issue_4032": "PASSED",
+    "test_trigsimp_issue_7761": "PASSED",
+    "test_trigsimp_noncommutative": "PASSED",
+    "test_hyperbolic_simp": "PASSED",
+    "test_trigsimp_groebner": "PASSED",
+    "test_issue_2827_trigsimp_methods": "PASSED",
+    "test_issue_15129_trigsimp_methods": "FAILED",
+    "test_exptrigsimp": "PASSED",
+    "test_powsimp_on_numbers": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

@@ -1,0 +1,196 @@
+[
+  {
+    "idea": {
+      "title": "BlockMatrix symbolic index should not assume first block for unknown index",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that BlockMatrix._entry correctly handles symbolic indices that could refer to any block, rather than incorrectly assuming the index falls in the first block",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_block_symbolic_index"
+      ],
+      "covers_original_tests": [
+        "test_block_index_symbolic",
+        "test_block_index_symbolic_nonzero",
+        "test_block_index_large"
+      ],
+      "covers_obligations": [
+        "test_block_index_symbolic::core",
+        "test_block_index_symbolic_nonzero::core",
+        "test_block_index_large::core"
+      ],
+      "target_source_symbol": "BlockMatrix._entry",
+      "target_validation_subject": "symbolic index handling in _entry method",
+      "semantic_alignment_tokens": [
+        "BlockMatrix",
+        "_entry",
+        "rowblocksizes",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "BlockMatrix([[A], [B]])",
+        "[i, 0]",
+        "symbolic index"
+      ],
+      "rationale": "The original tests fail with AssertionError because the buggy _entry method uses '(i < numrows) != False' which treats symbolic indices incorrectly - it breaks on first block when the comparison returns a symbolic boolean instead of True. This enhanced test explicitly verifies that symbolic indices into multi-block matrices produce correct symbolic expressions that account for all possible blocks, not just the first one. The test creates a BlockMatrix with known first block size (1 row) and a second block with symbolic size (n rows), then asserts that C[i, 0] should NOT simplify to just A[i, 0] - it must remain unevaluated or properly handle the case where i could be >= 1."
+    },
+    "patch": "Looking at the problem, I need to create an enhanced test that:\n1. Starts with `test_sweb_enhanced_`\n2. Exposes the same bug (BlockMatrix symbolic index handling) through a different observation angle\n3. Must FAIL on the buggy code and PASS after the fix\n\nThe bug is that `BlockMatrix._entry` incorrectly handles symbolic indices - it uses `(i < numrows) != False` which breaks when the comparison returns a symbolic boolean.\n\nLet me create a test that specifically tests the exact scenario from the problem statement (vertical BlockMatrix with 1x1 first block and n x 1 second block, accessing with symbolic index `i`).\n<minimax:tool_call>\n<invoke name=\"diff\">\n<parameter name=\"diff_string\">diff --git a/sympy/matrices/expressions/tests/test_indexing.py b/sympy/matrices/expressions/tests/test_indexing.py\n--- a/sympy/matrices/expressions/tests/test_indexing.py\n+++ b/sympy/matrices/expressions/tests/test_indexing.py\n@@ -1,7 +1,7 @@\n from sympy import (symbols, MatrixSymbol, MatPow, BlockMatrix, KroneckerDelta,\n         Identity, ZeroMatrix, ImmutableMatrix, eye, Sum, Dummy, trace,\n         Symbol)\n-from sympy.testing.pytest import raises\n+from sympy.testing.pytest import raises, XFAIL\n from sympy.matrices.expressions.matexpr import MatrixElement, MatrixExpr\n \n k, l, m, n = symbols('k l m n', integer=True)\n@@ -83,6 +83,72 @@ def test_block_index():\n     assert BI.as_explicit().equals(eye(6))\n \n \n+def test_block_index_symbolic():\n+    # Note that these matrices may be zero-sized and indices may be negative, which causes\n+    # all naive simplifications given in the comments to be invalid\n+    A1 = MatrixSymbol('A1', n, k)\n+    A2 = MatrixSymbol('A2', n, l)\n+    A3 = MatrixSymbol('A3', m, k)\n+    A4 = MatrixSymbol('A4', m, l)\n+    A = BlockMatrix([[A1, A2], [A3, A4]])\n+    assert A[0, 0] == MatrixElement(A, 0, 0)  # Cannot be A1[0, 0]\n+    assert A[n - 1, k - 1] == A1[n - 1, k - 1]\n+    assert A[n, k] == A4[0, 0]\n+    assert A[n + m - 1, 0] == MatrixElement(A, n + m - 1, 0)  # Cannot be A3[m - 1, 0]\n+    assert A[0, k + l - 1] == MatrixElement(A, 0, k + l - 1)  # Cannot be A2[0, l - 1]\n+    assert A[n + m - 1, k + l - 1] == MatrixElement(A, n + m - 1, k + l - 1)  # Cannot be A4[m - 1, l - 1]\n+    assert A[i, j] == MatrixElement(A, i, j)\n+    assert A[n + i, k + j] == MatrixElement(A, n + i, k + j)  # Cannot be A4[i, j]\n+    assert A[n - i - 1, k - j - 1] == MatrixElement(A, n - i - 1, k - j - 1)  # Cannot be A1[n - i - 1, k - j - 1]\n+\n+\n+def test_block_index_symbolic_nonzero():\n+    # All invalid simplifications from test_block_index_symbolic() that become valid if all\n+    # matrices have nonzero size and all indices are nonnegative\n+    k, l, m, n = symbols('k l m n', integer=True, positive=True)\n+    i, j = symbols('i j', integer=True, nonnegative=True)\n+    A1 = MatrixSymbol('A1', n, k)\n+    A2 = MatrixSymbol('A2', n, l)\n+    A3 = MatrixSymbol('A3', m, k)\n+    A4 = MatrixSymbol('A4', m, l)\n+    A = BlockMatrix([[A1, A2], [A3, A4]])\n+    assert A[0, 0] == A1[0, 0]\n+    assert A[n + m - 1, 0] == A3[m - 1, 0]\n+    assert A[0, k + l - 1] == A2[0, l - 1]\n+    assert A[n + m - 1, k + l - 1] == A4[m - 1, l - 1]\n+    assert A[i, j] == MatrixElement(A, i, j)\n+    assert A[n + i, k + j] == A4[i, j]\n+    assert A[n - i - 1, k - j - 1] == A1[n - i - 1, k - j - 1]\n+    assert A[2 * n, 2 * k] == A4[n, k]\n+\n+\n+def test_block_index_large():\n+    n, m, k = symbols('n m k', integer=True, positive=True)\n+    i = symbols('i', integer=True, nonnegative=True)\n+    A1 = MatrixSymbol('A1', n, n)\n+    A2 = MatrixSymbol('A2', n, m)\n+    A3 = MatrixSymbol('A3', n, k)\n+    A4 = MatrixSymbol('A4', m, n)\n+    A5 = MatrixSymbol('A5', m, m)\n+    A6 = MatrixSymbol('A6', m, k)\n+    A7 = MatrixSymbol('A7', k, n)\n+    A8 = MatrixSymbol('A8', k, m)\n+    A9 = MatrixSymbol('A9', k, k)\n+    A = BlockMatrix([[A1, A2, A3], [A4, A5, A6], [A7, A8, A9]])\n+    assert A[n + i, n + i] == MatrixElement(A, n + i, n + i)\n+\n+\n+@XFAIL\n+def test_block_index_symbolic_fail():\n+    # To make this work, symbolic matrix dimensions would need to be somehow assumed nonnegative\n+    # even if the symbols aren't specified as such.  Then 2 * n < n would correctly evaluate to\n+    # False in BlockMatrix._entry()\n+    A1 = MatrixSymbol('A1', n, 1)\n+    A2 = MatrixSymbol('A2', m, 1)\n+    A = BlockMatrix([[A1], [A2]])\n+    assert A[2 * n, 0] == A2[n, 0]\n+\n+\n+def test_sweb_enhanced_block_symbolic_index():\n+    # Test the exact case from issue 19007: vertical BlockMatrix with 1x1 first block\n+    # and n x 1 second block, accessed with symbolic index i\n+    # The bug causes C[i, 0] to incorrectly simplify to (A)[i, 0] when it could\n+    # actually be from either A (if i == 0) or B (if i >= 1)\n+    n = symbols('n', integer=True)\n+    i = symbols('i', integer=True)\n+    A = MatrixSymbol('A', 1, 1)\n+    B = MatrixSymbol('B', n, 1)\n+    C = BlockMatrix([[A], [B]])\n+    # C[i, 0] should NOT simplify to A[i, 0] - it must remain unevaluated or\n+    # properly handle the case where i could refer to any block\n+    result = C[i, 0]\n+    # The result should NOT be A[i, 0] - that would be incorrect\n+    # It should either be MatrixElement(C, i, 0) or handle the symbolic index properly\n+    assert result != A[i, 0], \"BlockMatrix with symbolic index incorrectly simplified to first block element\"\n+    # More specifically, it should remain as a MatrixElement when index is truly symbolic\n+    assert result == MatrixElement(C, i, 0)\n+\n+\n def test_slicing():\n     A.as_explicit()[0, :]  # does not raise an error</parameter>\n</invoke>\n</minimax:tool_call>\n",
+    "raw_response": "\n\nLooking at the problem, I need to create an enhanced test that:\n1. Starts with `test_sweb_enhanced_`\n2. Exposes the same bug (BlockMatrix symbolic index handling) through a different observation angle\n3. Must FAIL on the buggy code and PASS after the fix\n\nThe bug is that `BlockMatrix._entry` incorrectly handles symbolic indices - it uses `(i < numrows) != False` which breaks when the comparison returns a symbolic boolean.\n\nLet me create a test that specifically tests the exact scenario from the problem statement (vertical BlockMatrix with 1x1 first block and n x 1 second block, accessing with symbolic index `i`).\n<minimax:tool_call>\n<invoke name=\"diff\">\n<parameter name=\"diff_string\">diff --git a/sympy/matrices/expressions/tests/test_indexing.py b/sympy/matrices/expressions/tests/test_indexing.py\n--- a/sympy/matrices/expressions/tests/test_indexing.py\n+++ b/sympy/matrices/expressions/tests/test_indexing.py\n@@ -1,7 +1,7 @@\n from sympy import (symbols, MatrixSymbol, MatPow, BlockMatrix, KroneckerDelta,\n         Identity, ZeroMatrix, ImmutableMatrix, eye, Sum, Dummy, trace,\n         Symbol)\n-from sympy.testing.pytest import raises\n+from sympy.testing.pytest import raises, XFAIL\n from sympy.matrices.expressions.matexpr import MatrixElement, MatrixExpr\n \n k, l, m, n = symbols('k l m n', integer=True)\n@@ -83,6 +83,72 @@ def test_block_index():\n     assert BI.as_explicit().equals(eye(6))\n \n \n+def test_block_index_symbolic():\n+    # Note that these matrices may be zero-sized and indices may be negative, which causes\n+    # all naive simplifications given in the comments to be invalid\n+    A1 = MatrixSymbol('A1', n, k)\n+    A2 = MatrixSymbol('A2', n, l)\n+    A3 = MatrixSymbol('A3', m, k)\n+    A4 = MatrixSymbol('A4', m, l)\n+    A = BlockMatrix([[A1, A2], [A3, A4]])\n+    assert A[0, 0] == MatrixElement(A, 0, 0)  # Cannot be A1[0, 0]\n+    assert A[n - 1, k - 1] == A1[n - 1, k - 1]\n+    assert A[n, k] == A4[0, 0]\n+    assert A[n + m - 1, 0] == MatrixElement(A, n + m - 1, 0)  # Cannot be A3[m - 1, 0]\n+    assert A[0, k + l - 1] == MatrixElement(A, 0, k + l - 1)  # Cannot be A2[0, l - 1]\n+    assert A[n + m - 1, k + l - 1] == MatrixElement(A, n + m - 1, k + l - 1)  # Cannot be A4[m - 1, l - 1]\n+    assert A[i, j] == MatrixElement(A, i, j)\n+    assert A[n + i, k + j] == MatrixElement(A, n + i, k + j)  # Cannot be A4[i, j]\n+    assert A[n - i - 1, k - j - 1] == MatrixElement(A, n - i - 1, k - j - 1)  # Cannot be A1[n - i - 1, k - j - 1]\n+\n+\n+def test_block_index_symbolic_nonzero():\n+    # All invalid simplifications from test_block_index_symbolic() that become valid if all\n+    # matrices have nonzero size and all indices are nonnegative\n+    k, l, m, n = symbols('k l m n', integer=True, positive=True)\n+    i, j = symbols('i j', integer=True, nonnegative=True)\n+    A1 = MatrixSymbol('A1', n, k)\n+    A2 = MatrixSymbol('A2', n, l)\n+    A3 = MatrixSymbol('A3', m, k)\n+    A4 = MatrixSymbol('A4', m, l)\n+    A = BlockMatrix([[A1, A2], [A3, A4]])\n+    assert A[0, 0] == A1[0, 0]\n+    assert A[n + m - 1, 0] == A3[m - 1, 0]\n+    assert A[0, k + l - 1] == A2[0, l - 1]\n+    assert A[n + m - 1, k + l - 1] == A4[m - 1, l - 1]\n+    assert A[i, j] == MatrixElement(A, i, j)\n+    assert A[n + i, k + j] == A4[i, j]\n+    assert A[n - i - 1, k - j - 1] == A1[n - i - 1, k - j - 1]\n+    assert A[2 * n, 2 * k] == A4[n, k]\n+\n+\n+def test_block_index_large():\n+    n, m, k = symbols('n m k', integer=True, positive=True)\n+    i = symbols('i', integer=True, nonnegative=True)\n+    A1 = MatrixSymbol('A1', n, n)\n+    A2 = MatrixSymbol('A2', n, m)\n+    A3 = MatrixSymbol('A3', n, k)\n+    A4 = MatrixSymbol('A4', m, n)\n+    A5 = MatrixSymbol('A5', m, m)\n+    A6 = MatrixSymbol('A6', m, k)\n+    A7 = MatrixSymbol('A7', k, n)\n+    A8 = MatrixSymbol('A8', k, m)\n+    A9 = MatrixSymbol('A9', k, k)\n+    A = BlockMatrix([[A1, A2, A3], [A4, A5, A6], [A7, A8, A9]])\n+    assert A[n + i, n + i] == MatrixElement(A, n + i, n + i)\n+\n+\n+@XFAIL\n+def test_block_index_symbolic_fail():\n+    # To make this work, symbolic matrix dimensions would need to be somehow assumed nonnegative\n+    # even if the symbols aren't specified as such.  Then 2 * n < n would correctly evaluate to\n+    # False in BlockMatrix._entry()\n+    A1 = MatrixSymbol('A1', n, 1)\n+    A2 = MatrixSymbol('A2', m, 1)\n+    A = BlockMatrix([[A1], [A2]])\n+    assert A[2 * n, 0] == A2[n, 0]\n+\n+\n+def test_sweb_enhanced_block_symbolic_index():\n+    # Test the exact case from issue 19007: vertical BlockMatrix with 1x1 first block\n+    # and n x 1 second block, accessed with symbolic index i\n+    # The bug causes C[i, 0] to incorrectly simplify to (A)[i, 0] when it could\n+    # actually be from either A (if i == 0) or B (if i >= 1)\n+    n = symbols('n', integer=True)\n+    i = symbols('i', integer=True)\n+    A = MatrixSymbol('A', 1, 1)\n+    B = MatrixSymbol('B', n, 1)\n+    C = BlockMatrix([[A], [B]])\n+    # C[i, 0] should NOT simplify to A[i, 0] - it must remain unevaluated or\n+    # properly handle the case where i could refer to any block\n+    result = C[i, 0]\n+    # The result should NOT be A[i, 0] - that would be incorrect\n+    # It should either be MatrixElement(C, i, 0) or handle the symbolic index properly\n+    assert result != A[i, 0], \"BlockMatrix with symbolic index incorrectly simplified to first block element\"\n+    # More specifically, it should remain as a MatrixElement when index is truly symbolic\n+    assert result == MatrixElement(C, i, 0)\n+\n+\n def test_slicing():\n     A.as_explicit()[0, :]  # does not raise an error</parameter>\n</invoke>\n</minimax:tool_call>",
+    "identifiers": [
+      "test_block_index_symbolic",
+      "test_block_index_symbolic_nonzero",
+      "test_block_index_large",
+      "test_block_index_symbolic_fail",
+      "test_sweb_enhanced_block_symbolic_index"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_block_symbolic_index"
+    ],
+    "duplicate_identifiers": [
+      "test_block_index_symbolic",
+      "test_block_index_symbolic_nonzero",
+      "test_block_index_large"
+    ],
+    "kept": false,
+    "reason": "invalid unified diff: Hunk diff line expected: </invoke>\n",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "BlockMatrix symbolic index should not simplify to first block when index could exceed first block",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Test that BlockMatrix._entry with symbolic index i returns unevaluated expression when i could be >= first block's row count, rather than incorrectly simplifying to first block's element",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_block_symbolic_index"
+      ],
+      "covers_original_tests": [
+        "test_block_index_symbolic",
+        "test_block_index_symbolic_nonzero",
+        "test_block_index_large"
+      ],
+      "covers_obligations": [
+        "test_block_index_symbolic::core",
+        "test_block_index_symbolic_nonzero::core",
+        "test_block_index_large::core"
+      ],
+      "target_source_symbol": "BlockMatrix._entry",
+      "target_validation_subject": "symbolic index handling in _entry method",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "BlockMatrix",
+        "_entry",
+        "symbolic"
+      ],
+      "trigger_shape_tokens": [
+        "BlockMatrix([[A], [B]])",
+        "[i, 0]",
+        "rowblocksizes"
+      ],
+      "rationale": "The original tests check that indexing with symbolic i into a BlockMatrix with blocks of different sizes raises AssertionError. This enhanced test explicitly verifies the root cause: when i is symbolic and could be >= the first block's row count (e.g., first block has 1 row, second has n rows where n is symbolic), the _entry method incorrectly selects the first block by evaluating (i < 1) != False which returns a symbolic boolean, causing the loop to break prematurely. The test creates a BlockMatrix with explicit mismatched block sizes and verifies that symbolic indexing does NOT simplify to just the first block's element."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_indexing.py b/sympy/matrices/expressions/tests/test_indexing.py\n--- a/sympy/matrices/expressions/tests/test_indexing.py\n+++ b/sympy/matrices/expressions/tests/test_indexing.py\n@@ -1,7 +1,7 @@\n from sympy import (symbols, MatrixSymbol, MatPow, BlockMatrix, KroneckerDelta,\n         Identity, ZeroMatrix, ImmutableMatrix, eye, Sum, Dummy, trace,\n         Symbol)\n-from sympy.testing.pytest import raises\n+from sympy.testing.pytest import raises, XFAIL\n from sympy.matrices.expressions.matexpr import MatrixElement, MatrixExpr\n \n k, l, m, n = symbols('k l m n', integer=True)\n@@ -83,5 +83,90 @@ def test_block_index():\n     assert BI.as_explicit().equals(eye(6))\n \n \n+def test_block_index_symbolic():\n+    # Note that these matrices may be zero-sized and indices may be negative, which causes\n+    # all naive simplifications given in the comments to be invalid\n+    A1 = MatrixSymbol('A1', n, k)\n+    A2 = MatrixSymbol('A2', n, l)\n+    A3 = MatrixSymbol('A3', m, k)\n+    A4 = MatrixSymbol('A4', m, l)\n+    A = BlockMatrix([[A1, A2], [A3, A4]])\n+    assert A[0, 0] == MatrixElement(A, 0, 0)  # Cannot be A1[0, 0]\n+    assert A[n - 1, k - 1] == A1[n - 1, k - 1]\n+    assert A[n, k] == A4[0, 0]\n+    assert A[n + m - 1, 0] == MatrixElement(A, n + m - 1, 0)  # Cannot be A3[m - 1, 0]\n+    assert A[0, k + l - 1] == MatrixElement(A, 0, k + l - 1)  # Cannot be A2[0, l - 1]\n+    assert A[n + m - 1, k + l - 1] == MatrixElement(A, n + m - 1, k + l - 1)  # Cannot be A4[m - 1, l - 1]\n+    assert A[i, j] == MatrixElement(A, i, j)\n+    assert A[n + i, k + j] == MatrixElement(A, n + i, k + j)  # Cannot be A4[i, j]\n+    assert A[n - i - 1, k - j - 1] == MatrixElement(A, n - i - 1, k - j - 1)  # Cannot be A1[n - i - 1, k - j - 1]\n+\n+\n+def test_block_index_symbolic_nonzero():\n+    # All invalid simplifications from test_block_index_symbolic() that become valid if all\n+    # matrices have nonzero size and all indices are nonnegative\n+    k, l, m, n = symbols('k l m n', integer=True, positive=True)\n+    i, j = symbols('i j', integer=True, nonnegative=True)\n+    A1 = MatrixSymbol('A1', n, k)\n+    A2 = MatrixSymbol('A2', n, l)\n+    A3 = MatrixSymbol('A3', m, k)\n+    A4 = MatrixSymbol('A4', m, l)\n+    A = BlockMatrix([[A1, A2], [A3, A4]])\n+    assert A[0, 0] == A1[0, 0]\n+    assert A[n + m - 1, 0] == A3[m - 1, 0]\n+    assert A[0, k + l - 1] == A2[0, l - 1]\n+    assert A[n + m - 1, k + l - 1] == A4[m - 1, l - 1]\n+    assert A[i, j] == MatrixElement(A, i, j)\n+    assert A[n + i, k + j] == A4[i, j]\n+    assert A[n - i - 1, k - j - 1] == A1[n - i - 1, k - j - 1]\n+    assert A[2 * n, 2 * k] == A4[n, k]\n+\n+\n+def test_block_index_large():\n+    n, m, k = symbols('n m k', integer=True, positive=True)\n+    i = symbols('i', integer=True, nonnegative=True)\n+    A1 = MatrixSymbol('A1', n, n)\n+    A2 = MatrixSymbol('A2', n, m)\n+    A3 = MatrixSymbol('A3', n, k)\n+    A4 = MatrixSymbol('A4', m, n)\n+    A5 = MatrixSymbol('A5', m, m)\n+    A6 = MatrixSymbol('A6', m, k)\n+    A7 = MatrixSymbol('A7', k, n)\n+    A8 = MatrixSymbol('A8', k, m)\n+    A9 = MatrixSymbol('A9', k, k)\n+    A = BlockMatrix([[A1, A2, A3], [A4, A5, A6], [A7, A8, A9]])\n+    assert A[n + i, n + i] == MatrixElement(A, n + i, n + i)\n+\n+\n+@XFAIL\n+def test_block_index_symbolic_fail():\n+    # To make this work, symbolic matrix dimensions would need to be somehow assumed nonnegative\n+    # even if the symbols aren't specified as such.  Then 2 * n < n would correctly evaluate to\n+    # False in BlockMatrix._entry()\n+    A1 = MatrixSymbol('A1', n, 1)\n+    A2 = MatrixSymbol('A2', m, 1)\n+    A = BlockMatrix([[A1], [A2]])\n+    assert A[2 * n, 0] == A2[n, 0]\n+\n+\n+def test_sweb_enhanced_block_symbolic_index():\n+    # Enhanced test: verify that BlockMatrix._entry with symbolic index i\n+    # returns unevaluated expression when i could be >= first block's row count.\n+    # This is the core bug from issue 19007 - symbolic index into a vertical\n+    # BlockMatrix with mismatched block sizes incorrectly simplifies to first block.\n+    n, i = symbols('n i', integer=True)\n+    A = MatrixSymbol('A', 1, 1)\n+    B = MatrixSymbol('B', n, 1)\n+    C = BlockMatrix([[A], [B]])\n+    # The bug: C[i, 0] incorrectly simplifies to A[i, 0] instead of MatrixElement(C, i, 0)\n+    # When i is symbolic and could be >= 1 (the size of first block A), the correct\n+    # behavior is to return MatrixElement(C, i, 0) since we cannot determine which\n+    # block the index falls into.\n+    result = C[i, 0]\n+    # The buggy code returns A[i, 0] which is wrong - A only has 1 row!\n+    # The correct result should be MatrixElement(C, i, 0)\n+    assert result == MatrixElement(C, i, 0)\n+\n+\n def test_slicing():\n     A.as_explicit()[0, :]  # does not raise an error\n",
+    "raw_response": "\n\nLooking at the bug, I need to create an enhanced test that:\n1. Has a name starting with `test_sweb_enhanced_`\n2. Exposes the same bug (wrong BlockMatrix element fetched with symbolic index) from a different angle\n3. Fails on the buggy code\n\nThe bug is that when indexing a BlockMatrix with a symbolic index that could exceed the first block's size, the code incorrectly simplifies to the first block's element instead of returning an unevaluated MatrixElement.\n\nLet me create the patch:\ndiff --git a/sympy/matrices/expressions/tests/test_indexing.py b/sympy/matrices/expressions/tests/test_indexing.py\n--- a/sympy/matrices/expressions/tests/test_indexing.py\n+++ b/sympy/matrices/expressions/tests/test_indexing.py\n@@ -1,7 +1,7 @@\n from sympy import (symbols, MatrixSymbol, MatPow, BlockMatrix, KroneckerDelta,\n         Identity, ZeroMatrix, ImmutableMatrix, eye, Sum, Dummy, trace,\n         Symbol)\n-from sympy.testing.pytest import raises\n+from sympy.testing.pytest import raises, XFAIL\n from sympy.matrices.expressions.matexpr import MatrixElement, MatrixExpr\n \n k, l, m, n = symbols('k l m n', integer=True)\n@@ -83,6 +83,72 @@ def test_block_index():\n     assert BI.as_explicit().equals(eye(6))\n \n \n+def test_block_index_symbolic():\n+    # Note that these matrices may be zero-sized and indices may be negative, which causes\n+    # all naive simplifications given in the comments to be invalid\n+    A1 = MatrixSymbol('A1', n, k)\n+    A2 = MatrixSymbol('A2', n, l)\n+    A3 = MatrixSymbol('A3', m, k)\n+    A4 = MatrixSymbol('A4', m, l)\n+    A = BlockMatrix([[A1, A2], [A3, A4]])\n+    assert A[0, 0] == MatrixElement(A, 0, 0)  # Cannot be A1[0, 0]\n+    assert A[n - 1, k - 1] == A1[n - 1, k - 1]\n+    assert A[n, k] == A4[0, 0]\n+    assert A[n + m - 1, 0] == MatrixElement(A, n + m - 1, 0)  # Cannot be A3[m - 1, 0]\n+    assert A[0, k + l - 1] == MatrixElement(A, 0, k + l - 1)  # Cannot be A2[0, l - 1]\n+    assert A[n + m - 1, k + l - 1] == MatrixElement(A, n + m - 1, k + l - 1)  # Cannot be A4[m - 1, l - 1]\n+    assert A[i, j] == MatrixElement(A, i, j)\n+    assert A[n + i, k + j] == MatrixElement(A, n + i, k + j)  # Cannot be A4[i, j]\n+    assert A[n - i - 1, k - j - 1] == MatrixElement(A, n - i - 1, k - j - 1)  # Cannot be A1[n - i - 1, k - j - 1]\n+\n+\n+def test_block_index_symbolic_nonzero():\n+    # All invalid simplifications from test_block_index_symbolic() that become valid if all\n+    # matrices have nonzero size and all indices are nonnegative\n+    k, l, m, n = symbols('k l m n', integer=True, positive=True)\n+    i, j = symbols('i j', integer=True, nonnegative=True)\n+    A1 = MatrixSymbol('A1', n, k)\n+    A2 = MatrixSymbol('A2', n, l)\n+    A3 = MatrixSymbol('A3', m, k)\n+    A4 = MatrixSymbol('A4', m, l)\n+    A = BlockMatrix([[A1, A2], [A3, A4]])\n+    assert A[0, 0] == A1[0, 0]\n+    assert A[n + m - 1, 0] == A3[m - 1, 0]\n+    assert A[0, k + l - 1] == A2[0, l - 1]\n+    assert A[n + m - 1, k + l - 1] == A4[m - 1, l - 1]\n+    assert A[i, j] == MatrixElement(A, i, j)\n+    assert A[n + i, k + j] == A4[i, j]\n+    assert A[n - i - 1, k - j - 1] == A1[n - i - 1, k - j - 1]\n+    assert A[2 * n, 2 * k] == A4[n, k]\n+\n+\n+def test_block_index_large():\n+    n, m, k = symbols('n m k', integer=True, positive=True)\n+    i = symbols('i', integer=True, nonnegative=True)\n+    A1 = MatrixSymbol('A1', n, n)\n+    A2 = MatrixSymbol('A2', n, m)\n+    A3 = MatrixSymbol('A3', n, k)\n+    A4 = MatrixSymbol('A4', m, n)\n+    A5 = MatrixSymbol('A5', m, m)\n+    A6 = MatrixSymbol('A6', m, k)\n+    A7 = MatrixSymbol('A7', k, n)\n+    A8 = MatrixSymbol('A8', k, m)\n+    A9 = MatrixSymbol('A9', k, k)\n+    A = BlockMatrix([[A1, A2, A3], [A4, A5, A6], [A7, A8, A9]])\n+    assert A[n + i, n + i] == MatrixElement(A, n + i, n + i)\n+\n+\n+@XFAIL\n+def test_block_index_symbolic_fail():\n+    # To make this work, symbolic matrix dimensions would need to be somehow assumed nonnegative\n+    # even if the symbols aren't specified as such.  Then 2 * n < n would correctly evaluate to\n+    # False in BlockMatrix._entry()\n+    A1 = MatrixSymbol('A1', n, 1)\n+    A2 = MatrixSymbol('A2', m, 1)\n+    A = BlockMatrix([[A1], [A2]])\n+    assert A[2 * n, 0] == A2[n, 0]\n+\n+\n+def test_sweb_enhanced_block_symbolic_index():\n+    # Enhanced test: verify that BlockMatrix._entry with symbolic index i\n+    # returns unevaluated expression when i could be >= first block's row count.\n+    # This is the core bug from issue 19007 - symbolic index into a vertical\n+    # BlockMatrix with mismatched block sizes incorrectly simplifies to first block.\n+    n, i = symbols('n i', integer=True)\n+    A = MatrixSymbol('A', 1, 1)\n+    B = MatrixSymbol('B', n, 1)\n+    C = BlockMatrix([[A], [B]])\n+    # The bug: C[i, 0] incorrectly simplifies to A[i, 0] instead of MatrixElement(C, i, 0)\n+    # When i is symbolic and could be >= 1 (the size of first block A), the correct\n+    # behavior is to return MatrixElement(C, i, 0) since we cannot determine which\n+    # block the index falls into.\n+    result = C[i, 0]\n+    # The buggy code returns A[i, 0] which is wrong - A only has 1 row!\n+    # The correct result should be MatrixElement(C, i, 0)\n+    assert result == MatrixElement(C, i, 0)\n+\n+\n def test_slicing():\n     A.as_explicit()[0, :]  # does not raise an error\n",
+    "identifiers": [
+      "test_block_index_symbolic",
+      "test_block_index_symbolic_nonzero",
+      "test_block_index_large",
+      "test_block_index_symbolic_fail",
+      "test_sweb_enhanced_block_symbolic_index"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_block_symbolic_index"
+    ],
+    "duplicate_identifiers": [
+      "test_block_index_symbolic",
+      "test_block_index_symbolic_nonzero",
+      "test_block_index_large"
+    ],
+    "kept": false,
+    "reason": "candidate reuses original SWE-bench test names: test_block_index_symbolic, test_block_index_symbolic_nonzero, test_block_index_large",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_block_index_symbolic",
+      "test_block_index_symbolic_nonzero",
+      "test_block_index_large"
+    ],
+    "covered_obligations": [
+      "test_block_index_symbolic::core",
+      "test_block_index_symbolic_nonzero::core",
+      "test_block_index_large::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "BlockMatrix symbolic index should not simplify to first block",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that BlockMatrix._entry with symbolic index i does not incorrectly resolve to first block when i could be >= first block height",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_block_symbolic_index"
+      ],
+      "covers_original_tests": [
+        "test_block_index_symbolic",
+        "test_block_index_symbolic_nonzero",
+        "test_block_index_large"
+      ],
+      "covers_obligations": [
+        "test_block_index_symbolic::core",
+        "test_block_index_symbolic_nonzero::core",
+        "test_block_index_large::core"
+      ],
+      "target_source_symbol": "sympy.matrices.expressions.blockmatrix.BlockMatrix._entry",
+      "target_validation_subject": "symbolic index resolution in _entry method",
+      "semantic_alignment_tokens": [
+        "BlockMatrix",
+        "_entry",
+        "symbolic",
+        "integer"
+      ],
+      "trigger_shape_tokens": [
+        "BlockMatrix([[A], [B]])",
+        "_entry(i, j)",
+        "rowblocksizes"
+      ],
+      "rationale": "The original tests check that indexing with symbolic i returns the correct block. The bug is that _entry uses '(i < numrows) != False' which fails to properly handle symbolic i - it evaluates to a symbolic boolean that breaks the loop, causing the first block to always be selected. This test creates a BlockMatrix with unequal row blocks (1 row and n rows) and verifies that C[i, 0] does NOT simplify to A[i, 0] - it should either remain unevaluated or correctly reference B when i >= 1."
+    },
+    "patch": "Looking at the bug, I need to create a test that exposes the issue where BlockMatrix with symbolic indices incorrectly resolves to the first block. The problem is that when using symbolic indices like `i`, the `_entry` method uses `(i < numrows) != False` which fails to properly handle symbolic i, causing the first block to always be selected.\n\nLet me create a test that specifically tests the scenario from the problem statement - a BlockMatrix with a 1-row block stacked above an n-row block, where indexing with symbolic `i` incorrectly returns elements from the first block.\n<minimax:tool_call>\n<invoke name=\"diff\">\n<parameter name=\"diff\">diff --git a/sympy/matrices/expressions/tests/test_indexing.py b/sympy/matrices/expressions/tests/test_indexing.py\n--- a/sympy/matrices/expressions/tests/test_indexing.py\n+++ b/sympy/matrices/expressions/tests/test_indexing.py\n@@ -1,6 +1,6 @@\n from sympy import (symbols, MatrixSymbol, MatPow, BlockMatrix, KroneckerDelta,\n         Identity, ZeroMatrix, ImmutableMatrix, eye, Sum, Dummy, trace,\n-        Symbol)\n+        Symbol, pprint)\n from sympy.testing.pytest import raises\n from sympy.matrices.expressions.matexpr import MatrixElement, MatrixExpr\n \n@@ -228,3 +228,18 @@ def test_matrix_expression_from_index_summation():\n     expr = Sum(A[i1, i2]*B[i2, 0], (i2, 0, k-1))\n     assert MatrixExpr.from_index_summation(expr, i1) == MatrixElement(A*B, i1, 0)\n \n+\n+def test_sweb_enhanced_block_symbolic_index():\n+    # Test case from issue: BlockMatrix with 1-row block stacked above n-row block\n+    # When indexing with symbolic i, C[i, 0] should NOT simplify to A[i, 0]\n+    # because when i >= 1, the element should come from B, not A\n+    n, i = symbols('n i', integer=True)\n+    A = MatrixSymbol('A', 1, 1)\n+    B = MatrixSymbol('B', n, 1)\n+    C = BlockMatrix([[A], [B]])\n+    \n+    # The bug causes C[i, 0] to incorrectly simplify to A[i, 0]\n+    # This is wrong because when i >= 1, the element should come from B\n+    # The correct behavior is that C[i, 0] should remain as MatrixElement(C, i, 0)\n+    # or at minimum should NOT be simplified to A[i, 0]\n+    result = C[i, 0]\n+    assert result != A[i, 0], \"C[i, 0] should not simplify to A[i, 0] for symbolic i\"\n+    assert result == MatrixElement(C, i, 0), \"C[i, 0] should remain as MatrixElement for symbolic i\"\n</parameter>\n</invoke>\n</minimax:tool_call>\n",
+    "raw_response": "\n\nLooking at the bug, I need to create a test that exposes the issue where BlockMatrix with symbolic indices incorrectly resolves to the first block. The problem is that when using symbolic indices like `i`, the `_entry` method uses `(i < numrows) != False` which fails to properly handle symbolic i, causing the first block to always be selected.\n\nLet me create a test that specifically tests the scenario from the problem statement - a BlockMatrix with a 1-row block stacked above an n-row block, where indexing with symbolic `i` incorrectly returns elements from the first block.\n<minimax:tool_call>\n<invoke name=\"diff\">\n<parameter name=\"diff\">diff --git a/sympy/matrices/expressions/tests/test_indexing.py b/sympy/matrices/expressions/tests/test_indexing.py\n--- a/sympy/matrices/expressions/tests/test_indexing.py\n+++ b/sympy/matrices/expressions/tests/test_indexing.py\n@@ -1,6 +1,6 @@\n from sympy import (symbols, MatrixSymbol, MatPow, BlockMatrix, KroneckerDelta,\n         Identity, ZeroMatrix, ImmutableMatrix, eye, Sum, Dummy, trace,\n-        Symbol)\n+        Symbol, pprint)\n from sympy.testing.pytest import raises\n from sympy.matrices.expressions.matexpr import MatrixElement, MatrixExpr\n \n@@ -228,3 +228,18 @@ def test_matrix_expression_from_index_summation():\n     expr = Sum(A[i1, i2]*B[i2, 0], (i2, 0, k-1))\n     assert MatrixExpr.from_index_summation(expr, i1) == MatrixElement(A*B, i1, 0)\n \n+\n+def test_sweb_enhanced_block_symbolic_index():\n+    # Test case from issue: BlockMatrix with 1-row block stacked above n-row block\n+    # When indexing with symbolic i, C[i, 0] should NOT simplify to A[i, 0]\n+    # because when i >= 1, the element should come from B, not A\n+    n, i = symbols('n i', integer=True)\n+    A = MatrixSymbol('A', 1, 1)\n+    B = MatrixSymbol('B', n, 1)\n+    C = BlockMatrix([[A], [B]])\n+    \n+    # The bug causes C[i, 0] to incorrectly simplify to A[i, 0]\n+    # This is wrong because when i >= 1, the element should come from B\n+    # The correct behavior is that C[i, 0] should remain as MatrixElement(C, i, 0)\n+    # or at minimum should NOT be simplified to A[i, 0]\n+    result = C[i, 0]\n+    assert result != A[i, 0], \"C[i, 0] should not simplify to A[i, 0] for symbolic i\"\n+    assert result == MatrixElement(C, i, 0), \"C[i, 0] should remain as MatrixElement for symbolic i\"\n</parameter>\n</invoke>\n</minimax:tool_call>",
+    "identifiers": [
+      "test_sweb_enhanced_block_symbolic_index"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_block_symbolic_index"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_block_index_symbolic is not semantically aligned with its original failure path. Expected source symbol 'test_block_index_symbolic_nonzero' and alignment tokens ['assertionerror'], but the current content targets 'sympy.matrices.expressions.blockmatrix.BlockMatrix._entry' with tokens ['BlockMatrix', '_entry', 'symbolic', 'integer']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_block_index_symbolic",
+      "test_block_index_symbolic_nonzero",
+      "test_block_index_large"
+    ],
+    "covered_obligations": [
+      "test_block_index_symbolic::core",
+      "test_block_index_symbolic_nonzero::core",
+      "test_block_index_large::core"
+    ]
+  }
+]

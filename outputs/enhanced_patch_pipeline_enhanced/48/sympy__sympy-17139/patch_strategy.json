@@ -1,0 +1,18 @@
+{
+  "title": "Guard rv.exp comparison in _TR56._f against complex exponents",
+  "approach": "Add a check at the beginning of the _f inner function in _TR56 to verify that rv.exp is a real number (or at least not complex) before performing the < and > comparisons. If the exponent is complex or its reality cannot be determined, return the expression unchanged. This fix addresses the TypeError raised when comparing complex I with 0 in the expressions rv.exp < 0 and rv.exp > max.",
+  "edit_targets": [
+    "sympy/simplify/fu.py::_TR56"
+  ],
+  "dependency_files": [
+    "sympy/simplify/tests/test_fu.py",
+    "sympy/simplify/tests/test_simplify.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only the _TR56 function in fu.py is sufficient. The bug manifests in the inner _f function where comparisons rv.exp < 0 and rv.exp > max are performed without checking if the exponent is real. The fix must handle both validation subjects: (1) rv.exp comparison with 0 in _f function, and (2) rv.exp comparison with max in _f function. Both TR5 and TR6 call _TR56, so fixing _TR56 repairs both test__TR56 and test_issue_17137 obligations. The fix should check rv.exp.is_real before performing comparisons, returning rv unchanged if the exponent is not real or if reality cannot be determined.",
+  "risks": [
+    "Potential performance overhead from adding is_real check on every Pow node",
+    "Risk of skipping valid transformations for edge cases where exponent is symbolically complex but mathematically real - should be conservative and only skip when definitely non-real"
+  ]
+}

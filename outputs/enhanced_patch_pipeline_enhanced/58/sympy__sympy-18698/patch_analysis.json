@@ -1,0 +1,43 @@
+{
+  "root_cause": "The sqf_list function is not correctly grouping factors with the same multiplicity. When multiple irreducible factors share the same multiplicity (e.g., (x-2)^3 and (x-3)^3), they should be combined into a single factor (x^2-5x+6)^3, but instead they remain as separate entries.",
+  "affected_components": [
+    {
+      "file": "sympy/polys/polytools.py",
+      "symbol": "sqf_list",
+      "reason": "This is the main function that computes square-free factorization and returns the list of (factor, multiplicity) pairs. It incorrectly keeps separate factors with the same multiplicity instead of combining them."
+    },
+    {
+      "file": "sympy/polys/polytools.py",
+      "symbol": "sqf",
+      "reason": "Related function that returns the square-free factorization; likely uses sqf_list internally and would exhibit the same issue."
+    }
+  ],
+  "failing_signal": "The test test_factor_terms fails with AssertionError. The sqf_list output shows separate entries for (x-2, 3) and (x-3, 3) instead of the combined (x**2-5*x+6, 3).",
+  "propagation_path": "The sqf_list function internally calls factorization routines that return individual factors with their multiplicities. The bug is in how these factors are processed - they should be grouped by multiplicity and multiplied together for each multiplicity level, but this grouping is not happening correctly.",
+  "repair_constraint": "After the fix, sqf_list must return factors grouped by multiplicity: factors with the same multiplicity should be combined into a single polynomial. The product of all (factor, multiplicity) pairs must equal the original polynomial.",
+  "suggested_repair_scope": [
+    "sympy/polys/polytools.py"
+  ],
+  "suspicious_symbols": [
+    "sqf_list",
+    "sqf",
+    "sqf_norm",
+    "sqf_part",
+    "_sqf_list",
+    "_sqf"
+  ],
+  "repair_obligations": [
+    {
+      "id": "obligation_1",
+      "source_symbol": "sqf_list",
+      "validation_subject": "output grouping by multiplicity",
+      "why_it_matters": "The sqf_list function must group all factors with the same multiplicity together. For example, (x-2)^3 * (x-3)^3 should produce [(x**2-5*x+6, 3)] not [(x-2, 3), (x-3, 3)]."
+    },
+    {
+      "id": "obligation_2",
+      "source_symbol": "sqf_list",
+      "validation_subject": "product reconstruction",
+      "why_it_matters": "The product of all factors raised to their multiplicities must equal the original polynomial to maintain mathematical correctness."
+    }
+  ]
+}

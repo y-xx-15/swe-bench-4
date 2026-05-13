@@ -1,0 +1,34 @@
+{
+  "original_test_identifiers": [
+    "test_pretty_product",
+    "test_issue_6359"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_pretty_product",
+    "test_issue_6359"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/printing/pretty/tests/test_pretty.py:test_issue_8292",
+    "sympy/printing/pretty/tests/test_pretty.py:test_issue_8344",
+    "sympy/printing/pretty/tests/test_pretty.py:test_pretty_product",
+    "sympy/printing/pretty/tests/test_pretty.py:test_issue_6359",
+    "test_pretty_product"
+  ],
+  "failure_mode": "value_error",
+  "dominant_errors": [
+    "ValueError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_pretty_product F",
+    "test_issue_6359 F",
+    "__________ sympy/printing/pretty/tests/test_pretty.py:test_issue_8292 __________"
+  ],
+  "noise_ratio": 0.0043,
+  "target_test_tracebacks": {
+    "test_pretty_product": "TARGET TEST: test_pretty_product\n- snippet: test_pretty_product F\n- snippet: test_issue_6359 F\n- snippet: __________ sympy/printing/pretty/tests/test_pretty.py:test_issue_8292 __________\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_pretty_product F\nTraceback (most recent call last):\nValueError: Name node can't be used with 'False' constant\nTraceback (most recent call last):\nValueError: Name node can't be used with 'False' constant\n________ sympy/printing/pretty/tests/test_pretty.py:test_pretty_product ________\nTraceback (most recent call last):\n  File \"/testbed/sympy/printing/pretty/tests/test_pretty.py\", line 2102, in test_pretty_product\nAssertionError\nTraceback (most recent call last):\nAssertionError\n===== tests finished: 121 passed, 2 failed, 2 exceptions, in 14.64 seconds =====",
+    "test_issue_6359": "TARGET TEST: test_issue_6359\n- snippet: test_pretty_product F\n- snippet: test_issue_6359 F\n- snippet: __________ sympy/printing/pretty/tests/test_pretty.py:test_issue_8292 __________\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_issue_6359 F\nTraceback (most recent call last):\nValueError: Name node can't be used with 'False' constant\nTraceback (most recent call last):\nValueError: Name node can't be used with 'False' constant\nTraceback (most recent call last):\nAssertionError\n__________ sympy/printing/pretty/tests/test_pretty.py:test_issue_6359 __________\nTraceback (most recent call last):\n  File \"/testbed/sympy/printing/pretty/tests/test_pretty.py\", line 5509, in test_issue_6359\nAssertionError\n===== tests finished: 121 passed, 2 failed, 2 exceptions, in 14.64 seconds ====="
+  }
+}

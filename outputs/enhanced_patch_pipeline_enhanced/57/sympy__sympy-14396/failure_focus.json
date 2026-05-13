@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_Domain_preprocess"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_Domain_preprocess"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/polys/tests/test_polyoptions.py:test_Domain_preprocess",
+    "test_Domain_preprocess"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "OptionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_Domain_preprocess E",
+    "_________ sympy/polys/tests/test_polyoptions.py:test_Domain_preprocess _________",
+    "File \"/testbed/sympy/polys/tests/test_polyoptions.py\", line 179, in test_Domain_preprocess"
+  ],
+  "noise_ratio": 0.0262,
+  "target_test_tracebacks": {
+    "test_Domain_preprocess": "TARGET TEST: test_Domain_preprocess\n- snippet: test_Domain_preprocess E\n- snippet: _________ sympy/polys/tests/test_polyoptions.py:test_Domain_preprocess _________\n- snippet: File \"/testbed/sympy/polys/tests/test_polyoptions.py\", line 179, in test_Domain_preprocess\n- dominant_errors: OptionError\nWEAK TRACEBACK CONTEXT:\ntest_Domain_preprocess E\n_________ sympy/polys/tests/test_polyoptions.py:test_Domain_preprocess _________\n  File \"/testbed/sympy/polys/tests/test_polyoptions.py\", line 179, in test_Domain_preprocess\n    raise OptionError('expected a valid domain specification, got %s' % domain)\nsympy.polys.polyerrors.OptionError: expected a valid domain specification, got R[x]"
+  }
+}

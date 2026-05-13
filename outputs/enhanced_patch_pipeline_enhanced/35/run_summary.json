@@ -1,0 +1,201 @@
+[
+  {
+    "instance_id": "sympy__sympy-15346",
+    "repo": "sympy/sympy",
+    "model": "minimax-m2.5",
+    "pipeline_mode": "enhanced_guided",
+    "hide_original_test_patch_in_repair": false,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "enhanced_guided",
+    "original_test_identifiers": [
+      "test_issue_15129_trigsimp_methods"
+    ],
+    "original_status_counts": {
+      "FAILED": 2,
+      "PASSED": 22
+    },
+    "original_failed_count": 2,
+    "original_passed_count": 22,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_issue_15129_trigsimp_methods"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_issue_15129_trigsimp_methods"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods",
+        "test_issue_15129_trigsimp_methods"
+      ],
+      "failure_mode": "assertion_error",
+      "dominant_errors": [
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_issue_15129_trigsimp_methods F",
+        "___ sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods ____",
+        "Traceback (most recent call last):"
+      ],
+      "noise_ratio": 0.0058,
+      "target_test_tracebacks": {
+        "test_issue_15129_trigsimp_methods": "TARGET TEST: test_issue_15129_trigsimp_methods\n- snippet: test_issue_15129_trigsimp_methods F\n- snippet: ___ sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods ____\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_issue_15129_trigsimp_methods F\n___ sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods ____\nTraceback (most recent call last):\n  File \"/testbed/sympy/simplify/tests/test_trigsimp.py\", line 367, in test_issue_15129_trigsimp_methods\nAssertionError\n== tests finished: 23 passed, 1 failed, 1 expected to fail, in 68.97 seconds ==="
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 3,
+      "keep_top_k": 2,
+      "attempt_budget": 3,
+      "bucket_limit": 3,
+      "template_limit": 3,
+      "failure_mode": "assertion_error",
+      "noise_ratio": 0.0058,
+      "difficulty": "low"
+    },
+    "adaptive_num_candidates": 3,
+    "adaptive_keep_top_k": 2,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 3,
+    "kept_enhanced_candidates": 2,
+    "enhanced_candidate_retention_rate": 0.6666666666666666,
+    "enhanced_generation_attempts_total": 7,
+    "enhanced_generation_attempts_avg": 2.3333333333333335,
+    "kept_enhanced_test_identifiers": [
+      "test_sweb_enhanced_trigsimp_rational_angle_diff",
+      "test_sweb_enhanced_trigsimp_rational_cosine_identity"
+    ],
+    "enhanced_failed_test_identifiers": [
+      "test_sweb_enhanced_trigsimp_rational_angle_diff",
+      "test_sweb_enhanced_trigsimp_rational_cosine_identity"
+    ],
+    "enhanced_failed_count": 2,
+    "generated_patch_nonempty": false,
+    "generated_patch_error": "The edit plan did not contain any valid edit entries.",
+    "generated_patch_attempts": 10,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_not_generated",
+    "generated_patch_feedback": "The edit plan did not contain any valid edit entries.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The trigsimp pattern matching for the cosine difference identity (cos(a-b) = cos(a)*cos(b) + sin(a)*sin(b)) fails when arguments are Rational numbers because the pattern matcher uses Wild symbols that don't match against Rational arguments in the same way as symbolic arguments. Specifically, the matchers_add patterns expect terms that can be matched via Wild symbol substitution, but Rational arguments may not be properly recognized as valid match targets.",
+      "affected_components": [
+        {
+          "file": "sympy/simplify/trigsimp.py",
+          "symbol": "_trigsimp/__trigsimp",
+          "reason": "Contains the pattern matching logic that fails to match cos(a-b) identity with Rational arguments"
+        },
+        {
+          "file": "sympy/simplify/trigsimp.py",
+          "symbol": "matchers_add",
+          "reason": "Defines the cosine difference identity pattern that should match but doesn't for Rational arguments"
+        },
+        {
+          "file": "sympy/simplify/trigsimp.py",
+          "symbol": "_match_div_rewrite",
+          "reason": "Helper function that processes division patterns and may interact with how Rational arguments are handled"
+        }
+      ],
+      "failing_signal": "AssertionError in test_issue_15129_trigsimp_methods - the expression sin(1/50)*sin(1/25) + cos(1/50)*cos(1/25) does not simplify to cos(1/50) when trigsimp is called",
+      "propagation_path": "When trigsimp is called on an Add expression containing sin(Rational)*sin(Rational) + cos(Rational)*cos(Rational), the pattern matcher in __trigsimp iterates through matchers_add. The pattern (c*cos(a)*cos(b) + c*sin(a)*sin(b) + d, cos(a - b)*c + d) should match, but the Wild symbol matching fails because Rational arguments are being treated differently than symbolic arguments. The code falls through without applying the cosine difference identity simplification.",
+      "repair_constraint": "The fix must preserve existing trigsimp behavior for symbolic arguments while adding support for Rational arguments in the cosine difference identity (and potentially other similar identities). The mathematical correctness of cos(a-b) = cos(a)cos(b) + sin(a)sin(b) must be maintained.",
+      "suggested_repair_scope": [
+        "sympy/simplify/trigsimp.py"
+      ],
+      "suspicious_symbols": [
+        "__trigsimp",
+        "matchers_add",
+        "_dotrig",
+        "trigsimp",
+        "futrig"
+      ],
+      "repair_obligations": [
+        {
+          "id": "obligation_1",
+          "source_symbol": "test_issue_15129_trigsimp_methods",
+          "validation_subject": "trigsimp result for sin/cos product sum with Rational arguments",
+          "why_it_matters": "The core functionality of trigsimp to simplify sin(a)*sin(b) + cos(a)*cos(b) to cos(a-b) must work when a and b are Rational numbers, not just symbolic variables"
+        },
+        {
+          "id": "obligation_2",
+          "source_symbol": "test_issue_15129_trigsimp_methods",
+          "validation_subject": "cosine difference identity simplification with Rational arguments",
+          "why_it_matters": "The cosine difference identity cos(a-b) = cos(a)cos(b) + sin(a)sin(b) must be applicable regardless of whether arguments are symbolic or rational"
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Fix trigsimp pattern matching for Rational arguments in cosine difference identity",
+      "approach": "The bug occurs because the pattern matching in `__trigsimp` uses Wild symbols that fail to match when the trigonometric arguments are Rational numbers. Specifically, the `matchers_add` patterns (like `c*cos(a)*cos(b) + c*sin(a)*sin(b) + d` matching to `cos(a-b)*c + d`) don't match when `a` and `b` are Rational values. The fix should modify the matching logic in `__trigsimp` to handle the case where the arguments are concrete Rational/Number types by directly comparing the arguments of sin/cos functions rather than relying solely on Wild symbol matching. The key location is in the `matchers_add` loop where `expr.match(pattern)` is called - we need to add fallback logic that extracts sin/cos arguments directly from the expression when the Wild-based match fails, then applies the cosine difference identity manually.",
+      "edit_targets": [
+        "sympy/simplify/trigsimp.py::__trigsimp"
+      ],
+      "dependency_files": [
+        "sympy/simplify/tests/test_trigsimp.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [],
+      "sufficiency_assessment": "The primary fix targets `__trigsimp` function in `sympy/simplify/trigsimp.py` where the `matchers_add` pattern matching occurs. This single location should be sufficient because the cosine difference identity simplification is handled entirely within this function's pattern matching loop. The fix must handle both validation subjects: (1) test_issue_15129_trigsimp_methods::trigsimp result for sin/cos product sum with Rational arguments, and (2) test_issue_15129_trigsimp_methods::cosine difference identity simplification with Rational arguments. No changes to test files are needed - the existing test_issue_15129_trigsimp_methods test already covers this functionality.",
+      "risks": [
+        "Potential regression: the fix must not break existing trigsimp behavior for symbolic arguments - the Wild symbol matching should continue to work as before for non-Rational arguments",
+        "Potential regression: must preserve correctness of other trigonometric identities in matchers_add (sin(a+b), cos(a+b), sin(a-b), etc.)",
+        "Risk of over-simplification: ensure the fix only applies the cosine difference identity when mathematically valid"
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/simplify/trigsimp.py::__trigsimp",
+          "action": "modify_region",
+          "justification": "This is the primary function containing the pattern matching logic that fails to match the cosine difference identity when arguments are Rational numbers. The matchers_add patterns use Wild symbols that don't match against Rational arguments properly."
+        }
+      ]
+    },
+    "final_patch_attempted": false,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": false,
+    "final_patch_apply_mode": "no_patch",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 2,
+      "PASSED": 22
+    },
+    "final_failed_count": 2,
+    "final_passed_count": 22,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods": "FAILED",
+      "test_trigsimp1": "PASSED",
+      "test_trigsimp1a": "PASSED",
+      "test_trigsimp2": "PASSED",
+      "test_issue_4373": "PASSED",
+      "test_trigsimp3": "PASSED",
+      "test_issue_4661": "PASSED",
+      "test_issue_4494": "PASSED",
+      "test_issue_5948": "PASSED",
+      "test_issue_4775": "PASSED",
+      "test_issue_4280": "PASSED",
+      "test_issue_3210": "PASSED",
+      "test_trigsimp_issues": "PASSED",
+      "test_trigsimp_issue_2515": "PASSED",
+      "test_trigsimp_issue_3826": "PASSED",
+      "test_trigsimp_issue_4032": "PASSED",
+      "test_trigsimp_issue_7761": "PASSED",
+      "test_trigsimp_noncommutative": "PASSED",
+      "test_hyperbolic_simp": "PASSED",
+      "test_trigsimp_groebner": "PASSED",
+      "test_issue_2827_trigsimp_methods": "PASSED",
+      "test_issue_15129_trigsimp_methods": "FAILED",
+      "test_exptrigsimp": "PASSED",
+      "test_powsimp_on_numbers": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

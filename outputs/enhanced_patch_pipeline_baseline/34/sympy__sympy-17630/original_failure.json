@@ -1,0 +1,34 @@
+{
+  "original_test_identifiers": [
+    "test_issue_17624",
+    "test_zero_matrix_add"
+  ],
+  "status_map": {
+    "sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_17624": "FAILED",
+    "sympy/matrices/expressions/tests/test_matadd.py:test_zero_matrix_add": "FAILED",
+    "test_bc_matmul": "PASSED",
+    "test_bc_matadd": "PASSED",
+    "test_bc_transpose": "PASSED",
+    "test_bc_dist_diag": "PASSED",
+    "test_block_plus_ident": "PASSED",
+    "test_BlockMatrix": "PASSED",
+    "test_block_collapse_explicit_matrices": "PASSED",
+    "test_issue_17624": "ERROR",
+    "test_BlockMatrix_trace": "PASSED",
+    "test_BlockMatrix_Determinant": "PASSED",
+    "test_squareBlockMatrix": "PASSED",
+    "test_BlockDiagMatrix": "PASSED",
+    "test_blockcut": "PASSED",
+    "test_reblock_2x2": "PASSED",
+    "test_deblock": "PASSED",
+    "test_sort_key": "PASSED",
+    "test_matadd_sympify": "PASSED",
+    "test_matadd_of_matrices": "PASSED",
+    "test_doit_args": "PASSED",
+    "test_generic_identity": "PASSED",
+    "test_zero_matrix_add": "FAILED"
+  },
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/sympy__sympy-17630/test_output.txt",
+  "timed_out": false,
+  "error": null
+}

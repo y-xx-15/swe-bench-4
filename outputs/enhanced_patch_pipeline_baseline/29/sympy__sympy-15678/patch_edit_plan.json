@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/geometry/util.py",
+      "action": "modify_region",
+      "justification": "The idiff function has two bugs: (1) It doesn't handle Eq objects - needs to convert Eq to expression form (lhs - rhs) at the start. (2) It doesn't handle Function objects like f(x) - needs to accept Function type and extract the function symbol."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/geometry/util.py",
+      "target_symbol": "idiff__branch",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "1",
+        "2"
+      ],
+      "anchor_line_before": "    if is_sequence(y):",
+      "anchor_line_after": "        dep = {y}",
+      "replacement_block": "    if isinstance(eq, Eq):\n        eq = eq.lhs - eq.rhs\n    if is_sequence(y):\n        dep = set(y)\n        y = y[0]\n    elif isinstance(y, (Symbol, Function)):\n        if isinstance(y, Function):\n            y = y.func.args[0]\n        dep = {y}\n    else:\n        raise ValueError(\"expecting x-dependent symbol(s) but got: %s\" % y)"
+    }
+  ]
+}

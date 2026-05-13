@@ -1,0 +1,17 @@
+{
+  "title": "Include MatrixSymbols from argument_sequence in array_symbols",
+  "approach": "In CodeGen.routine(), the array_symbols dictionary is populated only from symbols that appear in the expression (via expressions.atoms(MatrixSymbol)). When a MatrixSymbol is passed in argument_sequence but doesn't appear in the expression, it's not recognized as an array, causing it to be created without dimensions and treated as a scalar in generated C code. The fix is to also include MatrixSymbols from argument_sequence when building array_symbols, ensuring all array arguments get proper dimensions regardless of whether they appear in the expression.",
+  "edit_targets": [
+    "sympy/utilities/codegen.py::CodeGen.routine"
+  ],
+  "dependency_files": [
+    "sympy/utilities/autowrap.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix should be sufficient because the root cause is in CodeGen.routine() where array_symbols is built only from expression atoms. The CCodeGen.get_prototype() method already correctly uses arg.dimensions to decide pointer vs value syntax - the problem is that dimensions are not set for unused array arguments. By ensuring all MatrixSymbols from argument_sequence are included in array_symbols with their dimensions, the prototype will correctly generate pointer syntax for these arguments.",
+  "risks": [
+    "Potential performance impact on routine() method when there are many arguments",
+    "Must ensure that MatrixSymbols from argument_sequence that are already in array_symbols are not duplicated"
+  ]
+}

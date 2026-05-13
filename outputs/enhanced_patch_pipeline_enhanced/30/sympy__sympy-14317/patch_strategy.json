@@ -1,0 +1,18 @@
+{
+  "title": "Order monomials by degree in LaTeX Poly printing",
+  "approach": "Modify the _print_Poly method in sympy/printing/latex.py to apply degree-based descending order to monomials, matching the behavior of str and pretty printers. The fix should extract terms using expr.as_poly().terms() which returns terms sorted by degree (highest first), then print them in that order rather than using the default expr.args which returns terms in internal order.",
+  "edit_targets": [
+    "sympy/printing/latex.py::_print_Poly"
+  ],
+  "dependency_files": [
+    "sympy/printing/latex.py::_print_PolyElement",
+    "sympy/polys/polytools.py::Poly.terms"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The primary fix target is _print_Poly in latex.py. This method handles Poly to LaTeX conversion and is the source of the ordering bug. The fix should ensure that when converting a Poly to LaTeX, the terms are ordered by descending degree (highest power first), matching the behavior of str and pretty printers. The _print_PolyElement method may also need inspection for consistency but is not the primary target. The repair addresses both validation subjects: (1) Poly monomial ordering in LaTeX output and (2) Poly monomial ordering in latex output, as both are covered by the test_latex_Poly_order source symbol.",
+  "risks": [
+    "Changing term ordering could affect other Poly-related printing; ensure domain, variable, and other Poly attributes are still printed correctly",
+    "Ensure the fix doesn't break existing tests for other Poly printing scenarios"
+  ]
+}

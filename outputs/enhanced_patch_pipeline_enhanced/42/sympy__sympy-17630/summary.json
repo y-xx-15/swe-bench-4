@@ -1,0 +1,203 @@
+{
+  "instance_id": "sympy__sympy-17630",
+  "repo": "sympy/sympy",
+  "model": "minimax-m2.5",
+  "pipeline_mode": "enhanced_guided",
+  "hide_original_test_patch_in_repair": false,
+  "disable_semantic_bucket_guidance": false,
+  "disable_enhanced_test_filtering": false,
+  "repair_mode": "enhanced_guided",
+  "original_test_identifiers": [
+    "test_issue_17624",
+    "test_zero_matrix_add"
+  ],
+  "original_status_counts": {
+    "FAILED": 3,
+    "PASSED": 19,
+    "ERROR": 1
+  },
+  "original_failed_count": 4,
+  "original_passed_count": 19,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_issue_17624",
+      "test_zero_matrix_add"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_issue_17624",
+      "test_zero_matrix_add"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_17624",
+      "sympy/matrices/expressions/tests/test_matadd.py:test_zero_matrix_add",
+      "test_issue_17624",
+      "test_zero_matrix_add"
+    ],
+    "failure_mode": "value_error",
+    "dominant_errors": [
+      "ValueError",
+      "AssertionError"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "test_issue_17624 E",
+      "test_zero_matrix_add F",
+      "____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_17624 _____"
+    ],
+    "noise_ratio": 0.0055,
+    "target_test_tracebacks": {
+      "test_issue_17624": "TARGET TEST: test_issue_17624\n- snippet: test_issue_17624 E\n- snippet: test_zero_matrix_add F\n- snippet: ____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_17624 _____\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_issue_17624 E\n____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_17624 _____\nTraceback (most recent call last):\n  File \"/testbed/sympy/matrices/expressions/tests/test_blockmatrix.py\", line 111, in test_issue_17624\n    raise ValueError(filldedent('''\nValueError: \nTraceback (most recent call last):\nAssertionError\n tests finished: 20 passed, 1 failed, 1 expected to fail, 1 exceptions, ",
+      "test_zero_matrix_add": "TARGET TEST: test_zero_matrix_add\n- snippet: test_issue_17624 E\n- snippet: test_zero_matrix_add F\n- snippet: ____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_17624 _____\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_zero_matrix_add F\nTraceback (most recent call last):\n    raise ValueError(filldedent('''\nValueError: \n_____ sympy/matrices/expressions/tests/test_matadd.py:test_zero_matrix_add _____\nTraceback (most recent call last):\n  File \"/testbed/sympy/matrices/expressions/tests/test_matadd.py\", line 37, in test_zero_matrix_add\nAssertionError\n tests finished: 20 passed, 1 failed, 1 expected to fail, 1 exceptions, "
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 5,
+    "keep_top_k": 3,
+    "attempt_budget": 3,
+    "bucket_limit": 5,
+    "template_limit": 4,
+    "failure_mode": "value_error",
+    "noise_ratio": 0.0055,
+    "difficulty": "medium"
+  },
+  "adaptive_num_candidates": 5,
+  "adaptive_keep_top_k": 3,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 5,
+  "kept_enhanced_candidates": 2,
+  "enhanced_candidate_retention_rate": 0.4,
+  "enhanced_generation_attempts_total": 18,
+  "enhanced_generation_attempts_avg": 3.6,
+  "kept_enhanced_test_identifiers": [
+    "test_sweb_enhanced_blockmul_zeromatrix_type",
+    "test_sweb_enhanced_blockmul_zeromatrix_preservation"
+  ],
+  "enhanced_failed_test_identifiers": [
+    "test_sweb_enhanced_blockmul_zeromatrix_type",
+    "test_sweb_enhanced_blockmul_zeromatrix_preservation"
+  ],
+  "enhanced_failed_count": 2,
+  "generated_patch_nonempty": false,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 9,
+  "generated_patch_accepted": false,
+  "generated_patch_acceptance_reason": "rejected_patch_apply_failed",
+  "generated_patch_feedback": "The previous patch was rejected because it did not satisfy the acceptance gate. Patch apply mode: apply_failed. Baseline passed=19, failed=4. Candidate passed=0, failed=0. Hard failure signal: none. FAIL_TO_PASS tests still failing after patch: test_issue_17624, test_zero_matrix_add. Your patch must make ALL of these tests pass, not just improve aggregate counts. Semantic oracle failed identifiers: test_sweb_enhanced_blockmul_zeromatrix_type, test_sweb_enhanced_blockmul_zeromatrix_preservation. Semantic oracle failure summaries: test_sweb_enhanced_blockmul_zeromatrix_type: patch: **** Only garbage was found in the patch input.\n test_sweb_enhanced_blockmul_zeromatrix_preservation: patch: **** Only garbage was found in the patch input.\n.  Target files: unknown. Target symbols: unknown. Generate a new source-only unified diff that is closer to the exact file context and lands inside the target class body.",
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [
+    "test_sweb_enhanced_blockmul_zeromatrix_type",
+    "test_sweb_enhanced_blockmul_zeromatrix_preservation"
+  ],
+  "patch_analysis": {
+    "root_cause": "The _blockmul method in BlockMatrix produces scalar Zero instead of ZeroMatrix when computing block multiplication results that are zero. This causes the colblocksizes property to fail when accessing .cols on block elements, since scalar Zero lacks the .cols attribute that ZeroMatrix has.",
+    "affected_components": [
+      {
+        "file": "sympy/matrices/expressions/blockmatrix.py",
+        "symbol": "BlockMatrix._blockmul",
+        "reason": "This method performs block-wise matrix multiplication and incorrectly returns scalar Zero for zero blocks instead of ZeroMatrix with proper dimensions"
+      },
+      {
+        "file": "sympy/matrices/expressions/blockmatrix.py",
+        "symbol": "BlockMatrix.colblocksizes",
+        "reason": "Property that iterates over block columns and accesses .cols on each block element; fails when blocks contain scalar Zero instead of ZeroMatrix"
+      },
+      {
+        "file": "sympy/matrices/expressions/matexpr.py",
+        "symbol": "ZeroMatrix",
+        "reason": "Matrix expression class with .rows, .cols, and .shape properties that scalar Zero lacks"
+      }
+    ],
+    "failing_signal": "AttributeError: 'Zero' object has no attribute 'cols' when attempting b._blockmul(b)._blockmul(b) or block_collapse(b * b * b). The first multiplication works because original blocks are ZeroMatrix, but the result contains scalar Zero which lacks .cols attribute needed for subsequent multiplication's dimension checking.",
+    "propagation_path": "1) First b._blockmul(b) computes block products including a*z and z*a which should produce ZeroMatrix(2,2) 2) Instead, the implementation returns scalar Zero for these zero results 3) When attempting second multiplication, colblocksizes property tries to access .cols on blocks[0,1] which is now scalar Zero 4) AttributeError is raised since scalar Zero has no .cols attribute",
+    "repair_constraint": "After the fix, block multiplication that results in zero must return ZeroMatrix objects with correct dimensions (matching the block shape), not scalar Zero. The colblocksizes and rowblocksizes properties must be able to access .cols and .rows on all block elements.",
+    "suggested_repair_scope": [
+      "sympy/matrices/expressions/blockmatrix.py"
+    ],
+    "suspicious_symbols": [
+      "BlockMatrix",
+      "_blockmul",
+      "colblocksizes",
+      "rowblocksizes",
+      "ZeroMatrix",
+      "bc_matmul"
+    ],
+    "repair_obligations": [
+      {
+        "id": "test_issue_17624::core::type of block elements after _blockmul",
+        "source_symbol": "test_issue_17624",
+        "validation_subject": "type of block elements after _blockmul",
+        "why_it_matters": "After _blockmul, block elements must remain ZeroMatrix type (not scalar Zero) to preserve the BlockMatrix invariants and enable subsequent block operations. The test verifies that b._blockmul(b).blocks[0,1] is ZeroMatrix, not Zero."
+      },
+      {
+        "id": "test_issue_17624::core::colblocksizes property accessing .cols on block elements",
+        "source_symbol": "test_issue_17624",
+        "validation_subject": "colblocksizes property accessing .cols on block elements",
+        "why_it_matters": "The colblocksizes property iterates over blocks in the first row and accesses .cols on each. This fails if any block is scalar Zero. The fix must ensure all block elements have .cols/.rows properties (i.e., are MatrixExpr subclasses like ZeroMatrix)."
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Fix _blockmul to preserve ZeroMatrix type for zero blocks",
+    "approach": "The bug occurs in the `_blockmul` method of BlockMatrix. When computing block multiplication, if a block operation results in zero (e.g., `a*ZeroMatrix` or `ZeroMatrix*a`), the result becomes scalar `Zero` from sympy.core.numbers instead of `ZeroMatrix` with proper dimensions. This causes `colblocksizes` and `rowblocksizes` properties to fail when accessing `.cols`/`.rows` on these scalar Zero blocks. The fix should ensure that when block multiplication produces a zero result, it returns a `ZeroMatrix` with the correct dimensions (matching the expected block shape from the rowblocksizes of the left operand and colblocksizes of the right operand). This can be done by wrapping zero results in ZeroMatrix with appropriate m,n dimensions.",
+    "edit_targets": [
+      "sympy/matrices/expressions/blockmatrix.py::BlockMatrix._blockmul"
+    ],
+    "dependency_files": [
+      "sympy/matrices/expressions/matexpr.py::ZeroMatrix",
+      "sympy/matrices/expressions/blockmatrix.py::BlockMatrix.colblocksizes",
+      "sympy/matrices/expressions/blockmatrix.py::BlockMatrix.rowblocksizes"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [],
+    "sufficiency_assessment": "The primary fix in `_blockmul` should be sufficient because: (1) test_issue_17624::core::type of block elements after _blockmul - the fix ensures block elements remain ZeroMatrix type (not scalar Zero) after multiplication by wrapping zero results in ZeroMatrix with correct dimensions; (2) test_issue_17624::core::colblocksizes property accessing .cols on block elements - once block elements maintain ZeroMatrix type with .cols/.rows properties, the colblocksizes and rowblocksizes properties will work correctly. The colblocksizes and rowblocksizes properties themselves don't need modification - they just need their block elements to have the .cols/.rows attributes that ZeroMatrix provides.",
+    "risks": [
+      "Potential performance impact if ZeroMatrix is created where scalar Zero would suffice - but this is necessary for correctness; must ensure the dimensions (m, n) used for ZeroMatrix match the expected block dimensions from the multiplication: m = left_block_rows, n = right_block_cols"
+    ]
+  },
+  "patch_edit_plan": null,
+  "final_patch_attempted": false,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": false,
+  "final_patch_apply_mode": "no_patch",
+  "final_patch_cleanly_applied": false,
+  "clean_apply_ratio": 0.0,
+  "resolved": false,
+  "final_resolved": false,
+  "final_status_counts": {
+    "FAILED": 3,
+    "PASSED": 19,
+    "ERROR": 1
+  },
+  "final_failed_count": 4,
+  "final_passed_count": 19,
+  "original_passed_count_improvement": 0,
+  "original_failed_count_reduction": 0,
+  "final_status_map": {
+    "sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_17624": "FAILED",
+    "sympy/matrices/expressions/tests/test_matadd.py:test_zero_matrix_add": "FAILED",
+    "test_bc_matmul": "PASSED",
+    "test_bc_matadd": "PASSED",
+    "test_bc_transpose": "PASSED",
+    "test_bc_dist_diag": "PASSED",
+    "test_block_plus_ident": "PASSED",
+    "test_BlockMatrix": "PASSED",
+    "test_block_collapse_explicit_matrices": "PASSED",
+    "test_issue_17624": "ERROR",
+    "test_BlockMatrix_trace": "PASSED",
+    "test_BlockMatrix_Determinant": "PASSED",
+    "test_squareBlockMatrix": "PASSED",
+    "test_BlockDiagMatrix": "PASSED",
+    "test_blockcut": "PASSED",
+    "test_reblock_2x2": "PASSED",
+    "test_deblock": "PASSED",
+    "test_sort_key": "PASSED",
+    "test_matadd_sympify": "PASSED",
+    "test_matadd_of_matrices": "PASSED",
+    "test_doit_args": "PASSED",
+    "test_generic_identity": "PASSED",
+    "test_zero_matrix_add": "FAILED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

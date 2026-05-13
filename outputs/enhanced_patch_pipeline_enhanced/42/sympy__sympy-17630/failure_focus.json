@@ -1,0 +1,33 @@
+{
+  "original_test_identifiers": [
+    "test_issue_17624",
+    "test_zero_matrix_add"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_issue_17624",
+    "test_zero_matrix_add"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_17624",
+    "sympy/matrices/expressions/tests/test_matadd.py:test_zero_matrix_add",
+    "test_issue_17624",
+    "test_zero_matrix_add"
+  ],
+  "failure_mode": "value_error",
+  "dominant_errors": [
+    "ValueError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_issue_17624 E",
+    "test_zero_matrix_add F",
+    "____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_17624 _____"
+  ],
+  "noise_ratio": 0.0055,
+  "target_test_tracebacks": {
+    "test_issue_17624": "TARGET TEST: test_issue_17624\n- snippet: test_issue_17624 E\n- snippet: test_zero_matrix_add F\n- snippet: ____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_17624 _____\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_issue_17624 E\n____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_17624 _____\nTraceback (most recent call last):\n  File \"/testbed/sympy/matrices/expressions/tests/test_blockmatrix.py\", line 111, in test_issue_17624\n    raise ValueError(filldedent('''\nValueError: \nTraceback (most recent call last):\nAssertionError\n tests finished: 20 passed, 1 failed, 1 expected to fail, 1 exceptions, ",
+    "test_zero_matrix_add": "TARGET TEST: test_zero_matrix_add\n- snippet: test_issue_17624 E\n- snippet: test_zero_matrix_add F\n- snippet: ____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_17624 _____\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_zero_matrix_add F\nTraceback (most recent call last):\n    raise ValueError(filldedent('''\nValueError: \n_____ sympy/matrices/expressions/tests/test_matadd.py:test_zero_matrix_add _____\nTraceback (most recent call last):\n  File \"/testbed/sympy/matrices/expressions/tests/test_matadd.py\", line 37, in test_zero_matrix_add\nAssertionError\n tests finished: 20 passed, 1 failed, 1 expected to fail, 1 exceptions, "
+  }
+}

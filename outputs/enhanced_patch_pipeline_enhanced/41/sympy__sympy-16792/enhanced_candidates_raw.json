@@ -1,0 +1,154 @@
+[
+  {
+    "idea": {
+      "title": "MatrixSymbol argument typed as scalar when not used in expression",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that MatrixSymbol arguments are correctly declared as pointer types in generated C code even when not used in the expression",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_codegen_unused_matrix_arg"
+      ],
+      "covers_original_tests": [
+        "test_ccode_unused_array_arg"
+      ],
+      "covers_obligations": [
+        "test_ccode_unused_array_arg::core"
+      ],
+      "target_source_symbol": "CCodeGen.get_prototype",
+      "target_validation_subject": "function prototype declaration",
+      "semantic_alignment_tokens": [
+        "CCodeGen",
+        "get_prototype",
+        "MatrixSymbol",
+        "codegen"
+      ],
+      "trigger_shape_tokens": [
+        "MatrixSymbol",
+        "get_prototype",
+        "dimensions"
+      ],
+      "rationale": "The original test failure shows AssertionError when generating C code for a routine with an unused MatrixSymbol argument. The bug is that get_prototype incorrectly treats MatrixSymbol as scalar (double x) instead of pointer (double *x) when the symbol doesn't appear in the expression. This test directly exercises the get_prototype method to verify the correct pointer declaration is generated for unused MatrixSymbol arguments."
+    },
+    "patch": "diff --git a/sympy/utilities/tests/test_codegen.py b/sympy/utilities/tests/test_codegen.py\n--- a/sympy/utilities/tests/test_codegen.py\n+++ b/sympy/utilities/tests/test_codegen.py\n@@ -596,3 +596,22 @@ def test_fcode_complex():\n         )\n     assert source==expected\n     sympy.utilities.codegen.COMPLEX_ALLOWED = False\n+\n+def test_sweb_enhanced_codegen_unused_matrix_arg():\n+    # Test that get_prototype correctly declares MatrixSymbol arguments as\n+    # pointers even when they don't appear in the expression\n+    from sympy import S\n+    from sympy.utilities.codegen import make_routine, CCodeGen\n+    \n+    x = MatrixSymbol('x', 2, 1)\n+    # x does not appear in the expression (constant 1.0)\n+    routine = make_routine(\"test\", S(1.0), argument_sequence=(x,))\n+    \n+    generator = CCodeGen()\n+    prototype = generator.get_prototype(routine)\n+    \n+    # The bug: when MatrixSymbol is not used in expression, it's incorrectly\n+    # typed as \"double x\" instead of \"double *x\"\n+    # This assertion will FAIL on buggy code and PASS after fix\n+    assert \"double *x\" in prototype, (\n+        \"MatrixSymbol argument should be declared as pointer (double *x), \"\n+        \"got: %s\" % prototype\n+    )\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Directly calls `CCodeGen.get_prototype` (as specified in the trigger shape)\n2. Tests that MatrixSymbol arguments are correctly declared as pointer types even when not used in the expression\n3. Must FAIL on the buggy code and PASS after the fix\n\nLet me examine the file structure to understand where to add the test:\n```python\n# sympy/utilities/tests/test_codegen.py - last lines shown\ndef test_fcode_complex():\n    import sympy.utilities.codegen\n    sympy.utilities.codegen.COMPLEX_ALLOWED = True\n    x = Symbol('x', real=True)\n    y = Symbol('y',real=True)\n    result = codegen(('test',x+y), 'f95', 'test', header=False, empty=False)\n    source = (result[0][1])\n    expected = (\n        \"REAL*8 function test(x, y)\\n\"\n        \"implicit none\\n\"\n        \"REAL*8, intent(in) :: x\\n\"\n        \"REAL*8, intent(in) :: y\\n\"\n        \"test = x + y\\n\"\n        \"end function\\n\")\n    assert source == expected\n    x = Symbol('x')\n    y = Symbol('y',real=True)\n    result = codegen(('test',x+y), 'f95', 'test', header=False, empty=False)\n    source = (result[0][1])\n    expected = (\n        \"COMPLEX*16 function test(x, y)\\n\"\n        \"implicit none\\n\"\n        \"COMPLEX*16, intent(in) :: x\\n\"\n        \"REAL*8, intent(in) :: y\\n\"\n        \"test = x + y\\n\"\n        \"end function\\n\"\n        )\n    assert source==expected\n    sympy.utilities.codegen.COMPLEX_ALLOWED = False\n```\n\nNow I'll create the enhanced test that directly tests `get_prototype`:\n```diff\ndiff --git a/sympy/utilities/tests/test_codegen.py b/sympy/utilities/tests/test_codegen.py\n--- a/sympy/utilities/tests/test_codegen.py\n+++ b/sympy/utilities/tests/test_codegen.py\n@@ -596,3 +596,22 @@ def test_fcode_complex():\n         )\n     assert source==expected\n     sympy.utilities.codegen.COMPLEX_ALLOWED = False\n+\n+def test_sweb_enhanced_codegen_unused_matrix_arg():\n+    # Test that get_prototype correctly declares MatrixSymbol arguments as\n+    # pointers even when they don't appear in the expression\n+    from sympy import S\n+    from sympy.utilities.codegen import make_routine, CCodeGen\n+    \n+    x = MatrixSymbol('x', 2, 1)\n+    # x does not appear in the expression (constant 1.0)\n+    routine = make_routine(\"test\", S(1.0), argument_sequence=(x,))\n+    \n+    generator = CCodeGen()\n+    prototype = generator.get_prototype(routine)\n+    \n+    # The bug: when MatrixSymbol is not used in expression, it's incorrectly\n+    # typed as \"double x\" instead of \"double *x\"\n+    # This assertion will FAIL on buggy code and PASS after fix\n+    assert \"double *x\" in prototype, (\n+        \"MatrixSymbol argument should be declared as pointer (double *x), \"\n+        \"got: %s\" % prototype\n+    )\n```",
+    "identifiers": [
+      "test_sweb_enhanced_codegen_unused_matrix_arg"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_codegen_unused_matrix_arg"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "MatrixSymbol argument not in expression generates incorrect C pointer declaration",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Verify that when a MatrixSymbol argument is provided but does not appear in the expression, the generated C code correctly declares it as a pointer (double *) rather than a scalar (double)",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_unused_matrixsymbol_arg_c_signature"
+      ],
+      "covers_original_tests": [
+        "test_ccode_unused_array_arg"
+      ],
+      "covers_obligations": [
+        "test_ccode_unused_array_arg::core"
+      ],
+      "target_source_symbol": "CCodeGen.get_prototype",
+      "target_validation_subject": "function prototype declaration for unused MatrixSymbol argument",
+      "semantic_alignment_tokens": [
+        "MatrixSymbol",
+        "get_prototype",
+        "CCodeGen",
+        "dimensions"
+      ],
+      "trigger_shape_tokens": [
+        "dimensions",
+        "InputArgument",
+        "MatrixSymbol",
+        "get_datatype"
+      ],
+      "rationale": "The original test checks the assertion failure but does not validate the specific C prototype signature. This enhanced test directly examines the generated function prototype to confirm that unused MatrixSymbol arguments are correctly declared as pointer types (double *) rather than scalar types (double), which is the root cause of the TypeError when the wrapped function is called."
+    },
+    "patch": "diff --git a/sympy/utilities/tests/test_codegen.py b/sympy/utilities/tests/test_codegen.py\n--- a/sympy/utilities/tests/test_codegen.py\n+++ b/sympy/utilities/tests/test_codegen.py\n@@ -598,3 +598,22 @@ def test_fcode_complex():\n     )\n     assert source==expected\n     sympy.utilities.codegen.COMPLEX_ALLOWED = False\n+\n+def test_sweb_enhanced_unused_matrixsymbol_arg_c_signature():\n+    # Test that get_prototype correctly declares unused MatrixSymbol args as pointers\n+    # This directly tests the root cause: the prototype should be \"double *x\" not \"double x\"\n+    from sympy import symbols\n+    from sympy.matrices import MatrixSymbol\n+    from sympy.utilities.codegen import make_routine, CCodeGen\n+    \n+    x = MatrixSymbol('x', 2, 1)\n+    # x does not appear in the expression (expr is just 1.0)\n+    routine = make_routine(\"test\", 1.0, argument_sequence=(x,))\n+    \n+    # Use CCodeGen.get_prototype directly to check the function signature\n+    generator = CCodeGen()\n+    prototype = generator.get_prototype(routine)\n+    \n+    # The bug: prototype incorrectly generates \"double test(double x)\"\n+    # Expected: prototype should generate \"double test(double *x)\"\n+    # because MatrixSymbol with dimensions should be passed as pointer\n+    assert \"double *x\" in prototype, (\n+        f\"Expected 'double *x' in prototype for unused MatrixSymbol argument, \"\n+        f\"but got: {prototype}\"\n+    )\n",
+    "raw_response": "\n\nLooking at this task, I need to create an enhanced test that:\n1. Directly tests the `CCodeGen.get_prototype` method (the target validation subject)\n2. Uses a MatrixSymbol argument that doesn't appear in the expression\n3. Verifies the generated prototype correctly declares it as `double *` (pointer) rather than `double` (scalar)\n4. This test must FAIL on the buggy code and PASS after the fix\n\nLet me create the diff:\n```diff\ndiff --git a/sympy/utilities/tests/test_codegen.py b/sympy/utilities/tests/test_codegen.py\n--- a/sympy/utilities/tests/test_codegen.py\n+++ b/sympy/utilities/tests/test_codegen.py\n@@ -598,3 +598,22 @@ def test_fcode_complex():\n     )\n     assert source==expected\n     sympy.utilities.codegen.COMPLEX_ALLOWED = False\n+\n+def test_sweb_enhanced_unused_matrixsymbol_arg_c_signature():\n+    # Test that get_prototype correctly declares unused MatrixSymbol args as pointers\n+    # This directly tests the root cause: the prototype should be \"double *x\" not \"double x\"\n+    from sympy import symbols\n+    from sympy.matrices import MatrixSymbol\n+    from sympy.utilities.codegen import make_routine, CCodeGen\n+    \n+    x = MatrixSymbol('x', 2, 1)\n+    # x does not appear in the expression (expr is just 1.0)\n+    routine = make_routine(\"test\", 1.0, argument_sequence=(x,))\n+    \n+    # Use CCodeGen.get_prototype directly to check the function signature\n+    generator = CCodeGen()\n+    prototype = generator.get_prototype(routine)\n+    \n+    # The bug: prototype incorrectly generates \"double test(double x)\"\n+    # Expected: prototype should generate \"double test(double *x)\"\n+    # because MatrixSymbol with dimensions should be passed as pointer\n+    assert \"double *x\" in prototype, (\n+        f\"Expected 'double *x' in prototype for unused MatrixSymbol argument, \"\n+        f\"but got: {prototype}\"\n+    )\n```",
+    "identifiers": [
+      "test_sweb_enhanced_unused_matrixsymbol_arg_c_signature"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_unused_matrixsymbol_arg_c_signature"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "test_codegen_unused_matrixsymbol_arg_pointer",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that C code generation correctly declares unused MatrixSymbol arguments as pointers",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_codegen_unused_matrixsymbol_arg_pointer"
+      ],
+      "covers_original_tests": [
+        "test_ccode_unused_array_arg"
+      ],
+      "covers_obligations": [
+        "test_ccode_unused_array_arg::core"
+      ],
+      "target_source_symbol": "CCodeGen.get_prototype",
+      "target_validation_subject": "function prototype declaration",
+      "semantic_alignment_tokens": [
+        "MatrixSymbol",
+        "CCodeGen",
+        "get_prototype",
+        "codegen"
+      ],
+      "trigger_shape_tokens": [
+        "MatrixSymbol",
+        "InputArgument",
+        "dimensions",
+        "get_prototype"
+      ],
+      "rationale": "The original test failure shows an AssertionError when generating C code for a routine with a MatrixSymbol argument that doesn't appear in the expression. The bug is that the generated C function prototype incorrectly declares the MatrixSymbol as 'double x' instead of 'double *x'. This test directly exercises CCodeGen.get_prototype to verify that unused MatrixSymbol arguments are correctly declared as pointers in the generated C code, which is the core issue causing the autowrap failure."
+    },
+    "patch": "diff --git a/sympy/utilities/tests/test_codegen.py b/sympy/utilities/tests/test_codegen.py\n--- a/sympy/utilities/tests/test_codegen.py\n+++ b/sympy/utilities/tests/test_codegen.py\n@@ -596,3 +596,22 @@ def test_fcode_complex():\n     )\n     assert source==expected\n     sympy.utilities.codegen.COMPLEX_ALLOWED = False\n+\n+\n+def test_sweb_enhanced_codegen_unused_matrixsymbol_arg_pointer():\n+    # Test that CCodeGen.get_prototype correctly declares unused MatrixSymbol\n+    # arguments as pointers (double *), not as scalars (double).\n+    # This is the core issue behind the autowrap failure when array arguments\n+    # don't appear in the wrapped expression.\n+    from sympy import Symbol\n+    from sympy.utilities.codegen import make_routine, CCodeGen\n+    \n+    # Create a MatrixSymbol that won't appear in the expression\n+    x = MatrixSymbol('x', 2, 1)\n+    # Expression is a constant, so x is not used\n+    expr = Symbol('result')  # Use a symbol to name the result\n+    \n+    # Create routine with the unused MatrixSymbol in argument sequence\n+    routine = make_routine(\"test\", expr, argument_sequence=[x])\n+    \n+    # Generate the prototype directly\n+    generator = CCodeGen()\n+    prototype = generator.get_prototype(routine)\n+    \n+    # The prototype should declare x as double *, not double\n+    # Bug: currently generates \"double test(double x)\" instead of \"double test(double *x)\"\n+    assert \"double *x\" in prototype, (\n+        \"Unused MatrixSymbol should be declared as pointer (double *x), \"\n+        \"got: %s\" % prototype\n+    )\n",
+    "raw_response": "\n\nLooking at this task, I need to create an enhanced test that:\n1. Tests the same bug (unused MatrixSymbol argument not being declared as pointer in C code)\n2. Uses a different observation angle than the original test\n3. Must FAIL on the buggy code and PASS after the fix\n\nThe original test uses `codegen` and checks the full generated source. I'll create a test that directly calls `CCodeGen.get_prototype` to verify the function prototype declaration, which is the core issue.\n\nLet me first check the exact end of the test file to know where to append:\n```python\n# Last lines from the file end shown:\ndef test_fcode_complex():\n    import sympy.utilities.codegen\n    sympy.utilities.codegen.COMPLEX_ALLOWED = True\n    x = Symbol('x', real=True)\n    y = Symbol('y',real=True)\n    result = codegen(('test',x+y), 'f95', 'test', header=False, empty=False)\n    source = (result[0][1])\n    expected = (\n        \"REAL*8 function test(x, y)\\n\"\n        \"implicit none\\n\"\n        \"REAL*8, intent(in) :: x\\n\"\n        \"REAL*8, intent(in) :: y\\n\"\n        \"test = x + y\\n\"\n        \"end function\\n\")\n    assert source == expected\n    x = Symbol('x')\n    y = Symbol('y',real=True)\n    result = codegen(('test',x+y), 'f95', 'test', header=False, empty=False)\n    source = (result[0][1])\n    expected = (\n        \"COMPLEX*16 function test(x, y)\\n\"\n        \"implicit none\\n\"\n        \"COMPLEX*16, intent(in) :: x\\n\"\n        \"REAL*8, intent(in) :: y\\n\"\n        \"test = x + y\\n\"\n        \"end function\\n\"\n        )\n    assert source==expected\n    sympy.utilities.codegen.COMPLEX_ALLOWED = False\n```\n\nNow I'll create the enhanced test that directly tests `CCodeGen.get_prototype`:\n```diff\ndiff --git a/sympy/utilities/tests/test_codegen.py b/sympy/utilities/tests/test_codegen.py\n--- a/sympy/utilities/tests/test_codegen.py\n+++ b/sympy/utilities/tests/test_codegen.py\n@@ -596,3 +596,22 @@ def test_fcode_complex():\n     )\n     assert source==expected\n     sympy.utilities.codegen.COMPLEX_ALLOWED = False\n+\n+\n+def test_sweb_enhanced_codegen_unused_matrixsymbol_arg_pointer():\n+    # Test that CCodeGen.get_prototype correctly declares unused MatrixSymbol\n+    # arguments as pointers (double *), not as scalars (double).\n+    # This is the core issue behind the autowrap failure when array arguments\n+    # don't appear in the wrapped expression.\n+    from sympy import Symbol\n+    from sympy.utilities.codegen import make_routine, CCodeGen\n+    \n+    # Create a MatrixSymbol that won't appear in the expression\n+    x = MatrixSymbol('x', 2, 1)\n+    # Expression is a constant, so x is not used\n+    expr = Symbol('result')  # Use a symbol to name the result\n+    \n+    # Create routine with the unused MatrixSymbol in argument sequence\n+    routine = make_routine(\"test\", expr, argument_sequence=[x])\n+    \n+    # Generate the prototype directly\n+    generator = CCodeGen()\n+    prototype = generator.get_prototype(routine)\n+    \n+    # The prototype should declare x as double *, not double\n+    # Bug: currently generates \"double test(double x)\" instead of \"double test(double *x)\"\n+    assert \"double *x\" in prototype, (\n+        \"Unused MatrixSymbol should be declared as pointer (double *x), \"\n+        \"got: %s\" % prototype\n+    )\n```",
+    "identifiers": [
+      "test_sweb_enhanced_codegen_unused_matrixsymbol_arg_pointer"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_codegen_unused_matrixsymbol_arg_pointer"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

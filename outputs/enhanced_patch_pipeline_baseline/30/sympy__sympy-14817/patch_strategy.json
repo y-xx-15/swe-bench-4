@@ -1,0 +1,16 @@
+{
+  "title": "Use _coeff_isneg instead of sympify on args[0]",
+  "approach": "Replace the buggy code `S(item.args[0]).is_negative` with `_coeff_isneg(item)` which safely checks if the coefficient of an expression is negative without attempting to parse string arguments. The `_coeff_isneg` function is already imported in the file and is designed for this purpose.",
+  "edit_targets": [
+    "sympy/printing/pretty/pretty.py::_print_MatAdd"
+  ],
+  "dependency_files": [
+    "sympy/core/function.py::_coeff_isneg"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only _print_MatAdd is sufficient. The _coeff_isneg function is already imported at the top of the file (line 7: `from sympy.core.function import _coeff_isneg`). The fix replaces the problematic sympify call on item.args[0] (which fails for MatrixSymbol strings) with a proper check that works on any expression.",
+  "risks": [
+    "Potential regression: the original code may have been intended to handle specific edge cases where _coeff_isneg behaves differently. However, _coeff_isneg is the proper API for checking negative coefficients and is already used elsewhere in the codebase for similar purposes."
+  ]
+}

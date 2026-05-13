@@ -1,0 +1,24 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/sets/sets.py",
+      "action": "modify_region",
+      "justification": "The Intersection.__new__ method must deduplicate arguments after flattening but before simplify_intersection to prevent incorrect EmptySet results when duplicate sets are present."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/sets/sets.py",
+      "target_symbol": "Intersection.__new__",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "OBL-1",
+        "OBL-2",
+        "OBL-3"
+      ],
+      "anchor_line_before": "        # flatten inputs to merge intersections and iterables\n        args = _sympify(args)",
+      "anchor_line_after": "        # Reduce sets using known rules\n        if evaluate:",
+      "replacement_block": "        # flatten inputs to merge intersections and iterables\n        args = _sympify(args)\n\n        # Remove duplicates while preserving order for deterministic behavior\n        args = list(dict.fromkeys(args))\n\n        # Reduce sets using known rules\n        if evaluate:"
+    }
+  ]
+}

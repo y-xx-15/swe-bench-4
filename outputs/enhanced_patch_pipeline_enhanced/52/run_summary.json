@@ -1,0 +1,392 @@
+[
+  {
+    "instance_id": "sympy__sympy-12454",
+    "repo": "sympy/sympy",
+    "model": "minimax-m2.5",
+    "pipeline_mode": "enhanced_guided",
+    "hide_original_test_patch_in_repair": false,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "enhanced_guided",
+    "original_test_identifiers": [
+      "test_is_upper",
+      "test_hessenberg"
+    ],
+    "original_status_counts": {
+      "FAILED": 10,
+      "PASSED": 135,
+      "ERROR": 9
+    },
+    "original_failed_count": 19,
+    "original_passed_count": 135,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_is_upper",
+        "test_hessenberg"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_is_upper",
+        "test_hessenberg"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/matrices/tests/test_matrices.py:test_refine",
+        "sympy/matrices/tests/test_matrices.py:test_eigen",
+        "sympy/matrices/tests/test_matrices.py:test_simplify",
+        "sympy/matrices/tests/test_matrices.py:test_is_upper",
+        "sympy/matrices/tests/test_matrices.py:test_issue_3749"
+      ],
+      "failure_mode": "assertion_error",
+      "dominant_errors": [
+        "RecursionError",
+        "IndexError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_is_upper E",
+        "test_hessenberg E",
+        "______________ sympy/matrices/tests/test_matrices.py:test_refine _______________"
+      ],
+      "noise_ratio": 0.0004,
+      "target_test_tracebacks": {
+        "test_is_upper": "TARGET TEST: test_is_upper\n- snippet: test_is_upper E\n- snippet: test_hessenberg E\n- snippet: ______________ sympy/matrices/tests/test_matrices.py:test_refine _______________\n- dominant_errors: RecursionError, IndexError\nWEAK TRACEBACK CONTEXT:\ntest_is_upper E\ntest_vech_errors ok\ntest_errors ok\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded in __instancecheck__\n_____________ sympy/matrices/tests/test_matrices.py:test_is_upper ______________\n  File \"/testbed/sympy/matrices/tests/test_matrices.py\", line 1229, in test_is_upper\n    raise IndexError(\"Index out of range: a[%s]\" % (j,))\nIndexError: Index out of range: a[2]\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded in __instancecheck__\n    raise IndexError(\"Index out of range: a[%s]\" % (j,))\nIndexError: Index out of range: a[2]\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object",
+        "test_hessenberg": "TARGET TEST: test_hessenberg\n- snippet: test_is_upper E\n- snippet: test_hessenberg E\n- snippet: ______________ sympy/matrices/tests/test_matrices.py:test_refine _______________\n- dominant_errors: RecursionError, IndexError\nWEAK TRACEBACK CONTEXT:\ntest_vech_errors ok\ntest_errors ok\ntest_hessenberg E\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded in __instancecheck__\n    raise IndexError(\"Index out of range: a[%s]\" % (j,))\nIndexError: Index out of range: a[2]\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded in __instancecheck__\n____________ sympy/matrices/tests/test_matrices.py:test_hessenberg _____________\n  File \"/testbed/sympy/matrices/tests/test_matrices.py\", line 1886, in test_hessenberg\n    raise IndexError(\"Index out of range: a[%s]\" % (j,))\nIndexError: Index out of range: a[2]\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object\nRecursionError: maximum recursion depth exceeded while calling a Python object"
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 7,
+      "keep_top_k": 4,
+      "attempt_budget": 3,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "assertion_error",
+      "noise_ratio": 0.0004,
+      "difficulty": "high"
+    },
+    "adaptive_num_candidates": 7,
+    "adaptive_keep_top_k": 4,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 7,
+    "kept_enhanced_candidates": 1,
+    "enhanced_candidate_retention_rate": 0.14285714285714285,
+    "enhanced_generation_attempts_total": 27,
+    "enhanced_generation_attempts_avg": 3.857142857142857,
+    "kept_enhanced_test_identifiers": [
+      "test_sweb_enhanced_is_upper_tall_matrix"
+    ],
+    "enhanced_failed_test_identifiers": [
+      "test_sweb_enhanced_is_upper_tall_matrix"
+    ],
+    "enhanced_failed_count": 1,
+    "generated_patch_nonempty": false,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 13,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_not_generated",
+    "generated_patch_feedback": "The patch did not target the expected file sympy/matrices/matrices.py.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The is_upper property iterates using `for j in range(i)` without bounding j by the number of columns. For tall matrices (more rows than columns), this generates column indices that exceed the matrix bounds, causing IndexError when accessing self[i, j].",
+      "affected_components": [
+        {
+          "file": "sympy/matrices/matrices.py",
+          "symbol": "is_upper (property in MatrixProperties)",
+          "reason": "The main buggy code that raises IndexError for tall matrices. Uses unbounded range(i) for column iteration."
+        },
+        {
+          "file": "sympy/matrices/matrices.py",
+          "symbol": "_eval_is_lower",
+          "reason": "Has the same bug pattern - uses unbounded range for wide matrices (more columns than rows)."
+        },
+        {
+          "file": "sympy/matrices/matrices.py",
+          "symbol": "_eval_is_upper_hessenberg",
+          "reason": "Uses `for j in range(i - 1)` which also exceeds column bounds for tall matrices."
+        },
+        {
+          "file": "sympy/matrices/matrices.py",
+          "symbol": "_eval_is_lower_hessenberg",
+          "reason": "Uses `for j in range(i + 2, self.cols)` which exceeds row bounds for wide matrices."
+        }
+      ],
+      "failing_signal": "IndexError: Index out of range: a[2] when calling sympy.zeros(4,2).is_upper. The iteration generates index (3,2) which is beyond column 1 (0-indexed) for a 2-column matrix.",
+      "propagation_path": "is_upper property calls all() with a generator that iterates over self[i, j] for i in range(1, self.rows) and j in range(i). For a 4x2 matrix, when i=3, j iterates 0,1,2 but column 2 doesn't exist. The __getitem__ method in dense.py calls extract() which validates indices via a2idx(), raising IndexError.",
+      "repair_constraint": "The fix must ensure that for any matrix shape, only valid indices (i < rows and j < cols) are accessed. The upper triangular check should only verify entries within the matrix bounds - for a tall matrix, this means only checking up to min(rows, cols) rows.",
+      "suggested_repair_scope": [
+        "sympy/matrices/matrices.py"
+      ],
+      "suspicious_symbols": [
+        "is_upper",
+        "_eval_is_lower",
+        "_eval_is_upper_hessenberg",
+        "_eval_is_lower_hessenberg"
+      ],
+      "repair_obligations": [
+        {
+          "id": "test_is_upper::core::is_upper property on tall matrix",
+          "source_symbol": "is_upper",
+          "validation_subject": "is_upper property on tall matrix",
+          "why_it_matters": "The primary bug - calling is_upper on a 4x2 matrix raises IndexError instead of returning a boolean. Must bound column iteration by self.cols."
+        },
+        {
+          "id": "test_hessenberg::core::is_upper property on tall matrix",
+          "source_symbol": "test_hessenberg",
+          "validation_subject": "is_upper property on tall matrix",
+          "why_it_matters": "test_hessenberg also fails because it likely creates tall matrices and calls is_upper internally. The same root cause affects this test."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Bound iteration in is_upper and related triangular checks",
+      "approach": "Fix is_upper by changing `range(i)` to `range(min(i, self.cols))` to prevent column index overflow for tall matrices. Also fix the related _eval_is_lower, _eval_is_upper_hessenberg, and _eval_is_lower_hessenberg methods which have similar unbounded iteration bugs that cause IndexErrors for non-square matrices. The core fix is to bound all inner loop iterations by the matrix dimensions.",
+      "edit_targets": [
+        "sympy/matrices/matrices.py::MatrixProperties.is_upper",
+        "sympy/matrices/matrices.py::MatrixProperties._eval_is_lower",
+        "sympy/matrices/matrices.py::MatrixProperties._eval_is_upper_hessenberg",
+        "sympy/matrices/matrices.py::MatrixProperties._eval_is_lower_hessenberg"
+      ],
+      "dependency_files": [
+        "sympy/matrices/tests/test_matrices.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [],
+      "sufficiency_assessment": "The fix requires editing four methods in the MatrixProperties class. Each method has unbounded iteration that causes IndexError when matrix dimensions are non-square. The is_upper property and _eval_is_upper_hessenberg need column bounds; _eval_is_lower and _eval_is_lower_hessenberg need row bounds. All four must be fixed to prevent similar IndexErrors across all triangular and Hessenberg checks.",
+      "risks": [
+        "Changing iteration bounds could affect performance for very large matrices, but the change is minimal and correct",
+        "The fix should not affect square matrices since min(i, self.cols) equals i when cols >= rows"
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/matrices/matrices.py",
+          "action": "modify_region",
+          "justification": "Contains is_upper property and related methods that have unbounded iteration causing IndexError for non-square matrices. All four methods must be fixed."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "sympy/matrices/matrices.py",
+          "target_symbol": "MatrixProperties.is_upper",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "test_is_upper::core::is_upper property on tall matrix",
+            "test_hessenberg::core::is_upper property on tall matrix"
+          ],
+          "anchor_line_before": "        return all(self[i, j].is_zero",
+          "anchor_line_after": "                   for j in range(i))",
+          "replacement_block": "        return all(self[i, j].is_zero\n                   for i in range(1, self.rows)\n                   for j in range(min(i, self.cols)))"
+        },
+        {
+          "target_file": "sympy/matrices/matrices.py",
+          "target_symbol": "MatrixProperties._eval_is_lower",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "test_is_upper::core::is_upper property on tall matrix"
+          ],
+          "anchor_line_before": "        return all(self[i, j].is_zero",
+          "anchor_line_after": "                   for i in range(self.rows)",
+          "replacement_block": "        return all(self[i, j].is_zero\n                   for i in range(self.rows)\n                   for j in range(i + 1, min(self.cols, self.rows)))"
+        },
+        {
+          "target_file": "sympy/matrices/matrices.py",
+          "target_symbol": "MatrixProperties._eval_is_upper_hessenberg",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "test_hessenberg::core::is_upper property on tall matrix"
+          ],
+          "anchor_line_before": "        return all(self[i, j].is_zero",
+          "anchor_line_after": "                   for i in range(2, self.rows)",
+          "replacement_block": "        return all(self[i, j].is_zero\n                   for i in range(2, self.rows)\n                   for j in range(min(i - 1, self.cols)))"
+        },
+        {
+          "target_file": "sympy/matrices/matrices.py",
+          "target_symbol": "MatrixProperties._eval_is_lower_hessenberg",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "test_hessenberg::core::is_upper property on tall matrix"
+          ],
+          "anchor_line_before": "        return all(self[i, j].is_zero",
+          "anchor_line_after": "                   for i in range(self.rows)",
+          "replacement_block": "        return all(self[i, j].is_zero\n                   for i in range(self.rows)\n                   for j in range(i + 2, min(self.cols, self.rows)))"
+        }
+      ]
+    },
+    "final_patch_attempted": false,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": false,
+    "final_patch_apply_mode": "no_patch",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 10,
+      "PASSED": 135,
+      "ERROR": 9
+    },
+    "final_failed_count": 19,
+    "final_passed_count": 135,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/matrices/tests/test_matrices.py:test_refine": "FAILED",
+      "sympy/matrices/tests/test_matrices.py:test_eigen": "FAILED",
+      "sympy/matrices/tests/test_matrices.py:test_simplify": "FAILED",
+      "sympy/matrices/tests/test_matrices.py:test_is_upper": "FAILED",
+      "sympy/matrices/tests/test_matrices.py:test_issue_3749": "FAILED",
+      "sympy/matrices/tests/test_matrices.py:test_limit": "FAILED",
+      "sympy/matrices/tests/test_matrices.py:test_hessenberg": "FAILED",
+      "sympy/matrices/tests/test_matrices.py:test_matrix_norm": "FAILED",
+      "sympy/matrices/tests/test_matrices.py:test_opportunistic_simplification": "FAILED",
+      "sympy/matrices/tests/test_matrices.py:test_as_real_imag": "FAILED",
+      "test_args": "PASSED",
+      "test_division": "PASSED",
+      "test_sum": "PASSED",
+      "test_addition": "PASSED",
+      "test_fancy_index_matrix": "PASSED",
+      "test_multiplication": "PASSED",
+      "test_power": "PASSED",
+      "test_creation": "PASSED",
+      "test_tolist": "PASSED",
+      "test_as_mutable": "PASSED",
+      "test_determinant": "PASSED",
+      "test_det_LU_decomposition": "PASSED",
+      "test_berkowitz_minors": "PASSED",
+      "test_slicing": "PASSED",
+      "test_submatrix_assignment": "PASSED",
+      "test_extract": "PASSED",
+      "test_reshape": "PASSED",
+      "test_applyfunc": "PASSED",
+      "test_expand": "PASSED",
+      "test_refine": "ERROR",
+      "test_random": "PASSED",
+      "test_LUdecomp": "PASSED",
+      "test_LUsolve": "PASSED",
+      "test_QRsolve": "PASSED",
+      "test_inverse": "PASSED",
+      "test_matrix_inverse_mod": "PASSED",
+      "test_util": "PASSED",
+      "test_jacobian_hessian": "PASSED",
+      "test_QR": "PASSED",
+      "test_QR_non_square": "PASSED",
+      "test_nullspace": "PASSED",
+      "test_columnspace": "PASSED",
+      "test_wronskian": "PASSED",
+      "test_eigen": "ERROR",
+      "test_subs": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_simplify": "ERROR",
+      "test_transpose": "PASSED",
+      "test_conjugate": "PASSED",
+      "test_conj_dirac": "PASSED",
+      "test_trace": "PASSED",
+      "test_shape": "PASSED",
+      "test_col_row_op": "PASSED",
+      "test_zip_row_op": "PASSED",
+      "test_issue_3950": "PASSED",
+      "test_issue_3981": "PASSED",
+      "test_evalf": "PASSED",
+      "test_is_symbolic": "PASSED",
+      "test_is_upper": "ERROR",
+      "test_is_lower": "PASSED",
+      "test_is_nilpotent": "PASSED",
+      "test_zeros_ones_fill": "PASSED",
+      "test_empty_zeros": "PASSED",
+      "test_issue_3749": "ERROR",
+      "test_inv_iszerofunc": "PASSED",
+      "test_jacobian_metrics": "PASSED",
+      "test_jacobian2": "PASSED",
+      "test_issue_4564": "PASSED",
+      "test_nonvectorJacobian": "PASSED",
+      "test_vec": "PASSED",
+      "test_vech": "PASSED",
+      "test_vech_errors": "PASSED",
+      "test_diag": "PASSED",
+      "test_get_diag_blocks1": "PASSED",
+      "test_get_diag_blocks2": "PASSED",
+      "test_inv_block": "PASSED",
+      "test_creation_args": "PASSED",
+      "test_diagonal_symmetrical": "PASSED",
+      "test_diagonalization": "PASSED",
+      "test_jordan_form": "PASSED",
+      "test_jordan_form_complex_issue_9274": "PASSED",
+      "test_issue_10220": "PASSED",
+      "test_Matrix_berkowitz_charpoly": "PASSED",
+      "test_exp": "PASSED",
+      "test_has": "PASSED",
+      "test_errors": "PASSED",
+      "test_len": "PASSED",
+      "test_integrate": "PASSED",
+      "test_limit": "ERROR",
+      "test_diff": "PASSED",
+      "test_getattr": "PASSED",
+      "test_hessenberg": "ERROR",
+      "test_cholesky": "PASSED",
+      "test_LDLdecomposition": "PASSED",
+      "test_cholesky_solve": "PASSED",
+      "test_LDLsolve": "PASSED",
+      "test_lower_triangular_solve": "PASSED",
+      "test_upper_triangular_solve": "PASSED",
+      "test_diagonal_solve": "PASSED",
+      "test_matrix_norm": "ERROR",
+      "test_singular_values": "PASSED",
+      "test_condition_number": "PASSED",
+      "test_equality": "PASSED",
+      "test_col_join": "PASSED",
+      "test_row_insert": "PASSED",
+      "test_col_insert": "PASSED",
+      "test_normalized": "PASSED",
+      "test_print_nonzero": "PASSED",
+      "test_zeros_eye": "PASSED",
+      "test_is_zero": "PASSED",
+      "test_rotation_matrices": "PASSED",
+      "test_DeferredVector": "PASSED",
+      "test_DeferredVector_not_iterable": "PASSED",
+      "test_DeferredVector_Matrix": "PASSED",
+      "test_GramSchmidt": "PASSED",
+      "test_casoratian": "PASSED",
+      "test_zero_dimension_multiply": "PASSED",
+      "test_slice_issue_2884": "PASSED",
+      "test_slice_issue_3401": "PASSED",
+      "test_copyin": "PASSED",
+      "test_invertible_check": "PASSED",
+      "test_issue_5964": "PASSED",
+      "test_issue_7604": "PASSED",
+      "test_is_Identity": "PASSED",
+      "test_dot": "PASSED",
+      "test_dual": "PASSED",
+      "test_anti_symmetric": "PASSED",
+      "test_normalize_sort_diogonalization": "PASSED",
+      "test_issue_5321": "PASSED",
+      "test_issue_5320": "PASSED",
+      "test_issue_11944": "PASSED",
+      "test_cross": "PASSED",
+      "test_hash": "PASSED",
+      "test_adjoint": "PASSED",
+      "test_simplify_immutable": "PASSED",
+      "test_rank": "PASSED",
+      "test_issue_11434": "PASSED",
+      "test_rank_regression_from_so": "PASSED",
+      "test_replace": "PASSED",
+      "test_replace_map": "PASSED",
+      "test_atoms": "PASSED",
+      "test_pinv_solve": "PASSED",
+      "test_gauss_jordan_solve": "PASSED",
+      "test_issue_7201": "PASSED",
+      "test_free_symbols": "PASSED",
+      "test_hermitian": "PASSED",
+      "test_doit": "PASSED",
+      "test_issue_9457_9467_9876": "PASSED",
+      "test_issue_9422": "PASSED",
+      "test_issue_10770": "PASSED",
+      "test_issue_10658": "PASSED",
+      "test_opportunistic_simplification": "ERROR",
+      "test_partial_pivoting": "PASSED",
+      "test_iszero_substitution": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

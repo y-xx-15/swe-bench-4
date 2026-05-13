@@ -1,0 +1,9 @@
+
+
+Looking at the problem, I need to find the `_print_Product` method in the pretty.py file and understand how it handles limits compared to `_print_Sum`. Let me examine the relevant code sections.
+<minimax:tool_call>
+<invoke name="grep">
+<parameter name="path">/testbed/sympy/printing/pretty/pretty.py</parameter>
+<parameter name="pattern">def _print_Product</parameter>
+</invoke>
+</minimax:tool_call>

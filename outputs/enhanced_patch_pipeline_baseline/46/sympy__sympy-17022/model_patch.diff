@@ -1,0 +1,11 @@
+--- a/sympy/printing/pycode.py
++++ b/sympy/printing/pycode.py
+@@ -488,6 +488,8 @@
+     ))
+     _kc = {k: 'numpy.'+v for k, v in _known_constants_math.items()}
+ 
++    def _print_Identity(self, expr):
++        return '{0}({1})'.format(self._module_format('numpy.eye'), self._print(expr.args[0]))
+ 
+     def _print_seq(self, seq):
+         "General sequence printer: converts to tuple"

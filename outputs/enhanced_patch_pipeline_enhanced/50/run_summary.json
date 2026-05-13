@@ -1,0 +1,289 @@
+[
+  {
+    "instance_id": "sympy__sympy-18199",
+    "repo": "sympy/sympy",
+    "model": "minimax-m2.5",
+    "pipeline_mode": "enhanced_guided",
+    "hide_original_test_patch_in_repair": false,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "baseline_fallback",
+    "original_test_identifiers": [
+      "test_solve_modular"
+    ],
+    "original_status_counts": {
+      "FAILED": 7,
+      "PASSED": 113
+    },
+    "original_failed_count": 7,
+    "original_passed_count": 113,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_solve_modular"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_solve_modular"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/ntheory/tests/test_residue.py:test_residue",
+        "sympy/solvers/tests/test_solveset.py:test_solve_trig",
+        "sympy/solvers/tests/test_solveset.py:test_solve_hyperbolic",
+        "sympy/solvers/tests/test_solveset.py:test_solve_modular",
+        "test_solve_trig"
+      ],
+      "failure_mode": "assertion_error",
+      "dominant_errors": [
+        "NotImplementedError",
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_solve_trig F",
+        "test_solve_trig_simplified f",
+        "test_solve_modular F"
+      ],
+      "noise_ratio": 0.0043,
+      "target_test_tracebacks": {
+        "test_solve_modular": "TARGET TEST: test_solve_modular\n- snippet: test_solve_trig F\n- snippet: test_solve_trig_simplified f\n- snippet: test_solve_modular F\n- dominant_errors: NotImplementedError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_errorinverses ok\ntest_solve_modular F\ntest_solve_modular_fail f                                                 [FAIL]\nTraceback (most recent call last):\n    raise NotImplementedError(\"Not implemented for composite p\")\nNotImplementedError: Not implemented for composite p\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\n___________ sympy/solvers/tests/test_solveset.py:test_solve_modular ____________\nTraceback (most recent call last):\n  File \"/testbed/sympy/solvers/tests/test_solveset.py\", line 2246, in test_solve_modular\nAssertionError\n tests finished: 113 passed, 3 failed, 3 skipped, 12 expected to fail, "
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 5,
+      "keep_top_k": 3,
+      "attempt_budget": 3,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "assertion_error",
+      "noise_ratio": 0.0043,
+      "difficulty": "medium"
+    },
+    "adaptive_num_candidates": 5,
+    "adaptive_keep_top_k": 3,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 5,
+    "kept_enhanced_candidates": 0,
+    "enhanced_candidate_retention_rate": 0.0,
+    "enhanced_generation_attempts_total": 20,
+    "enhanced_generation_attempts_avg": 4.0,
+    "kept_enhanced_test_identifiers": [],
+    "enhanced_failed_test_identifiers": [],
+    "enhanced_failed_count": 0,
+    "generated_patch_nonempty": false,
+    "generated_patch_error": "anchor_line_before was not found before anchor_line_after in the target file.",
+    "generated_patch_attempts": 6,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_not_generated",
+    "generated_patch_feedback": "anchor_line_before was not found before anchor_line_after in the target file.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "The nthroot_mod function does not handle the special case when a % p == 0. When a is divisible by p, x = 0 is always a root (since 0**n = 0 mod p for any n > 0), but the algorithm proceeds to use the general case which fails to return 0.",
+      "affected_components": [
+        {
+          "file": "sympy/ntheory/residue_ntheory.py",
+          "symbol": "nthroot_mod",
+          "reason": "Main function that needs to check for a % p == 0 case and return 0 as root"
+        }
+      ],
+      "failing_signal": "nthroot_mod(17*17, 5, 17) should return 0 but returns None or doesn't include 0 in the results",
+      "propagation_path": "When a % p == 0, is_nthpow_residue returns True (correctly), but then the algorithm uses the general nth-root finding logic which doesn't handle the zero case. The Euclidean algorithm-based approach doesn't produce 0 as a root.",
+      "repair_constraint": "When a % p == 0 and n > 0, the function must return 0 as a root (either alone or as part of the list of roots when all_roots=True)",
+      "suggested_repair_scope": [
+        "sympy/ntheory/residue_ntheory.py"
+      ],
+      "suspicious_symbols": [
+        "nthroot_mod",
+        "is_nthpow_residue",
+        "_nthroot_mod1"
+      ],
+      "repair_obligations": [
+        {
+          "id": "zero_root_case",
+          "source_symbol": "nthroot_mod",
+          "validation_subject": "return value when a % p == 0",
+          "why_it_matters": "When a % p == 0, x = 0 is always a valid root of x**n = a mod p for any n > 0. The function must explicitly handle this case before attempting the general algorithm."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Add zero root case handling in nthroot_mod",
+      "approach": "Add a check at the beginning of nthroot_mod function to handle the case when a % p == 0. When a is divisible by p, 0 is always a valid root since 0**n = 0 mod p for any n > 0. The fix should check if a % p == 0 and return 0 (or [0] if all_roots=True) before proceeding with the general algorithm.",
+      "edit_targets": [
+        "sympy/ntheory/residue_ntheory.py::nthroot_mod"
+      ],
+      "dependency_files": [
+        "sympy/ntheory/residue_ntheory.py::is_nthpow_residue",
+        "sympy/ntheory/residue_ntheory.py::_nthroot_mod1"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [],
+      "sufficiency_assessment": "Yes, editing only the nthroot_mod function is sufficient. The fix only requires adding a simple check at the start of the function to handle the special case when a % p == 0. No changes to helper functions like is_nthpow_residue or _nthroot_mod1 are needed since they are not responsible for this edge case.",
+      "risks": [
+        "Potential regression: The fix must ensure that when a % p == 0, the function returns 0 as the root. Need to verify this doesn't break any existing functionality for non-zero a values."
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/ntheory/residue_ntheory.py",
+          "action": "modify_region",
+          "justification": "The nthroot_mod function needs to handle the special case when a % p == 0. When a is divisible by p, x = 0 is always a valid root since 0**n = 0 mod p for any n > 0. The fix requires adding a check at the start of the function after the input normalization."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "sympy/ntheory/residue_ntheory.py",
+          "target_symbol": "nthroot_mod",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "zero_root_case"
+          ],
+          "anchor_line_before": "    a, n, p = as_int(a), as_int(n), as_int(p)",
+          "anchor_line_after": "    if n == 2:",
+          "replacement_block": "    a, n, p = as_int(a), as_int(n), as_int(p)\n    if a % p == 0:\n        if all_roots:\n            return [0]\n        return 0\n    if n == 2:"
+        }
+      ]
+    },
+    "final_patch_attempted": false,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": false,
+    "final_patch_apply_mode": "no_patch",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 7,
+      "PASSED": 113
+    },
+    "final_failed_count": 7,
+    "final_passed_count": 113,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/ntheory/tests/test_residue.py:test_residue": "FAILED",
+      "sympy/solvers/tests/test_solveset.py:test_solve_trig": "FAILED",
+      "sympy/solvers/tests/test_solveset.py:test_solve_hyperbolic": "FAILED",
+      "sympy/solvers/tests/test_solveset.py:test_solve_modular": "FAILED",
+      "test_invert_real": "PASSED",
+      "test_invert_complex": "PASSED",
+      "test_domain_check": "PASSED",
+      "test_issue_11536": "PASSED",
+      "test_issue_17479": "PASSED",
+      "test_is_function_class_equation": "PASSED",
+      "test_garbage_input": "PASSED",
+      "test_solve_mul": "PASSED",
+      "test_solve_invert": "PASSED",
+      "test_errorinverses": "PASSED",
+      "test_solve_polynomial": "PASSED",
+      "test_return_root_of": "PASSED",
+      "test__has_rational_power": "PASSED",
+      "test_solveset_sqrt_1": "PASSED",
+      "test_solveset_sqrt_2": "PASSED",
+      "test_solve_polynomial_symbolic_param": "PASSED",
+      "test_solve_rational": "PASSED",
+      "test_solveset_real_gen_is_pow": "PASSED",
+      "test_no_sol": "PASSED",
+      "test_sol_zero_real": "PASSED",
+      "test_no_sol_rational_extragenous": "PASSED",
+      "test_solve_polynomial_cv_1a": "PASSED",
+      "test_solveset_real_rational": "PASSED",
+      "test_solveset_real_log": "PASSED",
+      "test_poly_gens": "PASSED",
+      "test_solve_abs": "PASSED",
+      "test_issue_9565": "PASSED",
+      "test_issue_10069": "PASSED",
+      "test_real_imag_splitting": "PASSED",
+      "test_units": "PASSED",
+      "test_solve_only_exp_1": "PASSED",
+      "test_atan2": "PASSED",
+      "test_piecewise_solveset": "PASSED",
+      "test_solveset_complex_polynomial": "PASSED",
+      "test_sol_zero_complex": "PASSED",
+      "test_solveset_complex_rational": "PASSED",
+      "test_solveset_complex_exp": "PASSED",
+      "test_solveset_real_exp": "PASSED",
+      "test_solve_complex_log": "PASSED",
+      "test_solve_complex_sqrt": "PASSED",
+      "test_solveset_complex_tan": "PASSED",
+      "test_solve_trig": "FAILED",
+      "test_solve_hyperbolic": "FAILED",
+      "test_solve_invalid_sol": "PASSED",
+      "test_solveset": "PASSED",
+      "test__solveset_multi": "PASSED",
+      "test_conditionset": "PASSED",
+      "test_solveset_domain": "PASSED",
+      "test_improve_coverage": "PASSED",
+      "test_issue_9522": "PASSED",
+      "test_solvify": "PASSED",
+      "test_abs_invert_solvify": "PASSED",
+      "test_linear_eq_to_matrix": "PASSED",
+      "test_issue_16577": "PASSED",
+      "test_linsolve": "PASSED",
+      "test_linsolve_immutable": "PASSED",
+      "test_solve_decomposition": "PASSED",
+      "test_nonlinsolve_basic": "PASSED",
+      "test_nonlinsolve_abs": "PASSED",
+      "test_raise_exception_nonlinsolve": "PASSED",
+      "test_trig_system": "PASSED",
+      "test_nonlinsolve_positive_dimensional": "PASSED",
+      "test_nonlinsolve_polysys": "PASSED",
+      "test_nonlinsolve_using_substitution": "PASSED",
+      "test_nonlinsolve_complex": "PASSED",
+      "test_issue_5132_1": "PASSED",
+      "test_issue_5132_2": "PASSED",
+      "test_issue_6752": "PASSED",
+      "test_issue_2777": "PASSED",
+      "test_issue_8828": "PASSED",
+      "test_nonlinsolve_conditionset": "PASSED",
+      "test_substitution_basic": "PASSED",
+      "test_issue_5132_substitution": "PASSED",
+      "test_raises_substitution": "PASSED",
+      "test_issue_9556": "PASSED",
+      "test_issue_9611": "PASSED",
+      "test_issue_9557": "PASSED",
+      "test_issue_9778": "PASSED",
+      "test_issue_10214": "PASSED",
+      "test_issue_9849": "PASSED",
+      "test_issue_9953": "PASSED",
+      "test_issue_9913": "PASSED",
+      "test_issue_10397": "PASSED",
+      "test_issue_14987": "PASSED",
+      "test_simplification": "PASSED",
+      "test_issue_10555": "PASSED",
+      "test_issue_8715": "PASSED",
+      "test_issue_11174": "PASSED",
+      "test_issue_11534": "PASSED",
+      "test_issue_10477": "PASSED",
+      "test_issue_10671": "PASSED",
+      "test_issue_11064": "PASSED",
+      "test_issue_12478": "PASSED",
+      "test_issue_12429": "PASSED",
+      "test_solveset_arg": "PASSED",
+      "test__is_finite_with_finite_vars": "PASSED",
+      "test_issue_13550": "PASSED",
+      "test_issue_13849": "PASSED",
+      "test_issue_14223": "PASSED",
+      "test_issue_10158": "PASSED",
+      "test_issue_14300": "PASSED",
+      "test_issue_14454": "PASSED",
+      "test_term_factors": "PASSED",
+      "test_transolve": "PASSED",
+      "test_exponential_real": "PASSED",
+      "test_expo_conditionset": "PASSED",
+      "test_exponential_symbols": "PASSED",
+      "test_is_exponential": "PASSED",
+      "test_solve_exponential": "PASSED",
+      "test_logarithmic": "PASSED",
+      "test_is_logarithmic": "PASSED",
+      "test_solve_logarithm": "PASSED",
+      "test_linear_coeffs": "PASSED",
+      "test_is_modular": "PASSED",
+      "test_invert_modular": "PASSED",
+      "test_solve_modular": "FAILED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

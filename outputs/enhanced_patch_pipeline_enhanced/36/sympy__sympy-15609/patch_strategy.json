@@ -1,0 +1,18 @@
+{
+  "title": "Fix double underscore in indexed matrix element LaTeX output",
+  "approach": "The bug occurs in the LaTeX printer when printing MatrixElement expressions that contain Sum (from matrix multiplication). The dummy summation index (e.g., i_1) is being printed with an extra underscore prefix, resulting in `_i_1` instead of `i_1`. The fix should be in the `_print_MatrixElement` method in sympy/printing/latex.py to ensure summation indices are printed correctly without the extra underscore. The issue likely stems from how the method handles Indexed expressions within the MatrixElement's expanded form.",
+  "edit_targets": [
+    "sympy/printing/latex.py::_print_MatrixElement"
+  ],
+  "dependency_files": [
+    "sympy/printing/latex.py::_print_Indexed",
+    "sympy/printing/latex.py::LatexPrinter",
+    "sympy/printing/tests/test_latex.py::test_MatrixElement_printing"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix should be sufficient in the _print_MatrixElement method. The test_MatrixElement_printing test verifies the LaTeX output string for indexed matrix elements, specifically checking that (M*N)[i,j] produces valid LaTeX without the double underscore pattern. Editing only the primary target (_print_MatrixElement) should resolve both validation subjects: (1) LaTeX output string for indexed matrix element and (2) LaTeX string output for (M*N)[i,j].",
+  "risks": [
+    "Avoid breaking other MatrixElement printing cases; ensure the fix doesn't affect non-summation-based matrix indexing"
+  ]
+}

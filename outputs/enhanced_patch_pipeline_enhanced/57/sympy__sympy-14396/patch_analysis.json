@@ -1,0 +1,44 @@
+{
+  "root_cause": "The Domain.preprocess() method in polyoptions.py only supports polynomial rings over Z/ZZ/Q/QQ (via _re_polynomial regex), but not over RR/CC. When Poly() is called without explicit domain, it correctly infers RR[y,z] as the domain, but the explicit domain specification 'RR[y,z]' fails because the preprocessing logic doesn't recognize RR or CC as valid ground domains for polynomial rings.",
+  "affected_components": [
+    {
+      "file": "sympy/polys/polyoptions.py",
+      "symbol": "Domain",
+      "reason": "The Domain.preprocess() classmethod contains regex patterns and parsing logic that only handle Z/ZZ/Q/QQ polynomial rings, not RR/CC polynomial rings"
+    }
+  ],
+  "failing_signal": "OptionError: expected a valid domain specification, got RR[y,z] - when calling Poly(1.2*x*y*z, x, domain='RR[y,z]')",
+  "propagation_path": "Domain.preprocess() fails to match 'RR[y,z]' against _re_polynomial regex (which only matches Z/ZZ/Q/QQ), then falls through to raise OptionError. The same issue affects CC[y,z].",
+  "repair_constraint": "After the fix, Domain.preprocess('RR[y,z]') must return sympy.polys.domains.RR.poly_ring(y, z), and Domain.preprocess('CC[y,z]') must return sympy.polys.domains.CC.poly_ring(y, z). The existing functionality for Z/ZZ/Q/QQ polynomial rings must remain unchanged.",
+  "suggested_repair_scope": [
+    "sympy/polys/polyoptions.py"
+  ],
+  "suspicious_symbols": [
+    "Domain",
+    "_re_polynomial",
+    "preprocess",
+    "RR",
+    "CC",
+    "poly_ring"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_Domain_preprocess::core::domain specification string parsing",
+      "source_symbol": "specification",
+      "validation_subject": "domain specification string parsing",
+      "why_it_matters": "The Domain.preprocess method must correctly parse domain specification strings like 'RR[y,z]' and 'CC[y,z]' in addition to existing 'Z[x,y]', 'Q[x,y]', etc."
+    },
+    {
+      "id": "test_Domain_preprocess::core::domain specification parsing for RR[y,z] and CC[y,z]",
+      "source_symbol": "specification",
+      "validation_subject": "domain specification parsing for RR[y,z] and CC[y,z]",
+      "why_it_matters": "The specific case of RR[y,z] and CC[y,z] polynomial ring domains must work - this is the exact failure case reported in the bug"
+    },
+    {
+      "id": "test_Domain_preprocess::core::domain specification string",
+      "source_symbol": "specification",
+      "validation_subject": "domain specification string",
+      "why_it_matters": "The domain specification string 'RR[x,y]' and 'CC[x,y]' must be valid input to Domain.preprocess"
+    }
+  ]
+}

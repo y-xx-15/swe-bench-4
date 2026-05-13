@@ -1,0 +1,256 @@
+[
+  {
+    "idea": {
+      "title": "MatrixElement indexed access LaTeX output validation",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify LaTeX output for indexed matrix element access does not contain malformed double underscore tokens like _i_1",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_matrix_element_indexed"
+      ],
+      "covers_original_tests": [
+        "test_MatrixElement_printing"
+      ],
+      "covers_obligations": [
+        "test_MatrixElement_printing::core"
+      ],
+      "target_source_symbol": "test_MatrixElement_printing",
+      "target_validation_subject": "LaTeX output string for indexed matrix element",
+      "semantic_alignment_tokens": [
+        "latex",
+        "MatrixSymbol",
+        "MatrixElement",
+        "ValueError",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "latex(",
+        "MatrixSymbol",
+        "[i, j]",
+        "_i_1"
+      ],
+      "rationale": "The original test_MatrixElement_printing fails with ValueError/AssertionError when printing LaTeX for indexed matrix expressions like (M*N)[i,j]. This enhanced test directly validates that the generated LaTeX string does not contain the malformed double-underscore pattern '_i_1' which causes LaTeX compilation failures. The test uses a simpler setup focusing on the core symptom: ensuring the LaTeX output is valid and does not have the double underscore bug that triggers the ValueError in the printer."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1882,4 +1882,15 @@ def test_print_basic():\n \n     assert latex(unimplemented_expr(x)) == r'UnimplementedExpr\\left(x\\right)'\n     assert latex(unimplemented_expr(x**2)) == r'UnimplementedExpr\\left(x^{2}\\right)'\n     assert latex(unimplemented_expr_sup_sub(x)) == r'UnimplementedExpr^{1}_{x}\\left(x\\right)'\n+\n+\n+def test_sweb_enhanced_matrix_element_indexed():\n+    # Enhanced test: verify LaTeX output for indexed matrix element does not\n+    # contain malformed double-underscore patterns like _i_1 that break LaTeX\n+    i, j, k = symbols(\"i j k\")\n+    M = MatrixSymbol(\"M\", k, k)\n+    N = MatrixSymbol(\"N\", k, k)\n+    latex_output = latex((M*N)[i, j])\n+    # The buggy code produces _i_1 which is invalid LaTeX; fixed code produces i_{1}\n+    assert \"_i_1\" not in latex_output and \"i_{1}\" in latex_output\n",
+    "raw_response": "\n\nLooking at this task, I need to create an enhanced test that:\n1. Fails on the buggy code (triggers the same bug)\n2. Uses a different observation angle than the original test\n3. Has a name starting with `test_sweb_enhanced_`\n\nThe original test checks for exact string equality with the correct output. A different angle would be to check that the malformed double-underscore pattern (`_i_1`) is NOT present in the output - this directly validates the bug symptom.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1882,3 +1882,12 @@ def test_print_basic():\n \n     assert latex(unimplemented_expr(x)) == r'UnimplementedExpr\\left(x\\right)'\n     assert latex(unimplemented_expr(x**2)) == r'UnimplementedExpr\\left(x^{2}\\right)'\n     assert latex(unimplemented_expr_sup_sub(x)) == r'UnimplementedExpr^{1}_{x}\\left(x\\right)'\n+\n+\n+def test_sweb_enhanced_matrix_element_indexed():\n+    # Enhanced test: verify LaTeX output for indexed matrix element does not\n+    # contain malformed double-underscore patterns like _i_1 that break LaTeX\n+    i, j, k = symbols(\"i j k\")\n+    M = MatrixSymbol(\"M\", k, k)\n+    N = MatrixSymbol(\"N\", k, k)\n+    latex_output = latex((M*N)[i, j])\n+    # The buggy code produces _i_1 which is invalid LaTeX; fixed code produces i_{1}\n+    assert \"_i_1\" not in latex_output and \"i_{1}\" in latex_output\n```",
+    "identifiers": [
+      "test_sweb_enhanced_matrix_element_indexed"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_matrix_element_indexed"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "indexed_matrix_element_latex_no_double_underscore",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Verify LaTeX output for indexed matrix multiplication elements does not contain invalid double underscore patterns like _i_1",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_indexed_matrix_element_latex"
+      ],
+      "covers_original_tests": [
+        "test_MatrixElement_printing"
+      ],
+      "covers_obligations": [
+        "test_MatrixElement_printing::core"
+      ],
+      "target_source_symbol": "latex function for MatrixElement/Indexed expressions",
+      "target_validation_subject": "LaTeX string output for (M*N)[i,j]",
+      "semantic_alignment_tokens": [
+        "latex",
+        "MatrixSymbol",
+        "double underscore",
+        "ValueError",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "latex((M*N)[i, j])",
+        "_i_1",
+        "MatrixElement"
+      ],
+      "rationale": "This test isolates the specific failure mode where indexed matrix multiplication produces invalid LaTeX with double underscores (_i_1). Unlike the original test which may have multiple assertions, this focuses on the exact symptom: the corrupted summation index in the LaTeX output. The test constructs the precise expression (M*N)[i,j] that triggers the ValueError/AssertionError and verifies the output does not contain the malformed _i_1 pattern."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1919,4 +1919,16 @@ def test_print_basic():\n \n     assert latex(unimplemented_expr(x)) == r'UnimplementedExpr\\left(x\\right)'\n     assert latex(unimplemented_expr(x**2)) == r'UnimplementedExpr\\left(x^{2}\\right)'\n     assert latex(unimplemented_expr_sup_sub(x)) == r'UnimplementedExpr^{1}_{x}\\left(x\\right)'\n+\n+\n+def test_sweb_enhanced_indexed_matrix_element_latex():\n+    # Test for issue #15609: indexed matrix multiplication element LaTeX output\n+    # should not contain invalid double underscore patterns like _i_1\n+    i, j, k = symbols(\"i j k\")\n+    M = MatrixSymbol(\"M\", k, k)\n+    N = MatrixSymbol(\"N\", k, k)\n+    result = latex((M*N)[i, j])\n+    # The buggy output contains \"_i_1\" which is invalid LaTeX\n+    # Fixed output should have \"i_{1}\" not \"_i_1\"\n+    assert \"_i_1\" not in result, f\"Invalid double underscore pattern found: {result}\"\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Has a name starting with `test_sweb_enhanced_`\n2. Exposes the same bug (double underscore in LaTeX output for indexed matrix elements)\n3. Fails on the buggy code and passes on fixed code\n\nThe bug is that `latex((M*N)[i, j])` produces invalid LaTeX with `_i_1` instead of `i_{1}`.\n\nLet me create a targeted test that checks for this specific pattern:\n```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1919,3 +1919,12 @@ def test_print_basic():\n \n     assert latex(unimplemented_expr(x)) == r'UnimplementedExpr\\left(x\\right)'\n     assert latex(unimplemented_expr(x**2)) == r'UnimplementedExpr\\left(x^{2}\\right)'\n     assert latex(unimplemented_expr_sup_sub(x)) == r'UnimplementedExpr^{1}_{x}\\left(x\\right)'\n+\n+\n+def test_sweb_enhanced_indexed_matrix_element_latex():\n+    # Test for issue #15609: indexed matrix multiplication element LaTeX output\n+    # should not contain invalid double underscore patterns like _i_1\n+    i, j, k = symbols(\"i j k\")\n+    M = MatrixSymbol(\"M\", k, k)\n+    N = MatrixSymbol(\"N\", k, k)\n+    result = latex((M*N)[i, j])\n+    # The buggy output contains \"_i_1\" which is invalid LaTeX\n+    # Fixed output should have \"i_{1}\" not \"_i_1\"\n+    assert \"_i_1\" not in result, f\"Invalid double underscore pattern found: {result}\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_indexed_matrix_element_latex"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_indexed_matrix_element_latex"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "indexed_matrix_element_latex_no_double_underscore",
+      "semantic_bucket": "structural_invariant",
+      "goal": "verify LaTeX output for indexed matrix multiplication elements does not contain invalid double underscore patterns like _i_1",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_indexed_matrix_element_latex"
+      ],
+      "covers_original_tests": [
+        "test_MatrixElement_printing"
+      ],
+      "covers_obligations": [
+        "test_MatrixElement_printing::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_MatrixElement",
+      "target_validation_subject": "LaTeX string output for indexed matrix element expression",
+      "semantic_alignment_tokens": [
+        "MatrixSymbol",
+        "latex",
+        "ValueError",
+        "double underscore"
+      ],
+      "trigger_shape_tokens": [
+        "MatrixSymbol",
+        "latex",
+        "_print_MatrixElement",
+        "indices"
+      ],
+      "rationale": "This test directly exercises the LaTeX printing of indexed matrix multiplication elements (M*N)[i,j], which triggers the double underscore bug in the printer. Unlike the original test which may have multiple assertions, this focused test specifically checks that the generated LaTeX string does not contain the invalid pattern _i_1 (double underscore). The bug causes ValueError when the printer mishandles symbolic indices in matrix element access, producing malformed LaTeX with consecutive underscores that neither LaTeX nor MathJax can render."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1740,3 +1740,12 @@ def test_MatrixElement_printing():\n     F = C[0, 0].subs(C, A - B)\n     assert latex(F) == r\"\\left(A - B\\right)_{0, 0}\"\n \n+\n+def test_sweb_enhanced_indexed_matrix_element_latex():\n+    # Test that indexed matrix multiplication elements don't produce\n+    # invalid double underscore patterns in LaTeX output.\n+    # Bug: (M*N)[i,j] produces M_{i, _i_1} with double underscore.\n+    i, j, k = symbols(\"i j k\")\n+    M = MatrixSymbol(\"M\", k, k)\n+    N = MatrixSymbol(\"N\", k, k)\n+    result = latex((M*N)[i, j])\n+    # The LaTeX output must not contain the invalid pattern _i_1 (double underscore)\n+    assert \"_i_1\" not in result and \"_j_1\" not in result\n",
+    "raw_response": "\n\nLooking at this task, I need to create an enhanced test that:\n1. Exposes the same bug (double underscore in LaTeX output for indexed matrix elements)\n2. Uses a different observation angle than the original test\n3. Fails on the buggy code and passes on the fixed code\n\nLet me analyze the bug more carefully. The issue is that when printing `(M*N)[i, j]` where `M` and `N` are `MatrixSymbol` with symbolic dimension `k`, the LaTeX printer produces invalid output with double underscores like `_i_1`.\n\nThe original test checks the full expected output. I'll create a different test that specifically checks for the invalid double underscore pattern, which is a more targeted regression test.\n\n```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1740,3 +1740,12 @@ def test_MatrixElement_printing():\n     F = C[0, 0].subs(C, A - B)\n     assert latex(F) == r\"\\left(A - B\\right)_{0, 0}\"\n \n+\n+def test_sweb_enhanced_indexed_matrix_element_latex():\n+    # Test that indexed matrix multiplication elements don't produce\n+    # invalid double underscore patterns in LaTeX output.\n+    # Bug: (M*N)[i,j] produces M_{i, _i_1} with double underscore.\n+    i, j, k = symbols(\"i j k\")\n+    M = MatrixSymbol(\"M\", k, k)\n+    N = MatrixSymbol(\"N\", k, k)\n+    result = latex((M*N)[i, j])\n+    # The LaTeX output must not contain the invalid pattern _i_1 (double underscore)\n+    assert \"_i_1\" not in result and \"_j_1\" not in result\n```",
+    "identifiers": [
+      "test_sweb_enhanced_indexed_matrix_element_latex"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_indexed_matrix_element_latex"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "MatrixElement LaTeX subscript structural invariant",
+      "semantic_bucket": "structural_invariant",
+      "goal": "Verify LaTeX printer generates valid single-level subscripts for indexed matrix elements without spurious underscore prefixes",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_matrixelement_subscript_structure"
+      ],
+      "covers_original_tests": [
+        "test_MatrixElement_printing"
+      ],
+      "covers_obligations": [
+        "test_MatrixElement_printing::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_MatrixElement",
+      "target_validation_subject": "subscript_format",
+      "semantic_alignment_tokens": [
+        "MatrixElement",
+        "_latex",
+        "subscript",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "MatrixElement(",
+        "latex(",
+        "_print_MatrixElement"
+      ],
+      "rationale": "This test isolates the structural invariant that MatrixElement subscripts must render as clean single-level subscripts without underscore prefixes. Unlike the original test which exercises the full matrix multiplication and indexing pipeline, this test directly constructs a MatrixElement and validates the subscript formatting, exposing the underlying printing bug where dummy indices incorrectly acquire leading underscores."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1882,4 +1882,18 @@ def test_print_basic():\n \n     assert latex(unimplemented_expr(x)) == r'UnimplementedExpr\\left(x\\right)'\n     assert latex(unimplemented_expr(x**2)) == r'UnimplementedExpr\\left(x\\right)^{2}'\n     assert latex(unimplemented_expr_sup_sub(x)) == r'UnimplementedExpr^{1}_{x}\\left(x\\right)'\n+\n+\n+def test_sweb_enhanced_matrixelement_subscript_structure():\n+    # Test MatrixElement LaTeX subscript structural invariant\n+    # This tests the _print_MatrixElement path directly to expose\n+    # the bug where dummy indices get spurious underscore prefixes\n+    from sympy import MatrixSymbol\n+    i, j, k = symbols(\"i j k\")\n+    M = MatrixSymbol(\"M\", k, k)\n+    elem = M[i, j]  # Direct MatrixElement without matrix multiplication\n+    result = latex(elem)\n+    # The subscript must not have leading underscore - valid LaTeX subscript structure\n+    assert \"_\" not in result.split(\"_{\")[1] or result.count(\"_\") == 1, \\\n+        f\"MatrixElement subscript has invalid underscore pattern: {result}\"\n",
+    "raw_response": "\n\nLooking at this task, I need to create an enhanced test that:\n1. Exposes the same bug (double underscore in LaTeX subscripts for indexed matrix elements)\n2. Uses a different observation angle than the original test\n3. Must FAIL on the buggy code and PASS when fixed\n\nThe original test uses `(M*N)[i, j]` which involves matrix multiplication. I can test a more direct path by using `MatrixElement` directly, which tests the `_print_MatrixElement` method specifically.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1882,3 +1882,13 @@ def test_print_basic():\n \n     assert latex(unimplemented_expr(x)) == r'UnimplementedExpr\\left(x\\right)'\n     assert latex(unimplemented_expr(x**2)) == r'UnimplementedExpr\\left(x\\right)^{2}'\n     assert latex(unimplemented_expr_sup_sub(x)) == r'UnimplementedExpr^{1}_{x}\\left(x\\right)'\n+\n+\n+def test_sweb_enhanced_matrixelement_subscript_structure():\n+    # Test MatrixElement LaTeX subscript structural invariant\n+    # This tests the _print_MatrixElement path directly to expose\n+    # the bug where dummy indices get spurious underscore prefixes\n+    from sympy import MatrixSymbol\n+    i, j, k = symbols(\"i j k\")\n+    M = MatrixSymbol(\"M\", k, k)\n+    elem = M[i, j]  # Direct MatrixElement without matrix multiplication\n+    result = latex(elem)\n+    # The subscript must not have leading underscore - valid LaTeX subscript structure\n+    assert \"_\" not in result.split(\"_{\")[1] or result.count(\"_\") == 1, \\\n+        f\"MatrixElement subscript has invalid underscore pattern: {result}\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_matrixelement_subscript_structure"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_matrixelement_subscript_structure"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "double underscore in indexed matrix LaTeX output",
+      "semantic_bucket": "direct_symptom",
+      "goal": "verify LaTeX output for indexed matrix multiplication does not contain double underscore pattern",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_matrix_indexed_latex"
+      ],
+      "covers_original_tests": [
+        "test_MatrixElement_printing"
+      ],
+      "covers_obligations": [
+        "test_MatrixElement_printing::core"
+      ],
+      "target_source_symbol": "test_MatrixElement_printing",
+      "target_validation_subject": "LaTeX string output for indexed matrix expression",
+      "semantic_alignment_tokens": [
+        "valueerror",
+        "assertionerror",
+        "MatrixSymbol",
+        "latex"
+      ],
+      "trigger_shape_tokens": [
+        "latex((M*N)[i, j])",
+        "_i_1",
+        "double underscore"
+      ],
+      "rationale": "This test directly exercises the core bug: when printing LaTeX for an indexed matrix multiplication expression (M*N)[i,j], the summation index gets rendered as '_i_1' (double underscore) instead of a valid single-subscript form. The test will fail with ValueError on buggy code (as shown in traceback) and pass on fixed code that properly handles the indexed matrix element LaTeX rendering."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -190,3 +190,12 @@ def test_print_basic():\n     assert latex(unimplemented_expr(x**2)) == r'UnimplementedExpr\\left(x^{2}\\right)'\n     assert latex(unimplemented_expr_sup_sub(x)) == r'UnimplementedExpr^{1}_{x}\\left(x\\right)'\n \n+\n+def test_sweb_enhanced_matrix_indexed_latex():\n+    # Test that indexed matrix multiplication LaTeX output does not contain\n+    # invalid double underscore patterns like _i_1 which break LaTeX compilation\n+    i, j, k = symbols(\"i j k\")\n+    M = MatrixSymbol(\"M\", k, k)\n+    N = MatrixSymbol(\"N\", k, k)\n+    result = latex((M*N)[i, j])\n+    # The buggy output contains \"_i_1\" pattern which is invalid LaTeX\n+    assert \"_i_1\" not in result, f\"Invalid LaTeX with double underscore found: {result}\"\n",
+    "raw_response": "\n\nLooking at the bug and the original test, I need to create an enhanced test that:\n1. Tests the same bug (double underscore in indexed matrix LaTeX output)\n2. Uses a different observation angle than the original test\n3. Fails on the buggy code and passes on fixed code\n\nThe original test asserts the correct expected output. I'll create a test that checks for the presence of the buggy pattern (double underscore) which should FAIL on buggy code (because the buggy pattern exists) and PASS on fixed code (because the buggy pattern won't exist).\n\n```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -190,3 +190,12 @@ def test_print_basic():\n     assert latex(unimplemented_expr(x**2)) == r'UnimplementedExpr\\left(x^{2}\\right)'\n     assert latex(unimplemented_expr_sup_sub(x)) == r'UnimplementedExpr^{1}_{x}\\left(x\\right)'\n \n+\n+def test_sweb_enhanced_matrix_indexed_latex():\n+    # Test that indexed matrix multiplication LaTeX output does not contain\n+    # invalid double underscore patterns like _i_1 which break LaTeX compilation\n+    i, j, k = symbols(\"i j k\")\n+    M = MatrixSymbol(\"M\", k, k)\n+    N = MatrixSymbol(\"N\", k, k)\n+    result = latex((M*N)[i, j])\n+    # The buggy output contains \"_i_1\" pattern which is invalid LaTeX\n+    assert \"_i_1\" not in result, f\"Invalid LaTeX with double underscore found: {result}\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_matrix_indexed_latex"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_matrix_indexed_latex"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

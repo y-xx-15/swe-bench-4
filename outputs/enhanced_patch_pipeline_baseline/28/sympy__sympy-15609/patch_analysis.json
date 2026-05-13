@@ -1,0 +1,53 @@
+{
+  "root_cause": "The LaTeX printer incorrectly handles the dummy summation index when printing matrix multiplication with indexed access. The index symbol (e.g., i_1) is being printed with an extra underscore prefix, resulting in '_i_1' instead of 'i_1'. This is likely due to a Symbol name mangling issue in the _print_Symbol method when dealing with subscripted dummy indices in matrix expressions.",
+  "affected_components": [
+    {
+      "file": "sympy/printing/latex.py",
+      "symbol": "LatexPrinter._print_Symbol",
+      "reason": "Handles printing of Symbol objects to LaTeX, including subscript handling via _deal_with_super_sub. The bug likely causes incorrect underscore insertion for dummy indices."
+    },
+    {
+      "file": "sympy/printing/latex.py",
+      "symbol": "LatexPrinter._print_MatrixElement",
+      "reason": "Prints MatrixElement expressions which are created when accessing (M*N)[i, j]. The summation logic for matrix multiplication may be using incorrect symbol names."
+    },
+    {
+      "file": "sympy/printing/latex.py",
+      "symbol": "LatexPrinter._deal_with_super_sub",
+      "reason": "Processes symbol names to separate super/subscripts. May be incorrectly handling the dummy index names generated for matrix multiplication summations."
+    }
+  ],
+  "failing_signal": "The LaTeX output contains '_i_1' (with double underscore) instead of 'i_1' in the summation: '\\sum_{i_{1}=0}^{k - 1} M_{i, _i_1} N_{_i_1, j}'. This causes LaTeX compilation errors and MathJax rendering failures.",
+  "propagation_path": "When printing (M*N)[i, j], the MatrixElement printer generates a Sum expression for the matrix multiplication. The dummy index for this sum (e.g., i_1) is created with a specific name. When _print_Symbol processes this index, _deal_with_super_sub incorrectly splits the name, adding an underscore prefix. This propagates to both the Sum's limits and the MatrixElement's subscript positions.",
+  "repair_constraint": "The fix must ensure that dummy summation indices in matrix expressions are printed without extra underscores. The generated LaTeX must be valid and renderable in both LaTeX and MathJax.",
+  "suggested_repair_scope": [
+    "sympy/printing/latex.py"
+  ],
+  "suspicious_symbols": [
+    "_deal_with_super_sub",
+    "_print_Symbol",
+    "_print_MatrixElement",
+    "_print_Sum",
+    "_print_Indexed"
+  ],
+  "repair_obligations": [
+    {
+      "id": "RO-1",
+      "source_symbol": "_deal_with_super_sub",
+      "validation_subject": "Symbol names with underscores in matrix summation indices",
+      "why_it_matters": "This function splits symbol names into super/subscript parts. If it incorrectly handles names like 'i_1' (which is a valid symbol name, not a subscript indicator), it will add spurious underscores."
+    },
+    {
+      "id": "RO-2",
+      "source_symbol": "_print_MatrixElement",
+      "validation_subject": "LaTeX output for matrix element access on products",
+      "why_it_matters": "Must correctly print the summation index without mangling the symbol name when converting matrix multiplication to sum expressions."
+    },
+    {
+      "id": "RO-3",
+      "source_symbol": "_print_Symbol",
+      "validation_subject": "Symbol printing for dummy indices in summations",
+      "why_it_matters": "The final printing step that outputs the symbol name. Must preserve the original symbol name without adding extra underscores."
+    }
+  ]
+}

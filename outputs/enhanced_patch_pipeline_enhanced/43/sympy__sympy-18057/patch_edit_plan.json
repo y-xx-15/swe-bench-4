@@ -1,0 +1,24 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/expr.py",
+      "action": "modify_region",
+      "justification": "Expr.__eq__ is the entry point that calls sympify on arbitrary objects. The fix adds AttributeError to the exception tuple to catch errors when eval'ing malicious reprs like 'x.y' that try to access attributes on Symbol objects."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/expr.py",
+      "target_symbol": "Expr.__eq____branch_mid1",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_var::ns",
+        "test_var::ns::comparison_result",
+        "test_var::v::comparison_result"
+      ],
+      "anchor_line_before": "        except (SympifyError, SyntaxError):",
+      "anchor_line_after": "            return False",
+      "replacement_block": "        except (SympifyError, SyntaxError, AttributeError):\n            return False"
+    }
+  ]
+}

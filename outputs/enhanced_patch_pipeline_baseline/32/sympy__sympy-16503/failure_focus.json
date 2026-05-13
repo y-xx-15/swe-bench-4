@@ -1,0 +1,31 @@
+{
+  "original_test_identifiers": [
+    "test_pretty_sum"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_pretty_sum"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/printing/pretty/tests/test_pretty.py:test_issue_8292",
+    "sympy/printing/pretty/tests/test_pretty.py:test_issue_8344",
+    "sympy/printing/pretty/tests/test_pretty.py:test_pretty_sum",
+    "test_pretty_sum",
+    "test_issue_8292"
+  ],
+  "failure_mode": "value_error",
+  "dominant_errors": [
+    "ValueError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_pretty_sum F",
+    "test_issue_8292 E",
+    "__________ sympy/printing/pretty/tests/test_pretty.py:test_issue_8292 __________"
+  ],
+  "noise_ratio": 0.0043,
+  "target_test_tracebacks": {
+    "test_pretty_sum": "TARGET TEST: test_pretty_sum\n- snippet: test_pretty_sum F\n- snippet: test_issue_8292 E\n- snippet: __________ sympy/printing/pretty/tests/test_pretty.py:test_issue_8292 __________\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_pretty_sum F\nTraceback (most recent call last):\nValueError: Name node can't be used with 'False' constant\nTraceback (most recent call last):\nValueError: Name node can't be used with 'False' constant\n__________ sympy/printing/pretty/tests/test_pretty.py:test_pretty_sum __________\nTraceback (most recent call last):\n  File \"/testbed/sympy/printing/pretty/tests/test_pretty.py\", line 4439, in test_pretty_sum\nAssertionError\n===== tests finished: 122 passed, 1 failed, 2 exceptions, in 13.84 seconds ====="
+  }
+}

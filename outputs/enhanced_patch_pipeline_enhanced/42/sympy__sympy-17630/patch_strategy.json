@@ -1,0 +1,18 @@
+{
+  "title": "Fix _blockmul to preserve ZeroMatrix type for zero blocks",
+  "approach": "The bug occurs in the `_blockmul` method of BlockMatrix. When computing block multiplication, if a block operation results in zero (e.g., `a*ZeroMatrix` or `ZeroMatrix*a`), the result becomes scalar `Zero` from sympy.core.numbers instead of `ZeroMatrix` with proper dimensions. This causes `colblocksizes` and `rowblocksizes` properties to fail when accessing `.cols`/`.rows` on these scalar Zero blocks. The fix should ensure that when block multiplication produces a zero result, it returns a `ZeroMatrix` with the correct dimensions (matching the expected block shape from the rowblocksizes of the left operand and colblocksizes of the right operand). This can be done by wrapping zero results in ZeroMatrix with appropriate m,n dimensions.",
+  "edit_targets": [
+    "sympy/matrices/expressions/blockmatrix.py::BlockMatrix._blockmul"
+  ],
+  "dependency_files": [
+    "sympy/matrices/expressions/matexpr.py::ZeroMatrix",
+    "sympy/matrices/expressions/blockmatrix.py::BlockMatrix.colblocksizes",
+    "sympy/matrices/expressions/blockmatrix.py::BlockMatrix.rowblocksizes"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The primary fix in `_blockmul` should be sufficient because: (1) test_issue_17624::core::type of block elements after _blockmul - the fix ensures block elements remain ZeroMatrix type (not scalar Zero) after multiplication by wrapping zero results in ZeroMatrix with correct dimensions; (2) test_issue_17624::core::colblocksizes property accessing .cols on block elements - once block elements maintain ZeroMatrix type with .cols/.rows properties, the colblocksizes and rowblocksizes properties will work correctly. The colblocksizes and rowblocksizes properties themselves don't need modification - they just need their block elements to have the .cols/.rows attributes that ZeroMatrix provides.",
+  "risks": [
+    "Potential performance impact if ZeroMatrix is created where scalar Zero would suffice - but this is necessary for correctness; must ensure the dimensions (m, n) used for ZeroMatrix match the expected block dimensions from the multiplication: m = left_block_rows, n = right_block_cols"
+  ]
+}

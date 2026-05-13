@@ -1,0 +1,24 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/pycode.py::NumPyPrinter",
+      "action": "modify_region",
+      "justification": "The NumPyPrinter lacks a _print_Identity method, causing Identity(n) to fall back to the string 'I' which conflicts with Python's complex unit 1j. This must be fixed to generate proper numpy.eye(n) code."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/pycode.py",
+      "target_symbol": "NumPyPrinter",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "1",
+        "2",
+        "3"
+      ],
+      "anchor_line_before": "    _kc = {k: 'numpy.'+v for k, v in _known_constants_math.items()}",
+      "anchor_line_after": "    def _print_seq(self, seq):",
+      "replacement_block": "    _kc = {k: 'numpy.'+v for k, v in _known_constants_math.items()}\n\n    def _print_Identity(self, expr):\n        return '{0}({1})'.format(self._module_format('numpy.eye'), self._print(expr.args[0]))\n\n    def _print_seq(self, seq):"
+    }
+  ]
+}

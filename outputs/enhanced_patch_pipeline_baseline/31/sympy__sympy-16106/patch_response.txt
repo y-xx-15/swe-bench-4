@@ -1,0 +1,11 @@
+
+
+Looking at the bug, I need to add `_print_Indexed` and `_print_IndexedBase` methods to both `MathMLContentPrinter` and `MathMLPresentationPrinter` classes. The issue is that when printing an `Indexed` object, the printer falls back to `_print_Basic` which tries to iterate over the object directly, but `Indexed` objects are not directly iterable.
+
+Let me first examine the exact line numbers in the file to place the fix correctly:
+<minimax:tool_call>
+<invoke name="grep">
+<parameter name="pattern">def _print_Basic</parameter>
+<parameter name="path">/testbed/sympy/printing/mathml.py</parameter>
+</invoke>
+</minimax:tool_call>

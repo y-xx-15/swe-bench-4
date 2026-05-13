@@ -1,0 +1,149 @@
+[
+  {
+    "idea": {
+      "title": "Test Max function produces valid Mathematica syntax with square brackets",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Verify that Max function is printed with Mathematica square bracket syntax instead of Python parentheses",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_max_mathematica"
+      ],
+      "covers_original_tests": [
+        "test_Function"
+      ],
+      "covers_obligations": [
+        "test_Function::mcode"
+      ],
+      "target_source_symbol": "MCodePrinter._print_Function",
+      "target_validation_subject": "mcode",
+      "semantic_alignment_tokens": [
+        "mcode",
+        "Max",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "mcode",
+        "Max",
+        "assertionerror"
+      ],
+      "rationale": "The original test_Function tests f(x,y,z), sin(x)**cos(x), and conjugate(x) but does not test Max. The bug manifests when calling mathematica_code(Max(x,2)) which produces 'Max(2, x)' with Python parentheses instead of 'Max[x,2]' with Mathematica square brackets. This test directly exercises the _print_Function method with Max to expose the missing handling that causes the AssertionError in test_Function."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_mathematica.py b/sympy/printing/tests/test_mathematica.py\n--- a/sympy/printing/tests/test_mathematica.py\n+++ b/sympy/printing/tests/test_mathematica.py\n@@ -4,6 +4,6 @@\n from sympy.integrals import Integral\n from sympy.concrete import Sum\n-from sympy.functions import exp, sin, cos, conjugate\n+from sympy.functions import exp, sin, cos, conjugate, Max, Min\n \n from sympy import mathematica_code as mcode\n \n@@ -28,6 +28,11 @@ def test_Function():\n     assert mcode(conjugate(x)) == \"Conjugate[x]\"\n \n \n+def test_sweb_enhanced_max_mathematica():\n+    # Test that Max uses Mathematica square bracket syntax instead of Python parentheses\n+    assert mcode(Max(x, 2)) == \"Max[x, 2]\"\n+\n+\n def test_Pow():\n     assert mcode(x**3) == \"x^3\"\n     assert mcode(x**(y**3)) == \"x^(y^3)\"\n",
+    "raw_response": "\n\n```diff\ndiff --git a/sympy/printing/tests/test_mathematica.py b/sympy/printing/tests/test_mathematica.py\n--- a/sympy/printing/tests/test_mathematica.py\n+++ b/sympy/printing/tests/test_mathematica.py\n@@ -4,7 +4,7 @@\n from sympy.integrals import Integral\n from sympy.concrete import Sum\n-from sympy.functions import exp, sin, cos, conjugate\n+from sympy.functions import exp, sin, cos, conjugate, Max, Min\n \n from sympy import mathematica_code as mcode\n \n@@ -28,6 +28,11 @@ def test_Function():\n     assert mcode(conjugate(x)) == \"Conjugate[x]\"\n \n \n+def test_sweb_enhanced_max_mathematica():\n+    # Test that Max uses Mathematica square bracket syntax instead of Python parentheses\n+    assert mcode(Max(x, 2)) == \"Max[x, 2]\"\n+\n+\n def test_Pow():\n     assert mcode(x**3) == \"x^3\"\n     assert mcode(x**(y**3)) == \"x^(y^3)\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_max_mathematica"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_max_mathematica"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_max_mathematica"
+    ],
+    "eval_status_map": {
+      "sympy/printing/tests/test_mathematica.py:test_sweb_enhanced_max_mathematica": "FAILED",
+      "test_Integer": "PASSED",
+      "test_Rational": "PASSED",
+      "test_Function": "PASSED",
+      "test_sweb_enhanced_max_mathematica": "FAILED",
+      "test_Pow": "PASSED",
+      "test_Mul": "PASSED",
+      "test_constants": "PASSED",
+      "test_containers": "PASSED",
+      "test_Integral": "PASSED",
+      "test_Derivative": "PASSED"
+    },
+    "generation_attempts": 4,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_Function"
+    ],
+    "covered_obligations": [
+      "test_Function::mcode"
+    ]
+  },
+  {
+    "idea": {
+      "title": "Max function prints with Python parentheses instead of Mathematica brackets",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Test that Max function is printed with Mathematica bracket syntax [] instead of Python parentheses (), and that argument order is preserved",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_max_function_bracket_syntax"
+      ],
+      "covers_original_tests": [
+        "test_Function"
+      ],
+      "covers_obligations": [
+        "test_Function::mcode"
+      ],
+      "target_source_symbol": "MCodePrinter._print_Function",
+      "target_validation_subject": "mcode",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "mcode",
+        "Max",
+        "x",
+        "2"
+      ],
+      "trigger_shape_tokens": [
+        "mcode",
+        "Max",
+        "assertionerror",
+        "function"
+      ],
+      "rationale": "The original test_Function tests sin, cos, conjugate which are in known_functions. The bug is that Max is NOT in known_functions, causing it to fall back to Python-style parentheses () instead of Mathematica brackets []. This test explicitly checks Max to expose that the fallback path uses wrong syntax. The failure mode is AssertionError because the output 'Max(2, x)' does not match expected 'Max[x, 2]'."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_mathematica.py b/sympy/printing/tests/test_mathematica.py\n--- a/sympy/printing/tests/test_mathematica.py\n+++ b/sympy/printing/tests/test_mathematica.py\n@@ -2,7 +2,7 @@\n                         Rational, Integer, Tuple, Derivative)\n from sympy.integrals import Integral\n from sympy.concrete import Sum\n-from sympy.functions import exp, sin, cos, conjugate\n+from sympy.functions import exp, sin, cos, conjugate, Max, Min\n \n from sympy import mathematica_code as mcode\n \n@@ -73,6 +73,10 @@ def test_Sum():\n     assert mcode(Sum(sin(x), (x, 0, 10))) == \"Hold[Sum[Sin[x], {x, 0, 10}]]\"\n     assert mcode(Sum(exp(-x**2 - y**2),\n                      (x, -oo, oo),\n                      (y, -oo, oo))) == \\\n         \"Hold[Sum[Exp[-x^2 - y^2], {x, -Infinity, Infinity}, \" \\\n         \"{y, -Infinity, Infinity}]]\"\n+\n+\n+def test_sweb_enhanced_max_function_bracket_syntax():\n+    assert mcode(Max(x, 2)) == \"Max[x, 2]\"\n",
+    "raw_response": "\n\nLooking at the bug, the issue is that `Max` and `Min` are not in the `known_functions` dictionary in `mathematica.py`, so they fall back to using Python-style parentheses `()` instead of Mathematica brackets `[]`.\n\nI need to create a new test function that:\n1. Tests `Max` specifically with `mcode`\n2. Expects Mathematica bracket syntax `[]` (which the buggy code fails to produce)\n3. Will fail on the buggy code with an AssertionError\n\n```diff\ndiff --git a/sympy/printing/tests/test_mathematica.py b/sympy/printing/tests/test_mathematica.py\n--- a/sympy/printing/tests/test_mathematica.py\n+++ b/sympy/printing/tests/test_mathematica.py\n@@ -2,7 +2,7 @@\n                         Rational, Integer, Tuple, Derivative)\n from sympy.integrals import Integral\n from sympy.concrete import Sum\n-from sympy.functions import exp, sin, cos, conjugate\n+from sympy.functions import exp, sin, cos, conjugate, Max, Min\n \n from sympy import mathematica_code as mcode\n \n@@ -73,3 +73,7 @@ def test_Sum():\n     assert mcode(Sum(sin(x), (x, 0, 10))) == \"Hold[Sum[Sin[x], {x, 0, 10}]]\"\n     assert mcode(Sum(exp(-x**2 - y**2),\n                      (x, -oo, oo),\n                      (y, -oo, oo))) == \\\n         \"Hold[Sum[Exp[-x^2 - y^2], {x, -Infinity, Infinity}, \" \\\n         \"{y, -Infinity, Infinity}]]\"\n+\n+\n+def test_sweb_enhanced_max_function_bracket_syntax():\n+    assert mcode(Max(x, 2)) == \"Max[x, 2]\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_max_function_bracket_syntax"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_max_function_bracket_syntax"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_max_function_bracket_syntax"
+    ],
+    "eval_status_map": {
+      "sympy/printing/tests/test_mathematica.py:test_sweb_enhanced_max_function_bracket_syntax": "FAILED",
+      "test_Integer": "PASSED",
+      "test_Rational": "PASSED",
+      "test_Function": "PASSED",
+      "test_Pow": "PASSED",
+      "test_Mul": "PASSED",
+      "test_constants": "PASSED",
+      "test_containers": "PASSED",
+      "test_Integral": "PASSED",
+      "test_Derivative": "PASSED",
+      "test_Sum": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_Function"
+    ],
+    "covered_obligations": [
+      "test_Function::mcode"
+    ]
+  }
+]

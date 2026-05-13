@@ -1,0 +1,19 @@
+{
+  "title": "Fix double underscore in matrix summation index LaTeX output",
+  "approach": "The bug is in how the LaTeX printer handles dummy summation indices for matrix multiplication. When printing (M*N)[i, j], the dummy index (e.g., i_1) is being incorrectly processed by _deal_with_super_sub, which adds an extra underscore prefix. The fix should ensure that the dummy index symbol is printed correctly without the spurious underscore. The issue likely stems from how the symbol name is generated or processed in the MatrixElement printing logic - specifically, the dummy index may be created with a name that triggers incorrect underscore handling in _deal_with_super_sub. The fix should ensure the dummy index is printed as 'i_1' (with proper subscript formatting) rather than '_i_1'.",
+  "edit_targets": [
+    "sympy/printing/latex.py::_print_MatrixElement"
+  ],
+  "dependency_files": [
+    "sympy/printing/latex.py::_deal_with_super_sub",
+    "sympy/printing/latex.py::_print_Symbol",
+    "sympy/printing/conventions.py::split_super_sub"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The primary fix should be in _print_MatrixElement since that's where the summation for matrix multiplication is generated. However, if the root cause is in _deal_with_super_sub or how the dummy index symbol is created (possibly in core matrix code), additional fixes may be needed. The fix must ensure that when a dummy index like 'i_1' is printed in the context of a matrix summation, it renders correctly as 'i_{1}' in LaTeX without the extra underscore prefix.",
+  "risks": [
+    "Changing MatrixElement printing could affect other matrix expression outputs",
+    "The fix must not break existing LaTeX output for other symbol names with underscores"
+  ]
+}

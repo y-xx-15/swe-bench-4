@@ -1,0 +1,673 @@
+[
+  {
+    "idea": {
+      "title": "MathML printer fails to handle IndexedBase with AssertionError",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that printing IndexedBase to MathML raises AssertionError due to missing _print_Indexed method",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_IndexedBase_mathml"
+      ],
+      "covers_original_tests": [
+        "test_print_IndexedBase"
+      ],
+      "covers_obligations": [
+        "test_print_IndexedBase::core"
+      ],
+      "target_source_symbol": "sympy.printing.mathml.mathml",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "IndexedBase",
+        "mathml"
+      ],
+      "trigger_shape_tokens": [
+        "mathml(IndexedBase",
+        "TypeError",
+        "not iterable"
+      ],
+      "rationale": "The original failure shows that calling mathml() on an Indexed expression causes a TypeError when _print_Basic tries to iterate over the non-iterable Indexed object. The test should directly call mathml(sympy.IndexedBase(a)[b]) and verify it produces valid MathML output without raising TypeError or AssertionError. This is distinct from the original test because it directly exercises the API path that triggers the bug (mathml function -> Printer._print -> _print_Basic -> iteration over args) and validates the core fix is in place."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_mathml.py b/sympy/printing/tests/test_mathml.py\n--- a/sympy/printing/tests/test_mathml.py\n+++ b/sympy/printing/tests/test_mathml.py\n@@ -4,7 +4,7 @@ from sympy import diff, Integral, Limit, sin, Symbol, Integer, Rational, cos, \\\n     tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, E, I, oo, \\\n     pi, GoldenRatio, EulerGamma, Sum, Eq, Ne, Ge, Lt, Float, Matrix, Basic, S, \\\n     MatrixSymbol, Function, Derivative, log, Lambda\n-from sympy.core.containers import Tuple\n+from sympy.core.containers import Tuple, IndexedBase\n from sympy.functions.elementary.complexes import re, im, Abs, conjugate\n from sympy.functions.elementary.integers import floor, ceiling\n from sympy.functions.elementary.exponential import exp\n@@ -18,6 +18,7 @@ from sympy.sets.sets import FiniteSet, Union, Intersection, Complement, Symmetr\n from sympy.stats.rv import RandomSymbol\n from sympy.sets.sets import Interval\n from sympy.stats.rv import RandomSymbol\n+from sympy.core.symbol import symbols\n from sympy.utilities.pytest import raises\n \n x = Symbol('x')\n@@ -1139,3 +1140,10 @@ def test_print_random_symbol():\n     R = RandomSymbol(Symbol('R'))\n     assert mpp.doprint(R) == '<mi>R</mi>'\n     assert mp.doprint(R) == '<ci>R</ci>'\n+\n+\n+def test_sweb_enhanced_IndexedBase_mathml():\n+    # Test the core bug: mathml() on Indexed expression should not raise TypeError\n+    # The bug is that _print_Basic tries to iterate over 'Indexed' which is not iterable\n+    a, b = symbols('a b')\n+    result = mathml(IndexedBase(a)[b], printer='presentation')\n+    assert result == '<msub><mi>a</mi><mi>b</mi></msub>'\n",
+    "raw_response": "\n\nLooking at the task, I need to:\n1. Add `IndexedBase` and `symbols` to the imports in the test file\n2. Add a new test function `test_sweb_enhanced_IndexedBase_mathml` that tests the core bug path\n\nThe bug is that `mathml(IndexedBase(a)[b], printer='presentation')` fails with `TypeError: 'Indexed' object is not iterable` because there's no `_print_Indexed` method, so it falls back to `_print_Basic` which tries to iterate over the non-iterable Indexed object.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/printing/tests/test_mathml.py b/sympy/printing/tests/test_mathml.py\n--- a/sympy/printing/tests/test_mathml.py\n+++ b/sympy/printing/tests/test_mathml.py\n@@ -4,7 +4,7 @@ from sympy import diff, Integral, Limit, sin, Symbol, Integer, Rational, cos, \\\n     tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, E, I, oo, \\\n     pi, GoldenRatio, EulerGamma, Sum, Eq, Ne, Ge, Lt, Float, Matrix, Basic, S, \\\n     MatrixSymbol, Function, Derivative, log, Lambda\n-from sympy.core.containers import Tuple\n+from sympy.core.containers import Tuple, IndexedBase\n from sympy.functions.elementary.complexes import re, im, Abs, conjugate\n from sympy.functions.elementary.integers import floor, ceiling\n from sympy.functions.elementary.exponential import exp\n@@ -18,6 +18,7 @@ from sympy.sets.sets import FiniteSet, Union, Intersection, Complement, Symmetr\n from sympy.stats.rv import RandomSymbol\n from sympy.sets.sets import Interval\n from sympy.stats.rv import RandomSymbol\n+from sympy.core.symbol import symbols\n from sympy.utilities.pytest import raises\n \n x = Symbol('x')\n@@ -1139,3 +1140,10 @@ def test_print_random_symbol():\n     R = RandomSymbol(Symbol('R'))\n     assert mpp.doprint(R) == '<mi>R</mi>'\n     assert mp.doprint(R) == '<ci>R</ci>'\n+\n+\n+def test_sweb_enhanced_IndexedBase_mathml():\n+    # Test the core bug: mathml() on Indexed expression should not raise TypeError\n+    # The bug is that _print_Basic tries to iterate over 'Indexed' which is not iterable\n+    a, b = symbols('a b')\n+    result = mathml(IndexedBase(a)[b], printer='presentation')\n+    assert result == '<msub><mi>a</mi><mi>b</mi></msub>'\n```",
+    "identifiers": [
+      "test_sweb_enhanced_IndexedBase_mathml"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_IndexedBase_mathml"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "evaluation produced an empty status_map; likely log_parse_failed or tests_not_collected",
+    "failing_identifiers": null,
+    "eval_status_map": {},
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_print_IndexedBase"
+    ],
+    "covered_obligations": [
+      "test_print_IndexedBase::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "MathML printer should handle IndexedBase with indices",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Verify that MathML printer can handle Indexed expressions without TypeError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_IndexedBase_mathml"
+      ],
+      "covers_original_tests": [
+        "test_print_IndexedBase"
+      ],
+      "covers_obligations": [
+        "test_print_IndexedBase::core"
+      ],
+      "target_source_symbol": "sympy.printing.mathml.MathMLPresentationPrinter._print_Basic",
+      "target_validation_subject": "Indexed expression printing",
+      "semantic_alignment_tokens": [
+        "IndexedBase",
+        "Indexed",
+        "mathml",
+        "TypeError",
+        "not iterable"
+      ],
+      "trigger_shape_tokens": [
+        "IndexedBase(",
+        "mathml(",
+        "_print_Basic"
+      ],
+      "rationale": "The original test verifies basic IndexedBase printing but the bug manifests when printing Indexed objects (IndexedBase with indices). The current code falls back to _print_Basic which tries to iterate over the Indexed object incorrectly. This test specifically triggers the behavioral consequence: printing an Indexed expression should work without TypeError, and the output should contain valid MathML markup for the base symbol and its indices."
+    },
+    "patch": "R\n",
+    "raw_response": "\n\nLooking at this task, I need to:\n1. Add a new test function starting with `test_sweb_enhanced_`\n2. The test must FAIL on the buggy code (trigger the TypeError) and PASS after the fix\n3. Use a different observation angle than the original test\n\nThe bug is that when printing an `Indexed` expression, the code falls back to `_print_Basic` which tries to iterate over the object, causing `TypeError: 'Indexed' object is not iterable`.\n\nLet me create a test that specifically triggers this failure path with a different angle - testing that the content printer (not just presentation) can handle IndexedBase expressions without TypeError.\n<minimax:tool_call>\n<invoke name=\"apply_patch\">\n<parameter name=\"patch\">diff --git a/sympy/printing/tests/test_mathml.py b/sympy/printing/tests/test_mathml.py\n--- a/sympy/printing/tests/test_mathml.py\n+++ b/sympy/printing/tests/test_mathml.py\n@@ -1,7 +1,7 @@\n from sympy import diff, Integral, Limit, sin, Symbol, Integer, Rational, cos, \\\n     tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, E, I, oo, \\\n     pi, GoldenRatio, EulerGamma, Sum, Eq, Ne, Ge, Lt, Float, Matrix, Basic, S, \\\n-    MatrixSymbol, Function, Derivative, log, Lambda\n+    MatrixSymbol, Function, Derivative, log, Lambda, IndexedBase, symbols\n from sympy.core.containers import Tuple\n from sympy.functions.elementary.complexes import re, im, Abs, conjugate\n from sympy.functions.elementary.integers import floor, ceiling\n@@ -1139,3 +1139,10 @@ def test_print_random_symbol():\n     R = RandomSymbol(Symbol('R'))\n     assert mpp.doprint(R) == '<mi>R</mi>'\n     assert mp.doprint(R) == '<ci>R</ci>'\n+\n+\n+def test_sweb_enhanced_IndexedBase_content_printer():\n+    # Test that content printer can handle IndexedBase without TypeError\n+    # The bug causes _print_Basic to iterate over Indexed which is not iterable\n+    a, b = symbols('a b')\n+    # This should not raise TypeError: 'Indexed' object is not iterable\n+    result = mp.doprint(IndexedBase(a)[b])\n+    # Verify valid MathML content output is produced\n+    assert '<ci>' in result or '<cn>' in result\n</parameter>\n</invoke>\n</minimax:tool_call>",
+    "identifiers": [],
+    "enhanced_identifiers": [],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_print_IndexedBase is not semantically aligned with its original failure path. Expected source symbol 'None' and alignment tokens ['assertionerror'], but the current content targets 'sympy.printing.mathml.MathMLPresentationPrinter._print_Basic' with tokens ['IndexedBase', 'Indexed', 'mathml', 'TypeError', 'not iterable']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 7,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_print_IndexedBase"
+    ],
+    "covered_obligations": [
+      "test_print_IndexedBase::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "MathML printer fails to handle IndexedBase with subscript access",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Test that MathML printer can handle IndexedBase expressions accessed via subscript notation, which triggers iteration over the Indexed object in _print_Basic",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_IndexedBase_mathml"
+      ],
+      "covers_original_tests": [
+        "test_print_IndexedBase"
+      ],
+      "covers_obligations": [
+        "test_print_IndexedBase::core"
+      ],
+      "target_source_symbol": "sympy.printing.mathml.MathMLPresentationPrinter._print_Basic",
+      "target_validation_subject": "IndexedBase subscript access (IndexedBase(a)[b])",
+      "semantic_alignment_tokens": [
+        "IndexedBase",
+        "mathml",
+        "TypeError",
+        "not iterable",
+        "_print_Basic"
+      ],
+      "trigger_shape_tokens": [
+        "IndexedBase(",
+        "[b]",
+        "for arg in e"
+      ],
+      "rationale": "This test directly exercises the failing code path where _print_Basic attempts to iterate over an Indexed object. The original test likely tests a different aspect of IndexedBase printing. This test specifically targets the subscript access pattern (IndexedBase(a)[b]) which triggers the iteration bug in _print_Basic. The bug manifests as TypeError when trying to iterate over the non-iterable Indexed object, which then causes downstream AssertionError in the test framework."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_mathml.py b/sympy/printing/tests/test_mathml.py\n--- a/sympy/printing/tests/test_mathml.py\n+++ b/sympy/printing/tests/test_mathml.py\n@@ -1,7 +1,7 @@\n from sympy import diff, Integral, Limit, sin, Symbol, Integer, Rational, cos, \\\n     tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, E, I, oo, \\\n     pi, GoldenRatio, EulerGamma, Sum, Eq, Ne, Ge, Lt, Float, Matrix, Basic, S, \\\n-    MatrixSymbol, Function, Derivative, log, Lambda\n+    MatrixSymbol, Function, Derivative, log, Lambda, IndexedBase, symbols\n from sympy.core.containers import Tuple\n from sympy.functions.elementary.complexes import re, im, Abs, conjugate\n from sympy.functions.elementary.integers import floor, ceiling\n@@ -1139,3 +1139,9 @@ def test_print_random_symbol():\n     R = RandomSymbol(Symbol('R'))\n     assert mpp.doprint(R) == '<mi>R</mi>'\n     assert mp.doprint(R) == '<ci>R</ci>'\n+\n+\n+def test_sweb_enhanced_IndexedBase_content_mathml():\n+    # Test content printer with IndexedBase subscript access - different angle from presentation test\n+    a, b = symbols('a b')\n+    # This triggers _print_Basic which tries to iterate over Indexed (not iterable) - causes TypeError\n+    assert mp.doprint(IndexedBase(a)[b]) == '<ci>a</ci>'\n",
+    "raw_response": "\n\nLooking at the problem, I need to create an enhanced test that:\n1. Tests the same bug (MathML printer failing on IndexedBase with subscript access)\n2. Uses a different observation angle than the original test\n3. Must FAIL on the buggy code and PASS after the fix\n\nThe original test uses the presentation printer. I'll test the content printer with IndexedBase subscript access, which triggers the same bug through a different code path.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/printing/tests/test_mathml.py b/sympy/printing/tests/test_mathml.py\n--- a/sympy/printing/tests/test_mathml.py\n+++ b/sympy/printing/tests/test_mathml.py\n@@ -1,7 +1,7 @@\n from sympy import diff, Integral, Limit, sin, Symbol, Integer, Rational, cos, \\\n     tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, E, I, oo, \\\n     pi, GoldenRatio, EulerGamma, Sum, Eq, Ne, Ge, Lt, Float, Matrix, Basic, S, \\\n-    MatrixSymbol, Function, Derivative, log, Lambda\n+    MatrixSymbol, Function, Derivative, log, Lambda, IndexedBase, symbols\n from sympy.core.containers import Tuple\n from sympy.functions.elementary.complexes import re, im, Abs, conjugate\n from sympy.functions.elementary.integers import floor, ceiling\n@@ -1139,3 +1139,9 @@ def test_print_random_symbol():\n     R = RandomSymbol(Symbol('R'))\n     assert mpp.doprint(R) == '<mi>R</mi>'\n     assert mp.doprint(R) == '<ci>R</ci>'\n+\n+\n+def test_sweb_enhanced_IndexedBase_content_mathml():\n+    # Test content printer with IndexedBase subscript access - different angle from presentation test\n+    a, b = symbols('a b')\n+    # This triggers _print_Basic which tries to iterate over Indexed (not iterable) - causes TypeError\n+    assert mp.doprint(IndexedBase(a)[b]) == '<ci>a</ci>'\n```",
+    "identifiers": [
+      "test_sweb_enhanced_IndexedBase_content_mathml"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_IndexedBase_content_mathml"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "sympy/printing/tests/test_mathml.py:test_print_intervals": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_Abs": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_Determinant": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_mat_delim_print": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_set_frozenset": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_FiniteSet": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_SetOp": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_floor": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_ceiling": "FAILED",
+      "test_mathml_printer": "PASSED",
+      "test_content_printmethod": "PASSED",
+      "test_content_mathml_core": "PASSED",
+      "test_content_mathml_functions": "PASSED",
+      "test_content_mathml_limits": "PASSED",
+      "test_content_mathml_integrals": "PASSED",
+      "test_content_mathml_matrices": "PASSED",
+      "test_content_mathml_sums": "PASSED",
+      "test_content_mathml_tuples": "PASSED",
+      "test_content_mathml_add": "PASSED",
+      "test_content_mathml_Rational": "PASSED",
+      "test_content_mathml_constants": "PASSED",
+      "test_content_mathml_trig": "PASSED",
+      "test_content_mathml_relational": "PASSED",
+      "test_content_symbol": "PASSED",
+      "test_content_mathml_greek": "PASSED",
+      "test_content_mathml_order": "PASSED",
+      "test_content_settings": "PASSED",
+      "test_presentation_printmethod": "PASSED",
+      "test_presentation_mathml_core": "PASSED",
+      "test_presentation_mathml_functions": "PASSED",
+      "test_print_derivative": "PASSED",
+      "test_presentation_mathml_limits": "PASSED",
+      "test_presentation_mathml_integrals": "PASSED",
+      "test_presentation_mathml_matrices": "PASSED",
+      "test_presentation_mathml_sums": "PASSED",
+      "test_presentation_mathml_add": "PASSED",
+      "test_presentation_mathml_Rational": "PASSED",
+      "test_presentation_mathml_constants": "PASSED",
+      "test_presentation_mathml_trig": "PASSED",
+      "test_presentation_mathml_relational": "PASSED",
+      "test_presentation_symbol": "PASSED",
+      "test_presentation_mathml_greek": "PASSED",
+      "test_presentation_mathml_order": "PASSED",
+      "test_print_intervals": "FAILED",
+      "test_print_tuples": "PASSED",
+      "test_print_re_im": "PASSED",
+      "test_print_Abs": "FAILED",
+      "test_print_Determinant": "FAILED",
+      "test_presentation_settings": "PASSED",
+      "test_toprettyxml_hooking": "PASSED",
+      "test_print_domains": "PASSED",
+      "test_print_expression_with_minus": "PASSED",
+      "test_print_AssocOp": "PASSED",
+      "test_print_basic": "PASSED",
+      "test_mat_delim_print": "FAILED",
+      "test_ln_notation_print": "PASSED",
+      "test_mul_symbol_print": "PASSED",
+      "test_print_lerchphi": "PASSED",
+      "test_print_polylog": "PASSED",
+      "test_print_set_frozenset": "FAILED",
+      "test_print_FiniteSet": "FAILED",
+      "test_print_SetOp": "FAILED",
+      "test_print_logic": "PASSED",
+      "test_root_notation_print": "PASSED",
+      "test_fold_frac_powers_print": "PASSED",
+      "test_fold_short_frac_print": "PASSED",
+      "test_print_factorials": "PASSED",
+      "test_print_floor": "FAILED",
+      "test_print_ceiling": "FAILED",
+      "test_print_Lambda": "PASSED",
+      "test_print_conjugate": "PASSED",
+      "test_print_matrix_symbol": "PASSED",
+      "test_print_random_symbol": "PASSED"
+    },
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_print_IndexedBase"
+    ],
+    "covered_obligations": [
+      "test_print_IndexedBase::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "MathML printer assertion failure when printing IndexedBase with multiple indices",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that printing IndexedBase with multiple indices triggers the same assertion error as the original single-index case",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_indexed_multi_index"
+      ],
+      "covers_original_tests": [
+        "test_print_IndexedBase"
+      ],
+      "covers_obligations": [
+        "test_print_IndexedBase::core"
+      ],
+      "target_source_symbol": "sympy.printing.mathml.MathMLPresentationPrinter._print_Basic",
+      "target_validation_subject": "for arg in e iteration over non-iterable Indexed",
+      "semantic_alignment_tokens": [
+        "IndexedBase",
+        "mathml",
+        "AssertionError",
+        "_print_Basic"
+      ],
+      "trigger_shape_tokens": [
+        "IndexedBase(",
+        "[b, c]",
+        "for arg in e"
+      ],
+      "rationale": "The original test covers single-index IndexedBase (a[b]). This idea tests multi-index IndexedBase (a[b, c]) which triggers the same _print_Basic fallback path but through a different entry point, verifying the fix handles arbitrary index tuples not just single indices."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_mathml.py b/sympy/printing/tests/test_mathml.py\n--- a/sympy/printing/tests/test_mathml.py\n+++ b/sympy/printing/tests/test_mathml.py\n@@ -1,7 +1,7 @@\n from sympy import diff, Integral, Limit, sin, Symbol, Integer, Rational, cos, \\\n     tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, E, I, oo, \\\n     pi, GoldenRatio, EulerGamma, Sum, Eq, Ne, Ge, Lt, Float, Matrix, Basic, S, \\\n-    MatrixSymbol, Function, Derivative, log, Lambda\n+    MatrixSymbol, Function, Derivative, log, Lambda, IndexedBase, symbols\n from sympy.core.containers import Tuple\n from sympy.functions.elementary.complexes import re, im, Abs, conjugate\n from sympy.functions.elementary.integers import floor, ceiling\n@@ -1139,3 +1139,10 @@ def test_print_random_symbol():\n     R = RandomSymbol(Symbol('R'))\n     assert mpp.doprint(R) == '<mi>R</mi>'\n     assert mp.doprint(R) == '<ci>R</ci>'\n+\n+\n+def test_sweb_enhanced_indexed_multi_index():\n+    # Test IndexedBase with multiple indices triggers the same _print_Basic\n+    # fallback path that fails with \"TypeError: 'Indexed' object is not iterable\"\n+    a, b, c = symbols('a b c')\n+    # This tests multi-index case which falls through to _print_Basic\n+    assert mathml(IndexedBase(a)[b, c], printer='presentation') == '<msub><mi>a</mi><mi>b</mi><mi>c</mi></msub>'\n",
+    "raw_response": "\n\nLooking at the problem, I need to create an enhanced test that:\n1. Triggers the same bug as `test_print_IndexedBase` but through a different entry point\n2. Tests multi-index `IndexedBase` which would also fall through to `_print_Basic` and fail with the same iteration error\n3. Must FAIL on the buggy code (before the fix is applied)\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/printing/tests/test_mathml.py b/sympy/printing/tests/test_mathml.py\n--- a/sympy/printing/tests/test_mathml.py\n+++ b/sympy/printing/tests/test_mathml.py\n@@ -1,7 +1,7 @@\n from sympy import diff, Integral, Limit, sin, Symbol, Integer, Rational, cos, \\\n     tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, E, I, oo, \\\n     pi, GoldenRatio, EulerGamma, Sum, Eq, Ne, Ge, Lt, Float, Matrix, Basic, S, \\\n-    MatrixSymbol, Function, Derivative, log, Lambda\n+    MatrixSymbol, Function, Derivative, log, Lambda, IndexedBase, symbols\n from sympy.core.containers import Tuple\n from sympy.functions.elementary.complexes import re, im, Abs, conjugate\n from sympy.functions.elementary.integers import floor, ceiling\n@@ -1139,3 +1139,10 @@ def test_print_random_symbol():\n     R = RandomSymbol(Symbol('R'))\n     assert mpp.doprint(R) == '<mi>R</mi>'\n     assert mp.doprint(R) == '<ci>R</ci>'\n+\n+\n+def test_sweb_enhanced_indexed_multi_index():\n+    # Test IndexedBase with multiple indices triggers the same _print_Basic\n+    # fallback path that fails with \"TypeError: 'Indexed' object is not iterable\"\n+    a, b, c = symbols('a b c')\n+    # This tests multi-index case which falls through to _print_Basic\n+    assert mathml(IndexedBase(a)[b, c], printer='presentation') == '<msub><mi>a</mi><mi>b</mi><mi>c</mi></msub>'\n```",
+    "identifiers": [
+      "test_sweb_enhanced_indexed_multi_index"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_indexed_multi_index"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "sympy/printing/tests/test_mathml.py:test_print_intervals": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_Abs": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_Determinant": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_mat_delim_print": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_set_frozenset": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_FiniteSet": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_SetOp": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_floor": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_ceiling": "FAILED",
+      "test_mathml_printer": "PASSED",
+      "test_content_printmethod": "PASSED",
+      "test_content_mathml_core": "PASSED",
+      "test_content_mathml_functions": "PASSED",
+      "test_content_mathml_limits": "PASSED",
+      "test_content_mathml_integrals": "PASSED",
+      "test_content_mathml_matrices": "PASSED",
+      "test_content_mathml_sums": "PASSED",
+      "test_content_mathml_tuples": "PASSED",
+      "test_content_mathml_add": "PASSED",
+      "test_content_mathml_Rational": "PASSED",
+      "test_content_mathml_constants": "PASSED",
+      "test_content_mathml_trig": "PASSED",
+      "test_content_mathml_relational": "PASSED",
+      "test_content_symbol": "PASSED",
+      "test_content_mathml_greek": "PASSED",
+      "test_content_mathml_order": "PASSED",
+      "test_content_settings": "PASSED",
+      "test_presentation_printmethod": "PASSED",
+      "test_presentation_mathml_core": "PASSED",
+      "test_presentation_mathml_functions": "PASSED",
+      "test_print_derivative": "PASSED",
+      "test_presentation_mathml_limits": "PASSED",
+      "test_presentation_mathml_integrals": "PASSED",
+      "test_presentation_mathml_matrices": "PASSED",
+      "test_presentation_mathml_sums": "PASSED",
+      "test_presentation_mathml_add": "PASSED",
+      "test_presentation_mathml_Rational": "PASSED",
+      "test_presentation_mathml_constants": "PASSED",
+      "test_presentation_mathml_trig": "PASSED",
+      "test_presentation_mathml_relational": "PASSED",
+      "test_presentation_symbol": "PASSED",
+      "test_presentation_mathml_greek": "PASSED",
+      "test_presentation_mathml_order": "PASSED",
+      "test_print_intervals": "FAILED",
+      "test_print_tuples": "PASSED",
+      "test_print_re_im": "PASSED",
+      "test_print_Abs": "FAILED",
+      "test_print_Determinant": "FAILED",
+      "test_presentation_settings": "PASSED",
+      "test_toprettyxml_hooking": "PASSED",
+      "test_print_domains": "PASSED",
+      "test_print_expression_with_minus": "PASSED",
+      "test_print_AssocOp": "PASSED",
+      "test_print_basic": "PASSED",
+      "test_mat_delim_print": "FAILED",
+      "test_ln_notation_print": "PASSED",
+      "test_mul_symbol_print": "PASSED",
+      "test_print_lerchphi": "PASSED",
+      "test_print_polylog": "PASSED",
+      "test_print_set_frozenset": "FAILED",
+      "test_print_FiniteSet": "FAILED",
+      "test_print_SetOp": "FAILED",
+      "test_print_logic": "PASSED",
+      "test_root_notation_print": "PASSED",
+      "test_fold_frac_powers_print": "PASSED",
+      "test_fold_short_frac_print": "PASSED",
+      "test_print_factorials": "PASSED",
+      "test_print_floor": "FAILED",
+      "test_print_ceiling": "FAILED",
+      "test_print_Lambda": "PASSED",
+      "test_print_conjugate": "PASSED",
+      "test_print_matrix_symbol": "PASSED",
+      "test_print_random_symbol": "PASSED"
+    },
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_print_IndexedBase"
+    ],
+    "covered_obligations": [
+      "test_print_IndexedBase::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "MathML printer fails to handle IndexedBase with AssertionError",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that printing IndexedBase to MathML raises the expected error on buggy code and succeeds on fixed code",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_IndexedBase_mathml"
+      ],
+      "covers_original_tests": [
+        "test_print_IndexedBase"
+      ],
+      "covers_obligations": [
+        "test_print_IndexedBase::core"
+      ],
+      "target_source_symbol": "sympy.printing.mathml.MathMLPresentationPrinter._print_Basic",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "IndexedBase",
+        "Indexed",
+        "mathml"
+      ],
+      "trigger_shape_tokens": [
+        "for arg in e",
+        "TypeError: 'Indexed' object is not iterable"
+      ],
+      "rationale": "The original test targets the core bug: when printing an IndexedBase to MathML, the printer falls back to _print_Basic which tries to iterate over the Indexed object (for arg in e), causing a TypeError. This test directly reproduces that exact failure path by creating an IndexedBase object and attempting MathML printing, which should fail with the iteration error on buggy code and succeed after adding a proper _print_Indexed handler."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_mathml.py b/sympy/printing/tests/test_mathml.py\n--- a/sympy/printing/tests/test_mathml.py\n+++ b/sympy/printing/tests/test_mathml.py\n@@ -1,7 +1,7 @@\n from sympy import diff, Integral, Limit, sin, Symbol, Integer, Rational, cos, \\\n     tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, E, I, oo, \\\n     pi, GoldenRatio, EulerGamma, Sum, Eq, Ne, Ge, Lt, Float, Matrix, Basic, S, \\\n-    MatrixSymbol, Function, Derivative, log, Lambda\n+    MatrixSymbol, Function, Derivative, log, Lambda, IndexedBase, symbols\n from sympy.core.containers import Tuple\n from sympy.functions.elementary.complexes import re, im, Abs, conjugate\n from sympy.functions.elementary.integers import floor, ceiling\n@@ -1139,3 +1139,10 @@ def test_print_random_symbol():\n     R = RandomSymbol(Symbol('R'))\n     assert mpp.doprint(R) == '<mi>R</mi>'\n     assert mp.doprint(R) == '<ci>R</ci>'\n+\n+\n+def test_sweb_enhanced_IndexedBase_mathml():\n+    # Test that IndexedBase without indices can be printed to MathML\n+    # This triggers the core bug: _print_Basic tries to iterate over Indexed object\n+    a = Symbol('a')\n+    result = mpp.doprint(IndexedBase(a))\n+    assert result == '<mi>a</mi>'\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Fails on the buggy code (AssertionError)\n2. Passes after the fix\n3. Uses a different observation angle than the original test\n4. Tests the core bug: `_print_Basic` trying to iterate over `Indexed` object\n\nThe original test covers IndexedBase with indices. I'll create a test that focuses on the core failure path - directly testing that the printer can handle IndexedBase without indices (which triggers the iteration error in `_print_Basic`).\n\n```diff\ndiff --git a/sympy/printing/tests/test_mathml.py b/sympy/printing/tests/test_mathml.py\n--- a/sympy/printing/tests/test_mathml.py\n+++ b/sympy/printing/tests/test_mathml.py\n@@ -1,7 +1,7 @@\n from sympy import diff, Integral, Limit, sin, Symbol, Integer, Rational, cos, \\\n     tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, E, I, oo, \\\n     pi, GoldenRatio, EulerGamma, Sum, Eq, Ne, Ge, Lt, Float, Matrix, Basic, S, \\\n-    MatrixSymbol, Function, Derivative, log, Lambda\n+    MatrixSymbol, Function, Derivative, log, Lambda, IndexedBase, symbols\n from sympy.core.containers import Tuple\n from sympy.functions.elementary.complexes import re, im, Abs, conjugate\n from sympy.functions.elementary.integers import floor, ceiling\n@@ -1139,3 +1139,10 @@ def test_print_random_symbol():\n     R = RandomSymbol(Symbol('R'))\n     assert mpp.doprint(R) == '<mi>R</mi>'\n     assert mp.doprint(R) == '<ci>R</ci>'\n+\n+\n+def test_sweb_enhanced_IndexedBase_mathml():\n+    # Test that IndexedBase without indices can be printed to MathML\n+    # This triggers the core bug: _print_Basic tries to iterate over Indexed object\n+    a = Symbol('a')\n+    result = mpp.doprint(IndexedBase(a))\n+    assert result == '<mi>a</mi>'\n```",
+    "identifiers": [
+      "test_sweb_enhanced_IndexedBase_mathml"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_IndexedBase_mathml"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "sympy/printing/tests/test_mathml.py:test_print_intervals": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_Abs": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_Determinant": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_mat_delim_print": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_set_frozenset": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_FiniteSet": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_SetOp": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_floor": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_ceiling": "FAILED",
+      "test_mathml_printer": "PASSED",
+      "test_content_printmethod": "PASSED",
+      "test_content_mathml_core": "PASSED",
+      "test_content_mathml_functions": "PASSED",
+      "test_content_mathml_limits": "PASSED",
+      "test_content_mathml_integrals": "PASSED",
+      "test_content_mathml_matrices": "PASSED",
+      "test_content_mathml_sums": "PASSED",
+      "test_content_mathml_tuples": "PASSED",
+      "test_content_mathml_add": "PASSED",
+      "test_content_mathml_Rational": "PASSED",
+      "test_content_mathml_constants": "PASSED",
+      "test_content_mathml_trig": "PASSED",
+      "test_content_mathml_relational": "PASSED",
+      "test_content_symbol": "PASSED",
+      "test_content_mathml_greek": "PASSED",
+      "test_content_mathml_order": "PASSED",
+      "test_content_settings": "PASSED",
+      "test_presentation_printmethod": "PASSED",
+      "test_presentation_mathml_core": "PASSED",
+      "test_presentation_mathml_functions": "PASSED",
+      "test_print_derivative": "PASSED",
+      "test_presentation_mathml_limits": "PASSED",
+      "test_presentation_mathml_integrals": "PASSED",
+      "test_presentation_mathml_matrices": "PASSED",
+      "test_presentation_mathml_sums": "PASSED",
+      "test_presentation_mathml_add": "PASSED",
+      "test_presentation_mathml_Rational": "PASSED",
+      "test_presentation_mathml_constants": "PASSED",
+      "test_presentation_mathml_trig": "PASSED",
+      "test_presentation_mathml_relational": "PASSED",
+      "test_presentation_symbol": "PASSED",
+      "test_presentation_mathml_greek": "PASSED",
+      "test_presentation_mathml_order": "PASSED",
+      "test_print_intervals": "FAILED",
+      "test_print_tuples": "PASSED",
+      "test_print_re_im": "PASSED",
+      "test_print_Abs": "FAILED",
+      "test_print_Determinant": "FAILED",
+      "test_presentation_settings": "PASSED",
+      "test_toprettyxml_hooking": "PASSED",
+      "test_print_domains": "PASSED",
+      "test_print_expression_with_minus": "PASSED",
+      "test_print_AssocOp": "PASSED",
+      "test_print_basic": "PASSED",
+      "test_mat_delim_print": "FAILED",
+      "test_ln_notation_print": "PASSED",
+      "test_mul_symbol_print": "PASSED",
+      "test_print_lerchphi": "PASSED",
+      "test_print_polylog": "PASSED",
+      "test_print_set_frozenset": "FAILED",
+      "test_print_FiniteSet": "FAILED",
+      "test_print_SetOp": "FAILED",
+      "test_print_logic": "PASSED",
+      "test_root_notation_print": "PASSED",
+      "test_fold_frac_powers_print": "PASSED",
+      "test_fold_short_frac_print": "PASSED",
+      "test_print_factorials": "PASSED",
+      "test_print_floor": "FAILED",
+      "test_print_ceiling": "FAILED",
+      "test_print_Lambda": "PASSED",
+      "test_print_conjugate": "PASSED",
+      "test_print_matrix_symbol": "PASSED",
+      "test_print_random_symbol": "PASSED"
+    },
+    "generation_attempts": 7,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_print_IndexedBase"
+    ],
+    "covered_obligations": [
+      "test_print_IndexedBase::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "MathML printer fails to handle IndexedBase with indices",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Tests that MathML printer can handle IndexedBase expressions with indices, exposing the TypeError when trying to iterate over non-iterable Indexed object",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_IndexedBase_mathml"
+      ],
+      "covers_original_tests": [
+        "test_print_IndexedBase"
+      ],
+      "covers_obligations": [
+        "test_print_IndexedBase::core"
+      ],
+      "target_source_symbol": "sympy.printing.mathml.MathMLPresentationPrinter._print_Basic",
+      "target_validation_subject": "IndexedBase with indices printing",
+      "semantic_alignment_tokens": [
+        "IndexedBase",
+        "mathml",
+        "TypeError",
+        "not iterable"
+      ],
+      "trigger_shape_tokens": [
+        "IndexedBase(",
+        "[",
+        ")",
+        "for arg in e"
+      ],
+      "rationale": "This test directly reproduces the bug where printing an IndexedBase with indices to MathML fails with TypeError because the _print_Basic method tries to iterate over the Indexed object which is not iterable. The original test likely only checks the basic case, while this test ensures the specific failure path through _print_Basic is fixed by adding proper _print_Indexed support."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_mathml.py b/sympy/printing/tests/test_mathml.py\n--- a/sympy/printing/tests/test_mathml.py\n+++ b/sympy/printing/tests/test_mathml.py\n@@ -1,7 +1,7 @@\n from sympy import diff, Integral, Limit, sin, Symbol, Integer, Rational, cos, \\\n     tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, E, I, oo, \\\n     pi, GoldenRatio, EulerGamma, Sum, Eq, Ne, Ge, Lt, Float, Matrix, Basic, S, \\\n-    MatrixSymbol, Function, Derivative, log, Lambda\n+    MatrixSymbol, Function, Derivative, log, Lambda, IndexedBase, symbols\n from sympy.core.containers import Tuple\n from sympy.functions.elementary.complexes import re, im, Abs, conjugate\n from sympy.functions.elementary.integers import floor, ceiling\n@@ -1139,3 +1139,10 @@ def test_print_random_symbol():\n     R = RandomSymbol(Symbol('R'))\n     assert mpp.doprint(R) == '<mi>R</mi>'\n     assert mp.doprint(R) == '<ci>R</ci>'\n+\n+\n+def test_sweb_enhanced_IndexedBase_mathml():\n+    # Test IndexedBase with compound index in sum expression\n+    # This triggers the same bug path: _print_Basic tries to iterate over Indexed\n+    a, b, c = symbols('a b c')\n+    expr = IndexedBase(a)[b + c] + x\n+    assert mathml(expr, printer='presentation') is not None\n",
+    "raw_response": "\n\nLooking at the bug, the issue is that `MathMLPresentationPrinter._print_Basic` tries to iterate over an `Indexed` object (which is not iterable), causing a `TypeError`. The original test checks basic IndexedBase with indices.\n\nI'll create an enhanced test that exposes the same bug through a different angle - testing IndexedBase with a compound index expression within a larger mathematical expression, which still triggers the same `_print_Basic` fallback path.\n\n```diff\ndiff --git a/sympy/printing/tests/test_mathml.py b/sympy/printing/tests/test_mathml.py\n--- a/sympy/printing/tests/test_mathml.py\n+++ b/sympy/printing/tests/test_mathml.py\n@@ -1,7 +1,7 @@\n from sympy import diff, Integral, Limit, sin, Symbol, Integer, Rational, cos, \\\n     tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, E, I, oo, \\\n     pi, GoldenRatio, EulerGamma, Sum, Eq, Ne, Ge, Lt, Float, Matrix, Basic, S, \\\n-    MatrixSymbol, Function, Derivative, log, Lambda\n+    MatrixSymbol, Function, Derivative, log, Lambda, IndexedBase, symbols\n from sympy.core.containers import Tuple\n from sympy.functions.elementary.complexes import re, im, Abs, conjugate\n from sympy.functions.elementary.integers import floor, ceiling\n@@ -1139,3 +1139,10 @@ def test_print_random_symbol():\n     R = RandomSymbol(Symbol('R'))\n     assert mpp.doprint(R) == '<mi>R</mi>'\n     assert mp.doprint(R) == '<ci>R</ci>'\n+\n+\n+def test_sweb_enhanced_IndexedBase_mathml():\n+    # Test IndexedBase with compound index in sum expression\n+    # This triggers the same bug path: _print_Basic tries to iterate over Indexed\n+    a, b, c = symbols('a b c')\n+    expr = IndexedBase(a)[b + c] + x\n+    assert mathml(expr, printer='presentation') is not None\n```",
+    "identifiers": [
+      "test_sweb_enhanced_IndexedBase_mathml"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_IndexedBase_mathml"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_print_IndexedBase is not semantically aligned with its original failure path. Expected source symbol 'None' and alignment tokens ['assertionerror'], but the current content targets 'sympy.printing.mathml.MathMLPresentationPrinter._print_Basic' with tokens ['IndexedBase', 'mathml', 'TypeError', 'not iterable']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 7,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_print_IndexedBase"
+    ],
+    "covered_obligations": [
+      "test_print_IndexedBase::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "MathML printer fails to handle IndexedBase with assertion error",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Test that MathML printer correctly handles IndexedBase/Indexed expressions without raising AssertionError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_IndexedBase_mathml"
+      ],
+      "covers_original_tests": [
+        "test_print_IndexedBase"
+      ],
+      "covers_obligations": [
+        "test_print_IndexedBase::core"
+      ],
+      "target_source_symbol": "sympy.printing.mathml.MathMLPresentationPrinter._print_Basic",
+      "target_validation_subject": "Indexed expression iteration in _print_Basic",
+      "semantic_alignment_tokens": [
+        "IndexedBase",
+        "Indexed",
+        "mathml",
+        "_print_Basic"
+      ],
+      "trigger_shape_tokens": [
+        "for arg in e",
+        "e.args",
+        "Indexed"
+      ],
+      "rationale": "The original test test_print_IndexedBase fails with AssertionError because the MathML printer's _print_Basic method tries to iterate over the Indexed object directly instead of using e.args. This enhanced test directly exercises the _print_Basic path with an Indexed object to expose the iteration failure that causes the assertion error, providing clearer guidance on fixing the _print_Indexed method that should handle this case."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_mathml.py b/sympy/printing/tests/test_mathml.py\n--- a/sympy/printing/tests/test_mathml.py\n+++ b/sympy/printing/tests/test_mathml.py\n@@ -1,7 +1,7 @@\n from sympy import diff, Integral, Limit, sin, Symbol, Integer, Rational, cos, \\\n     tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, E, I, oo, \\\n     pi, GoldenRatio, EulerGamma, Sum, Eq, Ne, Ge, Lt, Float, Matrix, Basic, S, \\\n-    MatrixSymbol, Function, Derivative, log, Lambda\n+    MatrixSymbol, Function, Derivative, log, Lambda, IndexedBase, symbols\n from sympy.core.containers import Tuple\n from sympy.functions.elementary.complexes import re, im, Abs, conjugate\n from sympy.functions.elementary.integers import floor, ceiling\n@@ -1139,3 +1139,10 @@ def test_print_random_symbol():\n     R = RandomSymbol(Symbol('R'))\n     assert mpp.doprint(R) == '<mi>R</mi>'\n     assert mp.doprint(R) == '<ci>R</ci>'\n+\n+\n+def test_sweb_enhanced_IndexedBase_mathml():\n+    # Test that verifies the _print_Basic iteration bug is fixed\n+    # The bug causes TypeError when trying to iterate over Indexed directly\n+    # instead of using e.args\n+    a, b = symbols('a b')\n+    expr = IndexedBase(a)[b]\n+    # This should not raise TypeError: 'Indexed' object is not iterable\n+    result = mpp.doprint(expr)\n+    assert result == '<msub><mi>a</mi><mi>b</mi></msub>'\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Fails on the buggy code (triggers the same bug as `test_print_IndexedBase`)\n2. Passes after the fix is applied\n3. Uses a different observation angle than the original test\n\nThe bug is in `_print_Basic` which tries to iterate over the expression directly (`for arg in e`) instead of using `e.args`. The original test tests the full output. I'll create a test that directly tests the iteration issue by checking a simpler case that still triggers the bug.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/printing/tests/test_mathml.py b/sympy/printing/tests/test_mathml.py\n--- a/sympy/printing/tests/test_mathml.py\n+++ b/sympy/printing/tests/test_mathml.py\n@@ -1,7 +1,7 @@\n from sympy import diff, Integral, Limit, sin, Symbol, Integer, Rational, cos, \\\n     tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, E, I, oo, \\\n     pi, GoldenRatio, EulerGamma, Sum, Eq, Ne, Ge, Lt, Float, Matrix, Basic, S, \\\n-    MatrixSymbol, Function, Derivative, log, Lambda\n+    MatrixSymbol, Function, Derivative, log, Lambda, IndexedBase, symbols\n from sympy.core.containers import Tuple\n from sympy.functions.elementary.complexes import re, im, Abs, conjugate\n from sympy.functions.elementary.integers import floor, ceiling\n@@ -1139,3 +1139,10 @@ def test_print_random_symbol():\n     R = RandomSymbol(Symbol('R'))\n     assert mpp.doprint(R) == '<mi>R</mi>'\n     assert mp.doprint(R) == '<ci>R</ci>'\n+\n+\n+def test_sweb_enhanced_IndexedBase_mathml():\n+    # Test that verifies the _print_Basic iteration bug is fixed\n+    # The bug causes TypeError when trying to iterate over Indexed directly\n+    # instead of using e.args\n+    a, b = symbols('a b')\n+    expr = IndexedBase(a)[b]\n+    # This should not raise TypeError: 'Indexed' object is not iterable\n+    result = mpp.doprint(expr)\n+    assert result == '<msub><mi>a</mi><mi>b</mi></msub>'\n```",
+    "identifiers": [
+      "test_sweb_enhanced_IndexedBase_mathml"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_IndexedBase_mathml"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "sympy/printing/tests/test_mathml.py:test_print_intervals": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_Abs": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_Determinant": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_mat_delim_print": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_set_frozenset": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_FiniteSet": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_SetOp": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_floor": "FAILED",
+      "sympy/printing/tests/test_mathml.py:test_print_ceiling": "FAILED",
+      "test_mathml_printer": "PASSED",
+      "test_content_printmethod": "PASSED",
+      "test_content_mathml_core": "PASSED",
+      "test_content_mathml_functions": "PASSED",
+      "test_content_mathml_limits": "PASSED",
+      "test_content_mathml_integrals": "PASSED",
+      "test_content_mathml_matrices": "PASSED",
+      "test_content_mathml_sums": "PASSED",
+      "test_content_mathml_tuples": "PASSED",
+      "test_content_mathml_add": "PASSED",
+      "test_content_mathml_Rational": "PASSED",
+      "test_content_mathml_constants": "PASSED",
+      "test_content_mathml_trig": "PASSED",
+      "test_content_mathml_relational": "PASSED",
+      "test_content_symbol": "PASSED",
+      "test_content_mathml_greek": "PASSED",
+      "test_content_mathml_order": "PASSED",
+      "test_content_settings": "PASSED",
+      "test_presentation_printmethod": "PASSED",
+      "test_presentation_mathml_core": "PASSED",
+      "test_presentation_mathml_functions": "PASSED",
+      "test_print_derivative": "PASSED",
+      "test_presentation_mathml_limits": "PASSED",
+      "test_presentation_mathml_integrals": "PASSED",
+      "test_presentation_mathml_matrices": "PASSED",
+      "test_presentation_mathml_sums": "PASSED",
+      "test_presentation_mathml_add": "PASSED",
+      "test_presentation_mathml_Rational": "PASSED",
+      "test_presentation_mathml_constants": "PASSED",
+      "test_presentation_mathml_trig": "PASSED",
+      "test_presentation_mathml_relational": "PASSED",
+      "test_presentation_symbol": "PASSED",
+      "test_presentation_mathml_greek": "PASSED",
+      "test_presentation_mathml_order": "PASSED",
+      "test_print_intervals": "FAILED",
+      "test_print_tuples": "PASSED",
+      "test_print_re_im": "PASSED",
+      "test_print_Abs": "FAILED",
+      "test_print_Determinant": "FAILED",
+      "test_presentation_settings": "PASSED",
+      "test_toprettyxml_hooking": "PASSED",
+      "test_print_domains": "PASSED",
+      "test_print_expression_with_minus": "PASSED",
+      "test_print_AssocOp": "PASSED",
+      "test_print_basic": "PASSED",
+      "test_mat_delim_print": "FAILED",
+      "test_ln_notation_print": "PASSED",
+      "test_mul_symbol_print": "PASSED",
+      "test_print_lerchphi": "PASSED",
+      "test_print_polylog": "PASSED",
+      "test_print_set_frozenset": "FAILED",
+      "test_print_FiniteSet": "FAILED",
+      "test_print_SetOp": "FAILED",
+      "test_print_logic": "PASSED",
+      "test_root_notation_print": "PASSED",
+      "test_fold_frac_powers_print": "PASSED",
+      "test_fold_short_frac_print": "PASSED",
+      "test_print_factorials": "PASSED",
+      "test_print_floor": "FAILED",
+      "test_print_ceiling": "FAILED",
+      "test_print_Lambda": "PASSED",
+      "test_print_conjugate": "PASSED",
+      "test_print_matrix_symbol": "PASSED",
+      "test_print_random_symbol": "PASSED"
+    },
+    "generation_attempts": 7,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_print_IndexedBase"
+    ],
+    "covered_obligations": [
+      "test_print_IndexedBase::core"
+    ]
+  }
+]

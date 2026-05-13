@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/matrices/expressions/blockmatrix.py::BlockDiagMatrix",
+      "action": "modify_region",
+      "justification": "The BlockDiagMatrix class needs an _entry method override to handle the single-element case where blocks[0,0] incorrectly returns a sympy One object instead of the matrix. This is the root cause of the TypeError when converting single-element BlockDiagMatrix back to regular Matrix."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/matrices/expressions/blockmatrix.py",
+      "target_symbol": "BlockDiagMatrix",
+      "replacement_mode": "insert_after_anchor",
+      "covers_obligations": [
+        "single_element_block_access",
+        "conversion_to_dense_matrix"
+      ],
+      "anchor_line_before": "    def __new__(cls, *mats):",
+      "anchor_line_after": "    @property",
+      "replacement_block": "    def __new__(cls, *mats):\n        return Basic.__new__(BlockDiagMatrix, *mats)\n\n    def _entry(self, i, j):\n        # Handle single-element case specially to avoid blocks[0,0] returning One\n        if len(self.args) == 1:\n            return self.args[0][i, j]\n        # For multiple elements, use parent class implementation\n        return BlockMatrix._entry(self, i, j)\n\n    @property"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "root_cause": "The Domain.preprocess() method in polyoptions.py uses a regex pattern _re_polynomial = re.compile(r'^(Z|ZZ|Q|QQ)\\[(.+)\\]$') that only accepts Z, ZZ, Q, or QQ as ground domains for polynomial rings. It does not handle R, RR, C, or CC (real/complex fields), so 'RR[y,z]' fails to parse despite being a valid polynomial ring domain.",
+  "affected_components": [
+    {
+      "file": "sympy/polys/polyoptions.py",
+      "symbol": "Domain",
+      "reason": "The Domain class's preprocess() method contains the regex that rejects 'RR[y,z]' and similar valid domain specifications"
+    }
+  ],
+  "failing_signal": "OptionError: expected a valid domain specification, got RR[y,z] when calling Poly(1.2*x*y*z, x, domain='RR[y,z]')",
+  "propagation_path": "The Domain.preprocess() method checks the domain string against several regex patterns. The _re_polynomial pattern only matches ground domains Z/ZZ/Q/QQ, so RR[y,z] falls through all checks and raises OptionError at the end of the method.",
+  "repair_constraint": "The fix must allow R, RR, C, CC as ground domains in polynomial ring specifications while preserving all existing validations and not breaking backward compatibility with Z, ZZ, Q, QQ",
+  "suggested_repair_scope": [
+    "sympy/polys/polyoptions.py"
+  ],
+  "suspicious_symbols": [
+    "Domain",
+    "_re_polynomial",
+    "preprocess"
+  ],
+  "repair_obligations": [
+    {
+      "id": "1",
+      "source_symbol": "Domain._re_polynomial",
+      "validation_subject": "regex pattern for polynomial ring domains",
+      "why_it_matters": "The current pattern only matches Z/ZZ/Q/QQ but should also match R/RR/C/CC to support domains like RR[y,z]"
+    },
+    {
+      "id": "2",
+      "source_symbol": "Domain.preprocess",
+      "validation_subject": "polynomial ring domain handling logic",
+      "why_it_matters": "Must return the appropriate domain object (e.g., RR.poly_ring(y, z)) when ground domain is R/RR/C/CC"
+    }
+  ]
+}

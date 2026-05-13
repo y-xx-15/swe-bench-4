@@ -1,0 +1,40 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/mathml.py::MathMLContentPrinter",
+      "action": "modify_region",
+      "justification": "Missing _print_Indexed and _print_IndexedBase methods cause fallback to _print_Basic which tries to iterate non-iterable Indexed object, raising TypeError"
+    },
+    {
+      "target_file": "sympy/printing/mathml.py::MathMLPresentationPrinter",
+      "action": "modify_region",
+      "justification": "Missing _print_Indexed and _print_IndexedBase methods cause fallback to _print_Basic which tries to iterate non-iterable Indexed object, raising TypeError"
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/mathml.py",
+      "target_symbol": "MathMLContentPrinter",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "RO-1",
+        "RO-2"
+      ],
+      "anchor_line_before": "    printmethod = \"_mathml_content\"",
+      "anchor_line_after": "    def mathml_tag(self, e):",
+      "replacement_block": "    printmethod = \"_mathml_content\"\n\n    def _print_IndexedBase(self, e):\n        base = self._print(e.base)\n        return base\n\n    def _print_Indexed(self, e):\n        base = self._print(e.base)\n        indices = [self._print(i) for i in e.indices]\n        x = self.dom.createElement('apply')\n        selector = self.dom.createElement('selector')\n        x.appendChild(selector)\n        x.appendChild(base)\n        for idx in indices:\n            x.appendChild(idx)\n        return x\n\n    def mathml_tag(self, e):"
+    },
+    {
+      "target_file": "sympy/printing/mathml.py",
+      "target_symbol": "MathMLPresentationPrinter",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "RO-3",
+        "RO-4"
+      ],
+      "anchor_line_before": "    printmethod = \"_mathml_presentation\"",
+      "anchor_line_after": "    def mathml_tag(self, e):",
+      "replacement_block": "    printmethod = \"_mathml_presentation\"\n\n    def _print_IndexedBase(self, e):\n        base = self._print(e.base)\n        return base\n\n    def _print_Indexed(self, e):\n        base = self._print(e.base)\n        indices = [self._print(i) for i in e.indices]\n        x = self.dom.createElement('msub')\n        x.appendChild(base)\n        if len(indices) == 1:\n            x.appendChild(indices[0])\n        else:\n            row = self.dom.createElement('mrow')\n            for idx in indices:\n                if row.childNodes.length > 0:\n                    sep = self.dom.createElement('mo')\n                    sep.appendChild(self.dom.createTextNode(','))\n                    row.appendChild(sep)\n                row.appendChild(idx)\n            x.appendChild(row)\n        return x\n\n    def mathml_tag(self, e):"
+    }
+  ]
+}

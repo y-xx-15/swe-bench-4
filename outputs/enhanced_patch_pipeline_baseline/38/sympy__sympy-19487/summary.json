@@ -1,0 +1,234 @@
+{
+  "instance_id": "sympy__sympy-19487",
+  "repo": "sympy/sympy",
+  "model": "minimax-m2.5",
+  "pipeline_mode": "baseline_only",
+  "hide_original_test_patch_in_repair": true,
+  "disable_semantic_bucket_guidance": false,
+  "disable_enhanced_test_filtering": false,
+  "repair_mode": "baseline_fallback",
+  "original_test_identifiers": [
+    "test_sign"
+  ],
+  "original_status_counts": {
+    "FAILED": 2,
+    "PASSED": 90
+  },
+  "original_failed_count": 2,
+  "original_passed_count": 90,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_sign"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_sign"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/functions/elementary/tests/test_complexes.py:test_sign",
+      "test_sign"
+    ],
+    "failure_mode": "assertion_error",
+    "dominant_errors": [
+      "AssertionError"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "test_sign F",
+      "test_sign_issue_3068 f",
+      "_________ sympy/functions/elementary/tests/test_complexes.py:test_sign _________"
+    ],
+    "noise_ratio": 0.0048,
+    "target_test_tracebacks": {
+      "test_sign": "TARGET TEST: test_sign\n- snippet: test_sign F\n- snippet: test_sign_issue_3068 f\n- snippet: _________ sympy/functions/elementary/tests/test_complexes.py:test_sign _________\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_sign F\ntest_sign_issue_3068 f\n_________ sympy/functions/elementary/tests/test_complexes.py:test_sign _________\nTraceback (most recent call last):\n  File \"/testbed/sympy/functions/elementary/tests/test_complexes.py\", line 305, in test_sign\nAssertionError\n== tests finished: 92 passed, 1 failed, 4 expected to fail, in 16.90 seconds ==="
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 3,
+    "keep_top_k": 2,
+    "attempt_budget": 3,
+    "bucket_limit": 3,
+    "template_limit": 3,
+    "failure_mode": "assertion_error",
+    "noise_ratio": 0.0048,
+    "difficulty": "low"
+  },
+  "adaptive_num_candidates": 3,
+  "adaptive_keep_top_k": 2,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 0,
+  "kept_enhanced_candidates": 0,
+  "enhanced_candidate_retention_rate": 0.0,
+  "enhanced_generation_attempts_total": 0,
+  "enhanced_generation_attempts_avg": 0.0,
+  "kept_enhanced_test_identifiers": [],
+  "enhanced_failed_test_identifiers": [],
+  "enhanced_failed_count": 0,
+  "generated_patch_nonempty": false,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 6,
+  "generated_patch_accepted": false,
+  "generated_patch_acceptance_reason": "rejected_not_generated",
+  "generated_patch_feedback": null,
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [],
+  "patch_analysis": {
+    "root_cause": "The sign class is missing the _eval_rewrite_as_Abs method, which prevents sign(x).rewrite(Abs) from returning x/Abs(x). The doit method already implements the mathematical definition sign(z) = z/Abs(z) for non-zero z, but there's no rewrite handler to expose this functionality through the .rewrite() API.",
+    "affected_components": [
+      {
+        "file": "sympy/functions/elementary/complexes.py",
+        "symbol": "sign",
+        "reason": "Missing _eval_rewrite_as_Abs method to enable sign(x).rewrite(Abs)"
+      }
+    ],
+    "failing_signal": "test_sign in sympy/functions/elementary/tests/test_complexes.py fails with AssertionError, likely because sign(x).rewrite(Abs) does not return the expected x/Abs(x) form",
+    "propagation_path": "Without _eval_rewrite_as_Abs, the rewrite system cannot convert sign to Abs form. The doit method already correctly computes sign(z) = z/Abs(z) for non-zero z, but this logic is not exposed through the rewrite API.",
+    "repair_constraint": "The fix must return x/Abs(x) for sign(x).rewrite(Abs) when x is known to be non-zero, and handle the zero case appropriately (either return unevaluated or nan)",
+    "suggested_repair_scope": [
+      "sympy/functions/elementary/complexes.py"
+    ],
+    "suspicious_symbols": [
+      "sign",
+      "Abs",
+      "doit"
+    ],
+    "repair_obligations": [
+      {
+        "id": "1",
+        "source_symbol": "sign",
+        "validation_subject": "sign(x).rewrite(Abs)",
+        "why_it_matters": "The mathematical definition sign(z) = z/Abs(z) should be accessible via the rewrite API"
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Add _eval_rewrite_as_Abs to sign class",
+    "approach": "Add a _eval_rewrite_as_Abs method to the sign class in sympy/functions/elementary/complexes.py that returns arg/Abs(arg) when the argument is known to be non-zero (arg.is_zero is False). This mirrors the logic in the existing doit method which already implements sign(z) = z/Abs(z) for non-zero z. When the argument could be zero or is unknown, return None to leave the expression unevaluated.",
+    "edit_targets": [
+      "sympy/functions/elementary/complexes.py::sign"
+    ],
+    "dependency_files": [
+      "sympy/functions/elementary/tests/test_complexes.py"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [],
+    "sufficiency_assessment": "The fix is sufficient because the sign class already has the mathematical definition implemented in the doit method (arg/Abs(arg) for non-zero arg). Adding _eval_rewrite_as_Abs simply exposes this functionality through the .rewrite() API. No other files need modification.",
+    "risks": [
+      "The rewrite will only work when the argument is provably non-zero. If the argument could be zero (is_zero is None), the rewrite returns unevaluated, which is the correct conservative behavior to avoid producing nan.",
+      "Should not affect any existing functionality since it only adds a new rewrite path that was previously missing."
+    ]
+  },
+  "patch_edit_plan": null,
+  "final_patch_attempted": false,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": false,
+  "final_patch_apply_mode": "no_patch",
+  "final_patch_cleanly_applied": false,
+  "clean_apply_ratio": 0.0,
+  "resolved": false,
+  "final_resolved": false,
+  "final_status_counts": {
+    "FAILED": 2,
+    "PASSED": 90
+  },
+  "final_failed_count": 2,
+  "final_passed_count": 90,
+  "original_passed_count_improvement": 0,
+  "original_failed_count_reduction": 0,
+  "final_status_map": {
+    "sympy/functions/elementary/tests/test_complexes.py:test_sign": "FAILED",
+    "test_subs": "PASSED",
+    "test_subs_Matrix": "PASSED",
+    "test_subs_AccumBounds": "PASSED",
+    "test_trigonometric": "PASSED",
+    "test_powers": "PASSED",
+    "test_logexppow": "PASSED",
+    "test_bug": "PASSED",
+    "test_subbug1": "PASSED",
+    "test_subbug2": "PASSED",
+    "test_dict_set": "PASSED",
+    "test_dict_ambigous": "PASSED",
+    "test_deriv_sub_bug3": "PASSED",
+    "test_equality_subs1": "PASSED",
+    "test_equality_subs2": "PASSED",
+    "test_issue_3742": "PASSED",
+    "test_subs_dict1": "PASSED",
+    "test_mul": "PASSED",
+    "test_subs_simple": "PASSED",
+    "test_subs_constants": "PASSED",
+    "test_subs_commutative": "PASSED",
+    "test_subs_noncommutative": "PASSED",
+    "test_subs_basic_funcs": "PASSED",
+    "test_subs_wild": "PASSED",
+    "test_subs_mixed": "PASSED",
+    "test_division": "PASSED",
+    "test_add": "PASSED",
+    "test_subs_issue_4009": "PASSED",
+    "test_functions_subs": "PASSED",
+    "test_derivative_subs": "PASSED",
+    "test_derivative_subs2": "PASSED",
+    "test_derivative_subs3": "PASSED",
+    "test_issue_5284": "PASSED",
+    "test_subs_iter": "PASSED",
+    "test_subs_dict": "PASSED",
+    "test_no_arith_subs_on_floats": "PASSED",
+    "test_issue_5651": "PASSED",
+    "test_issue_6075": "PASSED",
+    "test_issue_6079": "PASSED",
+    "test_issue_4680": "PASSED",
+    "test_issue_6158": "PASSED",
+    "test_Function_subs": "PASSED",
+    "test_simultaneous_subs": "PASSED",
+    "test_issue_6419_6421": "PASSED",
+    "test_issue_6559": "PASSED",
+    "test_issue_5261": "PASSED",
+    "test_issue_6923": "PASSED",
+    "test_2arg_hack": "PASSED",
+    "test_noncommutative_subs": "PASSED",
+    "test_issue_2877": "PASSED",
+    "test_issue_5910": "PASSED",
+    "test_issue_5217": "PASSED",
+    "test_issue_10829": "PASSED",
+    "test_pow_eval_subs_no_cache": "PASSED",
+    "test_RootOf_issue_10092": "PASSED",
+    "test_issue_8886": "PASSED",
+    "test_issue_12657": "PASSED",
+    "test_recurse_Application_args": "PASSED",
+    "test_Subs_subs": "PASSED",
+    "test_issue_13333": "PASSED",
+    "test_issue_15234": "PASSED",
+    "test_issue_6976": "PASSED",
+    "test_issue_11746": "PASSED",
+    "test_issue_17823": "PASSED",
+    "test_issue_19326": "PASSED",
+    "test_re": "PASSED",
+    "test_im": "PASSED",
+    "test_sign": "FAILED",
+    "test_as_real_imag": "PASSED",
+    "test_Abs": "PASSED",
+    "test_Abs_rewrite": "PASSED",
+    "test_Abs_real": "PASSED",
+    "test_Abs_properties": "PASSED",
+    "test_abs": "PASSED",
+    "test_arg": "PASSED",
+    "test_arg_rewrite": "PASSED",
+    "test_adjoint": "PASSED",
+    "test_conjugate": "PASSED",
+    "test_conjugate_transpose": "PASSED",
+    "test_transpose": "PASSED",
+    "test_polarify": "PASSED",
+    "test_unpolarify": "PASSED",
+    "test_issue_4035": "PASSED",
+    "test_issue_3206": "PASSED",
+    "test_issue_4754_derivative_conjugate": "PASSED",
+    "test_derivatives_issue_4757": "PASSED",
+    "test_issue_11413": "PASSED",
+    "test_periodic_argument": "PASSED",
+    "test_principal_branch": "PASSED",
+    "test_issue_14216": "PASSED",
+    "test_issue_14238": "PASSED",
+    "test_zero_assumptions": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

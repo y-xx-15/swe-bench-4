@@ -1,0 +1,52 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/matrices/matrices.py::MatrixProperties._eval_is_upper",
+      "action": "modify_region",
+      "justification": "This method contains the buggy is_upper logic that iterates 'for j in range(i)' without checking column bounds. For tall matrices (rows > cols), j can exceed cols-1 causing IndexError. Must bound j by min(i, self.cols)."
+    },
+    {
+      "target_file": "sympy/matrices/matrices.py::MatrixProperties._eval_is_upper_hessenberg",
+      "action": "modify_region",
+      "justification": "This method has the same bug pattern - uses 'for j in range(i - 1)' without checking column bounds. Must bound j by min(i - 1, self.cols)."
+    },
+    {
+      "target_file": "sympy/matrices/matrices.py::MatrixProperties._eval_is_lower",
+      "action": "modify_region",
+      "justification": "This method has the inverse bug for wide matrices (cols > rows) - uses 'for j in range(i + 1, self.cols)' without checking row bounds. Must bound i by min(j, self.rows)."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/matrices/matrices.py",
+      "target_symbol": "MatrixProperties._eval_is_upper",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "1"
+      ],
+      "anchor_line_before": "        return all(self[i, j].is_zero\n                   for i in range(1, self.rows)\n                   for j in range(i))",
+      "anchor_line_after": "    def _eval_is_lower(self):",
+      "replacement_block": "        return all(self[i, j].is_zero\n                   for i in range(1, self.rows)\n                   for j in range(min(i, self.cols)))\n\n    def _eval_is_lower(self):"
+    },
+    {
+      "target_file": "sympy/matrices/matrices.py",
+      "target_symbol": "MatrixProperties._eval_is_upper_hessenberg",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "2"
+      ],
+      "anchor_line_before": "        return all(self[i, j].is_zero\n                   for i in range(2, self.rows)\n                   for j in range(i - 1))",
+      "anchor_line_after": "    def _eval_values(self):",
+      "replacement_block": "        return all(self[i, j].is_zero\n                   for i in range(2, self.rows)\n                   for j in range(min(i - 1, self.cols)))\n\n    def _eval_values(self):"
+    },
+    {
+      "target_file": "sympy/matrices/matrices.py",
+      "target_symbol": "MatrixProperties._eval_is_lower",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [],
+      "anchor_line_before": "        return all(self[i, j].is_zero\n                   for i in range(self.rows)\n                   for j in range(i + 1, self.cols))",
+      "anchor_line_after": "    def _eval_is_symbolic(self):",
+      "replacement_block": "        return all(self[i, j].is_zero\n                   for i in range(min(self.cols, self.rows))\n                   for j in range(i + 1, self.cols))\n\n    def _eval_is_symbolic(self):"
+    }
+  ]
+}

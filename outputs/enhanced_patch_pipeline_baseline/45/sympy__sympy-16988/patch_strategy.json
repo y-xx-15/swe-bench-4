@@ -1,0 +1,18 @@
+{
+  "title": "Deduplicate Intersection arguments",
+  "approach": "Add deduplication of arguments at the start of Intersection.__new__ after flattening but before _new_args_filter and simplify_intersection. This ensures duplicate sets like {1} appearing multiple times are reduced to a single instance, preventing the simplification logic from incorrectly treating them as conflicting constraints.",
+  "edit_targets": [
+    "sympy/sets/sets.py::Intersection.__new__"
+  ],
+  "dependency_files": [
+    "sympy/sets/sets.py::simplify_intersection",
+    "sympy/sets/sets.py::Intersection._new_args_filter"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only Intersection.__new__ is sufficient. The fix adds deduplication right after args are sympified/flattened and before any processing occurs. This ensures that duplicate arguments are removed before they reach simplify_intersection, which is where the bug manifests. No changes to simplify_intersection itself are needed since the root cause is the presence of duplicates in the input.",
+  "risks": [
+    "Potential performance impact for intersections with many arguments (mitigated by using dict-based deduplication)",
+    "Must preserve argument order for deterministic behavior - use dict.fromkeys() to maintain insertion order while removing duplicates"
+  ]
+}

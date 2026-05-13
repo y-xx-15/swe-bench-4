@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_sign"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_sign"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/functions/elementary/tests/test_complexes.py:test_sign",
+    "test_sign"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_sign F",
+    "test_sign_issue_3068 f",
+    "_________ sympy/functions/elementary/tests/test_complexes.py:test_sign _________"
+  ],
+  "noise_ratio": 0.0048,
+  "target_test_tracebacks": {
+    "test_sign": "TARGET TEST: test_sign\n- snippet: test_sign F\n- snippet: test_sign_issue_3068 f\n- snippet: _________ sympy/functions/elementary/tests/test_complexes.py:test_sign _________\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_sign F\ntest_sign_issue_3068 f\n_________ sympy/functions/elementary/tests/test_complexes.py:test_sign _________\nTraceback (most recent call last):\n  File \"/testbed/sympy/functions/elementary/tests/test_complexes.py\", line 305, in test_sign\nAssertionError\n== tests finished: 92 passed, 1 failed, 4 expected to fail, in 16.90 seconds ==="
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "root_cause": "The trigsimp function fails to simplify sin/cos expressions with Rational arguments because the pattern matching in __trigsimp does not properly handle Rational arguments. Specifically, when sin/cos have Rational arguments like Rational(1, 50), the code fails to recognize and apply trigonometric identities like cos(a-b) = cos(a)cos(b) + sin(a)sin(b).",
+  "affected_components": [
+    {
+      "file": "sympy/simplify/trigsimp.py",
+      "symbol": "__trigsimp",
+      "reason": "Main recursive trig simplification function that applies pattern matching. It fails to match patterns when arguments are Rational numbers instead of symbols."
+    },
+    {
+      "file": "sympy/simplify/trigsimp.py",
+      "symbol": "_trigsimp",
+      "reason": "Entry point that checks if expression has trigonometric functions using expr.has(*_trigs), which may not properly detect Rational-containing trig expressions"
+    },
+    {
+      "file": "sympy/simplify/trigsimp.py",
+      "symbol": "matchers_add",
+      "reason": "Contains patterns like c*cos(a)*cos(b) + c*sin(a)*sin(b) -> cos(a-b) that fail to match when a,b are Rational"
+    }
+  ],
+  "failing_signal": "AssertionError in test_issue_15129_trigsimp_methods - the test expects sin(Rational(1,50))*sin(Rational(1,25)) + cos(Rational(1,50))*cos(Rational(1,25)) to simplify to cos(Rational(1,50) - Rational(1,25)) but it remains unchanged",
+  "propagation_path": "When trigsimp is called on an Add expression containing sin/cos with Rational arguments, the pattern matching in __trigsimp fails to find matches because the Wild patterns (a,b,c,d) don't capture Rational arguments properly, or the _dotrig check fails. The expression is returned unchanged.",
+  "repair_constraint": "The fix must preserve all existing trigsimp behavior for symbolic arguments while adding support for Rational arguments. The mathematical identity cos(a-b) = cos(a)cos(b) + sin(a)sin(b) must work for Rational arguments.",
+  "suggested_repair_scope": [
+    "sympy/simplify/trigsimp.py"
+  ],
+  "suspicious_symbols": [
+    "__trigsimp",
+    "_trigsimp",
+    "_dotrig",
+    "matchers_add",
+    "matchers_identity",
+    "TrigonometricFunction",
+    "HyperbolicFunction"
+  ],
+  "repair_obligations": [
+    {
+      "id": "oblig_1",
+      "source_symbol": "__trigsimp",
+      "validation_subject": "sin(Rational(1,50))*sin(Rational(1,25)) + cos(Rational(1,50))*cos(Rational(1,25))",
+      "why_it_matters": "This expression should simplify to cos(Rational(1,50) - Rational(1,25)) using the identity cos(a-b)=cos(a)cos(b)+sin(a)sin(b)"
+    },
+    {
+      "id": "oblig_2",
+      "source_symbol": "_dotrig",
+      "validation_subject": "expressions with Rational trig arguments",
+      "why_it_matters": "The _dotrig helper must correctly identify that both operands have trigonometric functions of the same type"
+    },
+    {
+      "id": "oblig_3",
+      "source_symbol": "matchers_add",
+      "validation_subject": "c*cos(a)*cos(b) + c*sin(a)*sin(b) pattern",
+      "why_it_matters": "This pattern must match when a and b are Rational numbers, not just symbols"
+    }
+  ]
+}

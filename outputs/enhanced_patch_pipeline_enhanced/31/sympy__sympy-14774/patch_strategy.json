@@ -1,0 +1,16 @@
+{
+  "title": "Add acsc and asec to inv_trig_table",
+  "approach": "Add 'acsc' and 'asec' to the inv_trig_table list in the _print_Function method of LatexPrinter. This list currently contains ['asin', 'acos', 'atan', 'acot'] and needs to include all six inverse trig functions. When inv_trig_style='full', the code transforms the function name by prepending 'arc' (func[1:] removes the first character 'a' and 'arc' + func[1:] produces 'arccsc' from 'acsc' and 'arcsec' from 'asec'). This fix ensures that latex(acsc(x), inv_trig_style='full') returns r'\\operatorname{arccsc}{\\left (x \\right )}' and latex(asec(x), inv_trig_style='full') returns r'\\operatorname{arcsec}{\\left (x \\right )}'.",
+  "edit_targets": [
+    "sympy/printing/latex.py::LatexPrinter._print_Function"
+  ],
+  "dependency_files": [
+    "sympy/printing/tests/test_latex.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing only the primary target (inv_trig_table in _print_Function) is sufficient. The fix directly addresses all three validation obligations: (1) inv_trig_table must contain 'acsc' and 'asec', (2) inv_trig_style='full' for acsc and asec must produce the correct arc-prefixed output, and (3) inv_trig_table list completeness for all six inverse trig functions. No other files need modification as the existing transformation logic ('arc' + func[1:]) already works correctly for these function names.",
+  "risks": [
+    "Ensure existing behavior for asin, acos, atan, and acot remains unchanged when inv_trig_style='full' or other styles. The transformation logic should be tested to confirm it doesn't break other inverse trig functions."
+  ]
+}

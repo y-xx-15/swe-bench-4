@@ -1,0 +1,51 @@
+{
+  "root_cause": "The is_upper property iterates using `for j in range(i)` without bounding j by the number of columns. For tall matrices (more rows than columns), this generates column indices that exceed the matrix bounds, causing IndexError when accessing self[i, j].",
+  "affected_components": [
+    {
+      "file": "sympy/matrices/matrices.py",
+      "symbol": "is_upper (property in MatrixProperties)",
+      "reason": "The main buggy code that raises IndexError for tall matrices. Uses unbounded range(i) for column iteration."
+    },
+    {
+      "file": "sympy/matrices/matrices.py",
+      "symbol": "_eval_is_lower",
+      "reason": "Has the same bug pattern - uses unbounded range for wide matrices (more columns than rows)."
+    },
+    {
+      "file": "sympy/matrices/matrices.py",
+      "symbol": "_eval_is_upper_hessenberg",
+      "reason": "Uses `for j in range(i - 1)` which also exceeds column bounds for tall matrices."
+    },
+    {
+      "file": "sympy/matrices/matrices.py",
+      "symbol": "_eval_is_lower_hessenberg",
+      "reason": "Uses `for j in range(i + 2, self.cols)` which exceeds row bounds for wide matrices."
+    }
+  ],
+  "failing_signal": "IndexError: Index out of range: a[2] when calling sympy.zeros(4,2).is_upper. The iteration generates index (3,2) which is beyond column 1 (0-indexed) for a 2-column matrix.",
+  "propagation_path": "is_upper property calls all() with a generator that iterates over self[i, j] for i in range(1, self.rows) and j in range(i). For a 4x2 matrix, when i=3, j iterates 0,1,2 but column 2 doesn't exist. The __getitem__ method in dense.py calls extract() which validates indices via a2idx(), raising IndexError.",
+  "repair_constraint": "The fix must ensure that for any matrix shape, only valid indices (i < rows and j < cols) are accessed. The upper triangular check should only verify entries within the matrix bounds - for a tall matrix, this means only checking up to min(rows, cols) rows.",
+  "suggested_repair_scope": [
+    "sympy/matrices/matrices.py"
+  ],
+  "suspicious_symbols": [
+    "is_upper",
+    "_eval_is_lower",
+    "_eval_is_upper_hessenberg",
+    "_eval_is_lower_hessenberg"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_is_upper::core::is_upper property on tall matrix",
+      "source_symbol": "is_upper",
+      "validation_subject": "is_upper property on tall matrix",
+      "why_it_matters": "The primary bug - calling is_upper on a 4x2 matrix raises IndexError instead of returning a boolean. Must bound column iteration by self.cols."
+    },
+    {
+      "id": "test_hessenberg::core::is_upper property on tall matrix",
+      "source_symbol": "test_hessenberg",
+      "validation_subject": "is_upper property on tall matrix",
+      "why_it_matters": "test_hessenberg also fails because it likely creates tall matrices and calls is_upper internally. The same root cause affects this test."
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+[
+  {
+    "instance_id": "sympy__sympy-18621",
+    "repo": "sympy/sympy",
+    "model": "minimax-m2.5",
+    "pipeline_mode": "enhanced_guided",
+    "hide_original_test_patch_in_repair": false,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "enhanced_guided",
+    "original_test_identifiers": [
+      "test_issue_18618"
+    ],
+    "original_status_counts": {
+      "FAILED": 1,
+      "PASSED": 15,
+      "ERROR": 1
+    },
+    "original_failed_count": 2,
+    "original_passed_count": 15,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_issue_18618"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_issue_18618"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_18618",
+        "test_issue_18618"
+      ],
+      "failure_mode": "type_error",
+      "dominant_errors": [
+        "TypeError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_issue_18618 E",
+        "____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_18618 _____",
+        "Traceback (most recent call last):"
+      ],
+      "noise_ratio": 0.0057,
+      "target_test_tracebacks": {
+        "test_issue_18618": "TARGET TEST: test_issue_18618\n- snippet: test_issue_18618 E\n- snippet: ____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_18618 _____\n- snippet: Traceback (most recent call last):\n- dominant_errors: TypeError\nWEAK TRACEBACK CONTEXT:\ntest_issue_18618 E\n____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_18618 _____\nTraceback (most recent call last):\n  File \"/testbed/sympy/matrices/expressions/tests/test_blockmatrix.py\", line 115, in test_issue_18618\nTypeError: 'One' object is not subscriptable"
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 5,
+      "keep_top_k": 3,
+      "attempt_budget": 3,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "type_error",
+      "noise_ratio": 0.0057,
+      "difficulty": "medium"
+    },
+    "adaptive_num_candidates": 5,
+    "adaptive_keep_top_k": 3,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 5,
+    "kept_enhanced_candidates": 2,
+    "enhanced_candidate_retention_rate": 0.4,
+    "enhanced_generation_attempts_total": 13,
+    "enhanced_generation_attempts_avg": 2.6,
+    "kept_enhanced_test_identifiers": [
+      "test_sweb_enhanced_blockdiag_single_to_matrix",
+      "test_sweb_enhanced_blockdiag_single_element_as_explicit"
+    ],
+    "enhanced_failed_test_identifiers": [
+      "test_sweb_enhanced_blockdiag_single_to_matrix",
+      "test_sweb_enhanced_blockdiag_single_element_as_explicit"
+    ],
+    "enhanced_failed_count": 2,
+    "generated_patch_nonempty": false,
+    "generated_patch_error": "The replacement_block must start with anchor_line_before exactly.",
+    "generated_patch_attempts": 9,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_not_generated",
+    "generated_patch_feedback": "The replacement_block must start with anchor_line_before exactly.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "ImmutableDenseMatrix has a 1x1 optimization that returns the single element directly when indexed, breaking BlockDiagMatrix's expectation that blocks[row_block, col_block] returns a subscriptable matrix. When BlockDiagMatrix has a single element, self.blocks[0, 0] returns SymPy's One object instead of a matrix.",
+      "affected_components": [
+        {
+          "file": "sympy/matrices/expressions/blockmatrix.py",
+          "symbol": "BlockDiagMatrix.blocks",
+          "reason": "The blocks property creates an ImmutableDenseMatrix that loses the matrix wrapper for single-element diagonal matrices due to 1x1 optimization"
+        },
+        {
+          "file": "sympy/matrices/expressions/blockmatrix.py",
+          "symbol": "BlockMatrix._entry",
+          "reason": "The _entry method assumes self.blocks[row_block, col_block] returns a subscriptable matrix, but for 1x1 blockshape this fails"
+        }
+      ],
+      "failing_signal": "TypeError: 'One' object is not subscriptable when calling Matrix(BlockDiagMatrix(M)) with a single matrix M",
+      "propagation_path": "Matrix(D) calls as_explicit() which iterates rows/cols and calls _entry(i,j). _entry accesses self.blocks[row_block, col_block][i, j]. For single-element BlockDiagMatrix, blocks[0,0] returns One (the inner matrix element) instead of a matrix, causing subscript error.",
+      "repair_constraint": "BlockDiagMatrix with one element must convert to regular Matrix correctly; the blocks property must return subscriptable matrices for all block positions including 1x1 case",
+      "suggested_repair_scope": [
+        "sympy/matrices/expressions/blockmatrix.py"
+      ],
+      "suspicious_symbols": [
+        "BlockDiagMatrix.blocks",
+        "BlockMatrix._entry",
+        "ImmutableDenseMatrix"
+      ],
+      "repair_obligations": [
+        {
+          "id": "test_issue_18618::core::blocks property accessor for single-element diagonal",
+          "source_symbol": "BlockDiagMatrix.blocks",
+          "validation_subject": "blocks property accessor for single-element diagonal",
+          "why_it_matters": "The blocks property must return a structure where blocks[0,0] is subscriptable (a matrix), not the raw element. For single-element diagonal, accessing blocks[0,0] should return the matrix, not SymPy's One object."
+        },
+        {
+          "id": "test_issue_18618::core::blocks[row_block, col_block] subscript access",
+          "source_symbol": "BlockMatrix._entry",
+          "validation_subject": "blocks[row_block, col_block] subscript access",
+          "why_it_matters": "The _entry method relies on self.blocks[row_block, col_block] returning a subscriptable matrix to access [i, j]. This must work for 1x1 blockshape case."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Fix BlockDiagMatrix.blocks for single-element case",
+      "approach": "Modify the BlockDiagMatrix.blocks property to ensure it returns a structure where blocks[0,0] is always a subscriptable matrix, not the raw element. The fix should wrap the result in a way that prevents the ImmutableDenseMatrix 1x1 optimization from unwrapping the single matrix element. Specifically, in the blocks property, when len(mats) == 1, we need to ensure the returned ImmutableDenseMatrix preserves the matrix wrapper at position [0,0] rather than returning the raw element. This directly addresses the test_issue_18618::core::blocks property accessor for single-element diagonal validation subject, and also ensures test_issue_18618::core::blocks[row_block, col_block] subscript access works correctly in BlockMatrix._entry.",
+      "edit_targets": [
+        "sympy/matrices/expressions/blockmatrix.py::BlockDiagMatrix.blocks"
+      ],
+      "dependency_files": [
+        "sympy/matrices/expressions/blockmatrix.py::BlockMatrix._entry",
+        "sympy/matrices/immutable.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [],
+      "sufficiency_assessment": "The fix targets BlockDiagMatrix.blocks property which is the root cause - it must return a structure where blocks[0,0] is subscriptable (a matrix) for the single-element case. This directly satisfies both validation subjects: (1) blocks property accessor for single-element diagonal - the blocks property must return a structure where blocks[0,0] is the matrix M, not SymPy's One object; (2) blocks[row_block, col_block] subscript access - this will work once blocks[0,0] returns a matrix. No changes to BlockMatrix._entry are needed since the method correctly assumes self.blocks[row_block, col_block] returns a subscriptable matrix. The fix is localized to the blocks property in BlockDiagMatrix class.",
+      "risks": [
+        "Changing the blocks property could affect other code that relies on the current behavior for single-element BlockDiagMatrix",
+        "Need to ensure the fix doesn't break multi-element BlockDiagMatrix cases"
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/matrices/expressions/blockmatrix.py::BlockDiagMatrix.blocks",
+          "action": "modify_region",
+          "justification": "The blocks property is the root cause - when len(mats)==1, ImmutableDenseMatrix returns SymPy's One object instead of a matrix wrapper due to 1x1 optimization. Must modify to ensure blocks[0,0] is always subscriptable."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "sympy/matrices/expressions/blockmatrix.py",
+          "target_symbol": "BlockDiagMatrix.blocks",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "test_issue_18618::core::blocks property accessor for single-element diagonal",
+            "test_issue_18618::core::blocks[row_block, col_block] subscript access"
+          ],
+          "anchor_line_before": "    @property\n    def blocks(self):\n        from sympy.matrices.immutable import ImmutableDenseMatrix\n        mats = self.args\n        data = [[mats[i] if i == j else ZeroMatrix(mats[i].rows, mats[j].cols)\n                        for j in range(len(mats))]\n                        for i in range(len(mats))]\n        return ImmutableDenseMatrix(data)",
+          "anchor_line_after": "    @property\n    def shape(self):",
+          "replacement_block": "    @property\n    def blocks(self):\n        from sympy.matrices.immutable import ImmutableDenseMatrix\n        from sympy.matrices.dense import Matrix\n        mats = self.args\n        data = [[mats[i] if i == j else ZeroMatrix(mats[i].rows, mats[j].cols)\n                        for j in range(len(mats))]\n                        for i in range(len(mats))]\n        if len(mats) == 1:\n            # Prevent 1x1 optimization that returns raw element instead of matrix\n            return ImmutableDenseMatrix(Matrix(data))\n        return ImmutableDenseMatrix(data)"
+        }
+      ]
+    },
+    "final_patch_attempted": false,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": false,
+    "final_patch_apply_mode": "no_patch",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 1,
+      "PASSED": 15,
+      "ERROR": 1
+    },
+    "final_failed_count": 2,
+    "final_passed_count": 15,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_18618": "FAILED",
+      "test_bc_matmul": "PASSED",
+      "test_bc_matadd": "PASSED",
+      "test_bc_transpose": "PASSED",
+      "test_bc_dist_diag": "PASSED",
+      "test_block_plus_ident": "PASSED",
+      "test_BlockMatrix": "PASSED",
+      "test_block_collapse_explicit_matrices": "PASSED",
+      "test_issue_17624": "PASSED",
+      "test_issue_18618": "ERROR",
+      "test_BlockMatrix_trace": "PASSED",
+      "test_BlockMatrix_Determinant": "PASSED",
+      "test_squareBlockMatrix": "PASSED",
+      "test_BlockDiagMatrix": "PASSED",
+      "test_blockcut": "PASSED",
+      "test_reblock_2x2": "PASSED",
+      "test_deblock": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/geometry/point.py",
+      "action": "modify_region",
+      "justification": "The Point class is missing __rmul__ method, which is required to handle scalar * Point operations. Without it, expressions like 2.0 * point2 create a Mul expression instead of a scaled Point, causing subsequent addition to fail."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/geometry/point.py",
+      "target_symbol": "Point",
+      "replacement_mode": "insert_after_anchor",
+      "covers_obligations": [
+        "1",
+        "3"
+      ],
+      "anchor_line_before": "    is_Point = True",
+      "anchor_line_after": "    def __new__(cls, *args, **kwargs):",
+      "replacement_block": "    is_Point = True\n\n    def __rmul__(self, factor):\n        return self.__mul__(factor)\n\n    def __new__(cls, *args, **kwargs):"
+    }
+  ]
+}

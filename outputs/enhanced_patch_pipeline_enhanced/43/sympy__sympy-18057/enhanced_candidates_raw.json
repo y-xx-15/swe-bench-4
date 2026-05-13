@@ -1,0 +1,156 @@
+[
+  {
+    "idea": {
+      "title": "Symbol repr sympification causes AttributeError in __eq__",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that comparing a Symbol with an object whose repr contains attribute access (e.g., 'x.y') raises AttributeError instead of silently failing or returning wrong result",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_symbol_repr_eval"
+      ],
+      "covers_original_tests": [
+        "test_var"
+      ],
+      "covers_obligations": [
+        "test_var::ns"
+      ],
+      "target_source_symbol": "sympy.core.expr.Expr.__eq__",
+      "target_validation_subject": "ns",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "ns",
+        "Symbol",
+        "__eq__",
+        "sympify"
+      ],
+      "trigger_shape_tokens": [
+        "ns",
+        "Symbol",
+        "assertionerror"
+      ],
+      "rationale": "The original test_var tests var() function but doesn't explicitly test the __eq__ sympification bug. This test directly triggers the AttributeError by comparing a Symbol with an object whose __repr__ returns 'x.y', which when passed to eval() tries to access attribute 'y' on the Symbol. The bug is in Expr.__eq__ which calls sympify(other) without validating that the other object's repr is safe to parse. This test will fail with AttributeError on buggy code and pass on fixed code (where the fix properly handles non-SymPy objects in __eq__)."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_expr.py b/sympy/core/tests/test_expr.py\n--- a/sympy/core/tests/test_expr.py\n+++ b/sympy/core/tests/test_expr.py\n@@ -284,3 +284,17 @@ def test_ExprBuilder():\n     eb = ExprBuilder(Mul)\n     eb.args.extend([x, x])\n     assert eb.build() == x**2\n+\n+def test_sweb_enhanced_symbol_repr_eval():\n+    # Test that comparing a Symbol with an object whose repr contains\n+    # attribute access (e.g., 'x.y') does not raise AttributeError.\n+    # The bug is in Expr.__eq__ which calls sympify(other) and tries to\n+    # eval the repr string, causing AttributeError when repr is 'x.y'.\n+    class BadReprAttr:\n+        def __repr__(self):\n+            return 'x.y'\n+    \n+    x = Symbol('x')\n+    # This should return False, not raise AttributeError\n+    result = (x == BadReprAttr())\n+    assert result is False\n",
+    "raw_response": "\n\nLooking at this task, I need to:\n1. Add a new test function starting with `test_sweb_enhanced_` that exposes the bug\n2. The bug is that `Expr.__eq__` tries to eval reprs of unknown objects, causing AttributeError\n3. The test must FAIL on buggy code and PASS on fixed code\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/core/tests/test_expr.py b/sympy/core/tests/test_expr.py\n--- a/sympy/core/tests/test_expr.py\n+++ b/sympy/core/tests/test_expr.py\n@@ -284,3 +284,17 @@ def test_ExprBuilder():\n     eb = ExprBuilder(Mul)\n     eb.args.extend([x, x])\n     assert eb.build() == x**2\n+\n+def test_sweb_enhanced_symbol_repr_eval():\n+    # Test that comparing a Symbol with an object whose repr contains\n+    # attribute access (e.g., 'x.y') does not raise AttributeError.\n+    # The bug is in Expr.__eq__ which calls sympify(other) and tries to\n+    # eval the repr string, causing AttributeError when repr is 'x.y'.\n+    class BadReprAttr:\n+        def __repr__(self):\n+            return 'x.y'\n+    \n+    x = Symbol('x')\n+    # This should return False, not raise AttributeError\n+    result = (x == BadReprAttr())\n+    assert result is False\n```",
+    "identifiers": [
+      "test_sweb_enhanced_symbol_repr_eval"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_symbol_repr_eval"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Symbol equality should not evaluate arbitrary object reprs",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Verify that comparing a Symbol to an object with a sympy-like repr does not trigger eval and maintains correct equality semantics",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_symbol_eq_repr"
+      ],
+      "covers_original_tests": [
+        "test_var"
+      ],
+      "covers_obligations": [
+        "test_var::ns",
+        "test_var::v"
+      ],
+      "target_source_symbol": "sympy.core.expr.Expr.__eq__",
+      "target_validation_subject": "comparison_result",
+      "semantic_alignment_tokens": [
+        "__eq__",
+        "sympify",
+        "Symbol",
+        "repr"
+      ],
+      "trigger_shape_tokens": [
+        "Symbol(",
+        "==",
+        "eval"
+      ],
+      "rationale": "This test differs from the original test_var by directly exercising the __eq__ method with objects whose reprs mimic sympy expressions. The original test indirectly triggers this through var() which uses Symbol creation. This test explicitly verifies the behavioral contract: Symbol('x') should NOT equal an arbitrary object C() even if C().__repr__() returns 'x', and should NOT raise AttributeError when repr contains attribute access like 'x.y'. This covers both the ns and v obligations by testing the validation subjects that the fix must handle."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_expr.py b/sympy/core/tests/test_expr.py\n--- a/sympy/core/tests/test_expr.py\n+++ b/sympy/core/tests/test_expr.py\n@@ -284,3 +284,19 @@ def test_ExprBuilder():\n     eb = ExprBuilder(Mul)\n     eb.args.extend([x, x])\n     assert eb.build() == x**2\n+\n+def test_sweb_enhanced_symbol_eq_repr():\n+    # Test that Symbol equality does not evaluate arbitrary object reprs\n+    # Bug: sympy incorrectly attempts to eval reprs in its __eq__ method\n+    # Passing strings produced by unknown objects into eval is very bad\n+    \n+    # Case 1: repr contains attribute access - should not raise AttributeError\n+    class BadReprAttr:\n+        def __repr__(self):\n+            return 'x.y'\n+    \n+    # This should return False, not raise AttributeError\n+    result = (Symbol('x') == BadReprAttr())\n+    assert result is False\n+    \n+    # Case 2: repr matches symbol name - should not incorrectly equal\n+    class BadReprSame:\n+        def __repr__(self):\n+            return 'x'\n+    \n+    assert (Symbol('x') == BadReprSame()) is False\n",
+    "raw_response": "\n\nLooking at the bug, I need to create a test that:\n1. Directly triggers the `Expr.__eq__` method with objects whose reprs mimic sympy expressions\n2. Fails on the buggy code (raises AttributeError or returns wrong equality result)\n3. Passes on the fixed code\n\nLet me create the enhanced test:\n```diff\ndiff --git a/sympy/core/tests/test_expr.py b/sympy/core/tests/test_expr.py\n--- a/sympy/core/tests/test_expr.py\n+++ b/sympy/core/tests/test_expr.py\n@@ -284,3 +284,19 @@ def test_ExprBuilder():\n     eb = ExprBuilder(Mul)\n     eb.args.extend([x, x])\n     assert eb.build() == x**2\n+\n+def test_sweb_enhanced_symbol_eq_repr():\n+    # Test that Symbol equality does not evaluate arbitrary object reprs\n+    # Bug: sympy incorrectly attempts to eval reprs in its __eq__ method\n+    # Passing strings produced by unknown objects into eval is very bad\n+    \n+    # Case 1: repr contains attribute access - should not raise AttributeError\n+    class BadReprAttr:\n+        def __repr__(self):\n+            return 'x.y'\n+    \n+    # This should return False, not raise AttributeError\n+    result = (Symbol('x') == BadReprAttr())\n+    assert result is False\n+    \n+    # Case 2: repr matches symbol name - should not incorrectly equal\n+    class BadReprSame:\n+        def __repr__(self):\n+            return 'x'\n+    \n+    assert (Symbol('x') == BadReprSame()) is False\n```",
+    "identifiers": [
+      "test_sweb_enhanced_symbol_eq_repr"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_symbol_eq_repr"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Symbol __eq__ should not eval repr containing forbidden tokens",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that Symbol.__eq__ does not attempt to eval repr strings containing attribute access tokens like '.' which cause AttributeError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_symbol_eq_repr_eval"
+      ],
+      "covers_original_tests": [
+        "test_var"
+      ],
+      "covers_obligations": [
+        "test_var::ns"
+      ],
+      "target_source_symbol": "sympy.core.expr.Expr.__eq__",
+      "target_validation_subject": "ns",
+      "semantic_alignment_tokens": [
+        "assertionerror",
+        "ns",
+        "Symbol",
+        "__eq__",
+        "sympify"
+      ],
+      "trigger_shape_tokens": [
+        "ns",
+        "Symbol",
+        "assertionerror",
+        "=="
+      ],
+      "rationale": "The original test_var fails because the comparison ns['a'] == Symbol('a') triggers Expr.__eq__ which calls sympify on the other operand. When the other object has a __repr__ containing forbidden tokens like '.', sympify attempts to eval it, causing an AttributeError that manifests as AssertionError in the test. This enhanced test directly constructs the problematic scenario with a class whose repr contains 'x.y', explicitly testing that Symbol equality should not eval reprs and should return False instead of raising an exception."
+    },
+    "patch": "diff --git a/sympy/core/tests/test_expr.py b/sympy/core/tests/test_expr.py\n--- a/sympy/core/tests/test_expr.py\n+++ b/sympy/core/tests/test_expr.py\n@@ -284,3 +284,16 @@ def test_ExprBuilder():\n     eb = ExprBuilder(Mul)\n     eb.args.extend([x, x])\n     assert eb.build() == x**2\n+\n+def test_sweb_enhanced_symbol_eq_repr_eval():\n+    # Symbol.__eq__ should not attempt to eval repr strings containing\n+    # attribute access tokens like '.' which cause AttributeError.\n+    # This tests the bug where comparing Symbol to an object with a\n+    # repr like 'x.y' triggers eval of that string.\n+    class BadReprAttr:\n+        def __repr__(self):\n+            return 'x.y'\n+    \n+    x = Symbol('x')\n+    # Should return False, not raise AttributeError\n+    assert (x == BadReprAttr()) is False\n+    assert (x != BadReprAttr()) is True\n",
+    "raw_response": "\n\nLooking at this task, I need to create an enhanced test that:\n1. Tests the bug where `Symbol.__eq__` incorrectly tries to eval reprs containing forbidden tokens like '.'\n2. Must fail on the buggy code (raise AttributeError) and pass on fixed code (return False)\n3. Must be named with `test_sweb_enhanced_` prefix\n4. Should test a different angle than the original test\n\nThe original bug: When comparing a Symbol to an object whose `__repr__` returns something like `'x.y'`, sympy tries to eval that string, causing an AttributeError.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/core/tests/test_expr.py b/sympy/core/tests/test_expr.py\n--- a/sympy/core/tests/test_expr.py\n+++ b/sympy/core/tests/test_expr.py\n@@ -284,3 +284,16 @@ def test_ExprBuilder():\n     eb = ExprBuilder(Mul)\n     eb.args.extend([x, x])\n     assert eb.build() == x**2\n+\n+def test_sweb_enhanced_symbol_eq_repr_eval():\n+    # Symbol.__eq__ should not attempt to eval repr strings containing\n+    # attribute access tokens like '.' which cause AttributeError.\n+    # This tests the bug where comparing Symbol to an object with a\n+    # repr like 'x.y' triggers eval of that string.\n+    class BadReprAttr:\n+        def __repr__(self):\n+            return 'x.y'\n+    \n+    x = Symbol('x')\n+    # Should return False, not raise AttributeError\n+    assert (x == BadReprAttr()) is False\n+    assert (x != BadReprAttr()) is True\n```",
+    "identifiers": [
+      "test_sweb_enhanced_symbol_eq_repr_eval"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_symbol_eq_repr_eval"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "title": "Extend polynomial ring domain regex to support R/RR/C/CC",
+  "approach": "Modify the _re_polynomial regex pattern in the Domain class to accept R, RR, C, CC as valid ground domains for polynomial rings, and update the preprocess() method to return the appropriate domain object (e.g., RR.poly_ring(y, z)) when the ground domain is R/RR/C/CC.",
+  "edit_targets": [
+    "sympy/polys/polyoptions.py::Domain"
+  ],
+  "dependency_files": [
+    "sympy/polys/domains/realfield.py",
+    "sympy/polys/domains/complexfield.py",
+    "sympy/polys/domains/rr.py",
+    "sympy/polys/domains/cc.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix requires modifying only the Domain class in polyoptions.py. The regex pattern _re_polynomial needs to be extended to accept R|RR|C|CC as valid ground domains, and the logic inside preprocess() that handles the polynomial ring case needs to be updated to call poly_ring() on the appropriate domain object (RR, CC) when the ground domain is R, RR, C, or CC. The domain classes RR and CC already have poly_ring methods implemented, so no changes are needed in the dependency files.",
+  "risks": [
+    "Ensure backward compatibility with existing Z, ZZ, Q, QQ polynomial ring specifications",
+    "Make sure RR and CC domains support poly_ring() method with the same interface as ZZ and QQ",
+    "Consider if similar fixes are needed for _re_fraction (fraction field) regex pattern"
+  ]
+}

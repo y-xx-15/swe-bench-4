@@ -1,0 +1,17 @@
+diff --git a/sympy/printing/latex.py b/sympy/printing/latex.py
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -1866,5 +1866,13 @@ class LatexPrinter(Printer):
+         return r"\left|{%s}\right|" % self._print(expr.args[0])
+     _print_Determinant = _print_Abs
+ 
++    def _print_Trace(self, expr):
++        from sympy import Trace
++        arg = expr.args[0]
++        if arg.is_Matrix:
++            return r"\mathrm{tr}\left (%s \right )" % self._print(arg)
++        else:
++            return r"\mathrm{tr}\left (%s \right )" % self._print(arg)
++
+     def _print_re(self, expr, exp=None):
+         tex = r"\Re{%s}" % self.parenthesize(expr.args[0], PRECEDENCE['Atom'])

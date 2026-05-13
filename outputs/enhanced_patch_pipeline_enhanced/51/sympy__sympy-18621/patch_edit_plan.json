@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/matrices/expressions/blockmatrix.py::BlockDiagMatrix.blocks",
+      "action": "modify_region",
+      "justification": "The blocks property is the root cause - when len(mats)==1, ImmutableDenseMatrix returns SymPy's One object instead of a matrix wrapper due to 1x1 optimization. Must modify to ensure blocks[0,0] is always subscriptable."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/matrices/expressions/blockmatrix.py",
+      "target_symbol": "BlockDiagMatrix.blocks",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_issue_18618::core::blocks property accessor for single-element diagonal",
+        "test_issue_18618::core::blocks[row_block, col_block] subscript access"
+      ],
+      "anchor_line_before": "    @property\n    def blocks(self):\n        from sympy.matrices.immutable import ImmutableDenseMatrix\n        mats = self.args\n        data = [[mats[i] if i == j else ZeroMatrix(mats[i].rows, mats[j].cols)\n                        for j in range(len(mats))]\n                        for i in range(len(mats))]\n        return ImmutableDenseMatrix(data)",
+      "anchor_line_after": "    @property\n    def shape(self):",
+      "replacement_block": "    @property\n    def blocks(self):\n        from sympy.matrices.immutable import ImmutableDenseMatrix\n        from sympy.matrices.dense import Matrix\n        mats = self.args\n        data = [[mats[i] if i == j else ZeroMatrix(mats[i].rows, mats[j].cols)\n                        for j in range(len(mats))]\n                        for i in range(len(mats))]\n        if len(mats) == 1:\n            # Prevent 1x1 optimization that returns raw element instead of matrix\n            return ImmutableDenseMatrix(Matrix(data))\n        return ImmutableDenseMatrix(data)"
+    }
+  ]
+}

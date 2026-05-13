@@ -1,0 +1,20 @@
+{
+  "title": "Bound iteration in is_upper and related triangular checks",
+  "approach": "Fix is_upper by changing `range(i)` to `range(min(i, self.cols))` to prevent column index overflow for tall matrices. Also fix the related _eval_is_lower, _eval_is_upper_hessenberg, and _eval_is_lower_hessenberg methods which have similar unbounded iteration bugs that cause IndexErrors for non-square matrices. The core fix is to bound all inner loop iterations by the matrix dimensions.",
+  "edit_targets": [
+    "sympy/matrices/matrices.py::MatrixProperties.is_upper",
+    "sympy/matrices/matrices.py::MatrixProperties._eval_is_lower",
+    "sympy/matrices/matrices.py::MatrixProperties._eval_is_upper_hessenberg",
+    "sympy/matrices/matrices.py::MatrixProperties._eval_is_lower_hessenberg"
+  ],
+  "dependency_files": [
+    "sympy/matrices/tests/test_matrices.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix requires editing four methods in the MatrixProperties class. Each method has unbounded iteration that causes IndexError when matrix dimensions are non-square. The is_upper property and _eval_is_upper_hessenberg need column bounds; _eval_is_lower and _eval_is_lower_hessenberg need row bounds. All four must be fixed to prevent similar IndexErrors across all triangular and Hessenberg checks.",
+  "risks": [
+    "Changing iteration bounds could affect performance for very large matrices, but the change is minimal and correct",
+    "The fix should not affect square matrices since min(i, self.cols) equals i when cols >= rows"
+  ]
+}

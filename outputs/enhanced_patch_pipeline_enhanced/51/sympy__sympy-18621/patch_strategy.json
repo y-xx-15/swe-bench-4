@@ -1,0 +1,18 @@
+{
+  "title": "Fix BlockDiagMatrix.blocks for single-element case",
+  "approach": "Modify the BlockDiagMatrix.blocks property to ensure it returns a structure where blocks[0,0] is always a subscriptable matrix, not the raw element. The fix should wrap the result in a way that prevents the ImmutableDenseMatrix 1x1 optimization from unwrapping the single matrix element. Specifically, in the blocks property, when len(mats) == 1, we need to ensure the returned ImmutableDenseMatrix preserves the matrix wrapper at position [0,0] rather than returning the raw element. This directly addresses the test_issue_18618::core::blocks property accessor for single-element diagonal validation subject, and also ensures test_issue_18618::core::blocks[row_block, col_block] subscript access works correctly in BlockMatrix._entry.",
+  "edit_targets": [
+    "sympy/matrices/expressions/blockmatrix.py::BlockDiagMatrix.blocks"
+  ],
+  "dependency_files": [
+    "sympy/matrices/expressions/blockmatrix.py::BlockMatrix._entry",
+    "sympy/matrices/immutable.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix targets BlockDiagMatrix.blocks property which is the root cause - it must return a structure where blocks[0,0] is subscriptable (a matrix) for the single-element case. This directly satisfies both validation subjects: (1) blocks property accessor for single-element diagonal - the blocks property must return a structure where blocks[0,0] is the matrix M, not SymPy's One object; (2) blocks[row_block, col_block] subscript access - this will work once blocks[0,0] returns a matrix. No changes to BlockMatrix._entry are needed since the method correctly assumes self.blocks[row_block, col_block] returns a subscriptable matrix. The fix is localized to the blocks property in BlockDiagMatrix class.",
+  "risks": [
+    "Changing the blocks property could affect other code that relies on the current behavior for single-element BlockDiagMatrix",
+    "Need to ensure the fix doesn't break multi-element BlockDiagMatrix cases"
+  ]
+}

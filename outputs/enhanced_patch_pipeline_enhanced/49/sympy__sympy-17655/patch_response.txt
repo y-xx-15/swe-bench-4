@@ -1,0 +1,27 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/geometry/point.py",
+      "action": "modify_region",
+      "justification": "The Point class is missing the __rmul__ method, which causes scalar * Point to create a Mul expression instead of performing the multiplication. This is the root cause of the GeometryError when adding a Point to the result of scalar * Point."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/geometry/point.py",
+      "target_symbol": "Point.__mul__",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_point::core::scalar * Point operation",
+        "test_point::core::scalar multiplication operator",
+        "test_point::core::reverse_multiplication_operation",
+        "test_point3D::core::scalar * Point operation",
+        "test_point3D::core::scalar multiplication operator",
+        "test_point3D::core::reverse_multiplication_operation"
+      ],
+      "anchor_line_before": "        return Point(coords, evaluate=False)",
+      "anchor_line_after": "    def __neg__(self):",
+      "replacement_block": "        return Point(coords, evaluate=False)\n\n    __rmul__ = __mul__\n\n    def __neg__(self):"
+    }
+  ]
+}

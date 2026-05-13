@@ -1,0 +1,28 @@
+{
+  "original_test_identifiers": [
+    "test_var"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_var"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/core/tests/test_expr.py:test_non_string_equality",
+    "sympy/core/tests/test_var.py:test_var",
+    "test_var"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "+ git checkout 62000f37b8821573ba00280524ffb4ac4a380875 sympy/core/tests/test_expr.py sympy/core/tests/test_var.py",
+    "Checking patch sympy/core/tests/test_var.py...",
+    "Applied patch sympy/core/tests/test_var.py cleanly."
+  ],
+  "noise_ratio": 0.0046,
+  "target_test_tracebacks": {
+    "test_var": "TARGET TEST: test_var\n- snippet: + git checkout 62000f37b8821573ba00280524ffb4ac4a380875 sympy/core/tests/test_expr.py sympy/core/tests/test_var.py\n- snippet: Checking patch sympy/core/tests/test_var.py...\n- snippet: Applied patch sympy/core/tests/test_var.py cleanly.\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\n+ git checkout 62000f37b8821573ba00280524ffb4ac4a380875 sympy/core/tests/test_expr.py sympy/core/tests/test_var.py\nChecking patch sympy/core/tests/test_var.py...\nApplied patch sympy/core/tests/test_var.py cleanly.\n+ bin/test -C --verbose sympy/core/tests/test_expr.py sympy/core/tests/test_var.py\ntest_attribute_error ok\nsympy/core/tests/test_var.py[5] \ntest_var F\ntest_var_return ok\ntest_var_accepts_comma ok\ntest_var_keywords ok\ntest_var_cls ok                                                           [FAIL]\nTraceback (most recent call last):\nAssertionError\n____________________ sympy/core/tests/test_var.py:test_var _____________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/core/tests/test_var.py\", line 22, in test_var\nAssertionError\n== tests finished: 99 passed, 2 failed, 2 expected to fail, in 297.95 seconds ==\n+ git checkout 62000f37b8821573ba00280524ffb4ac4a380875 sympy/core/tests/test_expr.py sympy/core/tests/test_var.py"
+  }
+}

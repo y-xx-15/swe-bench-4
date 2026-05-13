@@ -1,0 +1,53 @@
+{
+  "root_cause": "The LaTeX printer's _print_Poly method does not apply the same ordering to monomials as the str and pretty printers. It uses the default ordering from expr.args which is not sorted by degree, while str/pretty use explicit degree-based ordering.",
+  "affected_components": [
+    {
+      "file": "sympy/printing/latex.py",
+      "symbol": "LatexPrinter._print_Poly",
+      "reason": "This method handles Poly to LaTeX conversion but doesn't apply degree-based ordering to monomials, causing the output to have terms in wrong order compared to str/pretty"
+    },
+    {
+      "file": "sympy/printing/latex.py",
+      "symbol": "LatexPrinter._print_PolyElement",
+      "reason": "Related to Poly printing, may need consistent ordering approach"
+    }
+  ],
+  "failing_signal": "AssertionError in test_latex_Poly and test_latex_Poly_order - the LaTeX output shows terms in wrong order: 'a x^{5} + b x^{3} + c x + x^{4} + 2 x^{2} + 3' instead of 'a x^{5} + x^{4} + b x^{3} + 2 x^{2} + c x + 3'",
+  "propagation_path": "When Poly is converted to LaTeX, _print_Poly accesses expr.rep.dump() or similar which returns terms in internal order (not degree-sorted). The str and pretty printers explicitly sort by degree using as_poly().terms() or similar, but the LaTeX printer doesn't apply this sorting.",
+  "repair_constraint": "The fix must ensure LaTeX output for Poly follows the same descending-degree order as str/pretty printers, while preserving all other Poly printing behavior (domain, variable, etc.)",
+  "suggested_repair_scope": [
+    "sympy/printing/latex.py"
+  ],
+  "suspicious_symbols": [
+    "_print_Poly",
+    "_print_PolyElement",
+    "Poly",
+    "as_ordered_terms"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_latex_Poly::core::Poly monomial ordering in LaTeX output",
+      "source_symbol": "test_latex_Poly_order",
+      "validation_subject": "Poly monomial ordering in LaTeX output",
+      "why_it_matters": "The LaTeX output must match the degree-sorted order used by str and pretty printers for consistency across different output formats"
+    },
+    {
+      "id": "test_latex_Poly_order::core::Poly monomial ordering in LaTeX output",
+      "source_symbol": "test_latex_Poly_order",
+      "validation_subject": "Poly monomial ordering in LaTeX output",
+      "why_it_matters": "The test specifically validates that Poly ordering in LaTeX follows the expected degree-based descending order"
+    },
+    {
+      "id": "test_latex_Poly::core::Poly monomial ordering in latex output",
+      "source_symbol": "test_latex_Poly_order",
+      "validation_subject": "Poly monomial ordering in latex output",
+      "why_it_matters": "Ensures latex() function produces correctly ordered monomials matching str(poly) and pretty(poly)"
+    },
+    {
+      "id": "test_latex_Poly_order::core::Poly monomial ordering in latex output",
+      "source_symbol": "test_latex_Poly_order",
+      "validation_subject": "Poly monomial ordering in latex output",
+      "why_it_matters": "Direct validation that latex(poly) output order matches the expected descending degree order"
+    }
+  ]
+}

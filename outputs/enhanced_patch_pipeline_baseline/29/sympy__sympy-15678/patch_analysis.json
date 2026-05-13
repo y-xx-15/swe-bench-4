@@ -1,0 +1,37 @@
+{
+  "root_cause": "The idiff function has two bugs: (1) It doesn't handle Eq objects - when passed an Eq, it should convert it to the expression form (eq.lhs - eq.rhs), but currently it tries to work with the Eq directly which causes solve() to return an empty list, leading to IndexError. (2) It doesn't handle f(x) as the dependent variable - the code only checks for Symbol instances but f(x) is a Function, so it raises ValueError instead of extracting the function name.",
+  "affected_components": [
+    {
+      "file": "sympy/geometry/util.py",
+      "symbol": "idiff",
+      "reason": "This is the main function that has bugs handling Eq and Function(f(x)) inputs"
+    }
+  ],
+  "failing_signal": "Two failures: (1) idiff(Eq(y*exp(y), x*exp(x)), y, x) raises IndexError: list index out of range because solve(eq.diff(x), dydx) returns empty list. (2) idiff(f(x)*exp(f(x)) - x*exp(x), f(x), x) raises ValueError: expecting x-dependent symbol(s) but got: f(x) because f(x) is a Function, not a Symbol.",
+  "propagation_path": "For Eq case: idiff receives Eq object -> tries to call eq.free_symbols (works) -> substitutes functions -> calls solve(eq.diff(x), dydx) where eq is still an Eq object -> solve returns empty list because it can't solve an Eq for dydx -> [0] index fails. For f(x) case: idiff receives f(x) -> checks isinstance(y, Symbol) which is False because f(x) is a Function -> raises ValueError before any computation.",
+  "repair_constraint": "The fix must: (1) Convert Eq objects to expression form (lhs - rhs) before processing. (2) Accept Function objects (like f(x)) as valid dependent variables by extracting the function name/symbol. (3) Maintain backward compatibility with existing Symbol-based usage.",
+  "suggested_repair_scope": [
+    "sympy/geometry/util.py"
+  ],
+  "suspicious_symbols": [
+    "idiff",
+    "Eq",
+    "Function",
+    "Symbol",
+    "solve"
+  ],
+  "repair_obligations": [
+    {
+      "id": "1",
+      "source_symbol": "idiff",
+      "validation_subject": "Eq input handling",
+      "why_it_matters": "idiff must convert Eq objects to expression form (eq.lhs - eq.rhs) before processing, otherwise solve() fails to find solutions and returns empty list causing IndexError"
+    },
+    {
+      "id": "2",
+      "source_symbol": "idiff",
+      "validation_subject": "Function input handling",
+      "why_it_matters": "idiff must accept Function objects like f(x) as the dependent variable by extracting the underlying function symbol, not just plain Symbol instances"
+    }
+  ]
+}

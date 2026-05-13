@@ -1,0 +1,11 @@
+--- a/sympy/printing/mathematica.py
++++ b/sympy/printing/mathematica.py
+@@ -9,6 +9,8 @@
+ 
+ # Used in MCodePrinter._print_Function(self)
+ known_functions = {
++    "Max": [(lambda x: True, "Max")],
++    "Min": [(lambda x: True, "Min")],
+     "exp": [(lambda x: True, "Exp")],
+     "log": [(lambda x: True, "Log")],
+     "sin": [(lambda x: True, "Sin")],

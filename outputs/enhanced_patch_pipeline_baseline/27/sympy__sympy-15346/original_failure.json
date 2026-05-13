@@ -1,0 +1,34 @@
+{
+  "original_test_identifiers": [
+    "test_issue_15129_trigsimp_methods"
+  ],
+  "status_map": {
+    "sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods": "FAILED",
+    "test_trigsimp1": "PASSED",
+    "test_trigsimp1a": "PASSED",
+    "test_trigsimp2": "PASSED",
+    "test_issue_4373": "PASSED",
+    "test_trigsimp3": "PASSED",
+    "test_issue_4661": "PASSED",
+    "test_issue_4494": "PASSED",
+    "test_issue_5948": "PASSED",
+    "test_issue_4775": "PASSED",
+    "test_issue_4280": "PASSED",
+    "test_issue_3210": "PASSED",
+    "test_trigsimp_issues": "PASSED",
+    "test_trigsimp_issue_2515": "PASSED",
+    "test_trigsimp_issue_3826": "PASSED",
+    "test_trigsimp_issue_4032": "PASSED",
+    "test_trigsimp_issue_7761": "PASSED",
+    "test_trigsimp_noncommutative": "PASSED",
+    "test_hyperbolic_simp": "PASSED",
+    "test_trigsimp_groebner": "PASSED",
+    "test_issue_2827_trigsimp_methods": "PASSED",
+    "test_issue_15129_trigsimp_methods": "FAILED",
+    "test_exptrigsimp": "PASSED",
+    "test_powsimp_on_numbers": "PASSED"
+  },
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/sympy__sympy-15346/test_output.txt",
+  "timed_out": false,
+  "error": null
+}

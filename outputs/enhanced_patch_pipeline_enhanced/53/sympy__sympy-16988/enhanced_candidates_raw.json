@@ -1,0 +1,241 @@
+[
+  {
+    "idea": {
+      "title": "Intersection should remove duplicate sets at instantiation",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Tests that duplicate sets in Intersection args are properly removed, preventing AssertionError when processing",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_intersection_duplicates"
+      ],
+      "covers_original_tests": [
+        "test_imageset",
+        "test_intersection"
+      ],
+      "covers_obligations": [
+        "test_imageset::core",
+        "test_intersection::core"
+      ],
+      "target_source_symbol": "Intersection",
+      "target_validation_subject": "duplicate argument handling in Intersection.__new__",
+      "semantic_alignment_tokens": [
+        "Intersection(",
+        "duplicate",
+        "sets",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "Intersection({1}, {1}, {x})",
+        "Intersection({1}, {x})"
+      ],
+      "rationale": "The original tests fail with AssertionError when Intersection receives duplicate sets like {1}. The problem statement explicitly says duplicates should be removed at the outset of instantiation. This test directly verifies that Intersection({1}, {1}, {x}) produces the same result as Intersection({1}, {x}) - both should equal {1} or properly handle the symbolic case. This is distinct from the original tests because it explicitly creates the duplicate scenario that triggers the bug, rather than relying on indirect paths through imageset that may or may not hit the duplicate case."
+    },
+    "patch": "diff --git a/sympy/sets/tests/test_sets.py b/sympy/sets/tests/test_sets.py\n--- a/sympy/sets/tests/test_sets.py\n+++ b/sympy/sets/tests/test_sets.py\n@@ -355,3 +355,10 @@ def test_issue_10931():\n @XFAIL\n def test_issue_16878b():\n     assert imageset(x, (x, x), S.Reals).is_subset(S.Reals**2) is True\n+\n+\n+def test_sweb_enhanced_intersection_duplicates():\n+    # Test that duplicate sets in Intersection are properly handled\n+    # The bug: Intersection({1},{1},{x}) returns EmptySet instead of {1}\n+    # This tests the duplicate removal at instantiation level\n+    assert Intersection(FiniteSet(1), FiniteSet(1), FiniteSet(x)) == FiniteSet(1)\n",
+    "raw_response": "\n\nLooking at the problem, I need to create an enhanced test that:\n1. Tests the duplicate handling in Intersection (the bug is that duplicates aren't removed)\n2. Fails on the buggy code (returns EmptySet instead of the correct result)\n3. Passes after the fix\n\nThe original test checks `Intersection({1}, {1}, {x}) == Intersection({1}, {x})`. I'll create a different test that also exposes the duplicate handling bug but from a different angle - testing that duplicate FiniteSets should be deduplicated.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/sets/tests/test_sets.py b/sympy/sets/tests/test_sets.py\n--- a/sympy/sets/tests/test_sets.py\n+++ b/sympy/sets/tests/test_sets.py\n@@ -355,3 +355,10 @@ def test_issue_10931():\n @XFAIL\n def test_issue_16878b():\n     assert imageset(x, (x, x), S.Reals).is_subset(S.Reals**2) is True\n+\n+\n+def test_sweb_enhanced_intersection_duplicates():\n+    # Test that duplicate sets in Intersection are properly handled\n+    # The bug: Intersection({1},{1},{x}) returns EmptySet instead of {1}\n+    # This tests the duplicate removal at instantiation level\n+    assert Intersection(FiniteSet(1), FiniteSet(1), FiniteSet(x)) == FiniteSet(1)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_intersection_duplicates"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_intersection_duplicates"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Intersection with duplicate arguments should deduplicate before evaluation",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Test that Intersection removes duplicate set arguments before computing the result, preventing incorrect evaluation due to argument order",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_intersection_duplicates"
+      ],
+      "covers_original_tests": [
+        "test_intersection"
+      ],
+      "covers_obligations": [
+        "test_intersection::core"
+      ],
+      "target_source_symbol": "Intersection.__new__",
+      "target_validation_subject": "duplicate argument handling in Intersection construction",
+      "semantic_alignment_tokens": [
+        "Intersection(",
+        "FiniteSet",
+        "EmptySet"
+      ],
+      "trigger_shape_tokens": [
+        "Intersection(FiniteSet(1), FiniteSet(1), FiniteSet(x))"
+      ],
+      "rationale": "The original test_intersection fails with AssertionError but doesn't explicitly test duplicate argument handling. This test directly exercises the core bug: Intersection({1},{1},{x}) should give the same result as Intersection({1},{x}) after deduplication, but currently gives EmptySet() incorrectly. The test verifies that duplicate FiniteSet arguments are properly deduplicated before intersection computation, which is a distinct repair obligation from the general intersection behavior tests."
+    },
+    "patch": "diff --git a/sympy/sets/tests/test_sets.py b/sympy/sets/tests/test_sets.py\n--- a/sympy/sets/tests/test_sets.py\n+++ b/sympy/sets/tests/test_sets.py\n@@ -343,6 +343,12 @@ def test_intersection():\n     # issue 12178\n     assert Intersection() == S.UniversalSet\n \n+    # issue 16987 - duplicate argument handling\n+    # Intersection with duplicate FiniteSet args should deduplicate\n+    # before evaluation, not incorrectly return EmptySet\n+    assert Intersection(FiniteSet(1), FiniteSet(1)) == FiniteSet(1)\n+    assert Intersection(FiniteSet(1), FiniteSet(1), FiniteSet(x)) == Intersection(FiniteSet(1), FiniteSet(x))\n+\n \n def test_issue_9623():\n     n = Symbol('n')\n",
+    "raw_response": "\n\nLooking at the problem, I need to add an enhanced test that:\n1. Tests the duplicate argument handling bug in Intersection\n2. Uses a different observation angle than the original test\n3. Fails on the buggy code and passes on fixed code\n\nThe original test checks `Intersection({1}, {1}, {x}) == Intersection({1}, {x})`. A different angle would be to test that duplicate FiniteSets with no symbolic variable should still return the correct result, e.g., `Intersection({1}, {1})` should return `{1}` not `EmptySet()`.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/sets/tests/test_sets.py b/sympy/sets/tests/test_sets.py\n--- a/sympy/sets/tests/test_sets.py\n+++ b/sympy/sets/tests/test_sets.py\n@@ -343,6 +343,12 @@ def test_intersection():\n     # issue 12178\n     assert Intersection() == S.UniversalSet\n \n+    # issue 16987 - duplicate argument handling\n+    # Intersection with duplicate FiniteSet args should deduplicate\n+    # before evaluation, not incorrectly return EmptySet\n+    assert Intersection(FiniteSet(1), FiniteSet(1)) == FiniteSet(1)\n+    assert Intersection(FiniteSet(1), FiniteSet(1), FiniteSet(x)) == Intersection(FiniteSet(1), FiniteSet(x))\n+\n \n def test_issue_9623():\n     n = Symbol('n')\n```",
+    "identifiers": [],
+    "enhanced_identifiers": [],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Intersection with duplicate sets should remove duplicates and not return EmptySet",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that Intersection handles duplicate sets by removing them at instantiation rather than incorrectly evaluating to EmptySet",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_intersection_duplicates"
+      ],
+      "covers_original_tests": [
+        "test_intersection"
+      ],
+      "covers_obligations": [
+        "test_intersection::core"
+      ],
+      "target_source_symbol": "Intersection",
+      "target_validation_subject": "core",
+      "semantic_alignment_tokens": [
+        "Intersection",
+        "FiniteSet",
+        "EmptySet"
+      ],
+      "trigger_shape_tokens": [
+        "Intersection(",
+        "FiniteSet"
+      ],
+      "rationale": "The original test_intersection fails with AssertionError but doesn't explicitly test duplicate set handling. This test directly constructs Intersection with duplicate FiniteSets ({1}, {1}, {x}) which should remove duplicates and evaluate to Piecewise(({1}, Eq(x, 1)), (S.EmptySet, True)) or remain unevaluated, not incorrectly return EmptySet(). This exposes the core bug: duplicates are not being removed at instantiation, causing wrong results."
+    },
+    "patch": "diff --git a/sympy/sets/tests/test_sets.py b/sympy/sets/tests/test_sets.py\n--- a/sympy/sets/tests/test_sets.py\n+++ b/sympy/sets/tests/test_sets.py\n@@ -204,0 +204,6 @@\n+def test_sweb_enhanced_intersection_duplicate_intervals():\n+    # Test with duplicate intervals - should be deduplicated at instantiation\n+    # This exposes the same bug as issue 16987 but with Interval sets\n+    # Intersection(Interval(0,1), Interval(0,1), Interval(0,2)) should equal\n+    # Intersection(Interval(0,1), Interval(0,2)) = Interval(0,1)\n+    assert Intersection(Interval(0, 1), Interval(0, 1), Interval(0, 2)) == Intersection(Interval(0, 1), Interval(0, 2))\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Starts with `test_sweb_enhanced_`\n2. Exposes the same bug through a different observation angle than the original test\n3. Must FAIL on the buggy code and PASS after the fix\n\nThe original test uses `Intersection({1}, {1}, {x})`. Let me try a different angle - testing with duplicate intervals, which is a different set type but exposes the same underlying bug: duplicates not being removed at instantiation.\n\n```diff\ndiff --git a/sympy/sets/tests/test_sets.py b/sympy/sets/tests/test_sets.py\n--- a/sympy/sets/tests/test_sets.py\n+++ b/sympy/sets/tests/test_sets.py\n@@ -204,0 +204,6 @@\n+def test_sweb_enhanced_intersection_duplicate_intervals():\n+    # Test with duplicate intervals - should be deduplicated at instantiation\n+    # This exposes the same bug as issue 16987 but with Interval sets\n+    # Intersection(Interval(0,1), Interval(0,1), Interval(0,2)) should equal\n+    # Intersection(Interval(0,1), Interval(0,2)) = Interval(0,1)\n+    assert Intersection(Interval(0, 1), Interval(0, 1), Interval(0, 2)) == Intersection(Interval(0, 1), Interval(0, 2))\n```",
+    "identifiers": [
+      "test_sweb_enhanced_intersection_duplicate_intervals"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_intersection_duplicate_intervals"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Intersection should remove duplicate sets at instantiation",
+      "semantic_bucket": "structural_invariant",
+      "goal": "Tests that Intersection removes duplicate sets at instantiation time to ensure consistent results regardless of argument order",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_intersection_duplicates"
+      ],
+      "covers_original_tests": [
+        "test_intersection"
+      ],
+      "covers_obligations": [
+        "test_intersection::core"
+      ],
+      "target_source_symbol": "Intersection",
+      "target_validation_subject": "Intersection.__new__",
+      "semantic_alignment_tokens": [
+        "Intersection(",
+        "FiniteSet",
+        "Eq"
+      ],
+      "trigger_shape_tokens": [
+        "Intersection({1}, {1}, {x})"
+      ],
+      "rationale": "The original test_intersection fails with AssertionError because Intersection does not remove duplicate sets at instantiation. This test directly exercises the duplicate removal invariant by creating Intersection({1}, {1}, {x}) which should evaluate to Piecewise(({1}, Eq(x, 1)), (S.EmptySet, True)) or remain unevaluated, not EmptySet(). The test will fail on buggy code (AssertionError) and pass on fixed code where duplicates are removed at the start of __new__."
+    },
+    "patch": "diff --git a/sympy/sets/tests/test_sets.py b/sympy/sets/tests/test_sets.py\n--- a/sympy/sets/tests/test_sets.py\n+++ b/sympy/sets/tests/test_sets.py\n@@ -343,5 +343,13 @@ def test_intersection():\n     # issue 12178\n     assert Intersection() == S.UniversalSet\n \n+    # issue 16987 - duplicate sets should be removed\n+    assert Intersection({1}, {1}, {x}) == Intersection({1}, {x})\n+\n+\n+def test_sweb_enhanced_intersection_duplicates():\n+    # Test duplicate Intervals - different code path than FiniteSet duplicates\n+    # Intersection should remove duplicates at instantiation, giving same result\n+    # whether or not duplicates are present\n+    assert Intersection(Interval(0, 2), Interval(0, 1), Interval(0, 2)) == Intersection(Interval(0, 2), Interval(0, 1))\n \n-def test_issue_9623():\n",
+    "raw_response": "\n\nLooking at the problem, I need to add an enhanced test that exposes the Intersection duplicate removal bug through a different observation angle than the original test. The original test uses `Intersection({1}, {1}, {x})` with duplicate FiniteSets. I'll create a test using duplicate Intervals which exercises a different code path.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/sets/tests/test_sets.py b/sympy/sets/tests/test_sets.py\n--- a/sympy/sets/tests/test_sets.py\n+++ b/sympy/sets/tests/test_sets.py\n@@ -343,6 +343,12 @@ def test_intersection():\n     # issue 12178\n     assert Intersection() == S.UniversalSet\n \n+    # issue 16987 - duplicate sets should be removed\n+    assert Intersection({1}, {1}, {x}) == Intersection({1}, {x})\n+\n+\n+def test_sweb_enhanced_intersection_duplicates():\n+    # Test duplicate Intervals - different code path than FiniteSet duplicates\n+    # Intersection should remove duplicates at instantiation, giving same result\n+    # whether or not duplicates are present\n+    assert Intersection(Interval(0, 2), Interval(0, 1), Interval(0, 2)) == Intersection(Interval(0, 2), Interval(0, 1))\n \n-def test_issue_9623():\n```",
+    "identifiers": [
+      "test_sweb_enhanced_intersection_duplicates"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_intersection_duplicates"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Intersection duplicate set handling triggers assertion error",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that Intersection properly handles duplicate sets without raising AssertionError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_intersection_duplicates"
+      ],
+      "covers_original_tests": [
+        "test_intersection",
+        "test_imageset"
+      ],
+      "covers_obligations": [
+        "test_intersection::core",
+        "test_imageset::core"
+      ],
+      "target_source_symbol": "Intersection.__new__",
+      "target_validation_subject": "duplicate argument handling in Intersection instantiation",
+      "semantic_alignment_tokens": [
+        "Intersection(",
+        "FiniteSet(",
+        "assert"
+      ],
+      "trigger_shape_tokens": [
+        "Intersection(FiniteSet(1), FiniteSet(1), FiniteSet(x))",
+        "Intersection(FiniteSet(1), FiniteSet(x))"
+      ],
+      "rationale": "The original tests fail with AssertionError when Intersection receives duplicate sets. This test directly exercises the duplicate removal logic in Intersection instantiation - when duplicate FiniteSets like FiniteSet(1) appear multiple times, the code should deduplicate them before processing. The bug causes an assertion failure because the code doesn't handle duplicates properly at instantiation time. This test is distinct from original tests as it explicitly constructs the duplicate scenario that triggers the assertion error, providing clear repair guidance to add deduplication at the start of Intersection.__new__."
+    },
+    "patch": "diff --git a/sympy/sets/tests/test_sets.py b/sympy/sets/tests/test_sets.py\n--- a/sympy/sets/tests/test_sets.py\n+++ b/sympy/sets/tests/test_sets.py\n@@ -204,3 +204,9 @@ def test_issue_16878b():\n     # for Integers\n     assert imageset(x, (x, x), S.Reals).is_subset(S.Reals**2) is True\n \n+\n+def test_sweb_enhanced_intersection_duplicates():\n+    # Test that Intersection properly handles duplicate set arguments\n+    # Intersection({1}, {1}, {x}) should equal Intersection({1}, {x})\n+    # The bug causes it to return EmptySet() instead\n+    assert Intersection(FiniteSet(1), FiniteSet(1), FiniteSet(x)) == Intersection(FiniteSet(1), FiniteSet(x))\n",
+    "raw_response": "\n\nLooking at the problem, I need to add a test that specifically triggers the duplicate handling bug in Intersection. The bug is that `Intersection({1},{1},{x})` returns `EmptySet()` instead of the correct result.\n\nLet me create the enhanced test patch:\n```diff\ndiff --git a/sympy/sets/tests/test_sets.py b/sympy/sets/tests/test_sets.py\n--- a/sympy/sets/tests/test_sets.py\n+++ b/sympy/sets/tests/test_sets.py\n@@ -204,3 +204,9 @@ def test_issue_16878b():\n     # for Integers\n     assert imageset(x, (x, x), S.Reals).is_subset(S.Reals**2) is True\n \n+\n+def test_sweb_enhanced_intersection_duplicates():\n+    # Test that Intersection properly handles duplicate set arguments\n+    # Intersection({1}, {1}, {x}) should equal Intersection({1}, {x})\n+    # The bug causes it to return EmptySet() instead\n+    assert Intersection(FiniteSet(1), FiniteSet(1), FiniteSet(x)) == Intersection(FiniteSet(1), FiniteSet(x))\n```",
+    "identifiers": [
+      "test_sweb_enhanced_intersection_duplicates"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_intersection_duplicates"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

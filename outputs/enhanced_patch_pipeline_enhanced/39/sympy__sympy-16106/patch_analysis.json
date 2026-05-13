@@ -1,0 +1,59 @@
+{
+  "root_cause": "The MathML printer lacks a specific print method for `Indexed` and `IndexedBase` objects. When printing an `Indexed` expression, the printer falls back to `_print_Basic` which attempts to iterate over the expression using `for arg in e`, but `Indexed` objects are not iterable, causing a TypeError.",
+  "affected_components": [
+    {
+      "file": "sympy/printing/mathml.py",
+      "symbol": "MathMLContentPrinter",
+      "reason": "Missing _print_IndexedBase and _print_Indexed methods to handle indexed expressions"
+    },
+    {
+      "file": "sympy/printing/mathml.py",
+      "symbol": "MathMLPresentationPrinter",
+      "reason": "Missing _print_IndexedBase and _print_Indexed methods to handle indexed expressions"
+    },
+    {
+      "file": "sympy/printing/mathml.py",
+      "symbol": "_print_Basic (MathMLContentPrinter)",
+      "reason": "Fallback method that incorrectly tries to iterate over non-iterable Indexed objects"
+    }
+  ],
+  "failing_signal": "TypeError: 'Indexed' object is not iterable when calling sympy.printing.mathml(sympy.IndexedBase(a)[b])",
+  "propagation_path": "1. User calls mathml(IndexedBase(a)[b]) -> 2. Printer._print finds no _print_Indexed method -> 3. Falls back to _print_Basic -> 4. _print_Basic tries 'for arg in e' -> 5. Indexed is not iterable, raises TypeError",
+  "repair_constraint": "The fix must add proper MathML printing support for Indexed and IndexedBase classes. The output should use appropriate MathML elements like <msub> for subscript notation.",
+  "suggested_repair_scope": [
+    "sympy/printing/mathml.py"
+  ],
+  "suspicious_symbols": [
+    "Indexed",
+    "IndexedBase",
+    "_print_Basic",
+    "MathMLContentPrinter",
+    "MathMLPresentationPrinter"
+  ],
+  "repair_obligations": [
+    {
+      "id": "1",
+      "source_symbol": "MathMLContentPrinter",
+      "validation_subject": "_print_IndexedBase method",
+      "why_it_matters": "Must provide MathML content printing for IndexedBase objects (e.g., a[i] where a is IndexedBase)"
+    },
+    {
+      "id": "2",
+      "source_symbol": "MathMLContentPrinter",
+      "validation_subject": "_print_Indexed method",
+      "why_it_matters": "Must provide MathML content printing for Indexed expressions"
+    },
+    {
+      "id": "3",
+      "source_symbol": "MathMLPresentationPrinter",
+      "validation_subject": "_print_IndexedBase method",
+      "why_it_matters": "Must provide MathML presentation printing for IndexedBase objects using <msub> element"
+    },
+    {
+      "id": "4",
+      "source_symbol": "MathMLPresentationPrinter",
+      "validation_subject": "_print_Indexed method",
+      "why_it_matters": "Must provide MathML presentation printing for Indexed expressions"
+    }
+  ]
+}

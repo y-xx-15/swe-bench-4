@@ -1,0 +1,17 @@
+{
+  "title": "Fix symbolic index handling in BlockMatrix._entry",
+  "approach": "Modify the `_entry` method in `BlockMatrix` class to detect when the row or column index is symbolic (i.e., not a concrete integer). When either index is symbolic, return an unevaluated `MatrixElement(self, i, j)` instead of attempting to resolve it to a specific block, which incorrectly assumes the index falls in the first block. For concrete (numeric) indices, preserve the existing logic that iterates through block sizes to find the correct block. This fix addresses both the 'symbolic index handling' and 'symbolic index boundary detection' validation subjects for the `_entry` method.",
+  "edit_targets": [
+    "sympy/matrices/expressions/blockmatrix.py::BlockMatrix._entry"
+  ],
+  "dependency_files": [
+    "sympy/matrices/expressions/matexpr.py::MatrixElement"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing only the `_entry` method in `BlockMatrix` is sufficient to fix the bug. The fix directly addresses the root cause: the method incorrectly uses `(i < numrows) != False` which treats symbolic Boolean results as True, causing the first block to be selected. By checking if indices are symbolic first and returning an unevaluated `MatrixElement`, we preserve the block structure for symbolic indices. No changes to parent classes or other modules are needed since `MatrixElement` is already imported in the matexpr module and accessible. The fix handles all test_block_index_symbolic, test_block_index_symbolic_nonzero, and test_block_index_large obligations by properly detecting symbolic indices and avoiding incorrect block selection.",
+  "risks": [
+    "Numeric indexing that previously worked may be affected if the symbolic detection is too broad - must ensure only truly symbolic (non-integer) indices trigger the unevaluated path",
+    "Potential performance regression if all indexing now checks is_symbolic for every access - numeric indices should bypass the check"
+  ]
+}

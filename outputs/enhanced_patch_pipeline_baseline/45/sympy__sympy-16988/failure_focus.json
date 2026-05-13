@@ -1,0 +1,32 @@
+{
+  "original_test_identifiers": [
+    "test_imageset",
+    "test_intersection"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_imageset",
+    "test_intersection"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/sets/tests/test_sets.py:test_imageset",
+    "sympy/sets/tests/test_sets.py:test_intersection",
+    "test_imageset",
+    "test_intersection"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_imageset F",
+    "test_intersection F",
+    "test_Intersection_as_relational ok"
+  ],
+  "noise_ratio": 0.0049,
+  "target_test_tracebacks": {
+    "test_imageset": "TARGET TEST: test_imageset\n- snippet: test_imageset F\n- snippet: test_intersection F\n- snippet: test_Intersection_as_relational ok\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_imageset F\n_________________ sympy/sets/tests/test_sets.py:test_imageset __________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/sets/tests/test_sets.py\", line 24, in test_imageset\nAssertionError\nTraceback (most recent call last):\nAssertionError\n== tests finished: 72 passed, 2 failed, 4 expected to fail, in 87.92 seconds ===",
+    "test_intersection": "TARGET TEST: test_intersection\n- snippet: test_imageset F\n- snippet: test_intersection F\n- snippet: test_Intersection_as_relational ok\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_intersection F\ntest_Intersection_as_relational ok\nTraceback (most recent call last):\nAssertionError\n_______________ sympy/sets/tests/test_sets.py:test_intersection ________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/sets/tests/test_sets.py\", line 346, in test_intersection\nAssertionError\n== tests finished: 72 passed, 2 failed, 4 expected to fail, in 87.92 seconds ==="
+  }
+}

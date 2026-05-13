@@ -1,0 +1,41 @@
+{
+  "root_cause": "The is_upper property iterates over positions below the diagonal without checking if the column index j is within bounds. For a 4x2 matrix (rows=4, cols=2), the loop generates indices like (3,2) where j=2 exceeds cols-1=1, causing IndexError.",
+  "affected_components": [
+    {
+      "file": "sympy/matrices/matrices.py",
+      "symbol": "MatrixProperties.is_upper",
+      "reason": "The main buggy property that raises IndexError for tall matrices. It uses 'for j in range(i)' which doesn't respect the column boundary."
+    },
+    {
+      "file": "sympy/matrices/matrices.py",
+      "symbol": "MatrixProperties._eval_is_upper_hessenberg",
+      "reason": "Has the same bug pattern - uses 'for j in range(i - 1)' without checking column bounds."
+    }
+  ],
+  "failing_signal": "IndexError: Index out of range: a[2] when calling sympy.zeros(4,2).is_upper",
+  "propagation_path": "is_upper property calls all() with a generator that iterates i in range(1, self.rows) and j in range(i). For 4x2 matrix, j reaches 2 while cols=2, causing out-of-bounds access in __getitem__ -> extract -> a2idx which raises IndexError.",
+  "repair_constraint": "The fix must only check positions (i,j) where both i < rows AND j < cols. For non-square matrices, the upper triangular check should only apply to the min(rows, cols) square submatrix on the diagonal.",
+  "suggested_repair_scope": [
+    "sympy/matrices/matrices.py"
+  ],
+  "suspicious_symbols": [
+    "is_upper",
+    "_eval_is_upper_hessenberg",
+    "is_lower",
+    "_eval_is_lower"
+  ],
+  "repair_obligations": [
+    {
+      "id": "1",
+      "source_symbol": "is_upper",
+      "validation_subject": "self[i, j] access for all i in range(1, self.rows) and j in range(i)",
+      "why_it_matters": "The inner loop j in range(i) can exceed self.cols-1 for tall matrices, causing IndexError. Must bound j by min(i, self.cols)."
+    },
+    {
+      "id": "2",
+      "source_symbol": "_eval_is_upper_hessenberg",
+      "validation_subject": "self[i, j] access for i in range(2, self.rows) and j in range(i - 1)",
+      "why_it_matters": "Same bug pattern - j in range(i-1) can exceed self.cols-1. Must bound j by min(i-1, self.cols)."
+    }
+  ]
+}

@@ -1,0 +1,295 @@
+[
+  {
+    "idea": {
+      "title": "idiff should handle function expressions like f(x) as dependent variable",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that idiff accepts function expressions (e.g., f(x)) as the dependent variable instead of raising ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_idiff_function_expr"
+      ],
+      "covers_original_tests": [
+        "test_idiff"
+      ],
+      "covers_obligations": [
+        "test_idiff::idiff"
+      ],
+      "target_source_symbol": "sympy.geometry.util.idiff",
+      "target_validation_subject": "idiff",
+      "semantic_alignment_tokens": [
+        "idiff",
+        "f(x)",
+        "ValueError",
+        "Function"
+      ],
+      "trigger_shape_tokens": [
+        "idiff",
+        "f(x)",
+        "Function",
+        "ValueError"
+      ],
+      "rationale": "The original test_idiff only tests with Symbol objects (y, t). The bug manifests when passing a Function expression like f(x) as the dependent variable - it raises 'ValueError: expecting x-dependent symbol(s) but got: f(x)'. This enhanced test directly triggers the ValueError by passing f(x) as the dependent variable, which is a valid use case that should work after the fix. The test will fail on buggy code (ValueError raised) and pass on fixed code (returns derivative)."
+    },
+    "patch": "Looking at the task, I need to create an enhanced test that:\n1. Tests the same bug (idiff not supporting f(x) as dependent variable)\n2. Has a different name starting with `test_sweb_enhanced_`\n3. Fails on the buggy code (raises ValueError) and passes on fixed code\n\nLet me create the patch:\ndiff --git a/sympy/geometry/tests/test_util.py b/sympy/geometry/tests/test_util.py\n--- a/sympy/geometry/tests/test_util.py\n+++ b/sympy/geometry/tests/test_util.py\n@@ -1,5 +1,5 @@\n-from sympy import Symbol, sqrt, Derivative, S\n-from sympy.geometry import Point, Point2D, Line, Circle ,Polygon, Segment, convex_hull, intersection, centroid\n+from sympy import Symbol, sqrt, Derivative, S, Function, exp\n+from sympy.geometry import Point, Point2D, Line, Circle, Polygon, Segment, convex_hull, intersection, centroid\n from sympy.geometry.util import idiff, closest_points, farthest_points, _ordered_points\n from sympy.solvers.solvers import solve\n from sympy.utilities.pytest import raises\n@@ -21,3 +21,11 @@ def test_idiff():\n     assert ans.subs(y, solve(circ, y)[0]).equals(explicit)\n     assert True in [sol.diff(x, 3).equals(explicit) for sol in solve(circ, y)]\n     assert idiff(x + t + y, [y, t], x) == -Derivative(t, x) - 1\n+\n+\n+def test_sweb_enhanced_idiff_function_expr():\n+    \"\"\"Test that idiff accepts function expressions like f(x) as dependent variable.\"\"\"\n+    x = Symbol('x', real=True)\n+    f = Function('f')\n+    # This should work - idiff should handle f(x) as the dependent variable\n+    result = idiff(f(x) * exp(f(x)) - x * exp(x), f(x), x)\n+    expected = (x + 1) * exp(x - f(x))/(f(x) + 1)\n+    assert result == expected\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Tests the same bug (idiff not supporting f(x) as dependent variable)\n2. Has a different name starting with `test_sweb_enhanced_`\n3. Fails on the buggy code (raises ValueError) and passes on fixed code\n\nLet me create the patch:\ndiff --git a/sympy/geometry/tests/test_util.py b/sympy/geometry/tests/test_util.py\n--- a/sympy/geometry/tests/test_util.py\n+++ b/sympy/geometry/tests/test_util.py\n@@ -1,5 +1,5 @@\n-from sympy import Symbol, sqrt, Derivative, S\n-from sympy.geometry import Point, Point2D, Line, Circle ,Polygon, Segment, convex_hull, intersection, centroid\n+from sympy import Symbol, sqrt, Derivative, S, Function, exp\n+from sympy.geometry import Point, Point2D, Line, Circle, Polygon, Segment, convex_hull, intersection, centroid\n from sympy.geometry.util import idiff, closest_points, farthest_points, _ordered_points\n from sympy.solvers.solvers import solve\n from sympy.utilities.pytest import raises\n@@ -21,3 +21,11 @@ def test_idiff():\n     assert ans.subs(y, solve(circ, y)[0]).equals(explicit)\n     assert True in [sol.diff(x, 3).equals(explicit) for sol in solve(circ, y)]\n     assert idiff(x + t + y, [y, t], x) == -Derivative(t, x) - 1\n+\n+\n+def test_sweb_enhanced_idiff_function_expr():\n+    \"\"\"Test that idiff accepts function expressions like f(x) as dependent variable.\"\"\"\n+    x = Symbol('x', real=True)\n+    f = Function('f')\n+    # This should work - idiff should handle f(x) as the dependent variable\n+    result = idiff(f(x) * exp(f(x)) - x * exp(x), f(x), x)\n+    expected = (x + 1) * exp(x - f(x))/(f(x) + 1)\n+    assert result == expected\n",
+    "identifiers": [
+      "test_sweb_enhanced_idiff_function_expr"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_idiff_function_expr"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_idiff": "PASSED",
+      "test_intersection": "PASSED",
+      "test_convex_hull": "PASSED",
+      "test_centroid": "PASSED"
+    },
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_idiff"
+    ],
+    "covered_obligations": [
+      "test_idiff::idiff"
+    ]
+  },
+  {
+    "idea": {
+      "title": "idiff should handle function expressions like f(x) as dependent variable",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Test that idiff accepts function applications (e.g., f(x)) as the dependent variable instead of only plain symbols, addressing the ValueError when f(x) is passed",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_idiff_function_expr"
+      ],
+      "covers_original_tests": [
+        "test_idiff"
+      ],
+      "covers_obligations": [
+        "test_idiff::ans",
+        "test_idiff::equals"
+      ],
+      "target_source_symbol": "sympy.geometry.util.idiff",
+      "target_validation_subject": "y parameter (dependent variable)",
+      "semantic_alignment_tokens": [
+        "idiff",
+        "ValueError",
+        "f(x)",
+        "expecting x-dependent symbol"
+      ],
+      "trigger_shape_tokens": [
+        "idiff(",
+        "f(x)",
+        "x",
+        "dependent"
+      ],
+      "rationale": "The original test_idiff only tests with plain Symbol objects (y, t). This new test specifically triggers the ValueError by passing f(x) (a Function application) as the dependent variable, which is one of the two bugs mentioned in the problem statement. The test exercises the 'ans' and 'equals' validation subjects by checking that idiff can compute the derivative dy/dx when y is expressed as f(x). This is distinct from the original test because it uses a Function object rather than a Symbol, which triggers the ValueError path in the buggy code."
+    },
+    "patch": "diff --git a/sympy/geometry/tests/test_util.py b/sympy/geometry/tests/test_util.py\n--- a/sympy/geometry/tests/test_util.py\n+++ b/sympy/geometry/tests/test_util.py\n@@ -1,4 +1,4 @@\n-from sympy import Symbol, sqrt, Derivative, S\n+from sympy import Symbol, sqrt, Derivative, S, Function, exp\n from sympy.geometry import Point, Point2D, Line, Circle ,Polygon, Segment, convex_hull, intersection, centroid\n from sympy.geometry.util import idiff, closest_points, farthest_points, _ordered_points\n from sympy.solvers.solvers import solve\n@@ -20,3 +20,6 @@ def test_idiff():\n     assert True in [sol.diff(x, 3).equals(explicit) for sol in solve(circ, y)]\n     assert idiff(x + t + y, [y, t], x) == -Derivative(t, x) - 1\n \n+\n+def test_sweb_enhanced_idiff_function_expr():\n+    \"\"\"Test that i\n",
+    "raw_response": "\n\nLooking at the problem, I need to create an enhanced test that:\n1. Triggers the same bug (ValueError when passing f(x) as dependent variable)\n2. Uses a different observation angle than the original test\n3. Fails on the buggy code and passes after the fix\n\nThe original test only uses plain Symbol objects (y, t). The bug is that idiff doesn't accept Function applications like f(x) as the dependent variable. Let me create a minimal test that specifically triggers this ValueError.\n\n```diff\ndiff --git a/sympy/geometry/tests/test_util.py b/sympy/geometry/tests/test_util.py\n--- a/sympy/geometry/tests/test_util.py\n+++ b/sympy/geometry/tests/test_util.py\n@@ -1,5 +1,5 @@\n-from sympy import Symbol, sqrt, Derivative, S\n+from sympy import Symbol, sqrt, Derivative, S, Function, exp\n from sympy.geometry import Point, Point2D, Line, Circle ,Polygon, Segment, convex_hull, intersection, centroid\n from sympy.geometry.util import idiff, closest_points, farthest_points, _ordered_points\n from sympy.solvers.solvers import solve\n@@ -20,3 +20,10 @@ def test_idiff():\n     assert True in [sol.diff(x, 3).equals(explicit) for sol in solve(circ, y)]\n     assert idiff(x + t + y, [y, t], x) == -Derivative(t, x) - 1\n \n+\n+def test_sweb_enhanced_idiff_function_expr():\n+    \"\"\"Test that idiff accepts function applications like f(x) as dependent variable.\n+    \n+    This tests the bug where idiff raises ValueError when given f(x) instead of a plain Symbol.\n+    \"\"\"\n+    f = Function('f')\n+    x = Symbol('x', real=True)\n+    # This should compute dy/dx where y = f(x), but currently raises:\n+    # ValueError: expecting x-dependent symbol(s) but got: f(x)\n+    result = idiff(f(x)*exp(f(x)) - x*exp(x), f(x), x)\n+    assert result == (x + 1) * exp(x - f(x))/(f(x) + 1)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_idiff_function_expr"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_idiff_function_expr"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_idiff": "PASSED",
+      "test_intersection": "PASSED",
+      "test_convex_hull": "PASSED",
+      "test_centroid": "PASSED"
+    },
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_idiff"
+    ],
+    "covered_obligations": [
+      "test_idiff::ans",
+      "test_idiff::equals"
+    ]
+  },
+  {
+    "idea": {
+      "title": "idiff should accept function notation f(x) as dependent variable",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Test that idiff handles function notation f(x) instead of just symbol y, which currently raises ValueError but should work after fix",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_idiff_function_notation"
+      ],
+      "covers_original_tests": [
+        "test_idiff"
+      ],
+      "covers_obligations": [
+        "test_idiff::idiff"
+      ],
+      "target_source_symbol": "sympy.geometry.util.idiff",
+      "target_validation_subject": "idiff function parameter y when passed as f(x)",
+      "semantic_alignment_tokens": [
+        "idiff",
+        "valueerror",
+        "f(x)",
+        "Function"
+      ],
+      "trigger_shape_tokens": [
+        "idiff(",
+        "f(x)",
+        "x",
+        "ValueError"
+      ],
+      "rationale": "The original test_idiff only tests with Symbol y (like y=Symbol('y')). The bug is that idiff raises ValueError when passed f(x) as the dependent variable instead of a plain Symbol. This enhanced test directly triggers the ValueError by calling idiff(f(x)*exp(f(x)) - x*exp(x), f(x), x), which should work after the fix but currently fails with 'expecting x-dependent symbol(s) but got: f(x)'. This is distinct from the original test because it uses function notation (f(x)) rather than a simple symbol, exercising the specific code path that raises the ValueError."
+    },
+    "patch": "diff --git a/sympy/geometry/tests/test_util.py b/sympy/geometry/tests/test_util.py\n--- a/sympy/geometry/tests/test_util.py\n+++ b/sympy/geometry/tests/test_util.py\n@@ -1,5 +1,5 @@\n-from sympy import Symbol, sqrt, Derivative, S\n+from sympy import Symbol, sqrt, Derivative, S, Function, exp\n from sympy.geometry import Point, Point2D, Line, Circle ,Polygon, Segment, convex_hull, intersection, centroid\n from sympy.geometry.util import idiff, closest_points, farthest_points, _ordered_points\n from sympy.solvers.solvers import solve\n from sympy.utilities.pytest import raises\n@@ -21,3 +21,10 @@ def test_idiff():\n     assert ans.subs(y, solve(circ, y)[0]).equals(explicit)\n     assert True in [sol.diff(x, 3).equals(explicit) for sol in solve(circ, y)]\n     assert idiff(x + t + y, [y, t], x) == -Derivative(t, x) - 1\n+\n+\n+def test_sweb_enhanced_idiff_function_notation():\n+    x = Symbol('x', real=True)\n+    f = Function('f')\n+    # Test that idiff accepts function notation f(x) as dependent variable\n+    # This currently raises ValueError but should work after fix\n+    assert idiff(f(x)*exp(f(x)) - x*exp(x), f(x), x) == (x + 1)*exp(x - f(x))/(f(x) + 1)\n",
+    "raw_response": "\n\n```diff\ndiff --git a/sympy/geometry/tests/test_util.py b/sympy/geometry/tests/test_util.py\n--- a/sympy/geometry/tests/test_util.py\n+++ b/sympy/geometry/tests/test_util.py\n@@ -1,5 +1,5 @@\n-from sympy import Symbol, sqrt, Derivative, S\n+from sympy import Symbol, sqrt, Derivative, S, Function, exp\n from sympy.geometry import Point, Point2D, Line, Circle ,Polygon, Segment, convex_hull, intersection, centroid\n from sympy.geometry.util import idiff, closest_points, farthest_points, _ordered_points\n from sympy.solvers.solvers import solve\n from sympy.utilities.pytest import raises\n@@ -21,3 +21,10 @@ def test_idiff():\n     assert ans.subs(y, solve(circ, y)[0]).equals(explicit)\n     assert True in [sol.diff(x, 3).equals(explicit) for sol in solve(circ, y)]\n     assert idiff(x + t + y, [y, t], x) == -Derivative(t, x) - 1\n+\n+\n+def test_sweb_enhanced_idiff_function_notation():\n+    x = Symbol('x', real=True)\n+    f = Function('f')\n+    # Test that idiff accepts function notation f(x) as dependent variable\n+    # This currently raises ValueError but should work after fix\n+    assert idiff(f(x)*exp(f(x)) - x*exp(x), f(x), x) == (x + 1)*exp(x - f(x))/(f(x) + 1)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_idiff_function_notation"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_idiff_function_notation"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_idiff": "PASSED",
+      "test_intersection": "PASSED",
+      "test_convex_hull": "PASSED",
+      "test_centroid": "PASSED"
+    },
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_idiff"
+    ],
+    "covered_obligations": [
+      "test_idiff::idiff"
+    ]
+  },
+  {
+    "idea": {
+      "title": "idiff with function expression as dependent variable",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that idiff raises ValueError when dependent variable is a function expression like f(x) instead of a plain Symbol",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_idiff_function_dep"
+      ],
+      "covers_original_tests": [
+        "test_idiff"
+      ],
+      "covers_obligations": [
+        "test_idiff::idiff"
+      ],
+      "target_source_symbol": "sympy.geometry.util.idiff",
+      "target_validation_subject": "idiff",
+      "semantic_alignment_tokens": [
+        "idiff",
+        "ValueError",
+        "f(x)",
+        "expecting x-dependent symbol(s)"
+      ],
+      "trigger_shape_tokens": [
+        "idiff(",
+        "f(x),",
+        "x)",
+        "ValueError"
+      ],
+      "rationale": "The original test_idiff fails on the case idiff(f(x)*exp(f(x)) - x*exp(x), f(x), x) which raises ValueError. This enhanced test isolates the function expression dependent variable case to specifically trigger the ValueError that occurs when y is f(x) instead of a plain Symbol. The test verifies the exact error message 'expecting x-dependent symbol(s) but got: f(x)' which is the direct symptom of the bug."
+    },
+    "patch": "diff --git a/sympy/geometry/tests/test_util.py b/sympy/geometry/tests/test_util.py\n--- a/sympy/geometry/tests/test_util.py\n+++ b/sympy/geometry/tests/test_util.py\n@@ -1,4 +1,4 @@\n-from sympy import Symbol, sqrt, Derivative, S\n+from sympy import Symbol, sqrt, Derivative, S, Function, exp\n from sympy.geometry import Point, Point2D, Line, Circle ,Polygon, Segment, convex_hull, intersection, centroid\n from sympy.geometry.util import idiff, closest_points, farthest_points, _ordered_points\n from sympy.solvers.solvers import solve\n@@ -9,4 +9,6 @@ def test_idiff():\n     x = Symbol('x', real=True)\n     y = Symbol('y', real=True)\n     t = Symbol('t', real=True)\n+    f = Function('f')\n+    g = Function('g')\n     # the use of i\n",
+    "raw_response": "\n\nLooking at the problem, I need to add an enhanced test that specifically tests the case where `idiff` is called with a function expression like `f(x)` as the dependent variable. This should fail on the buggy code (raising ValueError) but pass after the fix.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/geometry/tests/test_util.py b/sympy/geometry/tests/test_util.py\n--- a/sympy/geometry/tests/test_util.py\n+++ b/sympy/geometry/tests/test_util.py\n@@ -1,5 +1,5 @@\n-from sympy import Symbol, sqrt, Derivative, S\n+from sympy import Symbol, sqrt, Derivative, S, Function, exp\n from sympy.geometry import Point, Point2D, Line, Circle ,Polygon, Segment, convex_hull, intersection, centroid\n from sympy.geometry.util import idiff, closest_points, farthest_points, _ordered_points\n from sympy.solvers.solvers import solve\n@@ -9,6 +9,8 @@ def test_idiff():\n     x = Symbol('x', real=True)\n     y = Symbol('y', real=True)\n     t = Symbol('t', real=True)\n+    f = Function('f')\n+    g = Function('g')\n     # the use of idiff in ellipse also provides coverage\n     circ = x**2 + y**2 - 4\n     ans = -3*x*(x**2 + y**2)/y**5\n@@ -19,6 +21,10 @@ def test_idiff():\n     assert ans.subs(y, solve(circ, y)[0]).equals(explicit)\n     assert True in [sol.diff(x, 3).equals(explicit) for sol in solve(circ, y)]\n     assert idiff(x + t + y, [y, t], x) == -Derivative(t, x) - 1\n+    assert idiff(f(x) * exp(f(x)) - x * exp(x), f(x), x) == (x + 1) * exp(x - f(x))/(f(x) + 1)\n+    assert idiff(f(x) - y * exp(x), [f(x), y], x) == (y + Derivative(y, x)) * exp(x)\n+    assert idiff(f(x) - y * exp(x), [y, f(x)], x) == -y + exp(-x) * Derivative(f(x), x)\n+    assert idiff(f(x) - g(x), [f(x), g(x)], x) == Derivative(g(x), x)\n \n \n def test_intersection():\n```",
+    "identifiers": [],
+    "enhanced_identifiers": [],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "candidate did not add any test_sweb_enhanced_* test",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_idiff"
+    ],
+    "covered_obligations": [
+      "test_idiff::idiff"
+    ]
+  },
+  {
+    "idea": {
+      "title": "idiff should accept function expression f(x) as dependent variable",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that idiff handles Function expressions like f(x) as the dependent variable instead of raising ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_idiff_function_notation"
+      ],
+      "covers_original_tests": [
+        "test_idiff"
+      ],
+      "covers_obligations": [
+        "test_idiff::idiff"
+      ],
+      "target_source_symbol": "sympy.geometry.util.idiff",
+      "target_validation_subject": "idiff",
+      "semantic_alignment_tokens": [
+        "idiff",
+        "ValueError",
+        "f(x)",
+        "Function"
+      ],
+      "trigger_shape_tokens": [
+        "idiff(",
+        "f(x)",
+        "x",
+        "ValueError"
+      ],
+      "rationale": "The original test_idiff only tests with Symbol objects (y, t) but never exercises the function notation f(x). The bug manifests when passing f(x) as the dependent variable - it raises ValueError('expecting x-dependent symbol(s) but got: f(x)'). This enhanced test directly triggers the ValueError by passing f(x) as the dependent variable, which is the exact failure case reported in the problem statement. The test will fail on buggy code (ValueError) and pass on fixed code (returning the derivative)."
+    },
+    "patch": "diff --git a/sympy/geometry/tests/test_util.py b/sympy/geometry/tests/test_util.py\n--- a/sympy/geometry/tests/test_util.py\n+++ b/sympy/geometry/tests/test_util.py\n@@ -1,4 +1,5 @@\n from sympy import Symbol, sqrt, Derivative, S\n+from sympy import Function, exp\n from sympy.geometry import Point, Point2D, Line, Circle ,Polygon, Segment, convex_hull, intersection, centroid\n from sympy.geometry.util import idiff, closest_points, farthest_points, _ordered_points\n from sympy.solvers.solvers import solve\n@@ -23,3 +24,6 @@ def test_idiff():\n     assert True in [sol.diff(x, 3).equals(explicit) for sol in solve(circ, y)]\n     assert idiff(x + t + y, [y, t], x) == -Derivative(t, x) - 1\n \n+\n+def test_sweb_enhanced_idiff_function_notation():\n+    \"\"\"Test that i\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Triggers the same bug (ValueError when passing f(x) to idiff)\n2. Uses a different observation angle than the original test patch\n3. Fails on buggy code, passes on fixed code\n4. Does NOT use lines from the original SWE-bench test patch as context\n\nLet me analyze the buggy base commit test file and create a minimal, targeted test.\n\n```diff\ndiff --git a/sympy/geometry/tests/test_util.py b/sympy/geometry/tests/test_util.py\n--- a/sympy/geometry/tests/test_util.py\n+++ b/sympy/geometry/tests/test_util.py\n@@ -1,5 +1,6 @@\n from sympy import Symbol, sqrt, Derivative, S\n+from sympy import Function, exp\n from sympy.geometry import Point, Point2D, Line, Circle ,Polygon, Segment, convex_hull, intersection, centroid\n from sympy.geometry.util import idiff, closest_points, farthest_points, _ordered_points\n from sympy.solvers.solvers import solve\n@@ -23,3 +24,12 @@ def test_idiff():\n     assert True in [sol.diff(x, 3).equals(explicit) for sol in solve(circ, y)]\n     assert idiff(x + t + y, [y, t], x) == -Derivative(t, x) - 1\n \n+\n+def test_sweb_enhanced_idiff_function_notation():\n+    \"\"\"Test that idiff accepts function expression f(x) as dependent variable.\n+    \n+    This tests the bug where idiff raises ValueError when passed f(x) instead\n+    of a plain Symbol like y. The function should handle f(x) notation.\n+    \"\"\"\n+    x = Symbol('x', real=True)\n+    f = Function('f')\n+    # This should return a valid derivative, not raise ValueError\n+    result = idiff(f(x) * exp(f(x)) - x * exp(x), f(x), x)\n+    # The expected derivative is (x+1)*exp(x-f(x))/(f(x)+1)\n+    assert result == (x + 1) * exp(x - f(x)) / (f(x) + 1)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_idiff_function_notation"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_idiff_function_notation"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_idiff": "PASSED",
+      "test_intersection": "PASSED",
+      "test_convex_hull": "PASSED",
+      "test_centroid": "PASSED"
+    },
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_idiff"
+    ],
+    "covered_obligations": [
+      "test_idiff::idiff"
+    ]
+  }
+]

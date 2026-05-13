@@ -1,0 +1,15 @@
+{
+  "original_test_identifiers": [
+    "test_idiff"
+  ],
+  "status_map": {
+    "sympy/geometry/tests/test_util.py:test_idiff": "FAILED",
+    "test_idiff": "ERROR",
+    "test_intersection": "PASSED",
+    "test_convex_hull": "PASSED",
+    "test_centroid": "PASSED"
+  },
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/sympy__sympy-15678/test_output.txt",
+  "timed_out": false,
+  "error": null
+}

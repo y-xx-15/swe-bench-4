@@ -1,0 +1,27 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/matrices/expressions/blockmatrix.py",
+      "action": "modify_region",
+      "justification": "The _entry method incorrectly handles symbolic indices by using `(i < numrows) != False` which treats symbolic Boolean results as True, causing the first block to be selected. This must be fixed to properly handle symbolic indices."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/matrices/expressions/blockmatrix.py",
+      "target_symbol": "BlockMatrix._entry",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_block_index_symbolic::core::symbolic index handling in _entry method",
+        "test_block_index_symbolic_nonzero::core::symbolic index handling in _entry method",
+        "test_block_index_large::core::symbolic index handling in _entry method",
+        "test_block_index_symbolic::core::symbolic index boundary detection in _entry method",
+        "test_block_index_symbolic_nonzero::core::symbolic index boundary detection in _entry method",
+        "test_block_index_large::core::symbolic index boundary detection in _entry method"
+      ],
+      "anchor_line_before": "    def _entry(self, i, j, **kwargs):",
+      "anchor_line_after": "        return self.blocks[row_block, col_block][i, j]",
+      "replacement_block": "    def _entry(self, i, j, **kwargs):\n        from sympy.matrices.expressions.matexpr import MatrixElement\n        # Handle symbolic indices by returning unevaluated MatrixElement\n        # to preserve block structure - symbolic indices could refer to any block\n        if i.is_Symbol or j.is_Symbol:\n            return MatrixElement(self, i, j)\n        # Find row entry\n        for row_block, numrows in enumerate(self.rowblocksizes):\n            if (i < numrows) != False:\n                break\n            else:\n                i -= numrows\n        for col_block, numcols in enumerate(self.colblocksizes):\n            if (j < numcols) != False:\n                break\n            else:\n                j -= numcols\n        return self.blocks[row_block, col_block][i, j]"
+    }
+  ]
+}

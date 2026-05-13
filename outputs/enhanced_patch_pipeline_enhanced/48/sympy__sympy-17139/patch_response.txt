@@ -1,0 +1,19 @@
+
+
+Looking at the bug, the issue is in the `_TR56` function in `sympy/simplify/fu.py`. The inner function `_f` compares `rv.exp < 0` and `rv.exp > max` without checking if the exponent is a real number. When the exponent is complex (like `I`), this raises a TypeError.
+
+Let me find the exact line numbers in the file:
+```diff
+--- a/sympy/simplify/fu.py
++++ b/sympy/simplify/fu.py
+@@ -501,6 +501,9 @@ def _TR56(rv, f, g, h, max, pow):
+         if not (rv.is_Pow and rv.base.func == f):
+             return rv
+ 
++        if not rv.exp.is_real:
++            return rv
++
+         if (rv.exp < 0) == True:
+             return rv
+         if (rv.exp > max) == True:
+```

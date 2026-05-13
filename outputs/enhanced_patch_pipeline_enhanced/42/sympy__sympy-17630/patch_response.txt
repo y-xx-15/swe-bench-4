@@ -1,0 +1,9 @@
+
+
+
+<minimax:tool_call>
+<invoke name="glob">
+<parameter name="path">/testbed</parameter>
+<parameter name="pattern">sympy/matrices/expressions/blockmatrix.py</parameter>
+</invoke>
+</minimax:tool_call>

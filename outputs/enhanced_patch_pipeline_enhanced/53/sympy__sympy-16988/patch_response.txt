@@ -1,0 +1,21 @@
+
+
+Looking at the bug, the issue is that `Intersection({1},{1},{x})` returns `EmptySet()` but `Intersection({1},{x})` returns `{1}`. The fix is to remove duplicate set arguments at the start of `Intersection.__new__` before processing.
+
+Let me create the minimal fix:
+```diff
+--- a/sympy/sets/sets.py
++++ b/sympy/sets/sets.py
+@@ -1260,6 +1260,9 @@ class Intersection(Set, LatticeOp):
+     def __new__(cls, *args, **kwargs):
+         evaluate = kwargs.get('evaluate', global_evaluate[0])
+ 
+         # flatten inputs to merge intersections and iterables
+         args = _sympify(args)
++        
++        # Remove duplicates while preserving order
++        args = list(dict.fromkeys(args))
+ 
+         # Reduce sets using known rules
+         if evaluate:
+```

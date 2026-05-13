@@ -1,0 +1,271 @@
+[
+  {
+    "idea": {
+      "title": "Product pretty printing with symbolic upper bound triggers ValueError in Equality printing",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that Product with symbolic upper bound (like oo) triggers the ValueError when pretty printing the Equality for the lower bound",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_product_symbolic_bound"
+      ],
+      "covers_original_tests": [
+        "test_pretty_product",
+        "test_issue_6359"
+      ],
+      "covers_obligations": [
+        "test_pretty_product::core",
+        "test_issue_6359::core"
+      ],
+      "target_source_symbol": "sympy.printing.pretty.pretty.PrettyPrinter._print_Product",
+      "target_validation_subject": "Equality printing within Product bounds",
+      "semantic_alignment_tokens": [
+        "Product",
+        "pprint",
+        "Equality",
+        "ValueError"
+      ],
+      "trigger_shape_tokens": [
+        "Product(",
+        "pprint(",
+        "Equality(",
+        "oo"
+      ],
+      "rationale": "The original tests test_pretty_product and test_issue_6359 fail with AssertionError because the pretty printing output doesn't match expected strings. The traceback reveals a ValueError 'Name node can't be used with False constant' is being raised during the printing of Equality objects within Product bounds. This enhanced test directly triggers that ValueError by creating a Product with symbolic upper bound (oo) and calling pprint, which exercises the exact code path that raises the ValueError. This is distinct from the original tests because it focuses on exposing the ValueError that occurs during the Equality printing, rather than just checking the final output string match."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -5519,5 +5519,17 @@ def test_imaginary_unit():\n     from sympy import pretty # As it is redefined above\n     assert pretty(1 + I, use_unicode=False) == '1 + I'\n     assert pretty(1 + I, use_unicode=True) == u'1 + ⅈ'\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n+\n+\n+def test_sweb_enhanced_product_symbolic_bound():\n+    # Test that Product with symbolic upper bound (oo) triggers the ValueError\n+    # in Equality printing within Product bounds.\n+    # This test exposes the bug where pprint(Product(1, (n, 1, oo))) raises:\n+    # ValueError: Name node can't be used with 'False' constant\n+    # The bug is in _print_Product when it tries to print Equality(lim[0], lim[1])\n+    # for the lower bound of the Product.\n+    from sympy import pprint\n+    # This should not raise ValueError - it should produce valid output\n+    result = pprint(Product(1, (n, 1, oo)))\n",
+    "raw_response": "\n\nLooking at the problem, I need to create an enhanced test that:\n1. Triggers the ValueError that occurs during Product pretty printing with symbolic bounds\n2. Fails on the buggy code (the ValueError is raised)\n3. Would pass after the fix is applied\n\nLet me first examine the exact code path that triggers the bug by looking at the `_print_Product` method in the buggy code:\n\n```python\n# In _print_Product:\npretty_lower = self._print(Equality(lim[0], lim[1]))\n```\n\nThe bug occurs when printing the Equality for the lower bound. Let me create a test that directly triggers this:\n\n```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -5519,3 +5519,14 @@ def test_imaginary_unit():\n     from sympy import pretty # As it is redefined above\n     assert pretty(1 + I, use_unicode=False) == '1 + I'\n     assert pretty(1 + I, use_unicode=True) == u'1 + ⅈ'\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n+\n+\n+def test_sweb_enhanced_product_symbolic_bound():\n+    # Test that Product with symbolic upper bound (oo) triggers the ValueError\n+    # in Equality printing within Product bounds.\n+    # This test exposes the bug where pprint(Product(1, (n, 1, oo))) raises:\n+    # ValueError: Name node can't be used with 'False' constant\n+    # The bug is in _print_Product when it tries to print Equality(lim[0], lim[1])\n+    # for the lower bound of the Product.\n+    from sympy import pprint\n+    # This should not raise ValueError - it should produce valid output\n+    result = pprint(Product(1, (n, 1, oo)))\n```",
+    "identifiers": [
+      "test_sweb_enhanced_product_symbolic_bound"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_product_symbolic_bound"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Product pretty printing fails on infinite limit equality rendering",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Expose ValueError when printing Product with infinite upper limit - the Equality(lim[0], lim[1]) creation triggers a ValueError in the pretty printer's relational handling",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_product_infinite_limit"
+      ],
+      "covers_original_tests": [
+        "test_pretty_product",
+        "test_issue_6359"
+      ],
+      "covers_obligations": [
+        "test_pretty_product::core",
+        "test_issue_6359::core"
+      ],
+      "target_source_symbol": "sympy.printing.pretty.pretty.PrettyPrinter._print_Product",
+      "target_validation_subject": "Equality rendering in Product pretty printing with infinite limits",
+      "semantic_alignment_tokens": [
+        "ValueError",
+        "Name node can't be used with 'False' constant",
+        "Product",
+        "pprint",
+        "Equality"
+      ],
+      "trigger_shape_tokens": [
+        "Product(",
+        "pprint(Product(",
+        "Equality(",
+        "oo"
+      ],
+      "rationale": "The original tests test_pretty_product and test_issue_6359 fail with ValueError when the pretty printer attempts to render the Equality object for Product limits with infinity. This enhanced test isolates the exact trigger: creating a Product with an infinite upper limit (n, 1, oo) which causes the Equality(lim[0], lim[1]) in _print_Product to fail during printing. The test directly exercises the _print_Product method's handling of infinite limits, which is the root cause of both original test failures."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -5517,4 +5517,18 @@ def test_imaginary_unit():\n     assert pretty(1 + I, use_unicode=False) == '1 + I'\n     assert pretty(1 + I, use_unicode=True) == u'1 + ⅈ'\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n+\n+\n+def test_sweb_enhanced_product_infinite_limit():\n+    # This test exposes the ValueError that occurs when pretty printing\n+    # Product with infinite upper limit. The bug is in _print_Product\n+    # which creates Equality(lim[0], lim[1]) for the lower bound, and\n+    # this fails with \"Name node can't be used with 'False' constant\"\n+    # when the limit involves infinity.\n+    from sympy.printing.pretty.pretty import PrettyPrinter\n+    printer = PrettyPrinter()\n+    # This should not raise ValueError\n+    result = printer._print_Product(Product(1, (n, 1, oo)))\n+    # If we get here without ValueError, the test passes\n+    assert result is not None\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Fails on the buggy code (triggers the ValueError)\n2. Passes after the fix\n3. Tests the Product pretty printing with infinite limits\n\nLet me first understand the exact failure by examining the code path. The bug occurs when `_print_Product` tries to print `Equality(lim[0], lim[1])` for infinite limits.\n\nLet me create the test patch:\n```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -5517,3 +5517,14 @@ def test_imaginary_unit():\n     assert pretty(1 + I, use_unicode=False) == '1 + I'\n     assert pretty(1 + I, use_unicode=True) == u'1 + ⅈ'\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n+\n+\n+def test_sweb_enhanced_product_infinite_limit():\n+    # This test exposes the ValueError that occurs when pretty printing\n+    # Product with infinite upper limit. The bug is in _print_Product\n+    # which creates Equality(lim[0], lim[1]) for the lower bound, and\n+    # this fails with \"Name node can't be used with 'False' constant\"\n+    # when the limit involves infinity.\n+    from sympy.printing.pretty.pretty import PrettyPrinter\n+    printer = PrettyPrinter()\n+    # This should not raise ValueError\n+    result = printer._print_Product(Product(1, (n, 1, oo)))\n+    # If we get here without ValueError, the test passes\n+    assert result is not None\n```",
+    "identifiers": [
+      "test_sweb_enhanced_product_infinite_limit"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_product_infinite_limit"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Product pretty printing crashes on symbolic limits with ValueError",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that Product pretty printing handles symbolic limit variables correctly without raising ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_product_symbolic_limit"
+      ],
+      "covers_original_tests": [
+        "test_pretty_product",
+        "test_issue_6359"
+      ],
+      "covers_obligations": [
+        "test_pretty_product::core",
+        "test_issue_6359::core"
+      ],
+      "target_source_symbol": "sympy.printing.pretty.pretty.PrettyPrinter._print_Product",
+      "target_validation_subject": "Equality(lim[0], lim[1]) construction in Product printing",
+      "semantic_alignment_tokens": [
+        "Product",
+        "pprint",
+        "pretty",
+        "ValueError",
+        "Equality"
+      ],
+      "trigger_shape_tokens": [
+        "Product(",
+        "lim[0]",
+        "lim[1]",
+        "Equality(",
+        "pretty_lower"
+      ],
+      "rationale": "The original tests test_pretty_product and test_issue_6359 fail with ValueError: 'Name node can't be used with False constant' when pretty printing Product expressions with symbolic limits. This enhanced test directly triggers the buggy code path in _print_Product where Equality(lim[0], lim[1]) is constructed for the lower bound. The test creates a Product with a symbolic variable (n) as the iteration variable and verifies the pretty printer doesn't crash. This is distinct from the original tests because it focuses specifically on the ValueError crash rather than the visual output quality issues mentioned in the problem statement."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -5517,5 +5517,23 @@ def test_imaginary_unit():\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n \n     raises(TypeError, lambda: pretty(I, imaginary_unit=I))\n     raises(ValueError, lambda: pretty(I, imaginary_unit=\"kkk\"))\n+\n+\n+def test_sweb_enhanced_product_symbolic_limit():\n+    # Test that Product pretty printing handles symbolic iteration variable\n+    # without raising ValueError: \"Name node can't be used with 'False' constant\"\n+    # This directly triggers the buggy code path in _print_Product where\n+    # Equality(lim[0], lim[1]) is constructed for the lower bound.\n+    from sympy import Symbol, Product, oo\n+    n = Symbol('n')\n+    # Create a Product with symbolic iteration variable and numeric bounds\n+    # This triggers the Equality(lim[0], lim[1]) path in _print_Product\n+    expr = Product(1/n, (n, 1, 10))\n+    # The buggy code raises ValueError when printing this\n+    result = upretty(expr)\n+    # Verify the output contains expected elements\n+    assert 'n' in result\n+    assert '1' in result\n+    assert '10' in result\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Triggers the same bug as `test_pretty_product` and `test_issue_6359` (ValueError: Name node can't be used with 'False' constant)\n2. Uses a different observation angle than the original tests\n3. Must FAIL on the buggy code and PASS after the fix\n\nThe bug is in `PrettyPrinter._print_Product` where `Equality(lim[0], lim[1])` is constructed for the lower bound. Let me create a test that directly triggers this code path with a symbolic variable.\n\n```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -5517,3 +5517,14 @@ def test_imaginary_unit():\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n \n     raises(TypeError, lambda: pretty(I, imaginary_unit=I))\n     raises(ValueError, lambda: pretty(I, imaginary_unit=\"kkk\"))\n+\n+\n+def test_sweb_enhanced_product_symbolic_limit():\n+    # Test that Product pretty printing handles symbolic iteration variable\n+    # without raising ValueError: \"Name node can't be used with 'False' constant\"\n+    # This directly triggers the buggy code path in _print_Product where\n+    # Equality(lim[0], lim[1]) is constructed for the lower bound.\n+    from sympy import Symbol, Product, oo\n+    n = Symbol('n')\n+    # Create a Product with symbolic iteration variable and numeric bounds\n+    # This triggers the Equality(lim[0], lim[1]) path in _print_Product\n+    expr = Product(1/n, (n, 1, 10))\n+    # The buggy code raises ValueError when printing this\n+    result = upretty(expr)\n+    # Verify the output contains expected elements\n+    assert 'n' in result\n+    assert '1' in result\n+    assert '10' in result\n```",
+    "identifiers": [
+      "test_sweb_enhanced_product_symbolic_limit"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_product_symbolic_limit"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Product pretty print with infinity upper bound triggers ValueError",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that pretty printing Product with infinite upper bound (n, 1, oo) does not raise ValueError: Name node can't be used with 'False' constant",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_product_infinity"
+      ],
+      "covers_original_tests": [
+        "test_pretty_product",
+        "test_issue_6359"
+      ],
+      "covers_obligations": [
+        "test_pretty_product::core",
+        "test_issue_6359::core"
+      ],
+      "target_source_symbol": "sympy.printing.pretty.pretty.PrettyPrinter._print_Product",
+      "target_validation_subject": "Product(1, (n, 1, oo)) pretty printing",
+      "semantic_alignment_tokens": [
+        "Product",
+        "pprint",
+        "pretty",
+        "oo",
+        "Infinity"
+      ],
+      "trigger_shape_tokens": [
+        "Product(",
+        "Equality(",
+        "lim[2]",
+        "lim[1]"
+      ],
+      "rationale": "The original tests test_pretty_product and test_issue_6359 fail with ValueError when printing Product with infinite upper bound. This enhanced test directly triggers the ValueError by using Product(1, (n, 1, oo)) which causes Equality(n, oo) to be printed, triggering the 'Name node can't be used with False constant' error. The test differs from original by explicitly verifying the ValueError is fixed for the infinity boundary case, not just checking output string matching."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -5519,5 +5519,18 @@ def test_imaginary_unit():\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n \n     raises(TypeError, lambda: pretty(I, imaginary_unit=I))\n     raises(ValueError, lambda: pretty(I, imaginary_unit=\"kkk\"))\n+\n+\n+def test_sweb_enhanced_product_infinity():\n+    # Test that Product with infinite upper bound does not raise ValueError\n+    # This tests the bug where printing Product(1, (n, 1, oo)) raises:\n+    # ValueError: Name node can't be used with 'False' constant\n+    # The bug occurs when Equality(n, oo) is created for the pretty printing\n+    # and the printer incorrectly handles the oo (infinity) symbol\n+    expr = Product(1, (n, 1, oo))\n+    # Should not raise ValueError\n+    result = upretty(expr)\n+    # Basic sanity check that output is non-empty\n+    assert len(result) > 0\n",
+    "raw_response": "\n\nLooking at the failure log, the bug is that `Product(1, (n, 1, oo))` pretty printing raises `ValueError: Name node can't be used with 'False' constant`. The original tests `test_pretty_product` and `test_issue_6359` fail with this error.\n\nI'll create an enhanced test that specifically triggers this ValueError by using Product with an infinite upper bound, which should fail on the buggy code (due to ValueError) and pass after the fix.\n\n```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -5519,3 +5519,14 @@ def test_imaginary_unit():\n     assert pretty(1 + I, use_unicode=False, imaginary_unit='j') == '1 + I'\n     assert pretty(1 + I, use_unicode=True, imaginary_unit='j') == u'1 + ⅉ'\n \n     raises(TypeError, lambda: pretty(I, imaginary_unit=I))\n     raises(ValueError, lambda: pretty(I, imaginary_unit=\"kkk\"))\n+\n+\n+def test_sweb_enhanced_product_infinity():\n+    # Test that Product with infinite upper bound does not raise ValueError\n+    # This tests the bug where printing Product(1, (n, 1, oo)) raises:\n+    # ValueError: Name node can't be used with 'False' constant\n+    # The bug occurs when Equality(n, oo) is created for the pretty printing\n+    # and the printer incorrectly handles the oo (infinity) symbol\n+    expr = Product(1, (n, 1, oo))\n+    # Should not raise ValueError\n+    result = upretty(expr)\n+    # Basic sanity check that output is non-empty\n+    assert len(result) > 0\n```",
+    "identifiers": [
+      "test_sweb_enhanced_product_infinity"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_product_infinity"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Product pretty printing with infinity upper bound triggers ValueError",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Test that Product with infinite upper bound (oo) triggers ValueError in pretty printer due to Equality construction with non-symbol bound",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_product_infinity"
+      ],
+      "covers_original_tests": [
+        "test_pretty_product",
+        "test_issue_6359"
+      ],
+      "covers_obligations": [
+        "test_pretty_product::core",
+        "test_issue_6359::core"
+      ],
+      "target_source_symbol": "sympy.printing.pretty.pretty.PrettyPrinter._print_Product",
+      "target_validation_subject": "Equality(lim[0], lim[1]) construction when lim[1] is oo",
+      "semantic_alignment_tokens": [
+        "ValueError",
+        "Name node can't be used with 'False' constant",
+        "Equality",
+        "Product",
+        "oo"
+      ],
+      "trigger_shape_tokens": [
+        "Product(1, (n, 1, oo))",
+        "Equality(n, 1)",
+        "lim[1] is oo"
+      ],
+      "rationale": "The original tests test_pretty_product and test_issue_6359 fail with ValueError when printing Product with infinite upper bound. The bug is in _print_Product where Equality(lim[0], lim[1]) is constructed - when lim[1] is oo (infinity), the Equality printer apparently tries to use a Name node with False constant, triggering ValueError. This test directly triggers the ValueError by constructing Product(1/n, (n, 1, oo)) which should fail on buggy code and pass on fixed code."
+    },
+    "patch": "diff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -320,0 +320,14 @@\n+def test_sweb_enhanced_product_infinity():\n+    # Test Product with infinite upper bound - this triggers ValueError in\n+    # _print_Product when Equality(lim[0], lim[1]) is constructed with lim[1]=oo\n+    # The bug: Name node can't be used with 'False' constant\n+    # This is a different angle than test_pretty_product/test_issue_6359\n+    # by using a simple fraction 1/n with oo bound directly\n+    from sympy.printing.pretty.pretty import PrettyPrinter\n+    from sympy.core.relational import Equality\n+    \n+    expr = Product(1/n, (n, 1, oo))\n+    # Directly call the internal method to trigger the bug\n+    # The bug is in Equality(n, oo) construction within _print_Product\n+    pp = PrettyPrinter()\n+    # This should not raise ValueError on fixed code\n+    result = pp._print_Product(expr)\n+    assert result is not None\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Triggers the same bug as `test_pretty_product` and `test_issue_6359` (ValueError when printing Product with infinite upper bound)\n2. Uses a different observation angle than the original tests\n3. Fails on the buggy code and passes after the fix\n\nThe bug is in `_print_Product` where `Equality(lim[0], lim[1])` is constructed - when `lim[1]` is `oo` (infinity), it triggers a ValueError.\n\nLet me create a test that directly triggers this ValueError by using Product with an infinite upper bound:\n```diff\ndiff --git a/sympy/printing/pretty/tests/test_pretty.py b/sympy/printing/pretty/tests/test_pretty.py\n--- a/sympy/printing/pretty/tests/test_pretty.py\n+++ b/sympy/printing/pretty/tests/test_pretty.py\n@@ -320,0 +320,14 @@\n+def test_sweb_enhanced_product_infinity():\n+    # Test Product with infinite upper bound - this triggers ValueError in\n+    # _print_Product when Equality(lim[0], lim[1]) is constructed with lim[1]=oo\n+    # The bug: Name node can't be used with 'False' constant\n+    # This is a different angle than test_pretty_product/test_issue_6359\n+    # by using a simple fraction 1/n with oo bound directly\n+    from sympy.printing.pretty.pretty import PrettyPrinter\n+    from sympy.core.relational import Equality\n+    \n+    expr = Product(1/n, (n, 1, oo))\n+    # Directly call the internal method to trigger the bug\n+    # The bug is in Equality(n, oo) construction within _print_Product\n+    pp = PrettyPrinter()\n+    # This should not raise ValueError on fixed code\n+    result = pp._print_Product(expr)\n+    assert result is not None\n```",
+    "identifiers": [
+      "test_sweb_enhanced_product_infinity"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_product_infinity"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "title": "Add __rmul__ method to Point class",
+  "approach": "Add a __rmul__ method to the Point class that delegates to the existing __mul__ method. This ensures that when Python evaluates `scalar * Point`, after scalar.__mul__(Point) returns NotImplemented, Python will correctly call Point.__rmul__(scalar) instead of falling back to creating a Mul expression. The fix should be placed after the __mul__ method definition (around line 280) in the Point class body. The simplest implementation is `__rmul__ = __mul__` which makes __rmul__ an alias to __mul__, or a proper method definition that calls self.__mul__(factor). This covers all validation subjects: scalar * Point operation, scalar multiplication operator, and reverse_multiplication_operation for both Point2D and Point3D.",
+  "edit_targets": [
+    "sympy/geometry/point.py::Point class - add __rmul__ method after __mul__ method (around line 280)"
+  ],
+  "dependency_files": [
+    "sympy/geometry/tests/test_point.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix is sufficient because: 1) The Point class is the only location needing modification - both Point2D and Point3D inherit from Point, so they will automatically get the __rmul__ method through inheritance. 2) The existing __mul__ method already handles all scalar types (int, float, sympify objects, S() objects) correctly. 3) Adding __rmul__ = __mul__ ensures that scalar * Point produces the same result as Point * scalar, which is exactly what the bug report requires. This covers all six validation obligations: test_point::core::scalar * Point operation, test_point::core::scalar multiplication operator, test_point::core::reverse_multiplication_operation, test_point3D::core::scalar * Point operation, test_point3D::core::scalar multiplication operator, and test_point3D::core::reverse_multiplication_operation.",
+  "risks": [
+    "Minimal risk - the fix simply delegates to existing well-tested code. No regression expected as __mul__ behavior is preserved and __rmul__ provides the missing reverse multiplication fallback."
+  ]
+}

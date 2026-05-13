@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/mathematica.py",
+      "action": "modify_region",
+      "justification": "The Max function is not in the known_functions dictionary, causing it to fall back to default printing with parentheses instead of Mathematica square brackets. This file must be edited to add Max to known_functions."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/mathematica.py",
+      "target_symbol": "known_functions",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "RO-1"
+      ],
+      "anchor_line_before": "from sympy.printing.precedence import precedence",
+      "anchor_line_after": "    \"exp\": [(lambda x: True, \"Exp\")],",
+      "replacement_block": "from sympy.printing.precedence import precedence\n\n# Used in MCodePrinter._print_Function(self)\nknown_functions = {\n    \"Max\": [(lambda *args: True, \"Max\")],\n    \"exp\": [(lambda x: True, \"Exp\")],"
+    }
+  ]
+}

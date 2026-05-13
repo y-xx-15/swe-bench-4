@@ -1,0 +1,21 @@
+
+
+Looking at this bug, I need to understand the issue better. The problem is that `sqrt(sin(x)**2)` is incorrectly simplified to `sin(x)` for general complex x. Let me first explore the codebase to understand how this happens.
+<minimax:tool_call>
+<invoke name="bash">
+<parameter name="command">cd /testbed && python -c "
+from sympy import *
+x = Symbol('x')
+expr = sqrt(sin(x)**2)
+print('Original:', expr)
+print('Simplified:', simplify(expr))
+print('trigsimp:', trigsimp(expr))
+print()
+# Let's see what happens with cos(x) + sqrt(sin(x)**2)
+expr2 = cos(x) + sqrt(sin(x)**2)
+print('Original expr2:', expr2)
+print('trigsimp(expr2):', trigsimp(expr2))
+"
+</parameter>
+</invoke>
+</minimax:tool_call>

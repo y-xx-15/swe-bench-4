@@ -1,0 +1,16 @@
+{
+  "title": "Fix idiff to support Eq and Function types",
+  "approach": "Two changes needed: (1) Add import for Eq and convert Eq objects to expression form (lhs - rhs) at the start of idiff since Eq doesn't have diff method. (2) Modify the y parameter validation to accept Function types (like f(x)) in addition to Symbol types, extracting the function name for internal processing.",
+  "edit_targets": [
+    "sympy/geometry/util.py"
+  ],
+  "dependency_files": [],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only sympy/geometry/util.py is sufficient. The fix requires: (1) Adding Eq to imports from sympy, (2) Adding Eq-to-expression conversion at the start of idiff function, (3) Modifying the isinstance check for y to also accept Function types. No other files need modification.",
+  "risks": [
+    "Must ensure backward compatibility with existing Symbol-based idiff calls",
+    "Function name extraction must handle both simple functions like f(x) and nested function calls properly",
+    "solve() may still return empty list for some equations - should handle that gracefully with better error message"
+  ]
+}

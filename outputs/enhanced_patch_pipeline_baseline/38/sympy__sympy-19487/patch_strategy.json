@@ -1,0 +1,17 @@
+{
+  "title": "Add _eval_rewrite_as_Abs to sign class",
+  "approach": "Add a _eval_rewrite_as_Abs method to the sign class in sympy/functions/elementary/complexes.py that returns arg/Abs(arg) when the argument is known to be non-zero (arg.is_zero is False). This mirrors the logic in the existing doit method which already implements sign(z) = z/Abs(z) for non-zero z. When the argument could be zero or is unknown, return None to leave the expression unevaluated.",
+  "edit_targets": [
+    "sympy/functions/elementary/complexes.py::sign"
+  ],
+  "dependency_files": [
+    "sympy/functions/elementary/tests/test_complexes.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix is sufficient because the sign class already has the mathematical definition implemented in the doit method (arg/Abs(arg) for non-zero arg). Adding _eval_rewrite_as_Abs simply exposes this functionality through the .rewrite() API. No other files need modification.",
+  "risks": [
+    "The rewrite will only work when the argument is provably non-zero. If the argument could be zero (is_zero is None), the rewrite returns unevaluated, which is the correct conservative behavior to avoid producing nan.",
+    "Should not affect any existing functionality since it only adds a new rewrite path that was previously missing."
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "root_cause": "The Max function is not registered in the known_functions dictionary of MCodePrinter, causing it to fall back to a default printing mechanism that uses Python parentheses () instead of Mathematica square brackets []",
+  "affected_components": [
+    {
+      "file": "sympy/printing/mathematica.py",
+      "symbol": "MCodePrinter",
+      "reason": "The printer class lacks a handler for Max, causing incorrect output format"
+    },
+    {
+      "file": "sympy/printing/mathematica.py",
+      "symbol": "known_functions",
+      "reason": "Dictionary mapping SymPy functions to Mathematica equivalents is missing Max entry"
+    }
+  ],
+  "failing_signal": "test_Function fails with AssertionError - mathematica_code(Max(x,2)) returns 'Max(2, x)' instead of 'Max[x,2]'",
+  "propagation_path": "Max is not in known_functions → _print_Function falls back to default case → uses wrong bracket style (parentheses vs square brackets)",
+  "repair_constraint": "Max must be printed as 'Max[args]' with square brackets, preserving argument order",
+  "suggested_repair_scope": [
+    "sympy/printing/mathematica.py"
+  ],
+  "suspicious_symbols": [
+    "Max",
+    "known_functions",
+    "_print_Function",
+    "MCodePrinter"
+  ],
+  "repair_obligations": [
+    {
+      "id": "RO-1",
+      "source_symbol": "Max",
+      "validation_subject": "mathematica_code(Max(x,2))",
+      "why_it_matters": "Max must output valid Mathematica syntax with square brackets, not Python parentheses"
+    }
+  ]
+}

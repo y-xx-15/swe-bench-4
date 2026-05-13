@@ -1,0 +1,25 @@
+{
+  "original_test_identifiers": [
+    "test_arg"
+  ],
+  "status_map": {
+    "sympy/assumptions/tests/test_refine.py:test_arg": "FAILED",
+    "test_Abs": "PASSED",
+    "test_pow1": "PASSED",
+    "test_pow2": "PASSED",
+    "test_exp": "PASSED",
+    "test_Piecewise": "PASSED",
+    "test_atan2": "PASSED",
+    "test_re": "PASSED",
+    "test_im": "PASSED",
+    "test_complex": "PASSED",
+    "test_sign": "PASSED",
+    "test_arg": "FAILED",
+    "test_func_args": "PASSED",
+    "test_eval_refine": "PASSED",
+    "test_refine_issue_12724": "PASSED"
+  },
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/sympy__sympy-21055/test_output.txt",
+  "timed_out": false,
+  "error": null
+}

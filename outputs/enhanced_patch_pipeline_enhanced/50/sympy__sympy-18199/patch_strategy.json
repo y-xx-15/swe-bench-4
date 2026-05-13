@@ -1,0 +1,17 @@
+{
+  "title": "Add zero root case handling in nthroot_mod",
+  "approach": "Add a check at the beginning of nthroot_mod function to handle the case when a % p == 0. When a is divisible by p, 0 is always a valid root since 0**n = 0 mod p for any n > 0. The fix should check if a % p == 0 and return 0 (or [0] if all_roots=True) before proceeding with the general algorithm.",
+  "edit_targets": [
+    "sympy/ntheory/residue_ntheory.py::nthroot_mod"
+  ],
+  "dependency_files": [
+    "sympy/ntheory/residue_ntheory.py::is_nthpow_residue",
+    "sympy/ntheory/residue_ntheory.py::_nthroot_mod1"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only the nthroot_mod function is sufficient. The fix only requires adding a simple check at the start of the function to handle the special case when a % p == 0. No changes to helper functions like is_nthpow_residue or _nthroot_mod1 are needed since they are not responsible for this edge case.",
+  "risks": [
+    "Potential regression: The fix must ensure that when a % p == 0, the function returns 0 as the root. Need to verify this doesn't break any existing functionality for non-zero a values."
+  ]
+}

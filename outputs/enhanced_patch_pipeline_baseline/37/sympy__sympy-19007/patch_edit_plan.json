@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/matrices/expressions/blockmatrix.py",
+      "action": "modify_region",
+      "justification": "The _entry method in BlockMatrix contains the buggy logic that incorrectly handles symbolic indices. The condition (i < numrows) != False always evaluates to True for symbolic i, causing the code to always select the first block. This must be fixed to properly handle symbolic indices using Piecewise expressions."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/matrices/expressions/blockmatrix.py",
+      "target_symbol": "BlockMatrix._entry",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "1",
+        "2"
+      ],
+      "anchor_line_before": "        # Find row entry",
+      "anchor_line_after": "        return self.blocks[row_block, col_block][i, j]",
+      "replacement_block": "        # Find row entry\n        i_orig, j_orig = i, j\n        row_block = col_block = None\n        \n        # Check if indices are symbolic\n        if i.is_number is False or j.is_number is False:\n            # For symbolic indices, build a Piecewise expression\n            from sympy import Piecewise, And\n            \n            # Build row selection\n            row_exprs = []\n            cumulative_rows = 0\n            for rb, numrows in enumerate(self.rowblocksizes):\n                cond = And(i >= cumulative_rows, i < cumulative_rows + numrows)\n                row_exprs.append((self.blocks[rb, 0][i - cumulative_rows, 0], cond))\n                cumulative_rows += numrows\n            \n            # Build col selection (simplified for single column case)\n            col_exprs = []\n            cumulative_cols = 0\n            for cb, numcols in enumerate(self.colblocksizes):\n                cond = And(j >= cumulative_cols, j < cumulative_cols + numcols)\n                col_exprs.append((self.blocks[0, cb][0, j - cumulative_cols], cond))\n                cumulative_cols += numcols\n            \n            # For now, handle the common case of single column block matrices\n            # Return the row piece with the column index\n            if len(self.colblocksizes) == 1:\n                return Piecewise(*row_exprs)\n            else:\n                # More complex case: need to combine row and col selections\n                # This is a simplified approach\n                return Piecewise(*[(Piecewise(*[(self.blocks[rb, cb][i - cumulative_rows, j - cumulative_cols],\n                                    And(i >= cumulative_rows, i < cumulative_rows + nr, j >= cumulative_cols, j < cumulative_cols + nc))\n                                   for cb, nc in enumerate(self.colblocksizes) for cumulative_cols in [sum(self.colblocksizes[:cb])])\n                                  ])\n                                 for rb, nr in enumerate(self.rowblocksizes) for cumulative_rows in [sum(self.rowblocksizes[:rb])])\n                                ])\n        \n        # Concrete indices: use original logic\n        for row_block, numrows in enumerate(self.rowblocksizes):\n            if (i < numrows) != False:\n                break\n            else:\n                i -= numrows\n        for col_block, numcols in enumerate(self.colblocksizes):\n            if (j < numcols) != False:\n                break\n            else:\n                j -= numcols\n        return self.blocks[row_block, col_block][i, j]"
+    }
+  ]
+}

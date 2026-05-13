@@ -1,0 +1,199 @@
+{
+  "instance_id": "sympy__sympy-17022",
+  "repo": "sympy/sympy",
+  "model": "minimax-m2.5",
+  "pipeline_mode": "enhanced_guided",
+  "hide_original_test_patch_in_repair": false,
+  "disable_semantic_bucket_guidance": false,
+  "disable_enhanced_test_filtering": false,
+  "repair_mode": "baseline_fallback",
+  "original_test_identifiers": [
+    "test_NumPyPrinter"
+  ],
+  "original_status_counts": {
+    "FAILED": 2,
+    "PASSED": 8
+  },
+  "original_failed_count": 2,
+  "original_passed_count": 8,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_NumPyPrinter"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_NumPyPrinter"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/printing/tests/test_pycode.py:test_NumPyPrinter",
+      "test_NumPyPrinter"
+    ],
+    "failure_mode": "assertion_error",
+    "dominant_errors": [
+      "AssertionError"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "test_NumPyPrinter F",
+      "test_NumPyPrinter_print_seq ok                                            [FAIL]",
+      "____________ sympy/printing/tests/test_pycode.py:test_NumPyPrinter _____________"
+    ],
+    "noise_ratio": 0.0057,
+    "target_test_tracebacks": {
+      "test_NumPyPrinter": "TARGET TEST: test_NumPyPrinter\n- snippet: test_NumPyPrinter F\n- snippet: test_NumPyPrinter_print_seq ok                                            [FAIL]\n- snippet: ____________ sympy/printing/tests/test_pycode.py:test_NumPyPrinter _____________\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_NumPyPrinter F\ntest_NumPyPrinter_print_seq ok                                            [FAIL]\n____________ sympy/printing/tests/test_pycode.py:test_NumPyPrinter _____________\nTraceback (most recent call last):\n  File \"/testbed/sympy/printing/tests/test_pycode.py\", line 52, in test_NumPyPrinter\nAssertionError\n======= tests finished: 9 passed, 1 failed, 17 skipped, in 0.04 seconds ========"
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 3,
+    "keep_top_k": 2,
+    "attempt_budget": 3,
+    "bucket_limit": 3,
+    "template_limit": 3,
+    "failure_mode": "assertion_error",
+    "noise_ratio": 0.0057,
+    "difficulty": "low"
+  },
+  "adaptive_num_candidates": 3,
+  "adaptive_keep_top_k": 2,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 3,
+  "kept_enhanced_candidates": 0,
+  "enhanced_candidate_retention_rate": 0.0,
+  "enhanced_generation_attempts_total": 11,
+  "enhanced_generation_attempts_avg": 3.6666666666666665,
+  "kept_enhanced_test_identifiers": [],
+  "enhanced_failed_test_identifiers": [],
+  "enhanced_failed_count": 0,
+  "generated_patch_nonempty": true,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 8,
+  "generated_patch_accepted": true,
+  "generated_patch_acceptance_reason": "accepted_final_validation",
+  "generated_patch_feedback": null,
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [],
+  "patch_analysis": {
+    "root_cause": "The NumPyPrinter (and other code printers) lack a _print_Identity method, causing Identity matrix expressions to be printed as 'I' which conflicts with the imaginary unit (also printed as 'I' -> 1j). When the generated code is executed, 'I' resolves to the complex number 1j from Python's builtins instead of an identity matrix.",
+    "affected_components": [
+      {
+        "file": "sympy/printing/pycode.py",
+        "symbol": "NumPyPrinter",
+        "reason": "The primary printer that needs to handle Identity matrices for numpy-backed lambdify"
+      },
+      {
+        "file": "sympy/printing/pycode.py",
+        "symbol": "AbstractPythonCodePrinter",
+        "reason": "Base class that should provide fallback handling for Identity matrices"
+      },
+      {
+        "file": "sympy/printing/lambdarepr.py",
+        "symbol": "LambdaPrinter",
+        "reason": "Used by lambdify - inherits from PythonCodePrinter and needs Identity support"
+      }
+    ],
+    "failing_signal": "test_NumPyPrinter fails with AssertionError. When lambdifying A + Identity(n), the generated code is '(I + A)' where I resolves to 1j (complex unit) instead of an identity matrix, producing wrong results like array([[1.+1.j, 2.+1.j], [3.+1.j, 4.+1.j]]) instead of array([[2, 2], [3, 5]])",
+    "propagation_path": "Identity matrix expression -> NumPyPrinter.doprint() -> no _print_Identity method -> falls back to str() or default -> prints 'I' -> lambdified function uses 'I' from namespace -> 'I' is 1j (complex) -> wrong computation",
+    "repair_constraint": "After the fix, Identity matrices must be printed as valid numpy code that creates an identity matrix (e.g., numpy.eye(n)), and this must work correctly for both fixed-size and symbolic-dimension identity matrices",
+    "suggested_repair_scope": [
+      "sympy/printing/pycode.py"
+    ],
+    "suspicious_symbols": [
+      "Identity",
+      "NumPyPrinter",
+      "PythonCodePrinter",
+      "AbstractPythonCodePrinter",
+      "_print_ImaginaryUnit",
+      "MatrixSymbol"
+    ],
+    "repair_obligations": [
+      {
+        "id": "1",
+        "source_symbol": "NumPyPrinter",
+        "validation_subject": "_print_Identity method",
+        "why_it_matters": "NumPyPrinter is the primary printer used by lambdify with numpy backend. Without a proper _print_Identity method, Identity matrices are printed incorrectly as 'I' which conflicts with the imaginary unit"
+      },
+      {
+        "id": "2",
+        "source_symbol": "Identity",
+        "validation_subject": "numpy.eye(n) output",
+        "why_it_matters": "The Identity matrix expression needs to be printed as numpy.eye(n) for proper numpy array creation in the generated code"
+      },
+      {
+        "id": "3",
+        "source_symbol": "AbstractPythonCodePrinter",
+        "validation_subject": "fallback _print_Identity",
+        "why_it_matters": "Base class should provide a fallback that other specialized printers can override if needed"
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Add _print_Identity method to NumPyPrinter",
+    "approach": "Add a _print_Identity method to the NumPyPrinter class in sympy/printing/pycode.py that prints Identity matrices as numpy.eye(n) where n is the dimension. This will generate proper numpy code that creates an identity matrix instead of falling back to printing just 'I' which conflicts with the imaginary unit.",
+    "edit_targets": [
+      "sympy/printing/pycode.py::NumPyPrinter"
+    ],
+    "dependency_files": [
+      "sympy/printing/pycode.py::AbstractPythonCodePrinter",
+      "sympy/printing/pycode.py::PythonCodePrinter",
+      "sympy/printing/lambdarepr.py::LambdaPrinter"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [],
+    "sufficiency_assessment": "The primary fix is adding _print_Identity to NumPyPrinter. However, since AbstractPythonCodePrinter is the base class and other printers (like SciPyPrinter) inherit from NumPyPrinter, adding the method only to NumPyPrinter should be sufficient as it will be inherited by subclasses. The LambdaPrinter inherits from PythonCodePrinter which inherits from AbstractPythonCodePrinter, so it will also benefit if we add a fallback to AbstractPythonCodePrinter - but for numpy-specific lambdify, NumPyPrinter is what gets used, so targeting just NumPyPrinter is the primary fix. If other backends need Identity support, they can override this method.",
+    "risks": [
+      "The fix must handle both symbolic dimensions (like n in Identity(n) where n is a Symbol) and integer dimensions. numpy.eye() accepts both."
+    ]
+  },
+  "patch_edit_plan": {
+    "coverage_check": [
+      {
+        "target_file": "sympy/printing/pycode.py",
+        "action": "modify_region",
+        "justification": "NumPyPrinter lacks a _print_Identity method, causing Identity matrices to be printed as 'I' which conflicts with the imaginary unit (also 'I' -> 1j). This causes lambdify to produce incorrect results when using Identity matrices."
+      }
+    ],
+    "edits": [
+      {
+        "target_file": "sympy/printing/pycode.py",
+        "target_symbol": "NumPyPrinter",
+        "replacement_mode": "replace_span",
+        "covers_obligations": [
+          "1",
+          "2",
+          "3"
+        ],
+        "anchor_line_before": "    _kc = {k: 'numpy.'+v for k, v in _known_constants_math.items()}",
+        "anchor_line_after": "    def _print_seq(self, seq):",
+        "replacement_block": "    _kc = {k: 'numpy.'+v for k, v in _known_constants_math.items()}\n\n    def _print_Identity(self, expr):\n        return '{0}({1})'.format(self._module_format('numpy.eye'), self._print(expr.args[0]))\n\n    def _print_seq(self, seq):"
+      }
+    ]
+  },
+  "final_patch_attempted": true,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": true,
+  "final_patch_apply_mode": "clean_apply",
+  "final_patch_cleanly_applied": true,
+  "clean_apply_ratio": 1.0,
+  "resolved": true,
+  "final_resolved": true,
+  "final_status_counts": {
+    "PASSED": 9
+  },
+  "final_failed_count": 0,
+  "final_passed_count": 9,
+  "original_passed_count_improvement": 1,
+  "original_failed_count_reduction": 2,
+  "final_status_map": {
+    "test_numpy_piecewise_regression": "PASSED",
+    "test_PythonCodePrinter": "PASSED",
+    "test_MpmathPrinter": "PASSED",
+    "test_NumPyPrinter": "PASSED",
+    "test_SciPyPrinter": "PASSED",
+    "test_pycode_reserved_words": "PASSED",
+    "test_printmethod": "PASSED",
+    "test_codegen_ast_nodes": "PASSED",
+    "test_issue_14283": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

@@ -1,0 +1,24 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/utilities/codegen.py",
+      "action": "modify_region",
+      "justification": "The bug is in CodeGen.routine() where array_symbols is populated only from expression atoms, missing MatrixSymbols that don't appear in the expression but are in argument_sequence"
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/utilities/codegen.py",
+      "target_symbol": "CodeGen.routine",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "1",
+        "2",
+        "3"
+      ],
+      "anchor_line_before": "        # Create the symbols for the input arguments",
+      "anchor_line_after": "        # Create the code for the body of the routine",
+      "replacement_block": "        # Create the symbols for the input arguments\n\n        # Find all MatrixSymbols in the expression and argument_sequence\n        # This is needed to determine which arguments are arrays\n        array_symbols = {}\n        for symbol in expressions.atoms(MatrixSymbol):\n            array_symbols[symbol.name] = symbol\n\n        # Also include MatrixSymbols from argument_sequence that are not in the expression\n        if argument_sequence:\n            for arg in argument_sequence:\n                if isinstance(arg, MatrixSymbol) and arg.name not in array_symbols:\n                    array_symbols[arg.name] = arg\n\n        # Create the code for the body of the routine"
+    }
+  ]
+}

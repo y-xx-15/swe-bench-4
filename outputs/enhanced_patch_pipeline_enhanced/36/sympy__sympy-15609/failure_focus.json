@@ -1,0 +1,31 @@
+{
+  "original_test_identifiers": [
+    "test_MatrixElement_printing"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_MatrixElement_printing"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/printing/tests/test_latex.py:test_issue_8470",
+    "sympy/printing/tests/test_latex.py:test_issue_13559",
+    "sympy/printing/tests/test_latex.py:test_MatrixElement_printing",
+    "test_issue_8470",
+    "test_issue_13559"
+  ],
+  "failure_mode": "value_error",
+  "dominant_errors": [
+    "ValueError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_issue_8470 E",
+    "test_issue_13559 E",
+    "test_MatrixElement_printing F"
+  ],
+  "noise_ratio": 0.0043,
+  "target_test_tracebacks": {
+    "test_MatrixElement_printing": "TARGET TEST: test_MatrixElement_printing\n- snippet: test_issue_8470 E\n- snippet: test_issue_13559 E\n- snippet: test_MatrixElement_printing F\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_MatrixElement_printing F\nTraceback (most recent call last):\nValueError: Name node can't be used with 'False' constant\nTraceback (most recent call last):\nValueError: Name node can't be used with 'False' constant\n________ sympy/printing/tests/test_latex.py:test_MatrixElement_printing ________\nTraceback (most recent call last):\n  File \"/testbed/sympy/printing/tests/test_latex.py\", line 1744, in test_MatrixElement_printing\nAssertionError\n tests finished: 122 passed, 1 failed, 2 expected to fail, 2 exceptions, "
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "root_cause": "The idiff function has two bugs: (1) It doesn't handle Eq objects - when Eq is passed, eq.diff(x) fails because Eq doesn't have a diff method, and solve returns empty list causing IndexError. (2) It only accepts Symbol type for y parameter, rejecting Function types like f(x), raising ValueError prematurely.",
+  "affected_components": [
+    {
+      "file": "sympy/geometry/util.py",
+      "symbol": "idiff",
+      "reason": "Main function with bugs - doesn't handle Eq input and rejects Function type dependent variables"
+    }
+  ],
+  "failing_signal": "IndexError: list index out of range when solving Eq, and ValueError: expecting x-dependent symbol(s) but got: f(x) when using Function type",
+  "propagation_path": "When Eq is passed: eq.diff(x) fails because Eq has no diff method -> solve returns empty list -> [0] index fails. When f(x) is passed: isinstance(y, Symbol) check fails -> ValueError raised before any processing",
+  "repair_constraint": "Must preserve existing functionality for Symbol-based equations while adding support for Eq and Function types",
+  "suggested_repair_scope": [
+    "sympy/geometry/util.py"
+  ],
+  "suspicious_symbols": [
+    "idiff",
+    "Eq",
+    "Function",
+    "Symbol",
+    "is_sequence"
+  ],
+  "repair_obligations": [
+    {
+      "id": "1",
+      "source_symbol": "idiff",
+      "validation_subject": "Eq input handling",
+      "why_it_matters": "Eq objects must be converted to expression form (lhs - rhs) before differentiation, as Eq doesn't have diff method"
+    },
+    {
+      "id": "2",
+      "source_symbol": "idiff",
+      "validation_subject": "Function type y parameter",
+      "why_it_matters": "Function types like f(x) should be accepted as dependent variable, extracting the function name for internal processing"
+    }
+  ]
+}

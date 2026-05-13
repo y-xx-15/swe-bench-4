@@ -1,0 +1,43 @@
+{
+  "root_cause": "The _TR56 function in fu.py attempts to compare the exponent of a power expression (rv.exp) using < and > operators without first checking if the exponent is a comparable (real) number. When the exponent is complex (like I, the imaginary unit), Python raises TypeError because complex numbers cannot be ordered.",
+  "affected_components": [
+    {
+      "file": "sympy/simplify/fu.py",
+      "symbol": "_TR56._f",
+      "reason": "Contains the buggy comparison logic at line 504 that assumes exponent is real without validation"
+    },
+    {
+      "file": "sympy/simplify/fu.py",
+      "symbol": "TR6",
+      "reason": "Calls _TR56 with cos/sin, triggering the bug when cos(x)**I is processed"
+    },
+    {
+      "file": "sympy/simplify/trigsimp.py",
+      "symbol": "futrig",
+      "reason": "Calls TR6 during trigsimp, which eventually reaches the buggy code"
+    }
+  ],
+  "failing_signal": "TypeError: Invalid comparison of complex I - raised when simplify(cos(x)**I) is called and the code tries to evaluate (rv.exp < 0) where rv.exp is I",
+  "propagation_path": "simplify() -> trigsimp() -> futrig() -> _futrig() -> TR6() -> _TR56() -> _f() -> comparison rv.exp < 0 raises TypeError",
+  "repair_constraint": "The fix must skip transformation for powers with non-real exponents while preserving all existing behavior for real exponents",
+  "suggested_repair_scope": [
+    "sympy/simplify/fu.py"
+  ],
+  "suspicious_symbols": [
+    "_TR56",
+    "TR6",
+    "TR5",
+    "_f",
+    "rv.exp",
+    "is_real",
+    "is_extended_real"
+  ],
+  "repair_obligations": [
+    {
+      "id": "OBL1",
+      "source_symbol": "_TR56._f",
+      "validation_subject": "rv.exp",
+      "why_it_matters": "The exponent must be checked for real-ness before comparison. If the exponent is complex (like I), the function should return the expression unchanged rather than attempting comparison."
+    }
+  ]
+}

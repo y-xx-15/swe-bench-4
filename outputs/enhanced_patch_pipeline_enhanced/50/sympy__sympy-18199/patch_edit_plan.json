@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/ntheory/residue_ntheory.py",
+      "action": "modify_region",
+      "justification": "The nthroot_mod function needs to handle the special case when a % p == 0. When a is divisible by p, x = 0 is always a valid root since 0**n = 0 mod p for any n > 0. The fix requires adding a check at the start of the function after the input normalization."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/ntheory/residue_ntheory.py",
+      "target_symbol": "nthroot_mod",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "zero_root_case"
+      ],
+      "anchor_line_before": "    a, n, p = as_int(a), as_int(n), as_int(p)",
+      "anchor_line_after": "    if n == 2:",
+      "replacement_block": "    a, n, p = as_int(a), as_int(n), as_int(p)\n    if a % p == 0:\n        if all_roots:\n            return [0]\n        return 0\n    if n == 2:"
+    }
+  ]
+}

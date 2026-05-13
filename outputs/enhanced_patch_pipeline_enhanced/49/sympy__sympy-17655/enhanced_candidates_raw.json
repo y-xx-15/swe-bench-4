@@ -1,0 +1,265 @@
+[
+  {
+    "idea": {
+      "title": "Point multiplication should be commutative - number * Point",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that scalar multiplication on Point is commutative - multiplying a number by a Point (number * point) should work the same as point * number",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "coercion_contract",
+      "target_tests": [
+        "test_sweb_enhanced_point_rmul"
+      ],
+      "covers_original_tests": [
+        "test_point",
+        "test_point3D"
+      ],
+      "covers_obligations": [
+        "test_point::core",
+        "test_point3D::core"
+      ],
+      "target_source_symbol": "Point.__mul__",
+      "target_validation_subject": "Point multiplication operator",
+      "semantic_alignment_tokens": [
+        "Point.__mul__",
+        "__rmul__",
+        "Point2D",
+        "Point3D"
+      ],
+      "trigger_shape_tokens": [
+        "*",
+        "sympy.sympify",
+        "Point2D",
+        "Point3D"
+      ],
+      "rationale": "The original tests only test 'point * number' (e.g., p4*5) but not 'number * point'. The bug is that Point lacks __rmul__, so when Python evaluates 'sympy.sympify(2.0) * point2', it fails with TypeError because there's no reverse multiplication handler. This test explicitly exercises the reverse multiplication path (number * point) which triggers the missing __rmul__ method, exposing the core symbol-level behavior gap."
+    },
+    "patch": "diff --git a/sympy/geometry/tests/test_point.py b/sympy/geometry/tests/test_point.py\n--- a/sympy/geometry/tests/test_point.py\n+++ b/sympy/geometry/tests/test_point.py\n@@ -239,3 +239,14 @@ def test_direction_cosine():\n \n     assert p2.direction_cosine(Point3D(12, 1, 12)) == [sqrt(2) / 2, 0, sqrt(2) / 2]\n     assert p2.direction_cosine(Point3D(1, 1, 12)) == [0, 0, 1]\n+\n+\n+def test_sweb_enhanced_point_rmul():\n+    \"\"\"Test that scalar multiplication is commutative: number * Point should work.\n+    \n+    This tests the reverse multiplication path (number * point) which requires\n+    __rmul__ to be implemented on Point. Without __rmul__, Python raises:\n+    TypeError: unsupported operand type(s) for *: 'int' and 'Point2D'\n+    \"\"\"\n+    from sympy import sympify\n+    p = Point(1, 1)\n+    # This triggers the __rmul__ path: sympify(2.0) * p\n+    assert sympify(2.0) * p == Point(2.0, 2.0)\n+    # Also test with Point3D\n+    p3d = Point3D(1, 1, 1)\n+    assert sympify(2.0) * p3d == Point3D(2.0, 2.0, 2.0)\n",
+    "raw_response": "\n\nLooking at the bug, the issue is that `Point` class doesn't implement `__rmul__`, so when Python evaluates `sympy.sympify(2.0) * point2`, it fails because there's no reverse multiplication handler.\n\nThe original test patch adds `5 * p4` tests, but I need to create a new test function that specifically tests the `sympy.sympify` path as specified in the trigger shape tokens.\n\nLet me create the enhanced test:\n```diff\ndiff --git a/sympy/geometry/tests/test_point.py b/sympy/geometry/tests/test_point.py\n--- a/sympy/geometry/tests/test_point.py\n+++ b/sympy/geometry/tests/test_point.py\n@@ -239,3 +239,14 @@ def test_direction_cosine():\n \n     assert p2.direction_cosine(Point3D(12, 1, 12)) == [sqrt(2) / 2, 0, sqrt(2) / 2]\n     assert p2.direction_cosine(Point3D(1, 1, 12)) == [0, 0, 1]\n+\n+\n+def test_sweb_enhanced_point_rmul():\n+    \"\"\"Test that scalar multiplication is commutative: number * Point should work.\n+    \n+    This tests the reverse multiplication path (number * point) which requires\n+    __rmul__ to be implemented on Point. Without __rmul__, Python raises:\n+    TypeError: unsupported operand type(s) for *: 'int' and 'Point2D'\n+    \"\"\"\n+    from sympy import sympify\n+    p = Point(1, 1)\n+    # This triggers the __rmul__ path: sympify(2.0) * p\n+    assert sympify(2.0) * p == Point(2.0, 2.0)\n+    # Also test with Point3D\n+    p3d = Point3D(1, 1, 1)\n+    assert sympify(2.0) * p3d == Point3D(2.0, 2.0, 2.0)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_point_rmul"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_point_rmul"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "reverse_mul_scalar_commutativity",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "test that scalar * Point returns the same result as Point * scalar (reverse multiplication)",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "mixed_operand_type",
+      "target_tests": [
+        "test_sweb_enhanced_point_reverse_multiplication"
+      ],
+      "covers_original_tests": [
+        "test_point",
+        "test_point3D"
+      ],
+      "covers_obligations": [
+        "test_point::core",
+        "test_point3D::core"
+      ],
+      "target_source_symbol": "Point.__mul__",
+      "target_validation_subject": "reverse_multiplication_operation",
+      "semantic_alignment_tokens": [
+        "__mul__",
+        "__rmul__",
+        "Point2D",
+        "Point3D",
+        "sympify"
+      ],
+      "trigger_shape_tokens": [
+        "sympify(2.0) * point2",
+        "2 * point2",
+        "S(2) * point2"
+      ],
+      "rationale": "The original tests only verify forward multiplication (Point * scalar) which works via Point.__mul__. The bug manifests when the scalar is on the left side (scalar * Point), which requires Point.__rmul__ to handle the reverse operation. This test explicitly checks that both orderings produce equivalent results, exposing the missing __rmul__ implementation."
+    },
+    "patch": "diff --git a/sympy/geometry/tests/test_point.py b/sympy/geometry/tests/test_point.py\n--- a/sympy/geometry/tests/test_point.py\n+++ b/sympy/geometry/tests/test_point.py\n@@ -1,4 +1,5 @@\n from sympy import I, Rational, Symbol, pi, sqrt, S\n+from sympy import sympify\n from sympy.geometry import Line, Point, Point2D, Point3D, Line3D, Plane\n from sympy.geometry.entity import rotate, scale, translate\n from sympy.matrices import Matrix\n@@ -239,4 +240,23 @@ def test_direction_cosine():\n \n     assert p2.direction_cosine(Point3D(0, 0, 0)) == [-sqrt(3) / 3, -sqrt(3) / 3, -sqrt(3) / 3]\n     assert p2.direction_cosine(Point3D(1, 1, 12)) == [0, 0, 1]\n     assert p2.direction_cosine(Point3D(12, 1, 12)) == [sqrt(2) / 2, 0, sqrt(2) / 2]\n+\n+\n+def test_sweb_enhanced_point_reverse_multiplication():\n+    \"\"\"Test that scalar * Point works (reverse multiplication via __rmul__).\n+    \n+    This tests the bug from sympy issue #17655 where:\n+    - point * scalar works (uses Point.__mul__)\n+    - scalar * point fails with TypeError (missing Point.__rmul__)\n+    \n+    The original failing case was: point1 + sympy.sympify(2.0) * point2\n+    \"\"\"\n+    point1 = Point(0, 0)\n+    point2 = Point(1, 1)\n+    # This is the exact trigger shape from the bug report\n+    result = sympify(2.0) * point2\n+    # Verify the result can be added to another point (the original bug scenario)\n+    assert point1 + result == Point(2, 2)\n+    # Also verify it equals the forward multiplication result\n+    assert result == point2 * sympify(2.0)\n",
+    "raw_response": "\n\nLooking at the bug and the original test patch, I need to create an enhanced test that:\n1. Tests the reverse multiplication operation (scalar * Point) which triggers `__rmul__`\n2. Uses the exact trigger shape from the problem statement: `sympify(2.0) * point2`\n3. Must FAIL on the buggy code (which lacks `__rmul__`)\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/geometry/tests/test_point.py b/sympy/geometry/tests/test_point.py\n--- a/sympy/geometry/tests/test_point.py\n+++ b/sympy/geometry/tests/test_point.py\n@@ -1,4 +1,5 @@\n from sympy import I, Rational, Symbol, pi, sqrt, S\n+from sympy import sympify\n from sympy.geometry import Line, Point, Point2D, Point3D, Line3D, Plane\n from sympy.geometry.entity import rotate, scale, translate\n from sympy.matrices import Matrix\n@@ -239,3 +240,17 @@ def test_direction_cosine():\n \n     assert p2.direction_cosine(Point3D(0, 0, 0)) == [-sqrt(3) / 3, -sqrt(3) / 3, -sqrt(3) / 3]\n     assert p2.direction_cosine(Point3D(1, 1, 12)) == [0, 0, 1]\n     assert p2.direction_cosine(Point3D(12, 1, 12)) == [sqrt(2) / 2, 0, sqrt(2) / 2]\n+\n+\n+def test_sweb_enhanced_point_reverse_multiplication():\n+    \"\"\"Test that scalar * Point works (reverse multiplication via __rmul__).\n+    \n+    This tests the bug from sympy issue #17655 where:\n+    - point * scalar works (uses Point.__mul__)\n+    - scalar * point fails with TypeError (missing Point.__rmul__)\n+    \n+    The original failing case was: point1 + sympy.sympify(2.0) * point2\n+    \"\"\"\n+    point1 = Point(0, 0)\n+    point2 = Point(1, 1)\n+    # This is the exact trigger shape from the bug report\n+    result = sympify(2.0) * point2\n+    # Verify the result can be added to another point (the original bug scenario)\n+    assert point1 + result == Point(2, 2)\n+    # Also verify it equals the forward multiplication result\n+    assert result == point2 * sympify(2.0)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_point_reverse_multiplication"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_point_reverse_multiplication"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "reverse_scalar_multiplication_on_point",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "test that scalar * Point works via __rmul__ fallback when int.__mul__ fails",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "mixed_operand_type",
+      "target_tests": [
+        "test_sweb_enhanced_point_rmul"
+      ],
+      "covers_original_tests": [
+        "test_point",
+        "test_point3D"
+      ],
+      "covers_obligations": [
+        "test_point::core",
+        "test_point3D::core"
+      ],
+      "target_source_symbol": "Point.__mul__",
+      "target_validation_subject": "scalar * Point operation",
+      "semantic_alignment_tokens": [
+        "__mul__",
+        "__rmul__",
+        "Point2D",
+        "Point3D"
+      ],
+      "trigger_shape_tokens": [
+        "*",
+        "scalar * point",
+        "int * Point2D"
+      ],
+      "rationale": "The original test_point and test_point3D tests fail with TypeError when executing 'int * Point2D' because Point lacks __rmul__. The bug manifests as 'unsupported operand type(s) for *: int and Point2D'. This test directly exercises the reverse multiplication path (scalar * point) which is distinct from the forward path (point * scalar) already tested. It covers the core repair obligation by verifying that __rmul__ should delegate to __mul__ for scalar multiplication from the left."
+    },
+    "patch": "diff --git a/sympy/geometry/tests/test_point.py b/sympy/geometry/tests/test_point.py\n--- a/sympy/geometry/tests/test_point.py\n+++ b/sympy/geometry/tests/test_point.py\n@@ -242,0 +242,14 @@\n+import sympy\n+\n+def test_sweb_enhanced_point_rmul():\n+    \"\"\"Test scalar * Point works via __rmul__ fallback when int.__mul__ fails.\n+    \n+    This tests the exact scenario from the bug report:\n+    point1 + sympy.sympify(2.0) * point2\n+    should work the same as:\n+    point1 + point2 * sympy.sympify(2.0)\n+    \"\"\"\n+    point1 = Point(0, 0)\n+    point2 = Point(1, 1)\n+    # This is the exact failing case from the bug report\n+    result = point1 + sympy.sympify(2.0) * point2\n+    assert result == Point(2, 2)\n",
+    "raw_response": "\n\nLooking at the bug and the original test patch, I need to create an enhanced test that:\n1. Tests a different observation angle than the original (which tests `5 * p4`)\n2. Fails on the buggy code (TypeError: unsupported operand type(s) for *: 'int' and 'Point2D')\n3. Passes after the fix\n\nThe original test tests `5 * p4` (int * Point2D). I'll test a different angle - using sympify to create a Float/sympy number and testing the exact scenario from the bug report: `sympy.sympify(2.0) * point` which is the exact failure case mentioned in the problem statement.\n\n```diff\ndiff --git a/sympy/geometry/tests/test_point.py b/sympy/geometry/tests/test_point.py\n--- a/sympy/geometry/tests/test_point.py\n+++ b/sympy/geometry/tests/test_point.py\n@@ -242,0 +242,14 @@\n+import sympy\n+\n+def test_sweb_enhanced_point_rmul():\n+    \"\"\"Test scalar * Point works via __rmul__ fallback when int.__mul__ fails.\n+    \n+    This tests the exact scenario from the bug report:\n+    point1 + sympy.sympify(2.0) * point2\n+    should work the same as:\n+    point1 + point2 * sympy.sympify(2.0)\n+    \"\"\"\n+    point1 = Point(0, 0)\n+    point2 = Point(1, 1)\n+    # This is the exact failing case from the bug report\n+    result = point1 + sympy.sympify(2.0) * point2\n+    assert result == Point(2, 2)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_point_rmul"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_point_rmul"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "reverse_multiplication_commutativity",
+      "semantic_bucket": "direct_symptom",
+      "goal": "tests that scalar * Point should work identically to Point * scalar, exposing missing __rmul__",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "coercion_contract",
+      "target_tests": [
+        "test_sweb_enhanced_point_rmul"
+      ],
+      "covers_original_tests": [
+        "test_point",
+        "test_point3D"
+      ],
+      "covers_obligations": [
+        "test_point::core",
+        "test_point3D::core"
+      ],
+      "target_source_symbol": "Point.__mul__",
+      "target_validation_subject": "scalar multiplication operator",
+      "semantic_alignment_tokens": [
+        "__mul__",
+        "__rmul__",
+        "*",
+        "Point2D",
+        "Point3D"
+      ],
+      "trigger_shape_tokens": [
+        "*",
+        "2 *",
+        "int * Point"
+      ],
+      "rationale": "The original tests fail because they exercise 'point * scalar' which works via __mul__, but the bug manifests when doing 'scalar * point' which requires __rmul__. This test explicitly verifies commutativity of scalar-point multiplication, which is the exact symptom described in the bug report. The test will fail with TypeError on buggy code (no __rmul__) and pass on fixed code."
+    },
+    "patch": "diff --git a/sympy/geometry/tests/test_point.py b/sympy/geometry/tests/test_point.py\n--- a/sympy/geometry/tests/test_point.py\n+++ b/sympy/geometry/tests/test_point.py\n@@ -7,6 +7,7 @@ from sympy.utilities.iterables import subsets, permutations, cartes\n from sympy.utilities.pytest import raises, warns\n \n \n+\n def test_point():\n     x = Symbol('x', real=True)\n     y = Symbol('y', real=True)\n@@ -242,3 +243,17 @@ def test_direction_cosine():\n     assert p2.direction_cosine(Point3D(0, 0, 0)) == [-sqrt(3) / 3, -sqrt(3) / 3, -sqrt(3) / 3]\n     assert p2.direction_cosine(Point3D(1, 1, 12)) == [0, 0, 1]\n     assert p2.direction_cosine(Point3D(12, 1, 12)) == [sqrt(2) / 2, 0, sqrt(2) / 2]\n+\n+\n+def test_sweb_enhanced_point_rmul():\n+    \"\"\"Test that scalar * Point works identically to Point * scalar.\n+    \n+    This tests the exact scenario from the bug report:\n+    point1 + sympy.sympify(2.0) * point2 should work the same as\n+    point1 + point2 * sympy.sympify(2.0)\n+    \"\"\"\n+    import sympy\n+    point1 = Point(0, 0)\n+    point2 = Point(1, 1)\n+    # This is the exact failing case from the bug report\n+    result = point1 + sympy.sympify(2.0) * point2\n+    assert result == Point(2, 2)\n",
+    "raw_response": "\n\nLooking at the bug and the original test patch, I need to create an enhanced test that:\n1. Tests the commutativity of scalar * Point multiplication (the core bug)\n2. Uses a different observation angle than the original tests\n3. Fails on the buggy code and passes after the fix\n\nThe original tests add `5 * p4` assertions. I'll create a test that specifically tests the exact scenario from the bug report - using `sympy.sympify()` to create the scalar, which matches the problem statement exactly.\n\n```diff\ndiff --git a/sympy/geometry/tests/test_point.py b/sympy/geometry/tests/test_point.py\n--- a/sympy/geometry/tests/test_point.py\n+++ b/sympy/geometry/tests/test_point.py\n@@ -7,6 +7,7 @@ from sympy.utilities.iterables import subsets, permutations, cartes\n from sympy.utilities.pytest import raises, warns\n \n \n+\n def test_point():\n     x = Symbol('x', real=True)\n     y = Symbol('y', real=True)\n@@ -242,3 +243,17 @@ def test_direction_cosine():\n     assert p2.direction_cosine(Point3D(0, 0, 0)) == [-sqrt(3) / 3, -sqrt(3) / 3, -sqrt(3) / 3]\n     assert p2.direction_cosine(Point3D(1, 1, 12)) == [0, 0, 1]\n     assert p2.direction_cosine(Point3D(12, 1, 12)) == [sqrt(2) / 2, 0, sqrt(2) / 2]\n+\n+\n+def test_sweb_enhanced_point_rmul():\n+    \"\"\"Test that scalar * Point works identically to Point * scalar.\n+    \n+    This tests the exact scenario from the bug report:\n+    point1 + sympy.sympify(2.0) * point2 should work the same as\n+    point1 + point2 * sympy.sympify(2.0)\n+    \"\"\"\n+    import sympy\n+    point1 = Point(0, 0)\n+    point2 = Point(1, 1)\n+    # This is the exact failing case from the bug report\n+    result = point1 + sympy.sympify(2.0) * point2\n+    assert result == Point(2, 2)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_point_rmul"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_point_rmul"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "reverse_scalar_multiplication_on_point",
+      "semantic_bucket": "structural_invariant",
+      "goal": "verify that Point supports scalar multiplication from both left and right (scalar * point and point * scalar)",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "coercion_contract",
+      "target_tests": [
+        "test_sweb_enhanced_point_rmul"
+      ],
+      "covers_original_tests": [
+        "test_point",
+        "test_point3D"
+      ],
+      "covers_obligations": [
+        "test_point::core",
+        "test_point3D::core"
+      ],
+      "target_source_symbol": "Point.__mul__",
+      "target_validation_subject": "reverse_multiplication",
+      "semantic_alignment_tokens": [
+        "__mul__",
+        "__rmul__",
+        "Point2D",
+        "Point3D"
+      ],
+      "trigger_shape_tokens": [
+        "*",
+        "sympy.sympify",
+        "scalar * point"
+      ],
+      "rationale": "The original tests only verify point * scalar (using __mul__), but the bug manifests when scalar * point is attempted (requiring __rmul__). The traceback shows TypeError: unsupported operand type(s) for *: 'int' and 'Point2D', indicating Python cannot find __rmul__ on Point. This test directly exercises the reverse multiplication path that the original tests miss, exposing the missing __rmul__ method as the concrete repair obligation."
+    },
+    "patch": "diff --git a/sympy/geometry/tests/test_point.py b/sympy/geometry/tests/test_point.py\n--- a/sympy/geometry/tests/test_point.py\n+++ b/sympy/geometry/tests/test_point.py\n@@ -1,4 +1,5 @@\n from sympy import I, Rational, Symbol, pi, sqrt, S\n+import sympy\n from sympy.geometry import Line, Point, Point2D, Point3D, Line3D, Plane\n from sympy.geometry.entity import rotate, scale, translate\n from sympy.matrices import Matrix\n@@ -242,3 +243,16 @@ def test_direction_cosine():\n     assert p2.direction_cosine(Point3D(12, 1, 12)) == [sqrt(2) / 2, 0, sqrt(2) / 2]\n \n \n+def test_sweb_enhanced_point_rmul():\n+    \"\"\"Test that scalar * Point works with sympy.sympify created scalars.\n+    \n+    This tests the reverse multiplication path (scalar * point) which requires\n+    __rmul__ on Point. The bug manifests as TypeError when trying:\n+        sympy.sympify(2.0) * point\n+    because Point lacks __rmul__ to handle the reverse operand order.\n+    \"\"\"\n+    p = Point(1, 1)\n+    # This is the exact case from the bug report that fails on buggy code\n+    result = sympy.sympify(2.0) * p\n+    assert result == Point(2, 2)\n+\n",
+    "raw_response": "\n\nLooking at the bug and the original test patch, I need to create an enhanced test that:\n1. Tests the reverse multiplication (scalar * point) which is the bug\n2. Uses a different observation angle than the original tests\n3. Specifically triggers the bug via `sympy.sympify` as mentioned in the problem statement\n\nThe original tests add `5 * p4` which tests integer scalar multiplication. I'll create a test that uses `sympy.sympify()` to create the scalar, which is exactly the case described in the bug report.\n\n```diff\ndiff --git a/sympy/geometry/tests/test_point.py b/sympy/geometry/tests/test_point.py\n--- a/sympy/geometry/tests/test_point.py\n+++ b/sympy/geometry/tests/test_point.py\n@@ -1,4 +1,5 @@\n from sympy import I, Rational, Symbol, pi, sqrt, S\n+import sympy\n from sympy.geometry import Line, Point, Point2D, Point3D, Line3D, Plane\n from sympy.geometry.entity import rotate, scale, translate\n from sympy.matrices import Matrix\n@@ -242,0 +243,14 @@ def test_direction_cosine():\n     assert p2.direction_cosine(Point3D(12, 1, 12)) == [sqrt(2) / 2, 0, sqrt(2) / 2]\n \n \n+def test_sweb_enhanced_point_rmul():\n+    \"\"\"Test that scalar * Point works with sympy.sympify created scalars.\n+    \n+    This tests the reverse multiplication path (scalar * point) which requires\n+    __rmul__ on Point. The bug manifests as TypeError when trying:\n+        sympy.sympify(2.0) * point\n+    because Point lacks __rmul__ to handle the reverse operand order.\n+    \"\"\"\n+    p = Point(1, 1)\n+    # This is the exact case from the bug report that fails on buggy code\n+    result = sympy.sympify(2.0) * p\n+    assert result == Point(2, 2)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_point_rmul"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_point_rmul"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

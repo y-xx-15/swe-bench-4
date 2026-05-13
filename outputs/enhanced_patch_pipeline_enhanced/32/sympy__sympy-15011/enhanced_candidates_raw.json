@@ -1,0 +1,247 @@
+[
+  {
+    "idea": {
+      "title": "MatrixSymbol with curly braces fails lambdify even with dummify=True",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that lambdify correctly handles MatrixSymbol names containing curly braces when dummify=True is explicitly specified",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_curly_matrix_symbol_dummify"
+      ],
+      "covers_original_tests": [
+        "test_curly_matrix_symbol"
+      ],
+      "covers_obligations": [
+        "test_curly_matrix_symbol::core"
+      ],
+      "target_source_symbol": "sympy.utilities.lambdify.lambdify",
+      "target_validation_subject": "MatrixSymbol name handling with dummify=True",
+      "semantic_alignment_tokens": [
+        "MatrixSymbol",
+        "lambdify",
+        "dummify"
+      ],
+      "trigger_shape_tokens": [
+        "MatrixSymbol(",
+        "dummify=True",
+        "curly braces in name"
+      ],
+      "rationale": "The original test covers the basic failure case but does not explicitly verify that dummify=True should resolve the issue. This enhanced test specifically validates that when dummify=True is explicitly passed, lambdify should replace the invalid curly-brace name with a valid dummy identifier, making the generated code syntactically correct. The bug is that the current implementation fails to apply dummification to MatrixSymbol names with special characters, causing a SyntaxError in the generated lambda code."
+    },
+    "patch": "diff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +271,13 @@\n+def test_sweb_enhanced_curly_matrix_symbol_dummify():\n+    # Issue #15011 - Enhanced test for MatrixSymbol with curly braces\n+    # Tests that dummify=True properly handles MatrixSymbol names with\n+    # special characters (curly braces) by replacing them with valid\n+    # Python identifiers in the generated lambda code.\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Explicitly test dummify=True with matrix input\n+    # The bug causes SyntaxError because curly braces are not valid in\n+    # Python identifiers and dummification is not applied correctly\n+    lam = lambdify(curlyv, curlyv, dummify=True)\n+    # Verify the function works with matrix input\n+    import numpy as np\n+    assert np.array_equal(lam(np.array([[1], [2]])), np.array([[1], [2]]))\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Has a different observation angle than the original `test_curly_matrix_symbol`\n2. Must FAIL on the buggy code and PASS after the fix\n3. Specifically tests `dummify=True` with MatrixSymbol containing curly braces\n\nThe original test uses `lam(1)==1` (scalar input). I'll create a test that uses a matrix input to verify the behavior from a different angle - specifically testing that the generated lambda can accept a proper matrix argument when dummify=True is explicitly specified.\n\n```diff\ndiff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +271,13 @@\n+def test_sweb_enhanced_curly_matrix_symbol_dummify():\n+    # Issue #15011 - Enhanced test for MatrixSymbol with curly braces\n+    # Tests that dummify=True properly handles MatrixSymbol names with\n+    # special characters (curly braces) by replacing them with valid\n+    # Python identifiers in the generated lambda code.\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Explicitly test dummify=True with matrix input\n+    # The bug causes SyntaxError because curly braces are not valid in\n+    # Python identifiers and dummification is not applied correctly\n+    lam = lambdify(curlyv, curlyv, dummify=True)\n+    # Verify the function works with matrix input\n+    import numpy as np\n+    assert np.array_equal(lam(np.array([[1], [2]])), np.array([[1], [2]]))\n```",
+    "identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_dummify"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_dummify"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "lambdify with dummify=True should produce callable for curly MatrixSymbol",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "verify that lambdify produces a working callable when MatrixSymbol has curly braces in name, even without explicit dummify=True",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_curly_matrix_symbol_callable"
+      ],
+      "covers_original_tests": [
+        "test_curly_matrix_symbol"
+      ],
+      "covers_obligations": [
+        "test_curly_matrix_symbol::core"
+      ],
+      "target_source_symbol": "sympy.utilities.lambdify.lambdify",
+      "target_validation_subject": "callable_return_value",
+      "semantic_alignment_tokens": [
+        "lambdify",
+        "MatrixSymbol",
+        "dummify"
+      ],
+      "trigger_shape_tokens": [
+        "MatrixSymbol(",
+        "lambdify(",
+        "dummify"
+      ],
+      "rationale": "The original test likely just checks that lambdify doesn't raise SyntaxError. This enhanced test verifies the downstream behavioral consequence: that the returned callable actually works and produces correct output when invoked with proper arguments. This tests the full pipeline from symbol processing through code generation to actual function execution, ensuring the fix is complete rather than just preventing the SyntaxError."
+    },
+    "patch": "diff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +271,13 @@\n+def test_sweb_enhanced_curly_matrix_symbol_callable():\n+    # Enhanced test for issue #15009: Verify that lambdify returns a callable\n+    # that actually works with matrix arguments when MatrixSymbol has curly braces.\n+    # This tests the full pipeline: symbol processing -> code generation -> execution.\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Use dummify=True to ensure proper symbol handling\n+    lam = lambdify(curlyv, curlyv, dummify=True)\n+    # Test with a matrix-like input (list of lists) to verify the callable works\n+    import numpy as np\n+    input_matrix = np.array([[1], [2]])\n+    result = lam(input_matrix)\n+    assert np.allclose(result, input_matrix)\n+\ndiff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +271,13 @@\n+def test_sweb_enhanced_curly_matrix_symbol_callable():\n+    # Enhanced test for issue #15009: Verify that lambdify returns a callable\n+    # that actually works with matrix arguments when MatrixSymbol has curly braces.\n+    # This tests the full pipeline: symbol processing -> code generation -> execution.\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Use dummify=True to ensure proper symbol handling\n+    lam = lambdify(curlyv, curlyv, dummify=True)\n+    # Test with a matrix-like input (list of lists) to verify the callable works\n+    import numpy as np\n+    input_matrix = np.array([[1], [2]])\n+    result = lam(input_matrix)\n+    assert np.allclose(result, input_matrix)\n+\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Fails on the buggy code (triggers SyntaxError)\n2. Passes after the fix\n3. Tests a different angle than the original test\n\nThe original test uses `lam(1)==1` which expects a scalar return. I'll create a test that uses a matrix input and checks the matrix return value - this tests the full pipeline from symbol processing through code generation to actual function execution with proper matrix arguments.\n\nLet me create the patch:\ndiff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +272,14 @@\n+def test_sweb_enhanced_curly_matrix_symbol_callable():\n+    # Enhanced test for issue #15009: Verify that lambdify returns a callable\n+    # that actually works with matrix arguments when MatrixSymbol has curly braces.\n+    # This tests the full pipeline: symbol processing -> code generation -> execution.\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Use dummify=True to ensure proper symbol handling\n+    lam = lambdify(curlyv, curlyv, dummify=True)\n+    # Test with a matrix-like input (list of lists) to verify the callable works\n+    import numpy as np\n+    input_matrix = np.array([[1], [2]])\n+    result = lam(input_matrix)\n+    assert np.allclose(result, input_matrix)\n+\ndiff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +271,14 @@\n+def test_sweb_enhanced_curly_matrix_symbol_callable():\n+    # Enhanced test for issue #15009: Verify that lambdify returns a callable\n+    # that actually works with matrix arguments when MatrixSymbol has curly braces.\n+    # This tests the full pipeline: symbol processing -> code generation -> execution.\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Use dummify=True to ensure proper symbol handling\n+    lam = lambdify(curlyv, curlyv, dummify=True)\n+    # Test with a matrix-like input (list of lists) to verify the callable works\n+    import numpy as np\n+    input_matrix = np.array([[1], [2]])\n+    result = lam(input_matrix)\n+    assert np.allclose(result, input_matrix)\n+",
+    "identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_callable"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_callable"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "lambdify dummify fails on MatrixSymbol with curly braces in name",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify lambdify with dummify=True correctly handles MatrixSymbol containing curly braces in its name, which currently triggers SyntaxError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_curly_matrix_symbol_dummify"
+      ],
+      "covers_original_tests": [
+        "test_curly_matrix_symbol"
+      ],
+      "covers_obligations": [
+        "test_curly_matrix_symbol::core"
+      ],
+      "target_source_symbol": "sympy.utilities.lambdify.lambdify",
+      "target_validation_subject": "MatrixSymbol with curly braces in name passed to lambdify with dummify=True",
+      "semantic_alignment_tokens": [
+        "MatrixSymbol",
+        "lambdify",
+        "dummify"
+      ],
+      "trigger_shape_tokens": [
+        "MatrixSymbol(",
+        "dummify=True",
+        "curly"
+      ],
+      "rationale": "The original test_curly_matrix_symbol tests the basic failure case without dummify. This enhanced test specifically validates that dummify=True properly converts the invalid identifier '{v}' to a valid Python identifier when the argument is a MatrixSymbol. The bug is that dummify does not work for MatrixSymbol names with curly braces, causing SyntaxError during code generation. This test adds repair guidance by explicitly checking the dummify=True path which should substitute the problematic symbol name with a Dummy."
+    },
+    "patch": "diff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,3 +271,14 @@ def test_issue_14941():\n     f3 = lambdify([x, y], [y, x], 'sympy')\n     assert f3(2, 3) == [3, 2]\n \n+def test_sweb_enhanced_curly_matrix_symbol_expr():\n+    # Enhanced test: MatrixSymbol with curly braces used in expression\n+    # This tests a different code path than identity (curlyv, curlyv)\n+    # The bug manifests when curly MatrixSymbol appears in a larger expression\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Use curlyv in an expression: 2*curlyv\n+    lam = lambdify(curlyv, 2*curlyv, dummify=True)\n+    result = lam([[1], [2]])\n+    assert result[0][0] == 2\n+    assert result[1][0] == 4\n+\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Tests the same bug (lambdify fails with MatrixSymbol containing curly braces)\n2. Uses a different observation angle than the original test\n3. Must FAIL on the buggy code and PASS after the fix\n\nThe original test tests `lambdify(curlyv, curlyv)` and `lambdify(curlyv, curlyv, dummify=True)` where `curlyv = MatrixSymbol(\"{v}\", 2, 1)`.\n\nLet me create a different test - testing a case where the curly MatrixSymbol is used in an expression (not just identity), which is a different usage path that should trigger the same bug:\n\n```diff\ndiff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +272,14 @@ def test_issue_14941():\n     f3 = lambdify([x, y], [y, x], 'sympy')\n     assert f3(2, 3) == [3, 2]\n \n+def test_sweb_enhanced_curly_matrix_symbol_expr():\n+    # Enhanced test: MatrixSymbol with curly braces used in expression\n+    # This tests a different code path than identity (curlyv, curlyv)\n+    # The bug manifests when curly MatrixSymbol appears in a larger expression\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Use curlyv in an expression: 2*curlyv\n+    lam = lambdify(curlyv, 2*curlyv, dummify=True)\n+    result = lam([[1], [2]])\n+    assert result[0][0] == 2\n+    assert result[1][0] == 4\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_expr"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_expr"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "lambdify MatrixSymbol with curly braces and dummify=True",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify lambdify handles MatrixSymbol with curly braces in name when dummify=True, fixing the SyntaxError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_curly_matrix_symbol_dummify"
+      ],
+      "covers_original_tests": [
+        "test_curly_matrix_symbol"
+      ],
+      "covers_obligations": [
+        "test_curly_matrix_symbol::core"
+      ],
+      "target_source_symbol": "sympy.utilities.lambdify.lambdify",
+      "target_validation_subject": "MatrixSymbol name with curly braces",
+      "semantic_alignment_tokens": [
+        "MatrixSymbol",
+        "lambdify",
+        "dummify"
+      ],
+      "trigger_shape_tokens": [
+        "MatrixSymbol(",
+        "dummify=True"
+      ],
+      "rationale": "The original test covers the basic failure case. This enhanced test specifically validates that dummify=True properly handles MatrixSymbol objects with curly braces in their names, ensuring the dummification logic correctly replaces invalid identifiers. This adds repair guidance by explicitly testing the dummify parameter path which was mentioned as a workaround in the bug report but still fails."
+    },
+    "patch": "diff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,5 +271,16 @@ def test_issue_14941():\n     assert f1(2, 3) == {2: 3, 3: 3}\n \n     # test list\n     f3 = lambdify([x, y], [y, x], 'sympy')\n     assert f3(2, 3) == [3, 2]\n+\n+def test_sweb_enhanced_curly_matrix_symbol_dummify():\n+    # Issue #15011 - Test MatrixSymbol with curly braces in expression context\n+    # The original test uses identity (curlyv), this test uses matrix multiplication\n+    # to exercise a different code path while exposing the same bug\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Use the MatrixSymbol in an expression (not just identity)\n+    expr = curlyv.T * curlyv  # This creates a scalar expression\n+    lam = lambdify(curlyv, expr, dummify=True)\n+    # Verify the function works correctly after fix\n+    assert lam(1) == 1\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Tests a different angle than the original `test_curly_matrix_symbol`\n2. Still triggers the same bug (SyntaxError with curly braces in MatrixSymbol names)\n3. Uses `test_sweb_enhanced_` prefix\n\nThe original test uses `lambdify(curlyv, curlyv)` - identity function. I'll create a test that uses the MatrixSymbol in a non-identity expression (like matrix multiplication), which tests a different code path while still exposing the same bug.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +272,12 @@ def test_issue_14941():\n     assert f1(2, 3) == {2: 3, 3: 3}\n \n     # test list\n     f3 = lambdify([x, y], [y, x], 'sympy')\n     assert f3(2, 3) == [3, 2]\n+\n+def test_sweb_enhanced_curly_matrix_symbol_dummify():\n+    # Issue #15011 - Test MatrixSymbol with curly braces in expression context\n+    # The original test uses identity (curlyv), this test uses matrix multiplication\n+    # to exercise a different code path while exposing the same bug\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Use the MatrixSymbol in an expression (not just identity)\n+    expr = curlyv.T * curlyv  # This creates a scalar expression\n+    lam = lambdify(curlyv, expr, dummify=True)\n+    # Verify the function works correctly after fix\n+    assert lam(1) == 1\n```",
+    "identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_dummify"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_dummify"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "lambdify dummify fails for MatrixSymbol with curly braces in name",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that lambdify with dummify=True properly handles MatrixSymbol with curly braces in name, avoiding SyntaxError during code generation",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_curly_matrix_symbol_dummify"
+      ],
+      "covers_original_tests": [
+        "test_curly_matrix_symbol"
+      ],
+      "covers_obligations": [
+        "test_curly_matrix_symbol::core"
+      ],
+      "target_source_symbol": "sympy/utilities/lambdify.py::_EvaluatorPrinter._preprocess",
+      "target_validation_subject": "MatrixSymbol argument handling with dummify=True",
+      "semantic_alignment_tokens": [
+        "MatrixSymbol",
+        "lambdify",
+        "dummify",
+        "Dummy"
+      ],
+      "trigger_shape_tokens": [
+        "MatrixSymbol(",
+        "dummify=True",
+        "_preprocess"
+      ],
+      "rationale": "The original test covers the basic failure case (lambdify with curly MatrixSymbol fails with SyntaxError). This enhanced test specifically validates that the dummify=True parameter correctly substitutes unsafe identifiers for MatrixSymbol arguments containing curly braces, preventing the SyntaxError. The test differs by explicitly checking the dummify=True behavior which was mentioned as a workaround in the bug report but still fails."
+    },
+    "patch": "diff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,3 +271,12 @@ def test_issue_14941():\n     f3 = lambdify([x, y], [y, x], 'sympy')\n     assert f3(2, 3) == [3, 2]\n \n+def test_sweb_enhanced_curly_matrix_symbol_expr():\n+    # Issue #15011 - Enhanced test: MatrixSymbol with curly braces in expression\n+    # Tests the code generation path where MatrixSymbol appears in the expression\n+    # (not just as identity return), with dummify=True\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    expr = curlyv + curlyv  # Simple expression using the curly MatrixSymbol\n+    lam = lambdify(curlyv, expr, dummify=True)\n+    result = lam([[1], [2]])\n+    assert result[0][0] == 2 and result[1][0] == 4\n",
+    "raw_response": "\n\nLooking at the bug and the original test, I need to create an enhanced test that:\n1. Tests a different angle of the same bug\n2. Fails on the buggy code (triggers SyntaxError)\n3. Would pass after the fix\n\nThe original test covers basic identity lambdify of a curly MatrixSymbol. Let me create a test that uses the curly MatrixSymbol in an expression context (not just identity), which tests the code generation path differently.\n```diff\ndiff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +271,10 @@ def test_issue_14941():\n     f3 = lambdify([x, y], [y, x], 'sympy')\n     assert f3(2, 3) == [3, 2]\n \n+def test_sweb_enhanced_curly_matrix_symbol_expr():\n+    # Issue #15011 - Enhanced test: MatrixSymbol with curly braces in expression\n+    # Tests the code generation path where MatrixSymbol appears in the expression\n+    # (not just as identity return), with dummify=True\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    expr = curlyv + curlyv  # Simple expression using the curly MatrixSymbol\n+    lam = lambdify(curlyv, expr, dummify=True)\n+    result = lam([[1], [2]])\n+    assert result[0][0] == 2 and result[1][0] == 4\n```",
+    "identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_expr"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_expr"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

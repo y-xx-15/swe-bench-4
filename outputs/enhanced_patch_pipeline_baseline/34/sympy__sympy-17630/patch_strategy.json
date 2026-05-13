@@ -1,0 +1,17 @@
+{
+  "title": "Preserve ZeroMatrix type in block multiplication",
+  "approach": "The _blockmul method in BlockMatrix converts ZeroMatrix blocks to scalar Zero during multiplication, which breaks subsequent operations. The fix should ensure that when a block multiplication results in zero (either from multiplying by ZeroMatrix or from adding zeros), the result remains as a ZeroMatrix instance rather than scalar Zero. This can be done by checking if the result is Zero and converting it to ZeroMatrix with appropriate dimensions.",
+  "edit_targets": [
+    "sympy/matrices/expressions/blockmatrix.py::BlockMatrix._blockmul"
+  ],
+  "dependency_files": [
+    "sympy/matrices/expressions/matexpr.py::ZeroMatrix"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The primary fix is in the _blockmul method where the block multiplication happens. The colblocksizes and rowblocksizes properties are correct in expecting MatrixExpr objects with .cols/.rows attributes - they just need the input blocks to maintain their matrix type. The fix should ensure that any zero result from block multiplication is converted back to ZeroMatrix with proper dimensions. No other files need modification.",
+  "risks": [
+    "Changing the return type of block multiplication from scalar Zero to ZeroMatrix could affect other code that expects scalar Zero",
+    "Need to ensure ZeroMatrix is constructed with correct dimensions (rows, cols) matching the block position"
+  ]
+}

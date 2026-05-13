@@ -1,0 +1,10 @@
+
+
+Looking at the bug, the issue is in the `_entry` method of `BlockMatrix`. When indexing with a symbolic index like `i`, the comparison `(i < numrows) != False` always returns True because a symbolic Relational object is not equal to False. This causes the code to always select the first block, which is wrong.
+
+Let me look at the test file to understand what's expected:
+<read_file>
+test_path: /testbed/sympy/matrices/expressions/tests/test_indexing.py
+start: 85
+end: 145
+</read_file>

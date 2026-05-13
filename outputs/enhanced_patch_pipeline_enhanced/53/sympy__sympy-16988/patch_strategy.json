@@ -1,0 +1,18 @@
+{
+  "title": "Deduplicate Intersection args at instantiation",
+  "approach": "Add deduplication of args in Intersection.__new__ right after _sympify but before _new_args_filter processing. This ensures that duplicate sets like {1} are removed, so Intersection({1},{1},{x}) behaves identically to Intersection({1},{x}). Use an ordered deduplication approach to preserve deterministic behavior.",
+  "edit_targets": [
+    "sympy/sets/sets.py::Intersection.__new__"
+  ],
+  "dependency_files": [
+    "sympy/sets/sets.py",
+    "sympy/sets/fancysets.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only Intersection.__new__ in sympy/sets/sets.py should be sufficient. The deduplication needs to happen early, right after _sympify converts inputs, before _new_args_filter or simplify_intersection processes them. This prevents the duplicate {1} from causing incorrect EmptySet evaluation.",
+  "risks": [
+    "Potential performance impact for large numbers of arguments (mitigated by using efficient O(n) deduplication)",
+    "Must ensure order preservation for deterministic output - using dict.fromkeys or ordered set approach"
+  ]
+}

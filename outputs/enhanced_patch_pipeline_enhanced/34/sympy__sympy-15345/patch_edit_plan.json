@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/mathematica.py",
+      "action": "modify_region",
+      "justification": "The known_functions dictionary is missing entries for Max and Min, causing them to fall back to Python's default parentheses syntax instead of Mathematica's square bracket syntax. This is the root cause of the bug."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/mathematica.py",
+      "target_symbol": "known_functions",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_Function::mcode"
+      ],
+      "anchor_line_before": "known_functions = {",
+      "anchor_line_after": "    \"exp\": [(lambda x: True, \"Exp\")],",
+      "replacement_block": "known_functions = {\n    \"Max\": [(lambda x: True, \"Max\")],\n    \"Min\": [(lambda x: True, \"Min\")],\n    \"exp\": [(lambda x: True, \"Exp\")],"
+    }
+  ]
+}

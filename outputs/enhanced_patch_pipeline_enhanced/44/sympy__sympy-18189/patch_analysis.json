@@ -1,0 +1,31 @@
+{
+  "root_cause": "When syms parameter differs from default variable order, the diophantine function recursively calls itself to reorder results but does NOT pass the permute parameter to the recursive call, causing permute=True to be lost.",
+  "affected_components": [
+    {
+      "file": "sympy/solvers/diophantine.py",
+      "symbol": "diophantine",
+      "reason": "The main diophantine function has a code path that reorders results when syms != var, but this path loses the permute parameter by not passing it to the recursive call"
+    }
+  ],
+  "failing_signal": "diophantine(n**4 + m**4 - 2**4 - 3**4, syms=(m,n), permute=True) returns 8 solutions, but diophantine(n**4 + m**4 - 2**4 - 3**4, syms=(n,m), permute=True) returns only 1 solution. The test assertion fails because results depend on syms order.",
+  "propagation_path": "When syms order differs from default sorted order (var), the code enters the branch at line ~165: 'if syms != var:'. It then recursively calls diophantine(eq, param) without passing permute, so permute defaults to False in the recursive call, resulting in only base solutions being found before reordering.",
+  "repair_constraint": "The fix must preserve the permute parameter when reordering results. The output set should be identical regardless of syms order when permute=True.",
+  "suggested_repair_scope": [
+    "sympy/solvers/diophantine.py"
+  ],
+  "suspicious_symbols": [
+    "diophantine",
+    "permute",
+    "syms",
+    "var",
+    "dict_sym_index"
+  ],
+  "repair_obligations": [
+    {
+      "id": "required_1",
+      "source_symbol": "diophantine",
+      "validation_subject": "permute parameter preservation when syms reordering occurs",
+      "why_it_matters": "Without passing permute to the recursive call, permute=True is silently ignored when syms order differs from default, causing incomplete results"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+--- a/sympy/sets/sets.py
++++ b/sympy/sets/sets.py
+@@ -1260,6 +1260,9 @@ class Intersection(Set, LatticeOp):
+     def __new__(cls, *args, **kwargs):
+         evaluate = kwargs.get('evaluate', global_evaluate[0])
+ 
+         # flatten inputs to merge intersections and iterables
+         args = _sympify(args)
++        
++        # Remove duplicates while preserving order
++        args = list(dict.fromkeys(args))
+ 
+         # Reduce sets using known rules
+         if evaluate:

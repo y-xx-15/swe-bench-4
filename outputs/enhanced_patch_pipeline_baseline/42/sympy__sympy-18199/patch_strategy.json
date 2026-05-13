@@ -1,0 +1,18 @@
+{
+  "title": "Add trivial root check for a % p == 0 in nthroot_mod",
+  "approach": "Add an early return in nthroot_mod function to handle the case when a % p == 0. When a is divisible by p, x = 0 is always a valid root since 0**n = 0 ≡ a (mod p). The fix should check for this condition after handling the n==2 case but before the is_nthpow_residue call, returning 0 (or [0] if all_roots=True).",
+  "edit_targets": [
+    "sympy/ntheory/residue_ntheory.py::nthroot_mod"
+  ],
+  "dependency_files": [
+    "sympy/ntheory/residue_ntheory.py::is_nthpow_residue",
+    "sympy/ntheory/residue_ntheory.py::_nthroot_mod1"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix is sufficient because the only missing behavior is the trivial root case when a % p == 0. The is_nthpow_residue function already correctly returns True for this case, and the existing algorithm paths (_nthroot_mod1 and the extended Euclidean approach) don't handle this case properly. Adding the early return handles this edge case without affecting any other behavior.",
+  "risks": [
+    "Potential performance impact from the extra modulo operation (negligible)",
+    "Must ensure the fix doesn't break any existing tests for non-zero a values"
+  ]
+}

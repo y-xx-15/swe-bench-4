@@ -1,0 +1,29 @@
+{
+  "root_cause": "The sign class is missing the _eval_rewrite_as_Abs method, which prevents sign(x).rewrite(Abs) from returning x/Abs(x). The doit method already implements the mathematical definition sign(z) = z/Abs(z) for non-zero z, but there's no rewrite handler to expose this functionality through the .rewrite() API.",
+  "affected_components": [
+    {
+      "file": "sympy/functions/elementary/complexes.py",
+      "symbol": "sign",
+      "reason": "Missing _eval_rewrite_as_Abs method to enable sign(x).rewrite(Abs)"
+    }
+  ],
+  "failing_signal": "test_sign in sympy/functions/elementary/tests/test_complexes.py fails with AssertionError, likely because sign(x).rewrite(Abs) does not return the expected x/Abs(x) form",
+  "propagation_path": "Without _eval_rewrite_as_Abs, the rewrite system cannot convert sign to Abs form. The doit method already correctly computes sign(z) = z/Abs(z) for non-zero z, but this logic is not exposed through the rewrite API.",
+  "repair_constraint": "The fix must return x/Abs(x) for sign(x).rewrite(Abs) when x is known to be non-zero, and handle the zero case appropriately (either return unevaluated or nan)",
+  "suggested_repair_scope": [
+    "sympy/functions/elementary/complexes.py"
+  ],
+  "suspicious_symbols": [
+    "sign",
+    "Abs",
+    "doit"
+  ],
+  "repair_obligations": [
+    {
+      "id": "1",
+      "source_symbol": "sign",
+      "validation_subject": "sign(x).rewrite(Abs)",
+      "why_it_matters": "The mathematical definition sign(z) = z/Abs(z) should be accessible via the rewrite API"
+    }
+  ]
+}

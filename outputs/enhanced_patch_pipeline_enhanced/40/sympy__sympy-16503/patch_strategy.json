@@ -1,0 +1,17 @@
+{
+  "title": "Fix baseline calculation in _print_Sum",
+  "approach": "The baseline adjustment formula in _print_Sum is incorrect. The line `prettyF.baseline -= d - (prettyF.height()//2 - prettyF.baseline) - adjustment` computes a wrong baseline value. The fix is to directly set `prettyF.baseline = d` (center on the sum sign) instead of the complex subtraction. This ensures the summed expression is properly centered on the sum sign, which then aligns correctly when the Sum is added to other expressions like +3.",
+  "edit_targets": [
+    "sympy/printing/pretty/pretty.py::_print_Sum"
+  ],
+  "dependency_files": [
+    "sympy/printing/pretty/stringpict.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix targets only the _print_Sum method in pretty.py where the baseline calculation bug exists. The stringpict.py file contains the prettyForm class but does not need modification - the bug is in how _print_Sum uses the baseline attribute, not in the baseline attribute itself. Editing only the primary target is sufficient.",
+  "risks": [
+    "Changing baseline calculation could affect other Sum pretty-printing scenarios",
+    "Need to verify alignment works for both unicode and ascii modes"
+  ]
+}

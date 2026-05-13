@@ -1,0 +1,31 @@
+{
+  "root_cause": "When a MatrixSymbol is passed in argument_sequence but does not appear in the expression, the routine method creates a new InputArgument without dimensions, causing it to be treated as a scalar (double) instead of an array (double*) in the generated C code.",
+  "affected_components": [
+    {
+      "file": "sympy/utilities/codegen.py",
+      "symbol": "CodeGen.routine",
+      "reason": "This method builds the argument list and determines whether arguments have dimensions. When a symbol from argument_sequence is not found in the expression, it creates InputArgument without preserving the MatrixSymbol's shape information."
+    }
+  ],
+  "failing_signal": "The generated C code has signature 'double test(double x)' instead of 'double test(double *x)', causing TypeError when numpy array is passed.",
+  "propagation_path": "MatrixSymbol x -> not in expression free_symbols -> not in array_symbols dict -> KeyError when looking up in name_arg_dict -> creates plain InputArgument without dimensions -> CCodeGen.get_prototype treats it as scalar -> generates 'double x' instead of 'double *x'",
+  "repair_constraint": "The fix must preserve the dimensions/shape information for MatrixSymbol arguments that don't appear in the expression, while not breaking existing functionality for symbols that do appear in expressions.",
+  "suggested_repair_scope": [
+    "sympy/utilities/codegen.py"
+  ],
+  "suspicious_symbols": [
+    "CodeGen.routine",
+    "InputArgument",
+    "MatrixSymbol",
+    "array_symbols",
+    "argument_sequence"
+  ],
+  "repair_obligations": [
+    {
+      "id": "1",
+      "source_symbol": "CodeGen.routine",
+      "validation_subject": "InputArgument creation for symbols in argument_sequence",
+      "why_it_matters": "When a MatrixSymbol is in argument_sequence but not in the expression, we must still create an InputArgument with the correct dimensions derived from the MatrixSymbol's shape, not a plain InputArgument without dimensions."
+    }
+  ]
+}

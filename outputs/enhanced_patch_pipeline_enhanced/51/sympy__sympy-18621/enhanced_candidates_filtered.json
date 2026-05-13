@@ -1,0 +1,159 @@
+[
+  {
+    "idea": {
+      "title": "BlockDiagMatrix single element to Matrix conversion",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that a BlockDiagMatrix with a single matrix element can be converted to a regular Matrix via sympy.Matrix() constructor",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_blockdiag_single_to_matrix"
+      ],
+      "covers_original_tests": [
+        "test_issue_18618"
+      ],
+      "covers_obligations": [
+        "test_issue_18618::core"
+      ],
+      "target_source_symbol": "BlockDiagMatrix._entry",
+      "target_validation_subject": "blocks property accessor for single-element diagonal",
+      "semantic_alignment_tokens": [
+        "BlockDiagMatrix",
+        "blocks",
+        "_entry",
+        "as_explicit"
+      ],
+      "trigger_shape_tokens": [
+        "BlockDiagMatrix(M)",
+        "Matrix(D)",
+        "blocks[row_block, col_block]"
+      ],
+      "rationale": "This test directly reproduces the exact failure from test_issue_18618: creating a BlockDiagMatrix with one Matrix element and attempting to convert it back to a regular Matrix triggers TypeError: 'One' object is not subscriptable. The original test covers this path, but this enhanced test explicitly validates the conversion contract for single-element diagonal blocks, ensuring the fix properly handles the 1x1 blockshape case where blocks accessor returns the matrix directly rather than wrapped in a structure."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -240,0 +240,8 @@\n+def test_sweb_enhanced_blockdiag_single_to_matrix():\n+    # Test that BlockDiagMatrix with single element can be converted to regular Matrix\n+    # This tests the _entry method directly which is the core of issue 18618\n+    # Different from original test: uses as_explicit() to trigger _entry path\n+    M = Matrix([[1, 2], [3, 4]])\n+    D = BlockDiagMatrix(M)\n+    # as_explicit() internally calls _entry for each element - this is the failing path\n+    assert D.as_explicit() == M\n",
+    "raw_response": "\n\nLooking at the bug, I need to create an enhanced test that:\n1. Triggers the same bug (BlockDiagMatrix with single element cannot be converted to Matrix)\n2. Uses a different observation angle than the original test\n3. Must FAIL on the buggy code and PASS after fix\n\nThe original test uses `Matrix(BlockDiagMatrix(A))`. A different angle would be to directly test the `_entry` method or `as_explicit()` which is what gets called internally and triggers the bug.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -240,0 +240,8 @@\n+def test_sweb_enhanced_blockdiag_single_to_matrix():\n+    # Test that BlockDiagMatrix with single element can be converted to regular Matrix\n+    # This tests the _entry method directly which is the core of issue 18618\n+    # Different from original test: uses as_explicit() to trigger _entry path\n+    M = Matrix([[1, 2], [3, 4]])\n+    D = BlockDiagMatrix(M)\n+    # as_explicit() internally calls _entry for each element - this is the failing path\n+    assert D.as_explicit() == M\n```",
+    "identifiers": [
+      "test_sweb_enhanced_blockdiag_single_to_matrix"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blockdiag_single_to_matrix"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_blockdiag_single_to_matrix"
+    ],
+    "eval_status_map": {
+      "sympy/matrices/expressions/tests/test_blockmatrix.py:test_sweb_enhanced_blockdiag_single_to_matrix": "FAILED",
+      "test_bc_matmul": "PASSED",
+      "test_bc_matadd": "PASSED",
+      "test_bc_transpose": "PASSED",
+      "test_bc_dist_diag": "PASSED",
+      "test_block_plus_ident": "PASSED",
+      "test_BlockMatrix": "PASSED",
+      "test_block_collapse_explicit_matrices": "PASSED",
+      "test_issue_17624": "PASSED",
+      "test_BlockMatrix_trace": "PASSED",
+      "test_BlockMatrix_Determinant": "PASSED",
+      "test_squareBlockMatrix": "PASSED",
+      "test_BlockDiagMatrix": "PASSED",
+      "test_blockcut": "PASSED",
+      "test_reblock_2x2": "PASSED",
+      "test_deblock": "PASSED",
+      "test_block_collapse_type": "PASSED"
+    },
+    "generation_attempts": 1,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_issue_18618"
+    ],
+    "covered_obligations": [
+      "test_issue_18618::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "BlockDiagMatrix single element _entry access triggers type error",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Tests that converting a BlockDiagMatrix with one element to a regular Matrix triggers the TypeError in _entry method when accessing blocks[row_block, col_block]",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "coercion_contract",
+      "target_tests": [
+        "test_sweb_enhanced_blockdiag_single_element_conversion"
+      ],
+      "covers_original_tests": [
+        "test_issue_18618"
+      ],
+      "covers_obligations": [
+        "test_issue_18618::core"
+      ],
+      "target_source_symbol": "BlockDiagMatrix._entry",
+      "target_validation_subject": "blocks[row_block, col_block] subscript access",
+      "semantic_alignment_tokens": [
+        "BlockDiagMatrix",
+        "Matrix(",
+        "_entry"
+      ],
+      "trigger_shape_tokens": [
+        "BlockDiagMatrix(M)",
+        "Matrix(D)",
+        "self.blocks[row_block, col_block][i, j]"
+      ],
+      "rationale": "This test directly exercises the _entry method's block access path that fails when BlockDiagMatrix has only one element. The original test_issue_18618 covers the end-to-end conversion flow, but this enhanced test isolates the exact _entry method call that produces the TypeError: 'One' object is not subscriptable. By creating a BlockDiagMatrix with a single 2x2 matrix and attempting element access via Matrix() conversion, we trigger the exact code path in _entry where row_block=col_block=0 but self.blocks[0,0] incorrectly returns a One object instead of the matrix, causing the subscript [i,j] to fail."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -237,5 +237,11 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_transpose(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_inverse(Inverse(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockdiag_single_element_as_explicit():\n+    # Test as_explicit() on BlockDiagMatrix with single element - triggers _entry bug\n+    M = Matrix([[1, 2], [3, 4]])\n+    B = BlockDiagMatrix(M)\n+    assert B.as_explicit() == M\n",
+    "raw_response": "\n\nLooking at the bug, I need to create an enhanced test that:\n1. Tests the same underlying bug (BlockDiagMatrix with one element fails)\n2. Uses a different observation angle than the original test\n3. Must fail on the buggy code\n\nThe original test `test_issue_18618` tests the end-to-end conversion `Matrix(BlockDiagMatrix(A))`. A different angle would be to test the `as_explicit()` method directly, which also triggers the `_entry` method that causes the TypeError.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -237,3 +237,8 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_transpose(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_inverse(Inverse(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockdiag_single_element_as_explicit():\n+    # Test as_explicit() on BlockDiagMatrix with single element - triggers _entry bug\n+    M = Matrix([[1, 2], [3, 4]])\n+    B = BlockDiagMatrix(M)\n+    assert B.as_explicit() == M\n```",
+    "identifiers": [
+      "test_sweb_enhanced_blockdiag_single_element_as_explicit"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blockdiag_single_element_as_explicit"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_blockdiag_single_element_as_explicit"
+    ],
+    "eval_status_map": {
+      "sympy/matrices/expressions/tests/test_blockmatrix.py:test_sweb_enhanced_blockdiag_single_element_as_explicit": "FAILED",
+      "test_bc_matmul": "PASSED",
+      "test_bc_matadd": "PASSED",
+      "test_bc_transpose": "PASSED",
+      "test_bc_dist_diag": "PASSED",
+      "test_block_plus_ident": "PASSED",
+      "test_BlockMatrix": "PASSED",
+      "test_block_collapse_explicit_matrices": "PASSED",
+      "test_issue_17624": "PASSED",
+      "test_BlockMatrix_trace": "PASSED",
+      "test_BlockMatrix_Determinant": "PASSED",
+      "test_squareBlockMatrix": "PASSED",
+      "test_BlockDiagMatrix": "PASSED",
+      "test_blockcut": "PASSED",
+      "test_reblock_2x2": "PASSED",
+      "test_deblock": "PASSED",
+      "test_block_collapse_type": "PASSED"
+    },
+    "generation_attempts": 4,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_issue_18618"
+    ],
+    "covered_obligations": [
+      "test_issue_18618::core"
+    ]
+  }
+]

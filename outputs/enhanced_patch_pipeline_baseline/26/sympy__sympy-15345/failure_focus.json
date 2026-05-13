@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_Function"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_Function"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/printing/tests/test_mathematica.py:test_Function",
+    "test_Function"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_Function F",
+    "____________ sympy/printing/tests/test_mathematica.py:test_Function ____________",
+    "Traceback (most recent call last):"
+  ],
+  "noise_ratio": 0.0063,
+  "target_test_tracebacks": {
+    "test_Function": "TARGET TEST: test_Function\n- snippet: test_Function F\n- snippet: ____________ sympy/printing/tests/test_mathematica.py:test_Function ____________\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_Function F\n____________ sympy/printing/tests/test_mathematica.py:test_Function ____________\nTraceback (most recent call last):\n  File \"/testbed/sympy/printing/tests/test_mathematica.py\", line 31, in test_Function\nAssertionError\n============= tests finished: 9 passed, 1 failed, in 0.05 seconds =============="
+  }
+}

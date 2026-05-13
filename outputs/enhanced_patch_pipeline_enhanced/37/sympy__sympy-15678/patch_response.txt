@@ -1,0 +1,50 @@
+
+
+Looking at the bug analysis, I need to fix the `idiff` function in `sympy/geometry/util.py` to:
+1. Handle `Eq` objects by converting them to expression form (lhs - rhs)
+2. Accept `Function` types like `f(x)` as the dependent variable
+
+Let me first examine the exact line numbers in the file:
+```python
+def idiff(eq, y, x, n=1):
+    ...
+    if is_sequence(y):
+        dep = set(y)
+        y = y[0]
+    elif isinstance(y, Symbol):
+        dep = {y}
+    else:
+        raise ValueError("expecting x-dependent symbol(s) but got: %s" % y)
+```
+
+The fix needs to:
+1. Import `Eq` from sympy at line 15
+2. Add Eq handling at the start of idiff function
+3. Modify the isinstance check to also accept Function types
+
+Let me create the minimal patch:
+```diff
+diff --git a/sympy/geometry/util.py b/sympy/geometry/util.py
+--- a/sympy/geometry/util.py
++++ b/sympy/geometry/util.py
+@@ -12,7 +12,7 @@ Contains
+ """
+ from __future__ import division, print_function
+ 
+-from sympy import Function, Symbol, solve
++from sympy import Function, Symbol, solve, Eq
+ from sympy.core.compatibility import (
+     is_sequence, range, string_types, ordered)
+ from sympy.core.containers import OrderedSet
+@@ -568,6 +568,9 @@ def idiff(eq, y, x, n=1):
+     sympy.core.function.Derivative: represents unevaluated derivatives
+     sympy.core.function.diff: explicitly differentiates wrt symbols
+ 
+     """
++    if isinstance(eq, Eq):
++        eq = eq.lhs - eq.rhs
++
+     if is_sequence(y):
+         dep = set(y)
+         y = y[0]
+```

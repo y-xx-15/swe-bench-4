@@ -1,0 +1,18 @@
+{
+  "title": "Add _print_Identity method to NumPyPrinter",
+  "approach": "Add a _print_Identity method to the NumPyPrinter class in sympy/printing/pycode.py that prints Identity matrices as numpy.eye(n) where n is the dimension. This will generate proper numpy code that creates an identity matrix instead of falling back to printing just 'I' which conflicts with the imaginary unit.",
+  "edit_targets": [
+    "sympy/printing/pycode.py::NumPyPrinter"
+  ],
+  "dependency_files": [
+    "sympy/printing/pycode.py::AbstractPythonCodePrinter",
+    "sympy/printing/pycode.py::PythonCodePrinter",
+    "sympy/printing/lambdarepr.py::LambdaPrinter"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The primary fix is adding _print_Identity to NumPyPrinter. However, since AbstractPythonCodePrinter is the base class and other printers (like SciPyPrinter) inherit from NumPyPrinter, adding the method only to NumPyPrinter should be sufficient as it will be inherited by subclasses. The LambdaPrinter inherits from PythonCodePrinter which inherits from AbstractPythonCodePrinter, so it will also benefit if we add a fallback to AbstractPythonCodePrinter - but for numpy-specific lambdify, NumPyPrinter is what gets used, so targeting just NumPyPrinter is the primary fix. If other backends need Identity support, they can override this method.",
+  "risks": [
+    "The fix must handle both symbolic dimensions (like n in Identity(n) where n is a Symbol) and integer dimensions. numpy.eye() accepts both."
+  ]
+}

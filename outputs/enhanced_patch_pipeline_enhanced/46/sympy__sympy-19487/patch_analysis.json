@@ -1,0 +1,36 @@
+{
+  "root_cause": "The sign class is missing the _eval_rewrite_as_Abs method, which prevents sign(x).rewrite(Abs) from returning x/Abs(x). Additionally, the doit method uses is_zero is False to check for non-zero values, but this check may not work correctly in all cases.",
+  "affected_components": [
+    {
+      "file": "sympy/functions/elementary/complexes.py",
+      "symbol": "sign",
+      "reason": "Missing _eval_rewrite_as_Abs method to enable sign(x).rewrite(Abs)"
+    }
+  ],
+  "failing_signal": "test_sign fails with AssertionError - the sign function is not properly rewriting to Abs",
+  "propagation_path": "Without _eval_rewrite_as_Abs, sign(x).rewrite(Abs) returns unevaluated. The doit method has similar logic but may have issues with the is_zero check.",
+  "repair_constraint": "The fix must preserve sign(0) = 0 behavior while enabling sign(x).rewrite(Abs) = x/Abs(x) for non-zero x",
+  "suggested_repair_scope": [
+    "sympy/functions/elementary/complexes.py"
+  ],
+  "suspicious_symbols": [
+    "sign",
+    "Abs",
+    "_eval_rewrite_as_Abs",
+    "doit"
+  ],
+  "repair_obligations": [
+    {
+      "id": "1",
+      "source_symbol": "sign",
+      "validation_subject": "_eval_rewrite_as_Abs method",
+      "why_it_matters": "Must enable sign(x).rewrite(Abs) to return x/Abs(x) for non-zero x"
+    },
+    {
+      "id": "2",
+      "source_symbol": "sign",
+      "validation_subject": "sign(0) behavior",
+      "why_it_matters": "Must preserve sign(0) = 0, not return nan"
+    }
+  ]
+}

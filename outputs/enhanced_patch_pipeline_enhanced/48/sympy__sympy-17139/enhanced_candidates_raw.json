@@ -1,0 +1,260 @@
+[
+  {
+    "idea": {
+      "title": "complex_exponent_TR56_direct",
+      "semantic_bucket": "direct_symptom",
+      "goal": "trigger TypeError in _TR56 by passing complex exponent directly to TR6",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_TR56_complex_exp"
+      ],
+      "covers_original_tests": [
+        "test__TR56",
+        "test_issue_17137"
+      ],
+      "covers_obligations": [
+        "test__TR56::core",
+        "test_issue_17137::core"
+      ],
+      "target_source_symbol": "sympy.simplify.fu._TR56",
+      "target_validation_subject": "rv.exp comparison with complex number",
+      "semantic_alignment_tokens": [
+        "_TR56",
+        "TR6",
+        "rv.exp < 0",
+        "complex"
+      ],
+      "trigger_shape_tokens": [
+        "cos(x)**I",
+        "TR6(cos(x)**I)",
+        "complex exponent"
+      ],
+      "rationale": "The original tests trigger the bug through simplify() which eventually calls TR6->_TR56. This enhanced test directly invokes TR6 with a complex exponent (cos(x)**I), exercising the same buggy comparison (rv.exp < 0) but at a more direct code path. The test will fail with TypeError on buggy code and pass on fixed code that properly checks if exponent is real before comparison."
+    },
+    "patch": "diff --git a/sympy/simplify/tests/test_fu.py b/sympy/simplify/tests/test_fu.py\n--- a/sympy/simplify/tests/test_fu.py\n+++ b/sympy/simplify/tests/test_fu.py\n@@ -76,7 +76,12 @@ def test__TR56():\n     assert T(sin(x)**6, sin, cos, h, 6, True) == sin(x)**6\n     assert T(sin(x)**8, sin, cos, h, 10, True) == (-cos(x)**2 + 1)**4\n \n \n+def test_sweb_enhanced_TR56_complex_exp():\n+    # Test TR6 directly with complex exponent - triggers rv.exp < 0 comparison bug\n+    assert TR6(cos(x)**I) == cos(x)**I\n+\n+\n def test_TR5():\n     assert TR5(sin(x)**2) == -cos(x)**2 + 1\n     assert TR5(sin(x)**-2) == sin(x)**(-2)\n",
+    "raw_response": "\n\nLooking at the bug, it's in `_TR56` function in `fu.py` where it compares `rv.exp < 0` without checking if the exponent is real first. When the exponent is complex (like `I`), this raises a `TypeError`.\n\nThe original tests trigger this through `simplify(cos(x)**I)` which eventually calls `TR6` → `_TR56`. I'll create a more direct test that calls `TR6` with a complex exponent.\n\n```diff\ndiff --git a/sympy/simplify/tests/test_fu.py b/sympy/simplify/tests/test_fu.py\n--- a/sympy/simplify/tests/test_fu.py\n+++ b/sympy/simplify/tests/test_fu.py\n@@ -76,6 +76,10 @@ def test__TR56():\n     assert T(sin(x)**6, sin, cos, h, 6, True) == sin(x)**6\n     assert T(sin(x)**8, sin, cos, h, 10, True) == (-cos(x)**2 + 1)**4\n \n \n+def test_sweb_enhanced_TR56_complex_exp():\n+    # Test TR6 directly with complex exponent - triggers rv.exp < 0 comparison bug\n+    assert TR6(cos(x)**I) == cos(x)**I\n+\n+\n def test_TR5():\n     assert TR5(sin(x)**2) == -cos(x)**2 + 1\n     assert TR5(sin(x)**-2) == sin(x)**(-2)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_TR56_complex_exp"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_TR56_complex_exp"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "complex_exponent_trig_transformation_handling",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Test that TR6 transformation handles complex exponents gracefully without TypeError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "coercion_contract",
+      "target_tests": [
+        "test_sweb_enhanced_complex_exp_trig"
+      ],
+      "covers_original_tests": [
+        "test__TR56",
+        "test_issue_17137"
+      ],
+      "covers_obligations": [
+        "test__TR56::core",
+        "test_issue_17137::core"
+      ],
+      "target_source_symbol": "sympy.simplify.fu._TR56",
+      "target_validation_subject": "rv.exp comparison with 0 in _f function",
+      "semantic_alignment_tokens": [
+        "cos(x)**I",
+        "sin(x)**I",
+        "TR6(",
+        "_TR56"
+      ],
+      "trigger_shape_tokens": [
+        "rv.exp < 0",
+        "complex exponent",
+        "Pow("
+      ],
+      "rationale": "The original tests trigger the bug through simplify(cos(x)**I) which goes through a complex path. This test directly exercises the _TR56 helper function with a complex exponent to isolate the exact comparison failure. It differs from original tests by directly calling TR6 with cos(x)**I rather than going through simplify(), making the failure path more direct and the fix more targeted. The test verifies that when a complex exponent is encountered, the transformation should return the expression unchanged rather than attempting an invalid comparison."
+    },
+    "patch": "diff --git a/sympy/simplify/tests/test_fu.py b/sympy/simplify/tests/test_fu.py\n--- a/sympy/simplify/tests/test_fu.py\n+++ b/sympy/simplify/tests/test_fu.py\n@@ -205,0 +205,5 @@\n+def test_sweb_enhanced_complex_exp_trig():\n+    # Test TR6 directly with complex exponent - different from original tests\n+    # that use _TR56 (T) or simplify(). This directly exercises the rv.exp < 0\n+    # comparison path in _TR56's _f function.\n+    assert TR6(cos(x)**I) == cos(x)**I\n",
+    "raw_response": "\n\nLooking at the bug, it's in the `_TR56` function in `fu.py` where it compares `rv.exp < 0` which fails when the exponent is complex (like `I`). The original tests cover this through `_TR56` directly (`T()`) and through `simplify()`.\n\nI'll create an enhanced test that directly calls `TR6()` with a complex exponent, which is a different angle from the original tests that use `_TR56` (`T()`) or `simplify()`.\n\n```diff\ndiff --git a/sympy/simplify/tests/test_fu.py b/sympy/simplify/tests/test_fu.py\n--- a/sympy/simplify/tests/test_fu.py\n+++ b/sympy/simplify/tests/test_fu.py\n@@ -205,0 +205,5 @@\n+def test_sweb_enhanced_complex_exp_trig():\n+    # Test TR6 directly with complex exponent - different from original tests\n+    # that use _TR56 (T) or simplify(). This directly exercises the rv.exp < 0\n+    # comparison path in _TR56's _f function.\n+    assert TR6(cos(x)**I) == cos(x)**I\n```",
+    "identifiers": [
+      "test_sweb_enhanced_complex_exp_trig"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_complex_exp_trig"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "TR6 with complex exponent triggers TypeError in _TR56 comparison",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that TR6 (cos power transformation) raises TypeError when exponent is complex (I), directly exercising the _TR56 function where the comparison rv.exp < 0 fails",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_tr6_complex_exponent"
+      ],
+      "covers_original_tests": [
+        "test__TR56",
+        "test_issue_17137"
+      ],
+      "covers_obligations": [
+        "test__TR56::core",
+        "test_issue_17137::core"
+      ],
+      "target_source_symbol": "sympy.simplify.fu.TR6",
+      "target_validation_subject": "rv.exp comparison in _TR56 inner function",
+      "semantic_alignment_tokens": [
+        "TR6(",
+        "cos(x)**I",
+        "_TR56",
+        "rv.exp < 0"
+      ],
+      "trigger_shape_tokens": [
+        "cos(x)**I",
+        "complex exponent",
+        "TR6(cos(x)**I)"
+      ],
+      "rationale": "The original tests trigger the bug through simplify() -> trigsimp() -> futrig() -> TR6() -> _TR56(). This enhanced test directly calls TR6() with a complex exponent, bypassing the simplify() wrapper to directly exercise the _TR56 function where the buggy comparison (rv.exp < 0) == True occurs. This provides a more focused test that isolates the exact failure point in _TR56, making the repair obligation clearer: the function must check if the exponent is real/comparable before performing comparison operations."
+    },
+    "patch": "diff --git a/sympy/simplify/tests/test_fu.py b/sympy/simplify/tests/test_fu.py\n--- a/sympy/simplify/tests/test_fu.py\n+++ b/sympy/simplify/tests/test_fu.py\n@@ -205,0 +205,8 @@\n+def test_sweb_enhanced_tr6_complex_exponent():\n+    # TR6 should handle complex exponents without raising TypeError\n+    # This tests the bug in _TR56 where rv.exp < 0 fails for complex exponents\n+    # See issue 17139: simplify(cos(x)**I) triggers TypeError\n+    # The bug is in _TR56 inner function that compares rv.exp < 0\n+    # which raises \"Invalid comparison of complex I\" for complex exponents\n+    result = TR6(cos(x)**I)\n+    assert result == cos(x)**I\n",
+    "raw_response": "\n\nLooking at the bug and the test requirements, I need to create an enhanced test that:\n1. Directly calls `TR6` with a complex exponent (`cos(x)**I`)\n2. This triggers the bug in `_TR56` where `rv.exp < 0` comparison fails for complex exponents\n3. The test should FAIL on buggy code (raises TypeError) and PASS after fix\n\nLet me create the patch:\n\n```diff\ndiff --git a/sympy/simplify/tests/test_fu.py b/sympy/simplify/tests/test_fu.py\n--- a/sympy/simplify/tests/test_fu.py\n+++ b/sympy/simplify/tests/test_fu.py\n@@ -205,0 +206,9 @@\n+def test_sweb_enhanced_tr6_complex_exponent():\n+    # TR6 should handle complex exponents without raising TypeError\n+    # This tests the bug in _TR56 where rv.exp < 0 fails for complex exponents\n+    # See issue 17139: simplify(cos(x)**I) triggers TypeError\n+    # The bug is in _TR56 inner function that compares rv.exp < 0\n+    # which raises \"Invalid comparison of complex I\" for complex exponents\n+    result = TR6(cos(x)**I)\n+    assert result == cos(x)**I\n```",
+    "identifiers": [
+      "test_sweb_enhanced_tr6_complex_exponent"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_tr6_complex_exponent"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "complex_exponent_handling_in_TR56",
+      "semantic_bucket": "structural_invariant",
+      "goal": "verify that TR5/TR6 transformations handle complex exponents without raising TypeError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_TR56_complex_exponent"
+      ],
+      "covers_original_tests": [
+        "test__TR56",
+        "test_issue_17137"
+      ],
+      "covers_obligations": [
+        "test__TR56::core",
+        "test_issue_17137::core"
+      ],
+      "target_source_symbol": "sympy.simplify.fu._TR56",
+      "target_validation_subject": "rv.exp comparison with complex values",
+      "semantic_alignment_tokens": [
+        "_TR56",
+        "rv.exp < 0",
+        "complex"
+      ],
+      "trigger_shape_tokens": [
+        "cos(x)**I",
+        "sin(x)**I",
+        "complex exponent"
+      ],
+      "rationale": "The original tests fail with TypeError when TR5/TR6 try to compare complex exponents. This test directly exercises the structural invariant that _TR56 should handle non-real exponents gracefully (either skip transformation or handle comparison safely) rather than raising TypeError. It differs from original tests by explicitly testing the boundary case of complex exponent which triggers the comparison bug, and uses a different semantic bucket (structural_invariant) to verify the fix maintains proper invariant behavior."
+    },
+    "patch": "diff --git a/sympy/simplify/tests/test_fu.py b/sympy/simplify/tests/test_fu.py\n--- a/sympy/simplify/tests/test_fu.py\n+++ b/sympy/simplify/tests/test_fu.py\n@@ -76,4 +76,13 @@ def test__TR56():\n     assert T(sin(x)**6, sin, cos, h, 6, True) == sin(x)**6\n     assert T(sin(x)**8, sin, cos, h, 10, True) == (-cos(x)**2 + 1)**4\n \n \n+def test_sweb_enhanced_TR56_complex_exponent():\n+    # Test _TR56 directly with complex exponent to verify structural invariant\n+    # that rv.exp comparison with complex values should not raise TypeError\n+    h = lambda x: 1 - x\n+    # TR5 path: cos with complex exponent should return unchanged\n+    assert T(cos(x)**I, cos, sin, h, 4, False) == cos(x)**I\n+    # TR6 path: sin with complex exponent should return unchanged  \n+    assert T(sin(x)**(3*I), sin, cos, h, 4, False) == sin(x)**(3*I)\n+\n",
+    "raw_response": "\n\nLooking at the bug and the original tests, I need to create an enhanced test that:\n1. Directly calls `_TR56` (the target source symbol) with a complex exponent\n2. Triggers the same TypeError bug\n3. Uses a different angle than the original tests\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/simplify/tests/test_fu.py b/sympy/simplify/tests/test_fu.py\n--- a/sympy/simplify/tests/test_fu.py\n+++ b/sympy/simplify/tests/test_fu.py\n@@ -76,6 +76,10 @@ def test__TR56():\n     assert T(sin(x)**6, sin, cos, h, 6, True) == sin(x)**6\n     assert T(sin(x)**8, sin, cos, h, 10, True) == (-cos(x)**2 + 1)**4\n \n \n+def test_sweb_enhanced_TR56_complex_exponent():\n+    # Test _TR56 directly with complex exponent to verify structural invariant\n+    # that rv.exp comparison with complex values should not raise TypeError\n+    h = lambda x: 1 - x\n+    # TR5 path: cos with complex exponent should return unchanged\n+    assert T(cos(x)**I, cos, sin, h, 4, False) == cos(x)**I\n+    # TR6 path: sin with complex exponent should return unchanged  \n+    assert T(sin(x)**(3*I), sin, cos, h, 4, False) == sin(x)**(3*I)\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_TR56_complex_exponent"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_TR56_complex_exponent"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "TR5 transformation with complex exponent triggers type error",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Expose the type error when TR5 transformation encounters a complex exponent in sin(x)**I, triggering the same comparison bug as cos(x)**I but through a different transformation path",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "coercion_contract",
+      "target_tests": [
+        "test_sweb_enhanced_tr5_complex_exponent"
+      ],
+      "covers_original_tests": [
+        "test__TR56",
+        "test_issue_17137"
+      ],
+      "covers_obligations": [
+        "test__TR56::core",
+        "test_issue_17137::core"
+      ],
+      "target_source_symbol": "sympy.simplify.fu._TR56._f",
+      "target_validation_subject": "rv.exp comparison with 0",
+      "semantic_alignment_tokens": [
+        "_TR56",
+        "rv.exp < 0",
+        "complex"
+      ],
+      "trigger_shape_tokens": [
+        "sin(x)**I",
+        "TR5",
+        "complex exponent"
+      ],
+      "rationale": "The original tests use cos(x)**I which triggers TR6. This test uses sin(x)**I which triggers TR5, exercising the same underlying bug in _TR56's _f function where it compares rv.exp < 0 without checking if the exponent is real. This provides distinct repair guidance by showing the bug manifests in both TR5 and TR6 transformation paths."
+    },
+    "patch": "diff --git a/sympy/simplify/tests/test_fu.py b/sympy/simplify/tests/test_fu.py\n--- a/sympy/simplify/tests/test_fu.py\n+++ b/sympy/simplify/tests/test_fu.py\n@@ -205,0 +205,7 @@\n+def test_sweb_enhanced_tr5_complex_exponent():\n+    # TR5 transformation with complex exponent should not raise TypeError\n+    # This tests the same bug as issue 17137 but through TR5 (sin) instead of TR6 (cos)\n+    # The bug is in _TR56._f where rv.exp < 0 comparison fails for complex exponents\n+    from sympy.simplify.fu import TR5\n+    assert TR5(sin(x)**I) == sin(x)**I\n+    assert TR5(sin(x)**(1 + I)) == sin(x)**(1 + I)\n",
+    "raw_response": "\n\nLooking at the bug, I need to create a test that triggers the same bug but through a different path. The original tests use `cos(x)**I` which triggers TR6. I'll use `sin(x)**I` which triggers TR5, exercising the same underlying bug in `_TR56._f` where it compares `rv.exp < 0` without checking if the exponent is real.\n\nLet me create the enhanced test:\n```diff\ndiff --git a/sympy/simplify/tests/test_fu.py b/sympy/simplify/tests/test_fu.py\n--- a/sympy/simplify/tests/test_fu.py\n+++ b/sympy/simplify/tests/test_fu.py\n@@ -205,0 +205,7 @@\n+def test_sweb_enhanced_tr5_complex_exponent():\n+    # TR5 transformation with complex exponent should not raise TypeError\n+    # This tests the same bug as issue 17137 but through TR5 (sin) instead of TR6 (cos)\n+    # The bug is in _TR56._f where rv.exp < 0 comparison fails for complex exponents\n+    from sympy.simplify.fu import TR5\n+    assert TR5(sin(x)**I) == sin(x)**I\n+    assert TR5(sin(x)**(1 + I)) == sin(x)**(1 + I)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_tr5_complex_exponent"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_tr5_complex_exponent"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/latex.py",
+      "action": "modify_region",
+      "justification": "Must add _print_Trace method to LatexPrinter class to handle Trace expressions in LaTeX printing. The missing method causes fallback to generic printer that fails to render inner matrix expressions with proper LaTeX formatting."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/latex.py",
+      "target_symbol": "LatexPrinter",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "1",
+        "2"
+      ],
+      "anchor_line_before": "    }",
+      "anchor_line_after": "    def __init__(self, settings=None):",
+      "replacement_block": "    }\n\n    def _print_Trace(self, expr):\n        return r\"\\operatorname{tr}\\left(%s\\right)\" % self._print(expr.args[0])\n\n    def __init__(self, settings=None):"
+    }
+  ]
+}

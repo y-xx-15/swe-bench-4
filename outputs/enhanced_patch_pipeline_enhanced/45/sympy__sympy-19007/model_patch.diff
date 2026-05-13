@@ -1,0 +1,14 @@
+--- a/sympy/matrices/expressions/blockmatrix.py
++++ b/sympy/matrices/expressions/blockmatrix.py
+@@ -233,6 +233,11 @@
+         return self._eval_transpose()
+ 
+     def _entry(self, i, j, **kwargs):
++        from sympy.matrices.expressions.matexpr import MatrixElement
++        # Handle symbolic indices by returning unevaluated MatrixElement
++        # to preserve block structure - symbolic indices could refer to any block
++        if i.is_Symbol or j.is_Symbol:
++            return MatrixElement(self, i, j)
+         # Find row entry
+         for row_block, numrows in enumerate(self.rowblocksizes):
+             if (i < numrows) != False:

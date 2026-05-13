@@ -1,0 +1,19 @@
+{
+  "title": "Catch AttributeError in Expr.__eq__ to prevent repr eval",
+  "approach": "Add AttributeError to the exception tuple in Expr.__eq__ (line 127 in sympy/core/expr.py). This prevents the dangerous eval of arbitrary object reprs during equality comparison. When an object with a malicious repr like 'x.y' is compared to a Symbol, sympify will raise AttributeError during the eval stage (trying to access .y on Symbol), which will now be caught and return False instead of propagating. This fix preserves existing behavior for legitimate SymPy-to-SymPy comparisons (like Symbol('a') == ns['a'] where ns['a'] is also a Symbol) while blocking unsafe repr evaluation.",
+  "edit_targets": [
+    "sympy/core/expr.py::Expr.__eq__"
+  ],
+  "dependency_files": [
+    "sympy/core/sympify.py",
+    "sympy/parsing/sympy_parser.py",
+    "sympy/core/tests/test_var.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix is sufficient because: (1) The primary bug is in Expr.__eq__ which calls sympify on arbitrary objects without catching all possible exceptions. (2) Adding AttributeError to the exception tuple handles the case where eval of repr produces attribute access (e.g., 'x.y'). (3) The test_var tests validate that Symbol-to-Symbol comparisons still work - when ns['a'] is a Symbol, sympify(ns['a']) returns the same Symbol without raising exceptions, so the comparison proceeds correctly. (4) No other locations need modification because the root cause is the narrow exception handling in __eq__.",
+  "risks": [
+    "Could mask legitimate AttributeError bugs in sympify (though unlikely in practice for __eq__ use case)",
+    "Must ensure Symbol-to-Symbol equality still works (covered by test_var tests)"
+  ]
+}

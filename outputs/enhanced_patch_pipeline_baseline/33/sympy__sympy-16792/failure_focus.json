@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_ccode_unused_array_arg"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_ccode_unused_array_arg"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/utilities/tests/test_codegen.py:test_ccode_unused_array_arg",
+    "test_ccode_unused_array_arg"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_ccode_unused_array_arg F",
+    "______ sympy/utilities/tests/test_codegen.py:test_ccode_unused_array_arg _______",
+    "Traceback (most recent call last):"
+  ],
+  "noise_ratio": 0.0055,
+  "target_test_tracebacks": {
+    "test_ccode_unused_array_arg": "TARGET TEST: test_ccode_unused_array_arg\n- snippet: test_ccode_unused_array_arg F\n- snippet: ______ sympy/utilities/tests/test_codegen.py:test_ccode_unused_array_arg _______\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_ccode_unused_array_arg F\n______ sympy/utilities/tests/test_codegen.py:test_ccode_unused_array_arg _______\nTraceback (most recent call last):\n  File \"/testbed/sympy/utilities/tests/test_codegen.py\", line 602, in test_ccode_unused_array_arg\nAssertionError\n============= tests finished: 55 passed, 1 failed, in 3.50 seconds ============="
+  }
+}

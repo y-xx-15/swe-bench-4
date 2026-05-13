@@ -1,0 +1,17 @@
+{
+  "title": "Fix Sum baseline modification side-effect",
+  "approach": "The bug occurs because _print_Sum modifies prettyF.baseline in-place, which affects how the Sum is positioned when part of larger expressions. The fix is to work with a copy of prettyF for the baseline adjustment, preserving the original baseline for proper alignment in parent expressions. Specifically, create a copy of prettyF before the baseline adjustment loop, use that copy for the centering calculation, and then use the original prettyF (with unmodified baseline) when placing it next to the sum sign.",
+  "edit_targets": [
+    "sympy/printing/pretty/pretty.py::_print_Sum"
+  ],
+  "dependency_files": [
+    "sympy/printing/pretty/stringpict.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix should be sufficient because it addresses the root cause: the in-place modification of prettyF.baseline. By using a copy for the internal centering calculation while preserving the original baseline for the external layout, the Sum will be properly centered within its own sign while also being correctly positioned in parent expressions. No other files should need modification.",
+  "risks": [
+    "Changing baseline calculation could affect standalone Sum printing",
+    "Need to verify the fix doesn't break other Sum-related pretty printing"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "root_cause": "Point class is missing __rmul__ method, so when a scalar is multiplied with a Point from the left (e.g., 2.0 * point2), Python first tries int/Float.__mul__(point2) which fails, and there's no __rmul__ fallback in Point to handle this case. Additionally, __add__ doesn't handle the case where other is a Mul expression containing a Point.",
+  "affected_components": [
+    {
+      "file": "sympy/geometry/point.py",
+      "symbol": "Point",
+      "reason": "Missing __rmul__ method to handle scalar * Point operations"
+    },
+    {
+      "file": "sympy/geometry/point.py",
+      "symbol": "Point.__add__",
+      "reason": "Doesn't handle Mul expressions that could result from scalar*Point multiplication"
+    }
+  ],
+  "failing_signal": "TypeError: unsupported operand type(s) for *: 'int' and 'Point2D' when doing p4*5 or 5*p4; GeometryError: Don't know how to add 2.0*Point2D(1, 1) and a Point object when doing point1 + 2.0*point2",
+  "propagation_path": "When evaluating sympy.sympify(2.0) * point2, Python calls Float.__mul__(point2) which returns NotImplemented, then tries point2.__rmul__(Float) which doesn't exist. The result is a Mul(2.0, Point2D(1,1)) instead of a Point. Then when point1 + that_Mul is evaluated, __add__ tries to convert the Mul to a Point which fails.",
+  "repair_constraint": "After fix: 1) scalar * Point must return a Point with scaled coordinates; 2) Point.__add__ must handle Mul expressions containing Points; 3) All existing Point arithmetic behavior must be preserved",
+  "suggested_repair_scope": [
+    "sympy/geometry/point.py"
+  ],
+  "suspicious_symbols": [
+    "Point.__mul__",
+    "Point.__add__",
+    "Point.__rmul__"
+  ],
+  "repair_obligations": [
+    {
+      "id": "1",
+      "source_symbol": "Point",
+      "validation_subject": "__rmul__ method",
+      "why_it_matters": "Without __rmul__, expressions like 2.0 * point or int * point2D fail with TypeError. The Point class must handle reverse multiplication to support scalar*Point operations."
+    },
+    {
+      "id": "2",
+      "source_symbol": "Point.__add__",
+      "validation_subject": "handling of Mul expressions",
+      "why_it_matters": "When scalar*Point creates a Mul object (due to failed __rmul__), adding it to another Point fails because __add__ doesn't know how to extract the Point from Mul. Must handle this gracefully."
+    },
+    {
+      "id": "3",
+      "source_symbol": "Point.__mul__",
+      "validation_subject": "existing multiplication behavior",
+      "why_it_matters": "Existing tests rely on Point*scalar working (e.g., p4*5 == Point(5,5)). The fix must not break this."
+    }
+  ]
+}

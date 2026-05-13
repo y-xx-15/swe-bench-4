@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/sets/sets.py",
+      "action": "modify_region",
+      "justification": "Intersection.__new__ must deduplicate args to fix the bug where Intersection({1},{1},{x}) incorrectly returns EmptySet() instead of the same result as Intersection({1},{x})"
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/sets/sets.py",
+      "target_symbol": "Intersection.__new__",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "deduplicate_args"
+      ],
+      "anchor_line_before": "        # flatten inputs to merge intersections and iterables\n        args = _sympify(args)\n\n        # Reduce sets using known rules",
+      "anchor_line_after": "        if evaluate:\n            args = list(cls._new_args_filter(args))\n            return simplify_intersection(args)",
+      "replacement_block": "        # flatten inputs to merge intersections and iterables\n        args = _sympify(args)\n\n        # Remove duplicate sets while preserving order for deterministic behavior\n        args = list(dict.fromkeys(args))\n\n        # Reduce sets using known rules\n        if evaluate:\n            args = list(cls._new_args_filter(args))\n            return simplify_intersection(args)"
+    }
+  ]
+}

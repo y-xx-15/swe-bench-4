@@ -1,0 +1,37 @@
+{
+  "root_cause": "In _print_MatAdd, the code uses S(item.args[0]).is_negative to check if the first argument of a matrix addend is negative. When item.args[0] is a string (like 'y*' from MatrixSymbol('y*', n, n)), S() calls sympify() which tries to parse the string as a Python expression, causing a SyntaxError because 'y*' is not valid Python syntax.",
+  "affected_components": [
+    {
+      "file": "sympy/printing/pretty/pretty.py",
+      "symbol": "_print_MatAdd",
+      "reason": "This method incorrectly uses S() (sympify) on what may be a string argument from MatrixSymbol, causing parse failure"
+    }
+  ],
+  "failing_signal": "SympifyError: Sympify of expression 'could not parse 'y*'' failed, because of exception being raised: SyntaxError: unexpected EOF while parsing",
+  "propagation_path": "MatrixSymbol('y*', n, n) creates a symbol with name 'y*'. When added to another MatrixSymbol, MatAdd is created. During pretty printing, _print_MatAdd iterates through args and accesses item.args[0], which for a MatrixSymbol is the string 'y*'. Then S('y*') is called, which tries to parse 'y*' as Python code, failing because '*' at end of string is invalid syntax.",
+  "repair_constraint": "The fix must correctly detect negative terms in MatAdd without using sympify on potentially non-evaluable string arguments. The pretty printing of matrix addition must still correctly handle negative terms by omitting the '+' sign.",
+  "suggested_repair_scope": [
+    "sympy/printing/pretty/pretty.py"
+  ],
+  "suspicious_symbols": [
+    "_print_MatAdd",
+    "S",
+    "is_negative",
+    "MatrixSymbol",
+    "MatAdd"
+  ],
+  "repair_obligations": [
+    {
+      "id": "RO-1",
+      "source_symbol": "_print_MatAdd",
+      "validation_subject": "item.args[0]",
+      "why_it_matters": "The code assumes item.args[0] can be safely passed to S() for is_negative check, but for MatrixSymbol, args[0] is a string name that cannot be parsed as a SymPy expression"
+    },
+    {
+      "id": "RO-2",
+      "source_symbol": "_print_MatAdd",
+      "validation_subject": "negative term detection logic",
+      "why_it_matters": "The original intent is to detect when a term is negative (like -x) to print ' - x' instead of ' + -x'. This logic must be preserved but made robust against non-numeric args"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "title": "Group factors by multiplicity in sqf_list",
+  "approach": "The sqf_list function must group all factors with the same multiplicity together by multiplying them. Currently it returns separate entries for factors with the same multiplicity (e.g., (x-2, 3) and (x-3, 3)) instead of combining them into a single factor (x**2-5*x+6, 3). The fix requires modifying the sqf_list function to group factors by multiplicity after factorization and multiply together all factors that share the same multiplicity.",
+  "edit_targets": [
+    "sympy/polys/polytools.py::sqf_list"
+  ],
+  "dependency_files": [
+    "sympy/polys/polytools.py::sqf",
+    "sympy/polys/polytools.py::_sqf_list"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix should be contained within the sqf_list function in polytools.py. The function needs to group factors by multiplicity after calling the underlying factorization routine. Since sqf depends on sqf_list, fixing sqf_list should also fix sqf. The _sqf_list internal function may also need inspection to understand the data flow.",
+  "risks": [
+    "Changing the grouping logic could affect the order of factors in the output",
+    "Multivariate polynomials may have different behavior that needs testing",
+    "Edge cases like constant polynomials or polynomials with no repeated factors must still work correctly"
+  ]
+}

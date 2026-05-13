@@ -1,0 +1,16 @@
+{
+  "title": "Add MatrixSymbol handling to _preprocess method",
+  "approach": "The _preprocess method in _EvaluatorPrinter handles Symbol and Function types by checking if their string representation is a valid Python identifier and replacing with Dummy symbols if not, but it does not handle MatrixSymbol. MatrixSymbol with non-identifier names (like '{v}') falls through to the else clause and gets converted directly to a string, producing invalid Python syntax. The fix is to add a case for MatrixSymbol that mirrors the Symbol handling: check if the name is a valid identifier (or dummify=True), and if not, replace with a Dummy symbol both in the argument list and in the expression.",
+  "edit_targets": [
+    "sympy/utilities/lambdify.py::_EvaluatorPrinter::_preprocess"
+  ],
+  "dependency_files": [
+    "sympy/utilities/lambdify.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only the _preprocess method in _EvaluatorPrinter is sufficient. The fix adds MatrixSymbol handling similar to Symbol handling - checking if the name is a valid Python identifier and replacing with Dummy if needed. No other files need modification.",
+  "risks": [
+    "Potential name collision if a user-defined MatrixSymbol happens to have the same name as a generated Dummy - but this is the same risk that exists for Symbol handling and is acceptable."
+  ]
+}

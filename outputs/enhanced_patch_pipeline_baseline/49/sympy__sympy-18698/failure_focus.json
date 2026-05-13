@@ -1,0 +1,28 @@
+{
+  "original_test_identifiers": [
+    "test_factor_terms"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_factor_terms"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/polys/tests/test_polytools.py:test_factor_terms",
+    "sympy/polys/tests/test_polytools.py:test_issue_8695",
+    "test_factor_terms"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_factor_terms F",
+    "____________ sympy/polys/tests/test_polytools.py:test_factor_terms _____________",
+    "Traceback (most recent call last):"
+  ],
+  "noise_ratio": 0.0043,
+  "target_test_tracebacks": {
+    "test_factor_terms": "TARGET TEST: test_factor_terms\n- snippet: test_factor_terms F\n- snippet: ____________ sympy/polys/tests/test_polytools.py:test_factor_terms _____________\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_factor_terms F\n____________ sympy/polys/tests/test_polytools.py:test_factor_terms _____________\nTraceback (most recent call last):\n  File \"/testbed/sympy/polys/tests/test_polytools.py\", line 3276, in test_factor_terms\nAssertionError\nTraceback (most recent call last):\nAssertionError\n== tests finished: 147 passed, 2 failed, 1 expected to fail, in 10.55 seconds =="
+  }
+}

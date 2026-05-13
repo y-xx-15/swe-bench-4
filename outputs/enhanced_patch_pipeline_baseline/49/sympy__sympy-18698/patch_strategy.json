@@ -1,0 +1,19 @@
+{
+  "title": "Combine factors with same multiplicity in sqf_list",
+  "approach": "Modify the sqf_list function to group factors by multiplicity after factorization. When multiple irreducible factors share the same multiplicity, they should be multiplied together to form a single square-free factor. The fix should collect all factors with the same multiplicity and multiply them together before returning the result.",
+  "edit_targets": [
+    "sympy/polys/polytools.py::sqf_list"
+  ],
+  "dependency_files": [
+    "sympy/polys/polytools.py::sqf",
+    "sympy/polys/polytools.py::_sqf_list"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The primary fix should be in sqf_list. However, since sqf() may share underlying logic with sqf_list, we need to verify that both functions produce consistent output. The fix should ensure that factors with the same multiplicity are combined into a single polynomial factor. The mathematical property is: if f = g*h where g and h are coprime square-free polynomials, and both have multiplicity m, then the output should be (g*h, m) not [(g,m), (h,m)].",
+  "risks": [
+    "Changing the output format could break existing code that expects separate factors",
+    "Need to ensure the product of all factors raised to their multiplicities still equals the original polynomial",
+    "Potential performance impact when combining many factors"
+  ]
+}

@@ -1,0 +1,323 @@
+[
+  {
+    "idea": {
+      "title": "is_upper bounds check for non-square matrices",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify is_upper raises IndexError when accessing out-of-bounds indices on tall matrices (rows > cols)",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_is_upper_nonsquare"
+      ],
+      "covers_original_tests": [
+        "test_is_upper"
+      ],
+      "covers_obligations": [
+        "test_is_upper::core"
+      ],
+      "target_source_symbol": "Matrix.is_upper",
+      "target_validation_subject": "is_upper property with tall matrix",
+      "semantic_alignment_tokens": [
+        "is_upper",
+        "range(i)",
+        "self.cols"
+      ],
+      "trigger_shape_tokens": [
+        "self[i, j]",
+        "range(i)",
+        "self.cols"
+      ],
+      "rationale": "The original test_is_upper fails with IndexError on a 4x2 matrix because the is_upper implementation iterates j in range(i) without checking if j < self.cols. This test explicitly creates a tall matrix (rows > cols) to trigger the exact same IndexError: Index out of range: a[2]. The fix should add bounds checking (j < self.cols) to prevent accessing indices beyond matrix columns."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_matrices.py b/sympy/matrices/tests/test_matrices.py\n--- a/sympy/matrices/tests/test_matrices.py\n+++ b/sympy/matrices/tests/test_matrices.py\n@@ -2269,4 +2269,12 @@ def test_as_real_imag():\n     for kls in classes:\n         a,b = kls(m3).as_real_imag()\n         assert list(a) == list(m1)\n         assert list(b) == list(m1)\n+\n+\n+def test_sweb_enhanced_is_upper_nonsquare():\n+    # Test is_upper with a tall matrix (rows > cols) - triggers IndexError\n+    # because the implementation iterates j in range(i) without checking j < self.cols\n+    # For a 3x2 matrix: i=2, j in range(2) gives j=0,1 but j=1 is out of bounds\n+    m = zeros(3, 2)\n+    assert m.is_upper is True\n",
+    "raw_response": "\n\nLooking at the bug, I need to create an enhanced test that:\n1. Triggers the same IndexError bug with tall matrices (rows > cols)\n2. Uses a different observation angle than the original test\n3. Must FAIL on the buggy code and PASS after the fix\n\nThe bug is in `is_upper` which iterates `for j in range(i)` without checking if `j < self.cols`. For a tall matrix like 4x2, when i=3, it tries to access column 2 which doesn't exist.\n\nLet me create a test that specifically tests this boundary condition with a different matrix shape:\n```diff\ndiff --git a/sympy/matrices/tests/test_matrices.py b/sympy/matrices/tests/test_matrices.py\n--- a/sympy/matrices/tests/test_matrices.py\n+++ b/sympy/matrices/tests/test_matrices.py\n@@ -2269,3 +2269,10 @@ def test_as_real_imag():\n     for kls in classes:\n         a,b = kls(m3).as_real_imag()\n         assert list(a) == list(m1)\n         assert list(b) == list(m1)\n+\n+\n+def test_sweb_enhanced_is_upper_nonsquare():\n+    # Test is_upper with a tall matrix (rows > cols) - triggers IndexError\n+    # because the implementation iterates j in range(i) without checking j < self.cols\n+    # For a 3x2 matrix: i=2, j in range(2) gives j=0,1 but j=1 is out of bounds\n+    m = zeros(3, 2)\n+    assert m.is_upper is True\n```",
+    "identifiers": [
+      "test_sweb_enhanced_is_upper_nonsquare"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_is_upper_nonsquare"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_is_upper is not semantically aligned with its original failure path. Expected source symbol '__instancecheck__' and alignment tokens [], but the current content targets 'Matrix.is_upper' with tokens ['is_upper', 'range(i)', 'self.cols']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_is_upper"
+    ],
+    "covered_obligations": [
+      "test_is_upper::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "is_upper bounds check for non-square matrices",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that is_upper property correctly handles tall matrices (more rows than columns) without IndexError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_is_upper_tall_matrix"
+      ],
+      "covers_original_tests": [
+        "test_is_upper"
+      ],
+      "covers_obligations": [
+        "test_is_upper::core"
+      ],
+      "target_source_symbol": "Matrix.is_upper",
+      "target_validation_subject": "is_upper property with tall matrix input",
+      "semantic_alignment_tokens": [
+        "is_upper",
+        "range(i)",
+        "self.cols"
+      ],
+      "trigger_shape_tokens": [
+        "is_upper",
+        "range(i)",
+        "self.cols"
+      ],
+      "rationale": "The original test_is_upper fails with IndexError because is_upper iterates j in range(i) without checking if j < self.cols. For a 4x2 matrix, when i=3, range(3) gives [0,1,2] but column 2 doesn't exist. This test creates a tall matrix (4x2) and verifies is_upper returns a boolean instead of raising IndexError. The fix should use range(min(i, self.cols)) to bound the column iteration."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_matrices.py b/sympy/matrices/tests/test_matrices.py\n--- a/sympy/matrices/tests/test_matrices.py\n+++ b/sympy/matrices/tests/test_matrices.py\n@@ -2269,3 +2269,9 @@ def test_as_real_imag():\n         a,b = kls(m3).as_real_imag()\n         assert list(a) == list(m1)\n         assert list(b) == list(m1)\n+\n+\n+def test_sweb_enhanced_is_upper_tall_matrix():\n+    # 5x3 matrix: when i=4, range(4) gives [0,1,2,3] but col 3 doesn't exist\n+    # This should return True (all entries below diagonal are zero)\n+    assert zeros(5, 3).is_upper is True\n",
+    "raw_response": "\n\nLooking at the bug, I need to understand what's happening:\n- `is_upper` iterates `j in range(i)` without checking if `j < self.cols`\n- For a 4x2 matrix, when i=3, range(3) gives [0,1,2] but column 2 doesn't exist\n- This causes IndexError\n\nThe original test adds `zeros(4, 2)` to test_is_upper. I need to add a different test that:\n1. Uses a different matrix shape to trigger the same bug\n2. Has a different observation angle\n3. Must FAIL on buggy code (raise IndexError) and PASS on fixed code\n\nLet me create a test with a 5x3 tall matrix - this will also trigger the bug when i >= 3 (since cols=3, valid j values are 0,1,2 but when i=3, range(3) gives 0,1,2 which is valid, but when i=4, range(4) gives 0,1,2,3 where j=3 is out of bounds).\n\n```diff\ndiff --git a/sympy/matrices/tests/test_matrices.py b/sympy/matrices/tests/test_matrices.py\n--- a/sympy/matrices/tests/test_matrices.py\n+++ b/sympy/matrices/tests/test_matrices.py\n@@ -2269,3 +2269,9 @@ def test_as_real_imag():\n         a,b = kls(m3).as_real_imag()\n         assert list(a) == list(m1)\n         assert list(b) == list(m1)\n+\n+\n+def test_sweb_enhanced_is_upper_tall_matrix():\n+    # 5x3 matrix: when i=4, range(4) gives [0,1,2,3] but col 3 doesn't exist\n+    # This should return True (all entries below diagonal are zero)\n+    assert zeros(5, 3).is_upper is True\n```",
+    "identifiers": [
+      "test_sweb_enhanced_is_upper_tall_matrix"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_is_upper_tall_matrix"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_is_upper is not semantically aligned with its original failure path. Expected source symbol '__instancecheck__' and alignment tokens [], but the current content targets 'Matrix.is_upper' with tokens ['is_upper', 'range(i)', 'self.cols']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_is_upper"
+    ],
+    "covered_obligations": [
+      "test_is_upper::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "is_upper bounds check for non-square matrices",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that is_upper raises IndexError when accessing out-of-bounds column indices in tall matrices (more rows than columns)",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_is_upper_tall_matrix"
+      ],
+      "covers_original_tests": [
+        "test_is_upper",
+        "test_hessenberg"
+      ],
+      "covers_obligations": [
+        "test_is_upper::core",
+        "test_hessenberg::core"
+      ],
+      "target_source_symbol": "Matrix.is_upper",
+      "target_validation_subject": "is_upper property with tall matrix",
+      "semantic_alignment_tokens": [
+        "is_upper",
+        "range(i)",
+        "self.cols"
+      ],
+      "trigger_shape_tokens": [
+        "self[i, j]",
+        "range(i)",
+        "self.cols"
+      ],
+      "rationale": "The original test_is_upper fails with IndexError when calling is_upper on a 4x2 matrix because the implementation iterates j in range(i) without checking if j < self.cols. This test creates a tall matrix (more rows than columns) and verifies that is_upper either returns False correctly or raises IndexError on the buggy code. The test differs from the original by explicitly targeting the bounds-checking gap in the iteration logic, using a concrete tall matrix shape that triggers the exact out-of-bounds access (i=3, j=2) shown in the failure log."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_matrices.py b/sympy/matrices/tests/test_matrices.py\n--- a/sympy/matrices/tests/test_matrices.py\n+++ b/sympy/matrices/tests/test_matrices.py\n@@ -270,3 +270,10 @@ def test_as_real_imag():\n         assert list(a) == list(m1)\n         assert list(b) == list(m1)\n \n+\n+def test_sweb_enhanced_is_upper_tall_matrix():\n+    # Test is_upper with a 3x1 tall matrix - this triggers the bug where\n+    # range(i) is used without checking j < self.cols, causing IndexError\n+    # when i=2 and j tries to access column 1 (which doesn't exist)\n+    m = zeros(3, 1)\n+    assert m.is_upper is True\n",
+    "raw_response": "\n\nLooking at the bug, I need to create an enhanced test that:\n1. Triggers the same IndexError bug for tall matrices\n2. Uses a different observation angle than the original test\n3. Fails on the buggy code (raises IndexError) and passes after the fix\n\nLet me create a test that uses a different matrix shape (3x1) and explicitly tests the bounds-checking issue:\n```diff\ndiff --git a/sympy/matrices/tests/test_matrices.py b/sympy/matrices/tests/test_matrices.py\n--- a/sympy/matrices/tests/test_matrices.py\n+++ b/sympy/matrices/tests/test_matrices.py\n@@ -270,0 +270,6 @@ def test_as_real_imag():\n         assert list(a) == list(m1)\n         assert list(b) == list(m1)\n \n+\n+def test_sweb_enhanced_is_upper_tall_matrix():\n+    # Test is_upper with a 3x1 tall matrix - this triggers the bug where\n+    # range(i) is used without checking j < self.cols, causing IndexError\n+    # when i=2 and j tries to access column 1 (which doesn't exist)\n+    m = zeros(3, 1)\n+    assert m.is_upper is True\n```",
+    "identifiers": [
+      "test_sweb_enhanced_is_upper_tall_matrix"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_is_upper_tall_matrix"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_is_upper is not semantically aligned with its original failure path. Expected source symbol '__instancecheck__' and alignment tokens [], but the current content targets 'Matrix.is_upper' with tokens ['is_upper', 'range(i)', 'self.cols']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_is_upper",
+      "test_hessenberg"
+    ],
+    "covered_obligations": [
+      "test_is_upper::core",
+      "test_hessenberg::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "is_upper IndexError on tall matrix (rows > cols)",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify is_upper raises IndexError when accessing out-of-bounds column indices on non-square matrices with more rows than columns",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_is_upper_tall"
+      ],
+      "covers_original_tests": [
+        "test_is_upper"
+      ],
+      "covers_obligations": [
+        "test_is_upper::core"
+      ],
+      "target_source_symbol": "Matrix.is_upper",
+      "target_validation_subject": "is_upper property",
+      "semantic_alignment_tokens": [
+        "is_upper",
+        "property"
+      ],
+      "trigger_shape_tokens": [
+        "is_upper",
+        "zeros(",
+        "Matrix("
+      ],
+      "rationale": "The original test_is_upper fails with IndexError when calling is_upper on a 4x2 matrix. The bug occurs because the is_upper implementation iterates j in range(i) without checking if j < self.cols, causing out-of-bounds access when rows > cols. This test directly reproduces the exact IndexError shown in the traceback by creating a tall matrix (4 rows, 2 cols) and accessing is_upper, which should fail on buggy code and return True on fixed code."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_matrices.py b/sympy/matrices/tests/test_matrices.py\n--- a/sympy/matrices/tests/test_matrices.py\n+++ b/sympy/matrices/tests/test_matrices.py\n@@ -270,0 +270,6 @@\n+def test_sweb_enhanced_is_upper_tall():\n+    # Test is_upper on a tall matrix (more rows than columns)\n+    # This triggers IndexError on buggy code when j >= cols\n+    # Fixed code should return True since all accessible entries below diagonal are zero\n+    m = Matrix(5, 3, lambda i, j: 0)\n+    assert m.is_upper is True\n+\n",
+    "raw_response": "\n\nLooking at this task, I need to:\n1. Create an enhanced test that triggers the same bug (IndexError on tall matrices with is_upper)\n2. Use a different observation angle than the original test\n3. The test must fail on buggy code and pass on fixed code\n\nLet me analyze the bug: The `is_upper` property iterates `for i in range(1, self.rows)` and `for j in range(i)` without checking if `j < self.cols`, causing IndexError when rows > cols.\n\nThe original test adds `zeros(4, 2)` to `test_is_upper`. I'll create a different test that:\n- Uses a different matrix construction approach\n- Tests a different tall matrix shape\n- Uses a different assertion approach\n\n```diff\ndiff --git a/sympy/matrices/tests/test_matrices.py b/sympy/matrices/tests/test_matrices.py\n--- a/sympy/matrices/tests/test_matrices.py\n+++ b/sympy/matrices/tests/test_matrices.py\n@@ -270,0 +270,6 @@\n+def test_sweb_enhanced_is_upper_tall():\n+    # Test is_upper on a tall matrix (more rows than columns)\n+    # This triggers IndexError on buggy code when j >= cols\n+    # Fixed code should return True since all accessible entries below diagonal are zero\n+    m = Matrix(5, 3, lambda i, j: 0)\n+    assert m.is_upper is True\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_is_upper_tall"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_is_upper_tall"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_is_upper is not semantically aligned with its original failure path. Expected source symbol '__instancecheck__' and alignment tokens [], but the current content targets 'Matrix.is_upper' with tokens ['is_upper', 'property']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_is_upper"
+    ],
+    "covered_obligations": [
+      "test_is_upper::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "is_upper bounds check for tall matrices",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify is_upper handles matrices with more rows than columns without IndexError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_is_upper_tall"
+      ],
+      "covers_original_tests": [
+        "test_is_upper"
+      ],
+      "covers_obligations": [
+        "test_is_upper::core"
+      ],
+      "target_source_symbol": "Matrix.is_upper",
+      "target_validation_subject": "is_upper property with tall matrix",
+      "semantic_alignment_tokens": [
+        "is_upper",
+        "range(i)",
+        "self[i, j]"
+      ],
+      "trigger_shape_tokens": [
+        "is_upper",
+        "zeros(4, 2)",
+        "range(i)"
+      ],
+      "rationale": "The original test_is_upper fails with IndexError when calling is_upper on a 4x2 matrix because the implementation iterates j in range(i) without checking if j exceeds the number of columns. This test directly reproduces that specific failure by creating a tall matrix (more rows than columns) and verifying is_upper returns a boolean instead of raising IndexError. The test differs from generic matrix property tests by explicitly targeting the bounds violation in the iteration logic."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_matrices.py b/sympy/matrices/tests/test_matrices.py\n--- a/sympy/matrices/tests/test_matrices.py\n+++ b/sympy/matrices/tests/test_matrices.py\n@@ -270,3 +270,9 @@ def test_as_real_imag():\n         assert list(a) == list(m1)\n         assert list(b) == list(m1)\n \n+\n+def test_sweb_enhanced_is_upper_tall():\n+    # Test is_upper with a tall matrix (more rows than columns)\n+    # This triggers IndexError on buggy code due to range(i) exceeding cols\n+    m = zeros(5, 3)\n+    assert m.is_upper is True\n",
+    "raw_response": "\n\nLooking at the bug, I need to create an enhanced test that:\n1. Triggers the same IndexError bug in `is_upper` for tall matrices\n2. Uses a different angle than the original test (which uses `zeros(4, 2)`)\n3. Starts with `test_sweb_enhanced_`\n\nThe bug is that `is_upper` iterates `for j in range(i)` without checking if `j` exceeds `self.cols`. For a tall matrix (more rows than columns), this causes an IndexError when trying to access elements beyond the column count.\n\nLet me create a test that uses a different matrix shape to trigger the same bug:\n```diff\ndiff --git a/sympy/matrices/tests/test_matrices.py b/sympy/matrices/tests/test_matrices.py\n--- a/sympy/matrices/tests/test_matrices.py\n+++ b/sympy/matrices/tests/test_matrices.py\n@@ -270,0 +270,6 @@ def test_as_real_imag():\n         assert list(a) == list(m1)\n         assert list(b) == list(m1)\n \n+\n+def test_sweb_enhanced_is_upper_tall():\n+    # Test is_upper with a tall matrix (more rows than columns)\n+    # This triggers IndexError on buggy code due to range(i) exceeding cols\n+    m = zeros(5, 3)\n+    assert m.is_upper is True\n```",
+    "identifiers": [
+      "test_sweb_enhanced_is_upper_tall"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_is_upper_tall"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_is_upper is not semantically aligned with its original failure path. Expected source symbol '__instancecheck__' and alignment tokens [], but the current content targets 'Matrix.is_upper' with tokens ['is_upper', 'range(i)', 'self[i, j]']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_is_upper"
+    ],
+    "covered_obligations": [
+      "test_is_upper::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "is_upper on tall matrix triggers index error",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify is_upper raises IndexError for matrices with more rows than columns due to unbounded j iteration",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_is_upper_tall"
+      ],
+      "covers_original_tests": [
+        "test_is_upper"
+      ],
+      "covers_obligations": [
+        "test_is_upper::core"
+      ],
+      "target_source_symbol": "Matrix.is_upper",
+      "target_validation_subject": "is_upper property on non-square matrix",
+      "semantic_alignment_tokens": [
+        "is_upper",
+        "range(i)",
+        "self.cols"
+      ],
+      "trigger_shape_tokens": [
+        "is_upper",
+        "zeros(4,2)",
+        "range(i)"
+      ],
+      "rationale": "The original test_is_upper fails with IndexError when calling is_upper on a 4x2 matrix because the implementation iterates j in range(i) without bounding by self.cols. This test directly reproduces that specific bug scenario - a tall matrix (more rows than columns) where the nested loop attempts to access indices beyond the column count. The fix should add bounds checking (j < self.cols) to prevent the IndexError. This differs from the original test by focusing specifically on the non-square matrix edge case that triggers the exact IndexError shown in the traceback."
+    },
+    "patch": "diff --git a/sympy/matrices/tests/test_matrices.py b/sympy/matrices/tests/test_matrices.py\n--- a/sympy/matrices/tests/test_matrices.py\n+++ b/sympy/matrices/tests/test_matrices.py\n@@ -270,3 +270,10 @@ def test_as_real_imag():\n         assert list(b) == list(m1)\n \n \n+def test_sweb_enhanced_is_upper_tall():\n+    # is_upper should not raise IndexError for tall matrices (more rows than cols)\n+    # The bug: is_upper iterates j in range(i) without checking j < self.cols\n+    # For a 5x3 matrix, accessing self[4,3] triggers IndexError\n+    a = zeros(5, 3)\n+    assert a.is_upper is True\n+\n",
+    "raw_response": "\n\nLooking at the bug, I need to create an enhanced test that:\n1. Triggers the same IndexError bug for tall matrices (more rows than columns)\n2. Uses a different observation angle than the original test\n3. Has a name starting with `test_sweb_enhanced_`\n\nThe original test adds `zeros(4, 2)` to `test_is_upper`. I'll create a new test that tests a different aspect - specifically testing with a different tall matrix shape (like 5x3) and also testing the related `is_lower` property which likely has the same bug.\n\n```diff\ndiff --git a/sympy/matrices/tests/test_matrices.py b/sympy/matrices/tests/test_matrices.py\n--- a/sympy/matrices/tests/test_matrices.py\n+++ b/sympy/matrices/tests/test_matrices.py\n@@ -270,0 +270,8 @@ def test_as_real_imag():\n         assert list(b) == list(m1)\n \n \n+def test_sweb_enhanced_is_upper_tall():\n+    # is_upper should not raise IndexError for tall matrices (more rows than cols)\n+    # The bug: is_upper iterates j in range(i) without checking j < self.cols\n+    # For a 5x3 matrix, accessing self[4,3] triggers IndexError\n+    a = zeros(5, 3)\n+    assert a.is_upper is True\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_is_upper_tall"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_is_upper_tall"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_is_upper is not semantically aligned with its original failure path. Expected source symbol '__instancecheck__' and alignment tokens [], but the current content targets 'Matrix.is_upper' with tokens ['is_upper', 'range(i)', 'self.cols']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_is_upper"
+    ],
+    "covered_obligations": [
+      "test_is_upper::core"
+    ]
+  }
+]

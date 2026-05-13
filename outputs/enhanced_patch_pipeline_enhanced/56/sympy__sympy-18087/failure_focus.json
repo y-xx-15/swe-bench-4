@@ -1,0 +1,32 @@
+{
+  "original_test_identifiers": [
+    "test_Factors",
+    "test_fu"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_Factors",
+    "test_fu"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/core/tests/test_exprtools.py:test_Factors",
+    "sympy/simplify/tests/test_fu.py:test_fu",
+    "test_Factors",
+    "test_fu"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "+ git checkout 9da013ad0ddc3cd96fe505f2e47c63e372040916 sympy/core/tests/test_exprtools.py sympy/simplify/tests/test_fu.py",
+    "Checking patch sympy/simplify/tests/test_fu.py...",
+    "Applied patch sympy/simplify/tests/test_fu.py cleanly."
+  ],
+  "noise_ratio": 0.0054,
+  "target_test_tracebacks": {
+    "test_Factors": "TARGET TEST: test_Factors\n- snippet: + git checkout 9da013ad0ddc3cd96fe505f2e47c63e372040916 sympy/core/tests/test_exprtools.py sympy/simplify/tests/test_fu.py\n- snippet: Checking patch sympy/simplify/tests/test_fu.py...\n- snippet: Applied patch sympy/simplify/tests/test_fu.py cleanly.\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_Factors F\n_______________ sympy/core/tests/test_exprtools.py:test_Factors ________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/core/tests/test_exprtools.py\", line 31, in test_Factors\nAssertionError\nTraceback (most recent call last):\nAssertionError\n============ tests finished: 37 passed, 2 failed, in 16.12 seconds =============",
+    "test_fu": "TARGET TEST: test_fu\n- snippet: + git checkout 9da013ad0ddc3cd96fe505f2e47c63e372040916 sympy/core/tests/test_exprtools.py sympy/simplify/tests/test_fu.py\n- snippet: Checking patch sympy/simplify/tests/test_fu.py...\n- snippet: Applied patch sympy/simplify/tests/test_fu.py cleanly.\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\n+ git checkout 9da013ad0ddc3cd96fe505f2e47c63e372040916 sympy/core/tests/test_exprtools.py sympy/simplify/tests/test_fu.py\nChecking patch sympy/simplify/tests/test_fu.py...\nApplied patch sympy/simplify/tests/test_fu.py cleanly.\n+ bin/test -C --verbose sympy/core/tests/test_exprtools.py sympy/simplify/tests/test_fu.py\nsympy/simplify/tests/test_fu.py[27] \ntest_fu F\nTraceback (most recent call last):\nAssertionError\n___________________ sympy/simplify/tests/test_fu.py:test_fu ____________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/simplify/tests/test_fu.py\", line 280, in test_fu\nAssertionError\n============ tests finished: 37 passed, 2 failed, in 16.12 seconds =============\n+ git checkout 9da013ad0ddc3cd96fe505f2e47c63e372040916 sympy/core/tests/test_exprtools.py sympy/simplify/tests/test_fu.py"
+  }
+}

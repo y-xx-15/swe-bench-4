@@ -1,0 +1,42 @@
+{
+  "root_cause": "The sqf_list function is not combining factors with the same multiplicity into a single factor. When multiple irreducible factors share the same multiplicity (e.g., (x-2)^3 and (x-3)^3 both have multiplicity 3), they should be multiplied together to form one square-free factor, but the current implementation returns them as separate entries.",
+  "affected_components": [
+    {
+      "file": "sympy/polys/polytools.py",
+      "symbol": "sqf_list",
+      "reason": "This is the main function that computes square-free factorization and returns the list of (factor, multiplicity) pairs. It should combine factors with the same multiplicity."
+    },
+    {
+      "file": "sympy/polys/polytools.py",
+      "symbol": "sqf",
+      "reason": "Related function that returns the product form of square-free factorization; may share underlying logic with sqf_list."
+    }
+  ],
+  "failing_signal": "AssertionError in test_factor_terms - the sqf_list output shows separate factors (x-3,3) and (x-2,3) instead of a combined factor (x**2-5*x+6, 3)",
+  "propagation_path": "The sqf_list function calls internal factorization methods which return separate factors for each irreducible factor. The bug occurs because the code does not group factors by their multiplicity after factorization - it simply returns each factor separately without combining those with equal multiplicities.",
+  "repair_constraint": "After the fix, sqf_list must return factors grouped by multiplicity: factors with the same multiplicity must be combined into a single polynomial factor. The mathematical property is: if f = g*h where g and h are coprime square-free polynomials, and both have multiplicity m, then the output should be (g*h, m) not [(g,m), (h,m)].",
+  "suggested_repair_scope": [
+    "sympy/polys/polytools.py"
+  ],
+  "suspicious_symbols": [
+    "sqf_list",
+    "sqf",
+    "sqf_norm",
+    "sqf_part",
+    "_sqf_list"
+  ],
+  "repair_obligations": [
+    {
+      "id": "obligation_1",
+      "source_symbol": "sqf_list",
+      "validation_subject": "output grouping by multiplicity",
+      "why_it_matters": "Square-free factorization requires that each multiplicity appears at most once in the output list. Factors with the same multiplicity must be multiplied together to form a single square-free factor."
+    },
+    {
+      "id": "obligation_2",
+      "source_symbol": "sqf_list",
+      "validation_subject": "mathematical correctness of factorization",
+      "why_it_matters": "The product of all factors raised to their multiplicities must equal the original polynomial. Combining factors must preserve this invariant."
+    }
+  ]
+}

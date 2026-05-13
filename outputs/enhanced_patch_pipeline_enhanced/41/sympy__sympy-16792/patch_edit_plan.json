@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/utilities/codegen.py",
+      "action": "modify_region",
+      "justification": "The CodeGen.routine method is where InputArgument objects are created for arguments in argument_sequence. When a MatrixSymbol is in argument_sequence but not in the expression, it creates a plain InputArgument without dimensions, causing array arguments to be treated as scalars in generated C code."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/utilities/codegen.py",
+      "target_symbol": "CodeGen.routine",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "1"
+      ],
+      "anchor_line_before": "        # We currently do not support Matrices returning",
+      "anchor_line_after": "        # Optionally catch some common errors during construction",
+      "replacement_block": "        # We currently do not support Matrices returning\n        # as the l-value from a function (they are always returned via\n        # an OutputArgument).  In the future, we could allow this by\n        # passing a MatrixSymbol as the result_var.\n        if isinstance(result_var, MatrixBase):\n            raise CodeGenError(\"Matrix expressions cannot be currently returned from functions.\")\n\n        # Create dimensions for any MatrixSymbol in argument_sequence that\n        # doesn't appear in the expression (and thus wasn't handled above)\n        for symbol in argument_sequence:\n            if symbol not in name_arg_dict:\n                if isinstance(symbol, MatrixSymbol):\n                    # Preserve dimensions from MatrixSymbol shape\n                    dimensions = (symbol.rows, symbol.cols)\n                    name_arg_dict[symbol] = InputArgument(symbol, symbol, dimensions=dimensions)\n\n        # Optionally catch some common errors during construction"
+    }
+  ]
+}

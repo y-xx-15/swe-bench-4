@@ -1,0 +1,17 @@
+{
+  "title": "Fix Product pretty printing to handle variable-only limits",
+  "approach": "The _print_Product method always creates an Equality object for the lower bound using `Equality(lim[0], lim[1])`, but this fails when the limit tuple has only one element (variable only, like `(n,)`). Compare with _print_Sum which handles three cases: len(lim)==3 uses Equality, len(lim)==2 uses Equality, but len(lim)==1 just prints the variable. The fix should add the same conditional logic to _print_Product to handle the single-element limit case by printing just the variable instead of creating an invalid Equality.",
+  "edit_targets": [
+    "sympy/printing/pretty/pretty.py::_print_Product"
+  ],
+  "dependency_files": [
+    "sympy/printing/pretty/pretty.py::_print_Sum"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix should be sufficient. The _print_Sum method already handles this correctly with three cases based on the length of the limit tuple. Applying the same pattern to _print_Product should resolve the issue. No other files need modification.",
+  "risks": [
+    "Changing the Product printing logic might affect existing visual output for standard cases (n=1 to oo). Need to verify the visual output remains acceptable.",
+    "The Equality printing path might have edge cases beyond single-element limits that could still fail."
+  ]
+}

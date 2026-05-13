@@ -1,0 +1,14 @@
+{
+  "title": "Pass permute parameter in recursive diophantine call",
+  "approach": "The bug occurs in the diophantine function when syms order differs from the default sorted variable order. At line ~206, there's a recursive call to diophantine(eq, param) that handles symbol reordering, but it fails to pass the permute parameter. This causes the recursive call to use permute=False (the default), returning only the base solution instead of all permuted variants. The fix is to add permute=permute to the recursive call.",
+  "edit_targets": [
+    "sympy/solvers/diophantine.py::diophantine"
+  ],
+  "dependency_files": [],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only the primary target is sufficient. The bug is isolated to a single recursive call within the diophantine function where the permute parameter is omitted. No other files need modification.",
+  "risks": [
+    "Minimal risk - this is a straightforward parameter passing fix. The change preserves existing behavior for all other code paths and only fixes the missing permute flag propagation."
+  ]
+}

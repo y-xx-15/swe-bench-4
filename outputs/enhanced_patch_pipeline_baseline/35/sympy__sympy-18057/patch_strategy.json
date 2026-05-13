@@ -1,0 +1,18 @@
+{
+  "title": "Check if other is Expr before sympifying in Expr.__eq__",
+  "approach": "Add an early check in Expr.__eq__ to see if the other object is already an Expr instance. If it is, skip the sympify call which attempts to eval the object's repr. This prevents arbitrary repr strings from being parsed as Python code. The fix should check isinstance(other, Expr) before calling sympify(other).",
+  "edit_targets": [
+    "sympy/core/expr.py::Expr.__eq__"
+  ],
+  "dependency_files": [
+    "sympy/core/basic.py::Basic.__eq__",
+    "sympy/core/sympify.py::sympify"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The primary fix in Expr.__eq__ should be sufficient because that's where the sympify call happens that triggers the eval of arbitrary repr strings. The check for isinstance(other, Expr) before sympify will short-circuit this dangerous behavior. No changes needed to sympify itself or Basic.__eq__ since the problem is specifically in Expr.__eq__ calling sympify on non-Expr objects.",
+  "risks": [
+    "Potential performance regression if sympify was doing useful work for non-Expr objects that should be converted - but the current behavior of eval-ing arbitrary reprs is a correctness bug that must be fixed",
+    "Must ensure that existing SymPy object comparisons still work correctly - objects that are already Expr instances must still compare correctly"
+  ]
+}

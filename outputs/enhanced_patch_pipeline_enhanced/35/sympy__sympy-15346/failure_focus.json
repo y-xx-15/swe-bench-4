@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_issue_15129_trigsimp_methods"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_issue_15129_trigsimp_methods"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods",
+    "test_issue_15129_trigsimp_methods"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_issue_15129_trigsimp_methods F",
+    "___ sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods ____",
+    "Traceback (most recent call last):"
+  ],
+  "noise_ratio": 0.0058,
+  "target_test_tracebacks": {
+    "test_issue_15129_trigsimp_methods": "TARGET TEST: test_issue_15129_trigsimp_methods\n- snippet: test_issue_15129_trigsimp_methods F\n- snippet: ___ sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods ____\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_issue_15129_trigsimp_methods F\n___ sympy/simplify/tests/test_trigsimp.py:test_issue_15129_trigsimp_methods ____\nTraceback (most recent call last):\n  File \"/testbed/sympy/simplify/tests/test_trigsimp.py\", line 367, in test_issue_15129_trigsimp_methods\nAssertionError\n== tests finished: 23 passed, 1 failed, 1 expected to fail, in 68.97 seconds ==="
+  }
+}

@@ -1,0 +1,108 @@
+[
+  {
+    "idea": {
+      "title": "diophantine permute=True should return same results regardless of syms order",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Verify that permute=True produces complete results independent of symbol ordering",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_permute_syms_order_independence"
+      ],
+      "covers_original_tests": [
+        "test_diophantine"
+      ],
+      "covers_obligations": [
+        "test_diophantine::core"
+      ],
+      "target_source_symbol": "diophantine",
+      "target_validation_subject": "permute=True with syms parameter",
+      "semantic_alignment_tokens": [
+        "diophantine",
+        "permute",
+        "syms",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "syms=",
+        "permute=True",
+        "diophantine("
+      ],
+      "rationale": "The original test checks diophantine results but does not explicitly verify that symbol order independence holds when permute=True. This test directly compares results from two equivalent calls with reversed syms order, which will trigger AssertionError on buggy code since one returns only {(3,2)} while the other returns all 8 permutations."
+    },
+    "patch": "diff --git a/sympy/solvers/tests/test_diophantine.py b/sympy/solvers/tests/test_diophantine.py\n--- a/sympy/solvers/tests/test_diophantine.py\n+++ b/sympy/solvers/tests/test_diophantine.py\n@@ -187,6 +187,16 @@ def test_diophantine_permute_sign():\n     assert diophantine(10*x**2 + 12*x*y + 12*y**2 - 34, permute=True) == soln\n \n \n+def test_sweb_enhanced_permute_syms_order_independence():\n+    # Test that permute=True returns complete results regardless of syms order\n+    # Bug: diophantine returns only {(3, 2)} when syms=(n,m) but all 8 permutations\n+    # when syms=(m,n) - this tests that both orderings produce the same complete set\n+    from sympy.abc import m, n\n+    eq = m**4 + n**4 - 2**4 - 3**4\n+    result_mn = diophantine(eq, syms=(m, n), permute=True)\n+    result_nm = diophantine(eq, syms=(n, m), permute=True)\n+    assert result_mn == result_nm, \"permute=True should return same results regardless of syms order\"\n+\n @XFAIL\n def test_not_implemented():\n     eq = x**2 + y**4 - 1**2 - 3**4\n",
+    "raw_response": "\n\nLooking at the bug, I need to create an enhanced test that:\n1. Uses a different equation than the original test\n2. Directly compares results from two equivalent calls with reversed syms order\n3. Will fail on the buggy code (AssertionError) and pass after the fix\n\nLet me create the patch:\ndiff --git a/sympy/solvers/tests/test_diophantine.py b/sympy/solvers/tests/test_diophantine.py\n--- a/sympy/solvers/tests/test_diophantine.py\n+++ b/sympy/solvers/tests/test_diophantine.py\n@@ -187,0 +188,10 @@ def test_diophantine_permute_sign():\n     assert diophantine(10*x**2 + 12*x*y + 12*y**2 - 34, permute=True) == soln\n \n \n+def test_sweb_enhanced_permute_syms_order_independence():\n+    # Test that permute=True returns complete results regardless of syms order\n+    # Bug: diophantine returns only {(3, 2)} when syms=(n,m) but all 8 permutations\n+    # when syms=(m,n) - this tests that both orderings produce the same complete set\n+    from sympy.abc import m, n\n+    eq = m**4 + n**4 - 2**4 - 3**4\n+    result_mn = diophantine(eq, syms=(m, n), permute=True)\n+    result_nm = diophantine(eq, syms=(n, m), permute=True)\n+    assert result_mn == result_nm, \"permute=True should return same results regardless of syms order\"\n+\n @XFAIL\n def test_not_implemented():\n     eq = x**2 + y**4 - 1**2 - 3**4\n",
+    "identifiers": [
+      "test_sweb_enhanced_permute_syms_order_independence"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_permute_syms_order_independence"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_permute_syms_order_independence"
+    ],
+    "eval_status_map": {
+      "sympy/solvers/tests/test_diophantine.py:test_sweb_enhanced_permute_syms_order_independence": "FAILED",
+      "test_input_format": "PASSED",
+      "test_univariate": "PASSED",
+      "test_classify_diop": "PASSED",
+      "test_linear": "PASSED",
+      "test_quadratic_simple_hyperbolic_case": "PASSED",
+      "test_quadratic_elliptical_case": "PASSED",
+      "test_quadratic_parabolic_case": "PASSED",
+      "test_quadratic_perfect_square": "PASSED",
+      "test_quadratic_non_perfect_square": "PASSED",
+      "test_issue_9106": "PASSED",
+      "test_issue_18138": "PASSED",
+      "test_DN": "PASSED",
+      "test_bf_pell": "PASSED",
+      "test_length": "PASSED",
+      "test_transformation_to_pell": "PASSED",
+      "test_find_DN": "PASSED",
+      "test_ldescent": "PASSED",
+      "test_diop_ternary_quadratic_normal": "PASSED",
+      "test_transformation_to_normal": "PASSED",
+      "test_diop_ternary_quadratic": "PASSED",
+      "test_square_factor": "PASSED",
+      "test_parametrize_ternary_quadratic": "PASSED",
+      "test_no_square_ternary_quadratic": "PASSED",
+      "test_descent": "PASSED",
+      "test_diophantine": "PASSED",
+      "test_general_pythagorean": "PASSED",
+      "test_diop_general_sum_of_squares_quick": "PASSED",
+      "test_diop_partition": "PASSED",
+      "test_prime_as_sum_of_two_squares": "PASSED",
+      "test_sum_of_three_squares": "PASSED",
+      "test_sum_of_four_squares": "PASSED",
+      "test_power_representation": "PASSED",
+      "test_assumptions": "PASSED",
+      "test_diopcoverage": "PASSED",
+      "test_holzer": "PASSED",
+      "test_issue_9539": "PASSED",
+      "test_issue_8943": "PASSED",
+      "test_diop_sum_of_even_powers": "PASSED",
+      "test_sum_of_squares_powers": "PASSED",
+      "test__can_do_sum_of_squares": "PASSED",
+      "test_diophantine_permute_sign": "PASSED",
+      "test_sweb_enhanced_permute_syms_order_independence": "FAILED",
+      "test_issue_9538": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_diophantine"
+    ],
+    "covered_obligations": [
+      "test_diophantine::core"
+    ]
+  }
+]

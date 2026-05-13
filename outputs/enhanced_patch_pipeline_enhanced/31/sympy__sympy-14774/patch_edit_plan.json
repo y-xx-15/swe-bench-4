@@ -1,0 +1,24 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/latex.py",
+      "action": "modify_region",
+      "justification": "The inv_trig_table list in _print_Function is missing 'acsc' and 'asec', which causes these inverse trig functions to not receive the 'arc' prefix when inv_trig_style='full'. This is the root cause of the bug and must be fixed."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/latex.py",
+      "target_symbol": "LatexPrinter._print_Function__branch_mid1",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_latex_functions::core::inv_trig_table",
+        "test_latex_functions::core::inv_trig_style=full for acsc and asec",
+        "test_latex_functions::core::inv_trig_table list completeness"
+      ],
+      "anchor_line_before": "            if func in inv_trig_table:",
+      "anchor_line_after": "                if inv_trig_style == \"abbreviated\":",
+      "replacement_block": "            if func in inv_trig_table:\n                if inv_trig_style == \"abbreviated\":"
+    }
+  ]
+}

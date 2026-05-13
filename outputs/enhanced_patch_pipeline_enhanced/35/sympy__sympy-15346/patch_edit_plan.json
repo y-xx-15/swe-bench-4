@@ -1,0 +1,9 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/simplify/trigsimp.py::__trigsimp",
+      "action": "modify_region",
+      "justification": "This is the primary function containing the pattern matching logic that fails to match the cosine difference identity when arguments are Rational numbers. The matchers_add patterns use Wild symbols that don't match against Rational arguments properly."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "title": "Add __rmul__ method to Point class",
+  "approach": "Add a __rmul__ method to the Point class that delegates to __mul__, enabling scalar * Point operations (e.g., 2.0 * point2) to work correctly. This prevents the creation of a Mul expression that then causes __add__ to fail when adding to another Point.",
+  "edit_targets": [
+    "sympy/geometry/point.py::Point"
+  ],
+  "dependency_files": [
+    "sympy/geometry/point.py::Point.__mul__",
+    "sympy/geometry/point.py::Point.__add__"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, adding __rmul__ is sufficient. The root cause is that Point lacks __rmul__, so when Python evaluates scalar * Point, it creates a Mul expression instead of returning a scaled Point. Once __rmul__ is added, scalar * Point returns a Point, and the subsequent addition to another Point works correctly via the existing __add__ logic.",
+  "risks": [
+    "Ensure __rmul__ handles all scalar types that __mul__ handles (integers, floats, sympy expressions)",
+    "Ensure existing Point * scalar (forward multiplication) behavior is preserved"
+  ]
+}

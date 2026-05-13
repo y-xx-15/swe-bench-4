@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_arg"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_arg"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/assumptions/tests/test_refine.py:test_arg",
+    "test_arg"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_arg F",
+    "_______________ sympy/assumptions/tests/test_refine.py:test_arg ________________",
+    "Traceback (most recent call last):"
+  ],
+  "noise_ratio": 0.006,
+  "target_test_tracebacks": {
+    "test_arg": "TARGET TEST: test_arg\n- snippet: test_arg F\n- snippet: _______________ sympy/assumptions/tests/test_refine.py:test_arg ________________\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_arg F\n_______________ sympy/assumptions/tests/test_refine.py:test_arg ________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/assumptions/tests/test_refine.py\", line 165, in test_arg\nAssertionError\n============= tests finished: 14 passed, 1 failed, in 7.35 seconds ============="
+  }
+}

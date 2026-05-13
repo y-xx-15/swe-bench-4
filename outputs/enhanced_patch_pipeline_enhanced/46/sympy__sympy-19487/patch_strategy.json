@@ -1,0 +1,15 @@
+{
+  "title": "Add _eval_rewrite_as_Abs method to sign class",
+  "approach": "Add a _eval_rewrite_as_Abs method to the sign class in sympy/functions/elementary/complexes.py. This method should return self.args[0] / Abs(self.args[0]) when the argument is known to be non-zero (using fuzzy_not check on is_zero). This preserves sign(0)=0 behavior while enabling sign(x).rewrite(Abs)=x/Abs(x) for non-zero x. The doit method already has similar logic but uses is_zero is False which may not work in all cases - the rewrite method should handle the uncertain case by returning None to leave unevaluated.",
+  "edit_targets": [
+    "sympy/functions/elementary/complexes.py::sign"
+  ],
+  "dependency_files": [],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only the sign class in complexes.py is sufficient. The fix adds one new method _eval_rewrite_as_Abs that follows the same pattern as existing rewrite methods in the class (like _eval_rewrite_as_Piecewise and _eval_rewrite_as_Heaviside). No other files need modification.",
+  "risks": [
+    "Potential regression: if the is_zero check returns None (unknown), the rewrite should return None to leave unevaluated rather than incorrectly simplifying",
+    "Potential regression: must ensure sign(0) still returns 0 and not nan - the rewrite should not apply when argument is zero"
+  ]
+}

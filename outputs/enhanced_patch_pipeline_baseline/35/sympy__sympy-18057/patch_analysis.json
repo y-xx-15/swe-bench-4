@@ -1,0 +1,40 @@
+{
+  "root_cause": "Expr.__eq__ calls sympify() on arbitrary objects without first checking if they are already SymPy objects. When an arbitrary object has a __repr__ that looks like valid Python code (e.g., 'x.y'), sympify attempts to parse and evaluate it, causing AttributeError or incorrect equality results.",
+  "affected_components": [
+    {
+      "file": "sympy/core/expr.py",
+      "symbol": "Expr.__eq__",
+      "reason": "This is the entry point where sympify is called on the other object without type checking, leading to eval of arbitrary repr strings"
+    },
+    {
+      "file": "sympy/core/sympify.py",
+      "symbol": "sympify",
+      "reason": "The sympify function attempts to parse the repr string of arbitrary objects as Python code via parse_expr"
+    }
+  ],
+  "failing_signal": "AttributeError: 'Symbol' object has no attribute 'y' when comparing Symbol('x') == C() where C().__repr__() returns 'x.y'. Also, Symbol('x') incorrectly equals C() where C().__repr__() returns 'x'.",
+  "propagation_path": "1) User compares Symbol('x') == C() 2) Expr.__eq__ calls sympify(C()) 3) sympify calls parse_expr with the string repr of C() 4) parse_expr evaluates 'Symbol('x').y' which tries to access .y attribute on Symbol 5) AttributeError is raised",
+  "repair_constraint": "The fix must preserve existing equality semantics for legitimate SymPy objects while preventing arbitrary objects from being sympified based on their repr. Objects that are already Expr instances should not go through sympify.",
+  "suggested_repair_scope": [
+    "sympy/core/expr.py"
+  ],
+  "suspicious_symbols": [
+    "Expr.__eq__",
+    "sympify",
+    "Symbol"
+  ],
+  "repair_obligations": [
+    {
+      "id": "prevent_arbitrary_repr_eval",
+      "source_symbol": "Expr.__eq__",
+      "validation_subject": "other object before sympify call",
+      "why_it_matters": "Must check if other is already an Expr before calling sympify, to prevent eval of arbitrary object reprs which can cause AttributeError or incorrect equality"
+    },
+    {
+      "id": "preserve_sympy_equality",
+      "source_symbol": "Expr.__eq__",
+      "validation_subject": "existing SymPy object comparisons",
+      "why_it_matters": "The fix must not break existing equality checks between SymPy objects - objects that are already Expr instances must still compare correctly"
+    }
+  ]
+}

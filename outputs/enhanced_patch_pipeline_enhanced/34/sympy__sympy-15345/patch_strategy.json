@@ -1,0 +1,16 @@
+{
+  "title": "Add Max and Min to known_functions dictionary",
+  "approach": "Add 'Max' and 'Min' entries to the known_functions dictionary in sympy/printing/mathematica.py so that Max(x,2) and similar expressions are printed with Mathematica square bracket syntax [] instead of Python parentheses (). The known_functions dictionary maps SymPy function names to their Mathematica equivalents, and adding Max/Min there will route them through the _print_Function method which correctly uses square brackets.",
+  "edit_targets": [
+    "sympy/printing/mathematica.py"
+  ],
+  "dependency_files": [
+    "sympy/printing/tests/test_mathematica.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix should be sufficient because the _print_Function method already handles all functions in known_functions by printing them with square brackets. Adding Max and Min to known_functions will cause them to be printed as 'Max[x, 2]' instead of falling back to the default Python representation with parentheses. No additional printer methods should be needed since Max and Min are already Function subclasses that will be routed through _print_Function once registered in known_functions.",
+  "risks": [
+    "Adding Max/Min to known_functions should not break existing tests since they will now be handled by the existing _print_Function logic rather than falling back to an incorrect representation. The argument order issue (2, x vs x, 2) is likely due to how SymPy internally orders Max arguments, which is preserved by the printer - this is correct behavior."
+  ]
+}

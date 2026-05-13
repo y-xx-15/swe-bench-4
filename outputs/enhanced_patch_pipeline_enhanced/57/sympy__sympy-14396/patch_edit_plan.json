@@ -1,0 +1,24 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/polys/polyoptions.py",
+      "action": "modify_region",
+      "justification": "The Domain.preprocess() method in polyoptions.py contains the _re_polynomial regex that only matches Z/ZZ/Q/QQ polynomial rings, and the handling code that creates polynomial rings. Both need to be extended to support RR/CC polynomial rings."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/polys/polyoptions.py",
+      "target_symbol": "Domain",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_Domain_preprocess::core::domain specification string parsing",
+        "test_Domain_preprocess::core::domain specification parsing for RR[y,z] and CC[y,z]",
+        "test_Domain_preprocess::core::domain specification string"
+      ],
+      "anchor_line_before": "    _re_polynomial = re.compile(r\"^(Z|ZZ|Q|QQ)\\[(.+)\\]$\")",
+      "anchor_line_after": "    @classmethod",
+      "replacement_block": "    _re_polynomial = re.compile(r\"^(Z|ZZ|Q|QQ|R|RR|C|CC)\\[(.+)\\]$\")\n\n    @classmethod"
+    }
+  ]
+}

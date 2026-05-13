@@ -1,0 +1,18 @@
+{
+  "title": "Fix trigsimp pattern matching for Rational arguments in cosine difference identity",
+  "approach": "The bug occurs because the pattern matching in `__trigsimp` uses Wild symbols that fail to match when the trigonometric arguments are Rational numbers. Specifically, the `matchers_add` patterns (like `c*cos(a)*cos(b) + c*sin(a)*sin(b) + d` matching to `cos(a-b)*c + d`) don't match when `a` and `b` are Rational values. The fix should modify the matching logic in `__trigsimp` to handle the case where the arguments are concrete Rational/Number types by directly comparing the arguments of sin/cos functions rather than relying solely on Wild symbol matching. The key location is in the `matchers_add` loop where `expr.match(pattern)` is called - we need to add fallback logic that extracts sin/cos arguments directly from the expression when the Wild-based match fails, then applies the cosine difference identity manually.",
+  "edit_targets": [
+    "sympy/simplify/trigsimp.py::__trigsimp"
+  ],
+  "dependency_files": [
+    "sympy/simplify/tests/test_trigsimp.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The primary fix targets `__trigsimp` function in `sympy/simplify/trigsimp.py` where the `matchers_add` pattern matching occurs. This single location should be sufficient because the cosine difference identity simplification is handled entirely within this function's pattern matching loop. The fix must handle both validation subjects: (1) test_issue_15129_trigsimp_methods::trigsimp result for sin/cos product sum with Rational arguments, and (2) test_issue_15129_trigsimp_methods::cosine difference identity simplification with Rational arguments. No changes to test files are needed - the existing test_issue_15129_trigsimp_methods test already covers this functionality.",
+  "risks": [
+    "Potential regression: the fix must not break existing trigsimp behavior for symbolic arguments - the Wild symbol matching should continue to work as before for non-Rational arguments",
+    "Potential regression: must preserve correctness of other trigonometric identities in matchers_add (sin(a+b), cos(a+b), sin(a-b), etc.)",
+    "Risk of over-simplification: ensure the fix only applies the cosine difference identity when mathematically valid"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "title": "Pass permute parameter in syms reordering branch",
+  "approach": "The bug occurs in the diophantine function where it handles the syms parameter. When syms differs from the default variable order (var), the code recursively calls diophantine(eq, param) to get solutions in the default order, then reorders them. However, the permute parameter is NOT passed to this recursive call, causing permute=True to be silently lost. The fix is to pass permute=permute to the recursive call at line ~165 in sympy/solvers/diophantine.py.",
+  "edit_targets": [
+    "sympy/solvers/diophantine.py::diophantine"
+  ],
+  "dependency_files": [],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only the primary target is sufficient. The bug is isolated to a single line where the recursive call to diophantine() is made without passing the permute parameter. The fix is a one-line change that passes permute=permute to preserve the permute flag through the reordering logic.",
+  "risks": [
+    "Potential performance impact if permute=True is used with large solution sets, but this is expected behavior - the bug is that permute was being ignored"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "root_cause": "The _preprocess method in _EvaluatorPrinter handles Symbol and Function types by checking if their string representation is a valid Python identifier and replacing with Dummy symbols if not, but it does not handle MatrixSymbol. MatrixSymbol with non-identifier names (like '{v}') falls through to the else clause and gets converted directly to a string, producing invalid Python syntax.",
+  "affected_components": [
+    {
+      "file": "sympy/utilities/lambdify.py",
+      "symbol": "_EvaluatorPrinter._preprocess",
+      "reason": "This method preprocesses arguments to replace non-valid Python identifiers with Dummy symbols, but it only handles Symbol, Function, and DeferredVector types - not MatrixSymbol"
+    }
+  ],
+  "failing_signal": "SyntaxError when compiling the generated lambda function code because MatrixSymbol name '{v}' is used directly as a Python variable name, which is invalid syntax",
+  "propagation_path": "MatrixSymbol with name '{v}' -> _preprocess method -> falls through to else clause -> str(arg) produces '{v}' -> this becomes a function argument name -> compile() fails with SyntaxError",
+  "repair_constraint": "MatrixSymbol arguments must be handled the same way as Symbol arguments: if the name is not a valid Python identifier (or dummify=True), replace with a Dummy symbol both in the argument list and in the expression",
+  "suggested_repair_scope": [
+    "sympy/utilities/lambdify.py"
+  ],
+  "suspicious_symbols": [
+    "_EvaluatorPrinter",
+    "_preprocess",
+    "MatrixSymbol",
+    "Symbol",
+    "Function",
+    "DeferredVector"
+  ],
+  "repair_obligations": [
+    {
+      "id": "1",
+      "source_symbol": "_EvaluatorPrinter._preprocess",
+      "validation_subject": "MatrixSymbol handling",
+      "why_it_matters": "MatrixSymbol must be checked for valid identifier status just like Symbol is, to handle names with curly braces or other invalid Python identifier characters"
+    },
+    {
+      "id": "2",
+      "source_symbol": "_EvaluatorPrinter._preprocess",
+      "validation_subject": "dummify parameter behavior",
+      "why_it_matters": "When dummify=True, MatrixSymbol arguments must be replaced with Dummy symbols just like Symbol arguments"
+    }
+  ]
+}

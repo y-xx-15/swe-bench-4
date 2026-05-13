@@ -1,0 +1,56 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/matrices/matrices.py",
+      "action": "modify_region",
+      "justification": "Contains is_upper property and related methods that have unbounded iteration causing IndexError for non-square matrices. All four methods must be fixed."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/matrices/matrices.py",
+      "target_symbol": "MatrixProperties.is_upper",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_is_upper::core::is_upper property on tall matrix",
+        "test_hessenberg::core::is_upper property on tall matrix"
+      ],
+      "anchor_line_before": "        return all(self[i, j].is_zero",
+      "anchor_line_after": "                   for j in range(i))",
+      "replacement_block": "        return all(self[i, j].is_zero\n                   for i in range(1, self.rows)\n                   for j in range(min(i, self.cols)))"
+    },
+    {
+      "target_file": "sympy/matrices/matrices.py",
+      "target_symbol": "MatrixProperties._eval_is_lower",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_is_upper::core::is_upper property on tall matrix"
+      ],
+      "anchor_line_before": "        return all(self[i, j].is_zero",
+      "anchor_line_after": "                   for i in range(self.rows)",
+      "replacement_block": "        return all(self[i, j].is_zero\n                   for i in range(self.rows)\n                   for j in range(i + 1, min(self.cols, self.rows)))"
+    },
+    {
+      "target_file": "sympy/matrices/matrices.py",
+      "target_symbol": "MatrixProperties._eval_is_upper_hessenberg",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_hessenberg::core::is_upper property on tall matrix"
+      ],
+      "anchor_line_before": "        return all(self[i, j].is_zero",
+      "anchor_line_after": "                   for i in range(2, self.rows)",
+      "replacement_block": "        return all(self[i, j].is_zero\n                   for i in range(2, self.rows)\n                   for j in range(min(i - 1, self.cols)))"
+    },
+    {
+      "target_file": "sympy/matrices/matrices.py",
+      "target_symbol": "MatrixProperties._eval_is_lower_hessenberg",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test_hessenberg::core::is_upper property on tall matrix"
+      ],
+      "anchor_line_before": "        return all(self[i, j].is_zero",
+      "anchor_line_after": "                   for i in range(self.rows)",
+      "replacement_block": "        return all(self[i, j].is_zero\n                   for i in range(self.rows)\n                   for j in range(i + 2, min(self.cols, self.rows)))"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_curly_matrix_symbol"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_curly_matrix_symbol"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/utilities/tests/test_lambdify.py:test_curly_matrix_symbol",
+    "test_curly_matrix_symbol"
+  ],
+  "failure_mode": "generic_failure",
+  "dominant_errors": [
+    "SyntaxError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_curly_matrix_symbol E",
+    "_______ sympy/utilities/tests/test_lambdify.py:test_curly_matrix_symbol ________",
+    "Traceback (most recent call last):"
+  ],
+  "noise_ratio": 0.0049,
+  "target_test_tracebacks": {
+    "test_curly_matrix_symbol": "TARGET TEST: test_curly_matrix_symbol\n- snippet: test_curly_matrix_symbol E\n- snippet: _______ sympy/utilities/tests/test_lambdify.py:test_curly_matrix_symbol ________\n- snippet: Traceback (most recent call last):\n- dominant_errors: SyntaxError\nWEAK TRACEBACK CONTEXT:\ntest_imps_errors ok\ntest_curly_matrix_symbol E\n_______ sympy/utilities/tests/test_lambdify.py:test_curly_matrix_symbol ________\nTraceback (most recent call last):\n  File \"/testbed/sympy/utilities/tests/test_lambdify.py\", line 734, in test_curly_matrix_symbol\nSyntaxError: invalid syntax"
+  }
+}

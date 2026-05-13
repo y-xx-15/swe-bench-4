@@ -1,0 +1,17 @@
+{
+  "title": "Add Max to known_functions dictionary",
+  "approach": "Add 'Max' to the known_functions dictionary in sympy/printing/mathematica.py with the Mathematica function name 'Max'. This ensures that Max is properly recognized by _print_Function and printed with square brackets [] instead of falling back to a default that might use parentheses. The entry should follow the same pattern as other functions in the dictionary: 'Max': [(lambda *args: True, 'Max')].",
+  "edit_targets": [
+    "sympy/printing/mathematica.py"
+  ],
+  "dependency_files": [
+    "sympy/printing/tests/test_mathematica.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only sympy/printing/mathematica.py is sufficient. The fix involves adding Max to the known_functions dictionary, which is used by the _print_Function method to properly format function calls with Mathematica square brackets. No other files need modification.",
+  "risks": [
+    "Adding Max to known_functions should not cause regressions as it follows the established pattern for other functions like sin, cos, exp, etc.",
+    "The argument order issue (2, x vs x, 2) mentioned in the bug report may be a separate issue related to how SymPy orders Max arguments internally, but the primary issue of using parentheses vs square brackets should be fixed by this change."
+  ]
+}

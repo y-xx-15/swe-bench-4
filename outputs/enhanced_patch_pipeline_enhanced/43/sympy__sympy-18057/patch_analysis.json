@@ -1,0 +1,52 @@
+{
+  "root_cause": "Expr.__eq__ calls sympify() on arbitrary objects without validating them first. When sympify() receives an object with a malicious or unexpected __repr__ (like 'x.y'), it passes this string to parse_expr which then eval's it as Python code. This causes either AttributeError (accessing .y on Symbol) or worse, arbitrary code execution.",
+  "affected_components": [
+    {
+      "file": "sympy/core/expr.py",
+      "symbol": "Expr.__eq__",
+      "reason": "This is the entry point that calls sympify(other) on arbitrary objects during equality comparison. The try/except block catches SympifyError and SyntaxError but not the AttributeError that occurs when eval'ing the repr produces attribute access."
+    },
+    {
+      "file": "sympy/core/sympify.py",
+      "symbol": "sympify",
+      "reason": "The sympify function accepts any object, converts it to string via str() or repr(), and passes it to parse_expr which uses eval() - this is the dangerous behavior triggered during equality checks."
+    },
+    {
+      "file": "sympy/parsing/sympy_parser.py",
+      "symbol": "parse_expr/eval_expr",
+      "reason": "These functions use eval() on the string representation of objects, which is fundamentally unsafe when the repr comes from untrusted objects."
+    }
+  ],
+  "failing_signal": "AttributeError: 'Symbol' object has no attribute 'y' when comparing sympy.Symbol('x') == C() where C.__repr__ returns 'x.y'. Also, objects with repr='x' incorrectly compare equal to Symbol('x').",
+  "propagation_path": "1) User compares Symbol with arbitrary object: sympy.Symbol('x') == C()\n2) Expr.__eq__ calls sympify(other) on C() instance\n3) sympify calls str() on C() which calls C().__repr__() returning 'x.y'\n4) parse_expr receives 'x.y' and converts to 'Symbol(x).y'\n5) eval('Symbol(x).y') tries to access .y attribute on Symbol, raising AttributeError",
+  "repair_constraint": "The fix must prevent arbitrary code execution/repr evaluation in __eq__ while still allowing legitimate SymPy object comparisons. Objects that are not already SymPy expressions should be rejected early without calling sympify.",
+  "suggested_repair_scope": [
+    "sympy/core/expr.py"
+  ],
+  "suspicious_symbols": [
+    "Expr.__eq__",
+    "sympify",
+    "parse_expr",
+    "Symbol"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_var::ns",
+      "source_symbol": "Symbol",
+      "validation_subject": "ns",
+      "why_it_matters": "The test uses eval('var('a')', ns) and then checks ns['a'] == Symbol('a'). This comparison triggers sympify on the dictionary value. The fix must not break this comparison while preventing the repr-eval bug."
+    },
+    {
+      "id": "test_var::ns::comparison_result",
+      "source_symbol": "Symbol",
+      "validation_subject": "comparison_result",
+      "why_it_matters": "The comparison Symbol('a') == ns['a'] must return True when ns['a'] is Symbol('a'), but must not try to eval any repr strings from arbitrary objects."
+    },
+    {
+      "id": "test_var::v::comparison_result",
+      "source_symbol": "Symbol",
+      "validation_subject": "comparison_result",
+      "why_it_matters": "Similar to ns, the variable 'v' in test_var_return is compared with Symbol objects. The fix must preserve correct Symbol-to-Symbol equality while blocking unsafe repr evaluation."
+    }
+  ]
+}

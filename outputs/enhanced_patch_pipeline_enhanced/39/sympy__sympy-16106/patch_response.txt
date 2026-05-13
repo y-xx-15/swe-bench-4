@@ -1,0 +1,11 @@
+
+
+Looking at the bug, I need to add `_print_IndexedBase` and `_print_Indexed` methods to both `MathMLContentPrinter` and `MathMLPresentationPrinter` classes in `sympy/printing/mathml.py`.
+
+Let me first examine the exact structure of the file to find the right locations to add these methods.
+<minimax:tool_call>
+<invoke name="grep">
+<parameter name="path">/testbed/sympy/printing/mathml.py</parameter>
+<parameter name="pattern">def _print_Symbol</parameter>
+</invoke>
+</minimax:tool_call>

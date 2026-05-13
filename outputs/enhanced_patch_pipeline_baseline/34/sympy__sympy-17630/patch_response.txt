@@ -1,0 +1,6 @@
+
+
+Looking at the bug, I need to find where in the `_blockmul` method the ZeroMatrix blocks are being converted to scalar Zero. Let me examine the relevant code in blockmatrix.py.
+<tool_code>
+open_file path: "/testbed/sympy/matrices/expressions/blockmatrix.py"
+</tool_code>

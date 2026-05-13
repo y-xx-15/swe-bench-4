@@ -1,0 +1,294 @@
+{
+  "instance_id": "sympy__sympy-17139",
+  "repo": "sympy/sympy",
+  "model": "minimax-m2.5",
+  "pipeline_mode": "enhanced_guided",
+  "hide_original_test_patch_in_repair": false,
+  "disable_semantic_bucket_guidance": false,
+  "disable_enhanced_test_filtering": false,
+  "repair_mode": "enhanced_guided",
+  "original_test_identifiers": [
+    "test__TR56",
+    "test_issue_17137"
+  ],
+  "original_status_counts": {
+    "FAILED": 2,
+    "PASSED": 67,
+    "ERROR": 2
+  },
+  "original_failed_count": 4,
+  "original_passed_count": 67,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test__TR56",
+      "test_issue_17137"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test__TR56",
+      "test_issue_17137"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/simplify/tests/test_fu.py:test__TR56",
+      "sympy/simplify/tests/test_simplify.py:test_issue_17137",
+      "test__TR56",
+      "test_issue_17137"
+    ],
+    "failure_mode": "type_error",
+    "dominant_errors": [
+      "TypeError"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "test__TR56 E",
+      "test_issue_17137 E",
+      "__________________ sympy/simplify/tests/test_fu.py:test__TR56 __________________"
+    ],
+    "noise_ratio": 0.0046,
+    "target_test_tracebacks": {
+      "test__TR56": "TARGET TEST: test__TR56\n- snippet: test__TR56 E\n- snippet: test_issue_17137 E\n- snippet: __________________ sympy/simplify/tests/test_fu.py:test__TR56 __________________\n- dominant_errors: TypeError\nWEAK TRACEBACK CONTEXT:\ntest__TR56 E\n__________________ sympy/simplify/tests/test_fu.py:test__TR56 __________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/simplify/tests/test_fu.py\", line 80, in test__TR56\n    raise TypeError(\"Invalid comparison of complex %s\" % me)\nTypeError: Invalid comparison of complex I\nTraceback (most recent call last):\n    raise TypeError(\"Invalid comparison of complex %s\" % me)\nTypeError: Invalid comparison of complex I",
+      "test_issue_17137": "TARGET TEST: test_issue_17137\n- snippet: test__TR56 E\n- snippet: test_issue_17137 E\n- snippet: __________________ sympy/simplify/tests/test_fu.py:test__TR56 __________________\n- dominant_errors: TypeError\nWEAK TRACEBACK CONTEXT:\ntest_issue_17137 E\nTraceback (most recent call last):\n    raise TypeError(\"Invalid comparison of complex %s\" % me)\nTypeError: Invalid comparison of complex I\n____________ sympy/simplify/tests/test_simplify.py:test_issue_17137 ____________\nTraceback (most recent call last):\n  File \"/testbed/sympy/simplify/tests/test_simplify.py\", line 815, in test_issue_17137\n    raise TypeError(\"Invalid comparison of complex %s\" % me)\nTypeError: Invalid comparison of complex I"
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 5,
+    "keep_top_k": 3,
+    "attempt_budget": 3,
+    "bucket_limit": 5,
+    "template_limit": 4,
+    "failure_mode": "type_error",
+    "noise_ratio": 0.0046,
+    "difficulty": "medium"
+  },
+  "adaptive_num_candidates": 5,
+  "adaptive_keep_top_k": 3,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 5,
+  "kept_enhanced_candidates": 3,
+  "enhanced_candidate_retention_rate": 0.6,
+  "enhanced_generation_attempts_total": 12,
+  "enhanced_generation_attempts_avg": 2.4,
+  "kept_enhanced_test_identifiers": [
+    "test_sweb_enhanced_complex_exp_trig",
+    "test_sweb_enhanced_tr5_complex_exponent",
+    "test_sweb_enhanced_tr6_complex_exponent"
+  ],
+  "enhanced_failed_test_identifiers": [
+    "test_sweb_enhanced_complex_exp_trig",
+    "test_sweb_enhanced_tr5_complex_exponent",
+    "test_sweb_enhanced_tr6_complex_exponent"
+  ],
+  "enhanced_failed_count": 3,
+  "generated_patch_nonempty": true,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 13,
+  "generated_patch_accepted": true,
+  "generated_patch_acceptance_reason": "accepted_final_validation",
+  "generated_patch_feedback": null,
+  "semantic_oracle_passed": true,
+  "semantic_oracle_failed_identifiers": [],
+  "patch_analysis": {
+    "root_cause": "The _TR56 function in fu.py attempts to compare the exponent (rv.exp) with 0 using < and > operators without checking if the exponent is a comparable (real) number. When the exponent is complex (like I), Python raises TypeError because complex numbers cannot be ordered.",
+    "affected_components": [
+      {
+        "file": "sympy/simplify/fu.py",
+        "symbol": "_TR56",
+        "reason": "Contains the buggy _f inner function that compares rv.exp < 0 and rv.exp > max without verifying the exponent is real-valued"
+      },
+      {
+        "file": "sympy/simplify/fu.py",
+        "symbol": "TR5",
+        "reason": "Calls _TR56 and is affected when given sin(x)**I"
+      },
+      {
+        "file": "sympy/simplify/fu.py",
+        "symbol": "TR6",
+        "reason": "Calls _TR56 and is affected when given cos(x)**I"
+      }
+    ],
+    "failing_signal": "TypeError: Invalid comparison of complex I when simplify(cos(x)**I) is called. The error occurs at line 504 in fu.py: if (rv.exp < 0) == True:",
+    "propagation_path": "simplify() -> trigsimp() -> futrig() -> _futrig() -> greedy(tree) -> TR6() -> _TR56() -> _f() where rv.exp is I and comparison fails",
+    "repair_constraint": "The fix must skip the transformation when the exponent is not a real number that can be compared. The transformation should still work for valid real integer exponents.",
+    "suggested_repair_scope": [
+      "sympy/simplify/fu.py"
+    ],
+    "suspicious_symbols": [
+      "_TR56",
+      "TR5",
+      "TR6",
+      "_f",
+      "rv.exp"
+    ],
+    "repair_obligations": [
+      {
+        "id": "test__TR56::core::rv.exp comparison with 0 in _f function",
+        "source_symbol": "test__TR56",
+        "validation_subject": "rv.exp comparison with 0 in _f function",
+        "why_it_matters": "The _f inner function in _TR56 compares rv.exp < 0 which fails for complex exponents like I"
+      },
+      {
+        "id": "test__TR56::core::rv.exp comparison with 0",
+        "source_symbol": "test__TR56",
+        "validation_subject": "rv.exp comparison with 0",
+        "why_it_matters": "Direct comparison of complex exponent with 0 raises TypeError"
+      },
+      {
+        "id": "test__TR56::core::rv.exp comparison in _TR56 inner function",
+        "source_symbol": "test__TR56",
+        "validation_subject": "rv.exp comparison in _TR56 inner function",
+        "why_it_matters": "The inner _f function in _TR56 performs comparisons on rv.exp without checking if it's real"
+      },
+      {
+        "id": "test_issue_17137::core::rv.exp comparison with 0 in _f function",
+        "source_symbol": "test_issue_17137",
+        "validation_subject": "rv.exp comparison with 0 in _f function",
+        "why_it_matters": "The _f inner function in _TR56 compares rv.exp < 0 which fails for complex exponents like I"
+      },
+      {
+        "id": "test_issue_17137::core::rv.exp comparison with 0",
+        "source_symbol": "test_issue_17137",
+        "validation_subject": "rv.exp comparison with 0",
+        "why_it_matters": "Direct comparison of complex exponent with 0 raises TypeError"
+      },
+      {
+        "id": "test_issue_17137::core::rv.exp comparison in _TR56 inner function",
+        "source_symbol": "test_issue_17137",
+        "validation_subject": "rv.exp comparison in _TR56 inner function",
+        "why_it_matters": "The inner _f function in _TR56 performs comparisons on rv.exp without checking if it's real"
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Guard rv.exp comparison in _TR56._f against complex exponents",
+    "approach": "Add a check at the beginning of the _f inner function in _TR56 to verify that rv.exp is a real number (or at least not complex) before performing the < and > comparisons. If the exponent is complex or its reality cannot be determined, return the expression unchanged. This fix addresses the TypeError raised when comparing complex I with 0 in the expressions rv.exp < 0 and rv.exp > max.",
+    "edit_targets": [
+      "sympy/simplify/fu.py::_TR56"
+    ],
+    "dependency_files": [
+      "sympy/simplify/tests/test_fu.py",
+      "sympy/simplify/tests/test_simplify.py"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [],
+    "sufficiency_assessment": "Yes, editing only the _TR56 function in fu.py is sufficient. The bug manifests in the inner _f function where comparisons rv.exp < 0 and rv.exp > max are performed without checking if the exponent is real. The fix must handle both validation subjects: (1) rv.exp comparison with 0 in _f function, and (2) rv.exp comparison with max in _f function. Both TR5 and TR6 call _TR56, so fixing _TR56 repairs both test__TR56 and test_issue_17137 obligations. The fix should check rv.exp.is_real before performing comparisons, returning rv unchanged if the exponent is not real or if reality cannot be determined.",
+    "risks": [
+      "Potential performance overhead from adding is_real check on every Pow node",
+      "Risk of skipping valid transformations for edge cases where exponent is symbolically complex but mathematically real - should be conservative and only skip when definitely non-real"
+    ]
+  },
+  "patch_edit_plan": {
+    "coverage_check": [
+      {
+        "target_file": "sympy/simplify/fu.py",
+        "action": "modify_region",
+        "justification": "The _TR56 function contains the buggy _f inner function that compares rv.exp < 0 and rv.exp > max without checking if the exponent is real. When the exponent is complex (like I), Python raises TypeError. This edit adds a guard to check if rv.exp.is_real is False before performing comparisons."
+      }
+    ],
+    "edits": [
+      {
+        "target_file": "sympy/simplify/fu.py",
+        "target_symbol": "_TR56__branch",
+        "replacement_mode": "replace_span",
+        "covers_obligations": [
+          "test__TR56::core::rv.exp comparison with 0 in _f function",
+          "test__TR56::core::rv.exp comparison with 0",
+          "test__TR56::core::rv.exp comparison in _TR56 inner function",
+          "test_issue_17137::core::rv.exp comparison with 0 in _f function",
+          "test_issue_17137::core::rv.exp comparison with 0",
+          "test_issue_17137::core::rv.exp comparison in _TR56 inner function"
+        ],
+        "anchor_line_before": "        if not (rv.is_Pow and rv.base.func == f):",
+        "anchor_line_after": "            return rv",
+        "replacement_block": "        if not (rv.is_Pow and rv.base.func == f):\n            return rv\n\n        if rv.exp.is_real is False:\n            return rv"
+      }
+    ]
+  },
+  "final_patch_attempted": true,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": true,
+  "final_patch_apply_mode": "clean_apply",
+  "final_patch_cleanly_applied": true,
+  "clean_apply_ratio": 1.0,
+  "resolved": true,
+  "final_resolved": true,
+  "final_status_counts": {
+    "PASSED": 69
+  },
+  "final_failed_count": 0,
+  "final_passed_count": 69,
+  "original_passed_count_improvement": 2,
+  "original_failed_count_reduction": 4,
+  "final_status_map": {
+    "test_TR1": "PASSED",
+    "test_TR2": "PASSED",
+    "test_TR2i": "PASSED",
+    "test_TR3": "PASSED",
+    "test__TR56": "PASSED",
+    "test_TR5": "PASSED",
+    "test_TR6": "PASSED",
+    "test_TR7": "PASSED",
+    "test_TR8": "PASSED",
+    "test_TR9": "PASSED",
+    "test_TR10": "PASSED",
+    "test_TR10i": "PASSED",
+    "test_TR11": "PASSED",
+    "test_TR12": "PASSED",
+    "test_TR13": "PASSED",
+    "test_L": "PASSED",
+    "test_fu": "PASSED",
+    "test_objective": "PASSED",
+    "test_process_common_addends": "PASSED",
+    "test_trig_split": "PASSED",
+    "test_TRmorrie": "PASSED",
+    "test_TRpower": "PASSED",
+    "test_hyper_as_trig": "PASSED",
+    "test_TR12i": "PASSED",
+    "test_TR14": "PASSED",
+    "test_TR15_16_17": "PASSED",
+    "test_issue_7263": "PASSED",
+    "test_simplify_expr": "PASSED",
+    "test_issue_3557": "PASSED",
+    "test_simplify_other": "PASSED",
+    "test_simplify_complex": "PASSED",
+    "test_simplify_ratio": "PASSED",
+    "test_simplify_measure": "PASSED",
+    "test_simplify_rational": "PASSED",
+    "test_simplify_issue_1308": "PASSED",
+    "test_issue_5652": "PASSED",
+    "test_simplify_fail1": "PASSED",
+    "test_nthroot": "PASSED",
+    "test_nthroot1": "PASSED",
+    "test_separatevars": "PASSED",
+    "test_separatevars_advanced_factor": "PASSED",
+    "test_hypersimp": "PASSED",
+    "test_nsimplify": "PASSED",
+    "test_issue_9448": "PASSED",
+    "test_extract_minus_sign": "PASSED",
+    "test_diff": "PASSED",
+    "test_logcombine_1": "PASSED",
+    "test_logcombine_complex_coeff": "PASSED",
+    "test_issue_5950": "PASSED",
+    "test_posify": "PASSED",
+    "test_issue_4194": "PASSED",
+    "test_as_content_primitive": "PASSED",
+    "test_signsimp": "PASSED",
+    "test_besselsimp": "PASSED",
+    "test_Piecewise": "PASSED",
+    "test_polymorphism": "PASSED",
+    "test_issue_from_PR1599": "PASSED",
+    "test_issue_6811": "PASSED",
+    "test_issue_6920": "PASSED",
+    "test_issue_7001": "PASSED",
+    "test_inequality_no_auto_simplify": "PASSED",
+    "test_issue_9398": "PASSED",
+    "test_issue_9324_simplify": "PASSED",
+    "test_issue_13474": "PASSED",
+    "test_simplify_function_inverse": "PASSED",
+    "test_clear_coefficients": "PASSED",
+    "test_nc_simplify": "PASSED",
+    "test_issue_15965": "PASSED",
+    "test_issue_17137": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

@@ -1,0 +1,205 @@
+{
+  "instance_id": "sympy__sympy-15345",
+  "repo": "sympy/sympy",
+  "model": "minimax-m2.5",
+  "pipeline_mode": "enhanced_guided",
+  "hide_original_test_patch_in_repair": false,
+  "disable_semantic_bucket_guidance": false,
+  "disable_enhanced_test_filtering": false,
+  "repair_mode": "enhanced_guided",
+  "original_test_identifiers": [
+    "test_Function"
+  ],
+  "original_status_counts": {
+    "FAILED": 2,
+    "PASSED": 8
+  },
+  "original_failed_count": 2,
+  "original_passed_count": 8,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_Function"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_Function"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/printing/tests/test_mathematica.py:test_Function",
+      "test_Function"
+    ],
+    "failure_mode": "assertion_error",
+    "dominant_errors": [
+      "AssertionError"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "test_Function F",
+      "____________ sympy/printing/tests/test_mathematica.py:test_Function ____________",
+      "Traceback (most recent call last):"
+    ],
+    "noise_ratio": 0.0063,
+    "target_test_tracebacks": {
+      "test_Function": "TARGET TEST: test_Function\n- snippet: test_Function F\n- snippet: ____________ sympy/printing/tests/test_mathematica.py:test_Function ____________\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_Function F\n____________ sympy/printing/tests/test_mathematica.py:test_Function ____________\nTraceback (most recent call last):\n  File \"/testbed/sympy/printing/tests/test_mathematica.py\", line 31, in test_Function\nAssertionError\n============= tests finished: 9 passed, 1 failed, in 0.13 seconds =============="
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 3,
+    "keep_top_k": 2,
+    "attempt_budget": 3,
+    "bucket_limit": 3,
+    "template_limit": 3,
+    "failure_mode": "assertion_error",
+    "noise_ratio": 0.0063,
+    "difficulty": "low"
+  },
+  "adaptive_num_candidates": 3,
+  "adaptive_keep_top_k": 2,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 3,
+  "kept_enhanced_candidates": 2,
+  "enhanced_candidate_retention_rate": 0.6666666666666666,
+  "enhanced_generation_attempts_total": 8,
+  "enhanced_generation_attempts_avg": 2.6666666666666665,
+  "kept_enhanced_test_identifiers": [
+    "test_sweb_enhanced_max_mathematica",
+    "test_sweb_enhanced_max_function_bracket_syntax"
+  ],
+  "enhanced_failed_test_identifiers": [
+    "test_sweb_enhanced_max_mathematica",
+    "test_sweb_enhanced_max_function_bracket_syntax"
+  ],
+  "enhanced_failed_count": 2,
+  "generated_patch_nonempty": true,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 10,
+  "generated_patch_accepted": false,
+  "generated_patch_acceptance_reason": "rejected_no_metric_improvement",
+  "generated_patch_feedback": "The previous patch was rejected because it did not satisfy the acceptance gate. Patch apply mode: clean_apply. Baseline passed=8, failed=2. Candidate passed=8, failed=2. Hard failure signal: none. CRITICAL: the previous patch applied cleanly but had ZERO effect on test counts — the fix is unreachable or incorrect. Common causes: (1) your new code was inserted inside an `elif` chain that is bypassed by an earlier branch (e.g., `elif item.config.option.runxfail: pass` prevents later `elif` blocks from running) — check if an existing `elif` block needs to become a standalone `if`; (2) the wrong function/method was edited; (3) the condition in the existing branch already covers this case incorrectly. Rethink the control flow structure rather than re-inserting the same logic. FAIL_TO_PASS tests still failing after patch: test_Function. Your patch must make ALL of these tests pass, not just improve aggregate counts. Semantic oracle failed identifiers: test_sweb_enhanced_max_mathematica, test_sweb_enhanced_max_function_bracket_syntax. Semantic oracle failure summaries: test_sweb_enhanced_max_mathematica: Traceback (most recent call last):\n  File \"/testbed/sympy/printing/tests/test_mathematica.py\", line 35, in test_sweb_enhanced_max_mathematica\n    assert mcode(Max(x, 2)) == \"Max[x, 2]\"\n  File \"/testbed/sympy/printing/mathematica.py\", line 133, in mathematica_code\n    return MCodePrinter(settings).doprint(expr)\n  File \"/testbed/sympy/printing/printer.py\", line 249, in doprint\n    return self._str(s\n\n...[truncated 584 chars]... test_sweb_enhanced_max_function_bracket_syntax: Traceback (most recent call last):\n  File \"/testbed/sympy/printing/tests/test_mathematica.py\", line 96, in test_sweb_enhanced_max_function_bracket_syntax\n    assert mcode(Max(x, 2)) == \"Max[x, 2]\"\n  File \"/testbed/sympy/printing/mathematica.py\", line 133, in mathematica_code\n    return MCodePrinter(settings).doprint(expr)\n  File \"/testbed/sympy/printing/printer.py\", line 249, in doprint\n    return\n\n...[truncated 596 chars]....  Target files: sympy/printing/mathematica.py. Target symbols: known_functions. Generate a new source-only unified diff that is closer to the exact file context and lands inside the target class body.",
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [
+    "test_sweb_enhanced_max_mathematica",
+    "test_sweb_enhanced_max_function_bracket_syntax"
+  ],
+  "patch_analysis": {
+    "root_cause": "The Max function is not registered in the known_functions dictionary of MCodePrinter, causing it to fall back to the default Python string representation with parentheses () instead of Mathematica's square bracket [] syntax. Additionally, Max is likely a special SymPy class (Maxima/Max) that doesn't use the standard Function printing mechanism.",
+    "affected_components": [
+      {
+        "file": "sympy/printing/mathematica.py",
+        "symbol": "MCodePrinter",
+        "reason": "The main printer class that converts Python expressions to Mathematica code. Missing Max in known_functions causes fallback to incorrect output format."
+      },
+      {
+        "file": "sympy/printing/mathematica.py",
+        "symbol": "_print_Function",
+        "reason": "The method that handles function printing with square brackets. Max may not be routed through this method due to being a special class."
+      },
+      {
+        "file": "sympy/printing/mathematica.py",
+        "symbol": "known_functions",
+        "reason": "Dictionary mapping SymPy function names to Mathematica equivalents. Missing entry for 'Max' causes incorrect printing."
+      }
+    ],
+    "failing_signal": "The test_Function test fails with AssertionError because mathematica_code(Max(x,2)) returns 'Max(2, x)' with parentheses instead of 'Max[x,2]' with square brackets expected by Mathematica syntax.",
+    "propagation_path": "When mathematica_code is called with Max(x,2), the MCodePrinter attempts to find a handler for the Max class. Since Max is not in known_functions and may be handled by a parent class printer (like _print_Function or a special Max class handler), it falls back to Python's default __str__ representation using parentheses. The output uses wrong bracket style and potentially wrong argument order.",
+    "repair_constraint": "After the fix, mathematica_code(Max(x,2)) must return 'Max[x, 2]' (with square brackets and correct argument order), and existing tests must continue to pass.",
+    "suggested_repair_scope": [
+      "sympy/printing/mathematica.py"
+    ],
+    "suspicious_symbols": [
+      "Max",
+      "known_functions",
+      "_print_Function",
+      "MCodePrinter"
+    ],
+    "repair_obligations": [
+      {
+        "id": "obligation_1",
+        "source_symbol": "Max",
+        "validation_subject": "mathematica_code(Max(x,2))",
+        "why_it_matters": "The primary bug: Max must be printed with square brackets [] like all Mathematica functions, not parentheses ()."
+      },
+      {
+        "id": "obligation_2",
+        "source_symbol": "test_Function",
+        "validation_subject": "mcode(f(x, y, z))",
+        "why_it_matters": "Existing test must continue to pass - generic functions should still print as 'f[x, y, z]'."
+      },
+      {
+        "id": "obligation_3",
+        "source_symbol": "test_Function",
+        "validation_subject": "mcode(sin(x) ** cos(x))",
+        "why_it_matters": "Existing test for known functions like Sin, Cos must continue to work."
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Add Max and Min to known_functions dictionary",
+    "approach": "Add 'Max' and 'Min' entries to the known_functions dictionary in sympy/printing/mathematica.py so that Max(x,2) and similar expressions are printed with Mathematica square bracket syntax [] instead of Python parentheses (). The known_functions dictionary maps SymPy function names to their Mathematica equivalents, and adding Max/Min there will route them through the _print_Function method which correctly uses square brackets.",
+    "edit_targets": [
+      "sympy/printing/mathematica.py"
+    ],
+    "dependency_files": [
+      "sympy/printing/tests/test_mathematica.py"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [],
+    "sufficiency_assessment": "The fix should be sufficient because the _print_Function method already handles all functions in known_functions by printing them with square brackets. Adding Max and Min to known_functions will cause them to be printed as 'Max[x, 2]' instead of falling back to the default Python representation with parentheses. No additional printer methods should be needed since Max and Min are already Function subclasses that will be routed through _print_Function once registered in known_functions.",
+    "risks": [
+      "Adding Max/Min to known_functions should not break existing tests since they will now be handled by the existing _print_Function logic rather than falling back to an incorrect representation. The argument order issue (2, x vs x, 2) is likely due to how SymPy internally orders Max arguments, which is preserved by the printer - this is correct behavior."
+    ]
+  },
+  "patch_edit_plan": {
+    "coverage_check": [
+      {
+        "target_file": "sympy/printing/mathematica.py",
+        "action": "modify_region",
+        "justification": "The known_functions dictionary is missing entries for Max and Min, causing them to fall back to Python's default parentheses syntax instead of Mathematica's square bracket syntax. This is the root cause of the bug."
+      }
+    ],
+    "edits": [
+      {
+        "target_file": "sympy/printing/mathematica.py",
+        "target_symbol": "known_functions",
+        "replacement_mode": "replace_span",
+        "covers_obligations": [
+          "test_Function::mcode"
+        ],
+        "anchor_line_before": "known_functions = {",
+        "anchor_line_after": "    \"exp\": [(lambda x: True, \"Exp\")],",
+        "replacement_block": "known_functions = {\n    \"Max\": [(lambda x: True, \"Max\")],\n    \"Min\": [(lambda x: True, \"Min\")],\n    \"exp\": [(lambda x: True, \"Exp\")],"
+      }
+    ]
+  },
+  "final_patch_attempted": true,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": true,
+  "final_patch_apply_mode": "clean_apply",
+  "final_patch_cleanly_applied": true,
+  "clean_apply_ratio": 1.0,
+  "resolved": false,
+  "final_resolved": false,
+  "final_status_counts": {
+    "FAILED": 1,
+    "PASSED": 8,
+    "ERROR": 1
+  },
+  "final_failed_count": 2,
+  "final_passed_count": 8,
+  "original_passed_count_improvement": 0,
+  "original_failed_count_reduction": 0,
+  "final_status_map": {
+    "sympy/printing/tests/test_mathematica.py:test_Function": "FAILED",
+    "test_Integer": "PASSED",
+    "test_Rational": "PASSED",
+    "test_Function": "ERROR",
+    "test_Pow": "PASSED",
+    "test_Mul": "PASSED",
+    "test_constants": "PASSED",
+    "test_containers": "PASSED",
+    "test_Integral": "PASSED",
+    "test_Derivative": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

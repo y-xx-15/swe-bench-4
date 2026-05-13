@@ -1,0 +1,71 @@
+{
+  "root_cause": "The _TR56 function in fu.py attempts to compare the exponent (rv.exp) with 0 using < and > operators without checking if the exponent is a comparable (real) number. When the exponent is complex (like I), Python raises TypeError because complex numbers cannot be ordered.",
+  "affected_components": [
+    {
+      "file": "sympy/simplify/fu.py",
+      "symbol": "_TR56",
+      "reason": "Contains the buggy _f inner function that compares rv.exp < 0 and rv.exp > max without verifying the exponent is real-valued"
+    },
+    {
+      "file": "sympy/simplify/fu.py",
+      "symbol": "TR5",
+      "reason": "Calls _TR56 and is affected when given sin(x)**I"
+    },
+    {
+      "file": "sympy/simplify/fu.py",
+      "symbol": "TR6",
+      "reason": "Calls _TR56 and is affected when given cos(x)**I"
+    }
+  ],
+  "failing_signal": "TypeError: Invalid comparison of complex I when simplify(cos(x)**I) is called. The error occurs at line 504 in fu.py: if (rv.exp < 0) == True:",
+  "propagation_path": "simplify() -> trigsimp() -> futrig() -> _futrig() -> greedy(tree) -> TR6() -> _TR56() -> _f() where rv.exp is I and comparison fails",
+  "repair_constraint": "The fix must skip the transformation when the exponent is not a real number that can be compared. The transformation should still work for valid real integer exponents.",
+  "suggested_repair_scope": [
+    "sympy/simplify/fu.py"
+  ],
+  "suspicious_symbols": [
+    "_TR56",
+    "TR5",
+    "TR6",
+    "_f",
+    "rv.exp"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test__TR56::core::rv.exp comparison with 0 in _f function",
+      "source_symbol": "test__TR56",
+      "validation_subject": "rv.exp comparison with 0 in _f function",
+      "why_it_matters": "The _f inner function in _TR56 compares rv.exp < 0 which fails for complex exponents like I"
+    },
+    {
+      "id": "test__TR56::core::rv.exp comparison with 0",
+      "source_symbol": "test__TR56",
+      "validation_subject": "rv.exp comparison with 0",
+      "why_it_matters": "Direct comparison of complex exponent with 0 raises TypeError"
+    },
+    {
+      "id": "test__TR56::core::rv.exp comparison in _TR56 inner function",
+      "source_symbol": "test__TR56",
+      "validation_subject": "rv.exp comparison in _TR56 inner function",
+      "why_it_matters": "The inner _f function in _TR56 performs comparisons on rv.exp without checking if it's real"
+    },
+    {
+      "id": "test_issue_17137::core::rv.exp comparison with 0 in _f function",
+      "source_symbol": "test_issue_17137",
+      "validation_subject": "rv.exp comparison with 0 in _f function",
+      "why_it_matters": "The _f inner function in _TR56 compares rv.exp < 0 which fails for complex exponents like I"
+    },
+    {
+      "id": "test_issue_17137::core::rv.exp comparison with 0",
+      "source_symbol": "test_issue_17137",
+      "validation_subject": "rv.exp comparison with 0",
+      "why_it_matters": "Direct comparison of complex exponent with 0 raises TypeError"
+    },
+    {
+      "id": "test_issue_17137::core::rv.exp comparison in _TR56 inner function",
+      "source_symbol": "test_issue_17137",
+      "validation_subject": "rv.exp comparison in _TR56 inner function",
+      "why_it_matters": "The inner _f function in _TR56 performs comparisons on rv.exp without checking if it's real"
+    }
+  ]
+}

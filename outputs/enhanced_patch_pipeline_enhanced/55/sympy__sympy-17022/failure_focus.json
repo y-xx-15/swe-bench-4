@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_NumPyPrinter"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_NumPyPrinter"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/printing/tests/test_pycode.py:test_NumPyPrinter",
+    "test_NumPyPrinter"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_NumPyPrinter F",
+    "test_NumPyPrinter_print_seq ok                                            [FAIL]",
+    "____________ sympy/printing/tests/test_pycode.py:test_NumPyPrinter _____________"
+  ],
+  "noise_ratio": 0.0057,
+  "target_test_tracebacks": {
+    "test_NumPyPrinter": "TARGET TEST: test_NumPyPrinter\n- snippet: test_NumPyPrinter F\n- snippet: test_NumPyPrinter_print_seq ok                                            [FAIL]\n- snippet: ____________ sympy/printing/tests/test_pycode.py:test_NumPyPrinter _____________\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_NumPyPrinter F\ntest_NumPyPrinter_print_seq ok                                            [FAIL]\n____________ sympy/printing/tests/test_pycode.py:test_NumPyPrinter _____________\nTraceback (most recent call last):\n  File \"/testbed/sympy/printing/tests/test_pycode.py\", line 52, in test_NumPyPrinter\nAssertionError\n======= tests finished: 9 passed, 1 failed, 17 skipped, in 0.04 seconds ========"
+  }
+}

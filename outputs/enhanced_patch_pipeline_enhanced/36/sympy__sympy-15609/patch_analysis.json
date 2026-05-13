@@ -1,0 +1,48 @@
+{
+  "root_cause": "The LaTeX printer incorrectly prefixes summation indices with an underscore when printing indexed matrix elements. When (M*N)[i,j] is expanded to a Sum, the dummy index i_1 is being printed as '_i_1' instead of 'i_1', causing a double underscore in the output: M_{i, _i_1} instead of M_{i, i_1}.",
+  "affected_components": [
+    {
+      "file": "sympy/printing/latex.py",
+      "symbol": "_print_Indexed",
+      "reason": "Handles printing of Indexed expressions, including summation indices in matrix operations"
+    },
+    {
+      "file": "sympy/printing/latex.py",
+      "symbol": "_print_MatrixElement",
+      "reason": "Handles printing of MatrixElement which is what (M*N)[i,j] becomes"
+    },
+    {
+      "file": "sympy/printing/latex.py",
+      "symbol": "LatexPrinter",
+      "reason": "Main LaTeX printer class that coordinates the printing of all expression types"
+    }
+  ],
+  "failing_signal": "The LaTeX output contains '_i_1' (with leading underscore) instead of 'i_1', producing invalid LaTeX: \\sum_{i_{1}=0}^{k - 1} M_{i, _i_1} N_{_i_1, j}. The test_MatrixElement_printing test fails with AssertionError and ValueError: Name node can't be used with 'False' constant.",
+  "propagation_path": "When MatrixSymbol multiplication (M*N) is indexed with [i,j], it creates a MatrixElement containing a Sum expression. The Sum's dummy index (i_1) is being printed with an extra underscore prefix in the MatrixElement's indices. This propagates to the final LaTeX string where _i_1 appears instead of i_1 in both M_{i, _i_1} and N_{_i_1, j}.",
+  "repair_constraint": "The fix must ensure that summation indices in matrix element printing are rendered without the extra underscore prefix. The LaTeX output for (M*N)[i,j] should be \\sum_{i_{1}=0}^{k - 1} M_{i, i_{1}} N_{i_{1}, j} (or similar valid LaTeX).",
+  "suggested_repair_scope": [
+    "sympy/printing/latex.py"
+  ],
+  "suspicious_symbols": [
+    "_print_Indexed",
+    "_print_MatrixElement",
+    "_print_IndexedBase",
+    "Indexed",
+    "MatrixElement",
+    "MatrixSymbol"
+  ],
+  "repair_obligations": [
+    {
+      "id": "obligation_1",
+      "source_symbol": "test_MatrixElement_printing",
+      "validation_subject": "LaTeX output string for indexed matrix element",
+      "why_it_matters": "The test verifies that latex(M[i,j]) produces valid LaTeX. The current bug causes _i_1 to appear instead of i_1, breaking LaTeX compilation."
+    },
+    {
+      "id": "obligation_2",
+      "source_symbol": "test_MatrixElement_printing",
+      "validation_subject": "LaTeX string output for (M*N)[i,j]",
+      "why_it_matters": "This specific case is the primary bug report. The output must not contain double underscores or invalid subscript notation."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "original_test_identifiers": [
+    "test__TR56",
+    "test_issue_17137"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test__TR56",
+    "test_issue_17137"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/simplify/tests/test_fu.py:test__TR56",
+    "sympy/simplify/tests/test_simplify.py:test_issue_17137",
+    "test__TR56",
+    "test_issue_17137"
+  ],
+  "failure_mode": "type_error",
+  "dominant_errors": [
+    "TypeError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test__TR56 E",
+    "test_issue_17137 E",
+    "__________________ sympy/simplify/tests/test_fu.py:test__TR56 __________________"
+  ],
+  "noise_ratio": 0.0046,
+  "target_test_tracebacks": {
+    "test__TR56": "TARGET TEST: test__TR56\n- snippet: test__TR56 E\n- snippet: test_issue_17137 E\n- snippet: __________________ sympy/simplify/tests/test_fu.py:test__TR56 __________________\n- dominant_errors: TypeError\nWEAK TRACEBACK CONTEXT:\ntest__TR56 E\n__________________ sympy/simplify/tests/test_fu.py:test__TR56 __________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/simplify/tests/test_fu.py\", line 80, in test__TR56\n    raise TypeError(\"Invalid comparison of complex %s\" % me)\nTypeError: Invalid comparison of complex I\nTraceback (most recent call last):\n    raise TypeError(\"Invalid comparison of complex %s\" % me)\nTypeError: Invalid comparison of complex I",
+    "test_issue_17137": "TARGET TEST: test_issue_17137\n- snippet: test__TR56 E\n- snippet: test_issue_17137 E\n- snippet: __________________ sympy/simplify/tests/test_fu.py:test__TR56 __________________\n- dominant_errors: TypeError\nWEAK TRACEBACK CONTEXT:\ntest_issue_17137 E\nTraceback (most recent call last):\n    raise TypeError(\"Invalid comparison of complex %s\" % me)\nTypeError: Invalid comparison of complex I\n____________ sympy/simplify/tests/test_simplify.py:test_issue_17137 ____________\nTraceback (most recent call last):\n  File \"/testbed/sympy/simplify/tests/test_simplify.py\", line 815, in test_issue_17137\n    raise TypeError(\"Invalid comparison of complex %s\" % me)\nTypeError: Invalid comparison of complex I"
+  }
+}

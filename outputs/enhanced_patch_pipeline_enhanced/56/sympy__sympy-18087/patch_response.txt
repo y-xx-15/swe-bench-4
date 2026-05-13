@@ -1,0 +1,30 @@
+
+
+Looking at the bug, the issue is that `sqrt(sin(x)**2)` incorrectly simplifies to `sin(x)` for general complex `x`. The problem is in the `Factors.__init__` method in `sympy/core/exprtools.py` where `as_powers_dict()` incorrectly simplifies these expressions.
+
+Let me examine the exact location and create the fix:
+```diff
+--- a/sympy/core/exprtools.py
++++ b/sympy/core/exprtools.py
+@@ -353,6 +353,18 @@ class Factors(object):
+             i = c.count(I)
+             for _ in range(i):
+                 c.remove(I)
++            # Handle sqrt(x**2) specially - for general complex x, sqrt(x**2) != x
++            # Only simplify if x is known to be real and non-negative
++            from sympy import sqrt
++            if factors.is_Pow and factors.exp is S.Half:
++                base = factors.base
++                if base.is_Pow and base.exp == 2:
++                    # sqrt(x**2) - check if base.base is real and non-negative
++                    inner = base.base
++                    if not (inner.is_extended_real and inner.is_nonnegative):
++                        # Keep sqrt(x**2) as sqrt(x**2), don't simplify
++                        factors = {factors: S.One}
++                        self.factors = factors
++                        self.gens = frozenset(keys())
++                        return
+             factors = dict(Mul._from_args(c).as_powers_dict())
+             # Handle all rational Coefficients
+             for f in list(factors.keys()):
+```

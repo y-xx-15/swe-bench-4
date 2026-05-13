@@ -1,0 +1,222 @@
+{
+  "instance_id": "sympy__sympy-16792",
+  "repo": "sympy/sympy",
+  "model": "minimax-m2.5",
+  "pipeline_mode": "enhanced_guided",
+  "hide_original_test_patch_in_repair": false,
+  "disable_semantic_bucket_guidance": false,
+  "disable_enhanced_test_filtering": false,
+  "repair_mode": "baseline_fallback",
+  "original_test_identifiers": [
+    "test_ccode_unused_array_arg"
+  ],
+  "original_status_counts": {
+    "FAILED": 2,
+    "PASSED": 54
+  },
+  "original_failed_count": 2,
+  "original_passed_count": 54,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_ccode_unused_array_arg"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_ccode_unused_array_arg"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/utilities/tests/test_codegen.py:test_ccode_unused_array_arg",
+      "test_ccode_unused_array_arg"
+    ],
+    "failure_mode": "assertion_error",
+    "dominant_errors": [
+      "AssertionError"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "test_ccode_unused_array_arg F",
+      "______ sympy/utilities/tests/test_codegen.py:test_ccode_unused_array_arg _______",
+      "Traceback (most recent call last):"
+    ],
+    "noise_ratio": 0.0055,
+    "target_test_tracebacks": {
+      "test_ccode_unused_array_arg": "TARGET TEST: test_ccode_unused_array_arg\n- snippet: test_ccode_unused_array_arg F\n- snippet: ______ sympy/utilities/tests/test_codegen.py:test_ccode_unused_array_arg _______\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_ccode_unused_array_arg F\n______ sympy/utilities/tests/test_codegen.py:test_ccode_unused_array_arg _______\nTraceback (most recent call last):\n  File \"/testbed/sympy/utilities/tests/test_codegen.py\", line 602, in test_ccode_unused_array_arg\nAssertionError\n============= tests finished: 55 passed, 1 failed, in 3.26 seconds ============="
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 3,
+    "keep_top_k": 2,
+    "attempt_budget": 3,
+    "bucket_limit": 3,
+    "template_limit": 3,
+    "failure_mode": "assertion_error",
+    "noise_ratio": 0.0055,
+    "difficulty": "low"
+  },
+  "adaptive_num_candidates": 3,
+  "adaptive_keep_top_k": 2,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 3,
+  "kept_enhanced_candidates": 0,
+  "enhanced_candidate_retention_rate": 0.0,
+  "enhanced_generation_attempts_total": 8,
+  "enhanced_generation_attempts_avg": 2.6666666666666665,
+  "kept_enhanced_test_identifiers": [],
+  "enhanced_failed_test_identifiers": [],
+  "enhanced_failed_count": 0,
+  "generated_patch_nonempty": false,
+  "generated_patch_error": "anchor_line_after was not found in the target file.",
+  "generated_patch_attempts": 7,
+  "generated_patch_accepted": false,
+  "generated_patch_acceptance_reason": "rejected_not_generated",
+  "generated_patch_feedback": "anchor_line_after was not found in the target file.",
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [],
+  "patch_analysis": {
+    "root_cause": "When a MatrixSymbol is passed in argument_sequence but does not appear in the expression, the routine method creates a new InputArgument without dimensions, causing it to be treated as a scalar (double) instead of an array (double*) in the generated C code.",
+    "affected_components": [
+      {
+        "file": "sympy/utilities/codegen.py",
+        "symbol": "CodeGen.routine",
+        "reason": "This method builds the argument list and determines whether arguments have dimensions. When a symbol from argument_sequence is not found in the expression, it creates InputArgument without preserving the MatrixSymbol's shape information."
+      }
+    ],
+    "failing_signal": "The generated C code has signature 'double test(double x)' instead of 'double test(double *x)', causing TypeError when numpy array is passed.",
+    "propagation_path": "MatrixSymbol x -> not in expression free_symbols -> not in array_symbols dict -> KeyError when looking up in name_arg_dict -> creates plain InputArgument without dimensions -> CCodeGen.get_prototype treats it as scalar -> generates 'double x' instead of 'double *x'",
+    "repair_constraint": "The fix must preserve the dimensions/shape information for MatrixSymbol arguments that don't appear in the expression, while not breaking existing functionality for symbols that do appear in expressions.",
+    "suggested_repair_scope": [
+      "sympy/utilities/codegen.py"
+    ],
+    "suspicious_symbols": [
+      "CodeGen.routine",
+      "InputArgument",
+      "MatrixSymbol",
+      "array_symbols",
+      "argument_sequence"
+    ],
+    "repair_obligations": [
+      {
+        "id": "1",
+        "source_symbol": "CodeGen.routine",
+        "validation_subject": "InputArgument creation for symbols in argument_sequence",
+        "why_it_matters": "When a MatrixSymbol is in argument_sequence but not in the expression, we must still create an InputArgument with the correct dimensions derived from the MatrixSymbol's shape, not a plain InputArgument without dimensions."
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Preserve MatrixSymbol dimensions for unused args",
+    "approach": "In the CodeGen.routine method, when creating InputArgument for symbols in argument_sequence that are not found in name_arg_dict (i.e., not appearing in the expression), check if the symbol is a MatrixSymbol and preserve its shape information as dimensions. Currently it creates a plain InputArgument without dimensions, causing array arguments to be treated as scalars in the generated C code.",
+    "edit_targets": [
+      "sympy/utilities/codegen.py::CodeGen.routine"
+    ],
+    "dependency_files": [
+      "sympy/utilities/autowrap.py",
+      "sympy/utilities/tests/test_codegen.py"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [],
+    "sufficiency_assessment": "The fix should be sufficient because the root cause is in the routine method where InputArgument is created without dimensions for symbols not in the expression. The CCodeGen.get_prototype method already correctly handles dimensions to generate pointer types (double* vs double), so we just need to ensure dimensions are preserved when creating the InputArgument. No other files need modification.",
+    "risks": [
+      "Potential regression for non-MatrixSymbol arguments that legitimately should be scalars",
+      "Edge case: IndexedBase arguments in argument_sequence may also need similar handling"
+    ]
+  },
+  "patch_edit_plan": {
+    "coverage_check": [
+      {
+        "target_file": "sympy/utilities/codegen.py",
+        "action": "modify_region",
+        "justification": "The CodeGen.routine method is where InputArgument objects are created for arguments in argument_sequence. When a MatrixSymbol is in argument_sequence but not in the expression, it creates a plain InputArgument without dimensions, causing array arguments to be treated as scalars in generated C code."
+      }
+    ],
+    "edits": [
+      {
+        "target_file": "sympy/utilities/codegen.py",
+        "target_symbol": "CodeGen.routine",
+        "replacement_mode": "replace_span",
+        "covers_obligations": [
+          "1"
+        ],
+        "anchor_line_before": "        # We currently do not support Matrices returning",
+        "anchor_line_after": "        # Optionally catch some common errors during construction",
+        "replacement_block": "        # We currently do not support Matrices returning\n        # as the l-value from a function (they are always returned via\n        # an OutputArgument).  In the future, we could allow this by\n        # passing a MatrixSymbol as the result_var.\n        if isinstance(result_var, MatrixBase):\n            raise CodeGenError(\"Matrix expressions cannot be currently returned from functions.\")\n\n        # Create dimensions for any MatrixSymbol in argument_sequence that\n        # doesn't appear in the expression (and thus wasn't handled above)\n        for symbol in argument_sequence:\n            if symbol not in name_arg_dict:\n                if isinstance(symbol, MatrixSymbol):\n                    # Preserve dimensions from MatrixSymbol shape\n                    dimensions = (symbol.rows, symbol.cols)\n                    name_arg_dict[symbol] = InputArgument(symbol, symbol, dimensions=dimensions)\n\n        # Optionally catch some common errors during construction"
+      }
+    ]
+  },
+  "final_patch_attempted": false,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": false,
+  "final_patch_apply_mode": "no_patch",
+  "final_patch_cleanly_applied": false,
+  "clean_apply_ratio": 0.0,
+  "resolved": false,
+  "final_resolved": false,
+  "final_status_counts": {
+    "FAILED": 2,
+    "PASSED": 54
+  },
+  "final_failed_count": 2,
+  "final_passed_count": 54,
+  "original_passed_count_improvement": 0,
+  "original_failed_count_reduction": 0,
+  "final_status_map": {
+    "sympy/utilities/tests/test_codegen.py:test_ccode_unused_array_arg": "FAILED",
+    "test_Routine_argument_order": "PASSED",
+    "test_empty_c_code": "PASSED",
+    "test_empty_c_code_with_comment": "PASSED",
+    "test_empty_c_header": "PASSED",
+    "test_simple_c_code": "PASSED",
+    "test_c_code_reserved_words": "PASSED",
+    "test_numbersymbol_c_code": "PASSED",
+    "test_c_code_argument_order": "PASSED",
+    "test_simple_c_header": "PASSED",
+    "test_simple_c_codegen": "PASSED",
+    "test_multiple_results_c": "PASSED",
+    "test_no_results_c": "PASSED",
+    "test_ansi_math1_codegen": "PASSED",
+    "test_ansi_math2_codegen": "PASSED",
+    "test_complicated_codegen": "PASSED",
+    "test_loops_c": "PASSED",
+    "test_dummy_loops_c": "PASSED",
+    "test_partial_loops_c": "PASSED",
+    "test_output_arg_c": "PASSED",
+    "test_output_arg_c_reserved_words": "PASSED",
+    "test_ccode_results_named_ordered": "PASSED",
+    "test_ccode_matrixsymbol_slice": "PASSED",
+    "test_ccode_cse": "PASSED",
+    "test_ccode_unused_array_arg": "FAILED",
+    "test_empty_f_code": "PASSED",
+    "test_empty_f_code_with_header": "PASSED",
+    "test_empty_f_header": "PASSED",
+    "test_simple_f_code": "PASSED",
+    "test_numbersymbol_f_code": "PASSED",
+    "test_erf_f_code": "PASSED",
+    "test_f_code_argument_order": "PASSED",
+    "test_simple_f_header": "PASSED",
+    "test_simple_f_codegen": "PASSED",
+    "test_multiple_results_f": "PASSED",
+    "test_no_results_f": "PASSED",
+    "test_intrinsic_math_codegen": "PASSED",
+    "test_intrinsic_math2_codegen": "PASSED",
+    "test_complicated_codegen_f95": "PASSED",
+    "test_loops": "PASSED",
+    "test_dummy_loops_f95": "PASSED",
+    "test_loops_InOut": "PASSED",
+    "test_partial_loops_f": "PASSED",
+    "test_output_arg_f": "PASSED",
+    "test_inline_function": "PASSED",
+    "test_f_code_call_signature_wrap": "PASSED",
+    "test_check_case": "PASSED",
+    "test_check_case_false_positive": "PASSED",
+    "test_c_fortran_omit_routine_name": "PASSED",
+    "test_fcode_matrix_output": "PASSED",
+    "test_fcode_results_named_ordered": "PASSED",
+    "test_fcode_matrixsymbol_slice": "PASSED",
+    "test_fcode_matrixsymbol_slice_autoname": "PASSED",
+    "test_global_vars": "PASSED",
+    "test_custom_codegen": "PASSED",
+    "test_c_with_printer": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

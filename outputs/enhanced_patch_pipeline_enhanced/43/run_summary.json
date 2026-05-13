@@ -1,0 +1,300 @@
+[
+  {
+    "instance_id": "sympy__sympy-18057",
+    "repo": "sympy/sympy",
+    "model": "minimax-m2.5",
+    "pipeline_mode": "enhanced_guided",
+    "hide_original_test_patch_in_repair": false,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "enhanced_guided",
+    "original_test_identifiers": [
+      "test_var"
+    ],
+    "original_status_counts": {
+      "FAILED": 3,
+      "PASSED": 98
+    },
+    "original_failed_count": 3,
+    "original_passed_count": 98,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_var"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_var"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/core/tests/test_expr.py:test_non_string_equality",
+        "sympy/core/tests/test_var.py:test_var",
+        "test_var"
+      ],
+      "failure_mode": "assertion_error",
+      "dominant_errors": [
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "+ git checkout 62000f37b8821573ba00280524ffb4ac4a380875 sympy/core/tests/test_expr.py sympy/core/tests/test_var.py",
+        "Checking patch sympy/core/tests/test_var.py...",
+        "Applied patch sympy/core/tests/test_var.py cleanly."
+      ],
+      "noise_ratio": 0.0046,
+      "target_test_tracebacks": {
+        "test_var": "TARGET TEST: test_var\n- snippet: + git checkout 62000f37b8821573ba00280524ffb4ac4a380875 sympy/core/tests/test_expr.py sympy/core/tests/test_var.py\n- snippet: Checking patch sympy/core/tests/test_var.py...\n- snippet: Applied patch sympy/core/tests/test_var.py cleanly.\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\n+ git checkout 62000f37b8821573ba00280524ffb4ac4a380875 sympy/core/tests/test_expr.py sympy/core/tests/test_var.py\nChecking patch sympy/core/tests/test_var.py...\nApplied patch sympy/core/tests/test_var.py cleanly.\n+ bin/test -C --verbose sympy/core/tests/test_expr.py sympy/core/tests/test_var.py\ntest_attribute_error ok\nsympy/core/tests/test_var.py[5] \ntest_var F\ntest_var_return ok\ntest_var_accepts_comma ok\ntest_var_keywords ok\ntest_var_cls ok                                                           [FAIL]\nTraceback (most recent call last):\nAssertionError\n____________________ sympy/core/tests/test_var.py:test_var _____________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/core/tests/test_var.py\", line 22, in test_var\nAssertionError\n== tests finished: 99 passed, 2 failed, 2 expected to fail, in 290.34 seconds ==\n+ git checkout 62000f37b8821573ba00280524ffb4ac4a380875 sympy/core/tests/test_expr.py sympy/core/tests/test_var.py"
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 3,
+      "keep_top_k": 2,
+      "attempt_budget": 3,
+      "bucket_limit": 3,
+      "template_limit": 3,
+      "failure_mode": "assertion_error",
+      "noise_ratio": 0.0046,
+      "difficulty": "low"
+    },
+    "adaptive_num_candidates": 3,
+    "adaptive_keep_top_k": 2,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 3,
+    "kept_enhanced_candidates": 2,
+    "enhanced_candidate_retention_rate": 0.6666666666666666,
+    "enhanced_generation_attempts_total": 6,
+    "enhanced_generation_attempts_avg": 2.0,
+    "kept_enhanced_test_identifiers": [
+      "test_sweb_enhanced_symbol_repr_eval",
+      "test_sweb_enhanced_symbol_eq_repr"
+    ],
+    "enhanced_failed_test_identifiers": [
+      "test_sweb_enhanced_symbol_repr_eval",
+      "test_sweb_enhanced_symbol_eq_repr"
+    ],
+    "enhanced_failed_count": 2,
+    "generated_patch_nonempty": false,
+    "generated_patch_error": "The replacement_block must start with anchor_line_before exactly.",
+    "generated_patch_attempts": 9,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_not_generated",
+    "generated_patch_feedback": "The replacement_block must start with anchor_line_before exactly.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [],
+    "patch_analysis": {
+      "root_cause": "Expr.__eq__ calls sympify() on arbitrary objects without validating them first. When sympify() receives an object with a malicious or unexpected __repr__ (like 'x.y'), it passes this string to parse_expr which then eval's it as Python code. This causes either AttributeError (accessing .y on Symbol) or worse, arbitrary code execution.",
+      "affected_components": [
+        {
+          "file": "sympy/core/expr.py",
+          "symbol": "Expr.__eq__",
+          "reason": "This is the entry point that calls sympify(other) on arbitrary objects during equality comparison. The try/except block catches SympifyError and SyntaxError but not the AttributeError that occurs when eval'ing the repr produces attribute access."
+        },
+        {
+          "file": "sympy/core/sympify.py",
+          "symbol": "sympify",
+          "reason": "The sympify function accepts any object, converts it to string via str() or repr(), and passes it to parse_expr which uses eval() - this is the dangerous behavior triggered during equality checks."
+        },
+        {
+          "file": "sympy/parsing/sympy_parser.py",
+          "symbol": "parse_expr/eval_expr",
+          "reason": "These functions use eval() on the string representation of objects, which is fundamentally unsafe when the repr comes from untrusted objects."
+        }
+      ],
+      "failing_signal": "AttributeError: 'Symbol' object has no attribute 'y' when comparing sympy.Symbol('x') == C() where C.__repr__ returns 'x.y'. Also, objects with repr='x' incorrectly compare equal to Symbol('x').",
+      "propagation_path": "1) User compares Symbol with arbitrary object: sympy.Symbol('x') == C()\n2) Expr.__eq__ calls sympify(other) on C() instance\n3) sympify calls str() on C() which calls C().__repr__() returning 'x.y'\n4) parse_expr receives 'x.y' and converts to 'Symbol(x).y'\n5) eval('Symbol(x).y') tries to access .y attribute on Symbol, raising AttributeError",
+      "repair_constraint": "The fix must prevent arbitrary code execution/repr evaluation in __eq__ while still allowing legitimate SymPy object comparisons. Objects that are not already SymPy expressions should be rejected early without calling sympify.",
+      "suggested_repair_scope": [
+        "sympy/core/expr.py"
+      ],
+      "suspicious_symbols": [
+        "Expr.__eq__",
+        "sympify",
+        "parse_expr",
+        "Symbol"
+      ],
+      "repair_obligations": [
+        {
+          "id": "test_var::ns",
+          "source_symbol": "Symbol",
+          "validation_subject": "ns",
+          "why_it_matters": "The test uses eval('var('a')', ns) and then checks ns['a'] == Symbol('a'). This comparison triggers sympify on the dictionary value. The fix must not break this comparison while preventing the repr-eval bug."
+        },
+        {
+          "id": "test_var::ns::comparison_result",
+          "source_symbol": "Symbol",
+          "validation_subject": "comparison_result",
+          "why_it_matters": "The comparison Symbol('a') == ns['a'] must return True when ns['a'] is Symbol('a'), but must not try to eval any repr strings from arbitrary objects."
+        },
+        {
+          "id": "test_var::v::comparison_result",
+          "source_symbol": "Symbol",
+          "validation_subject": "comparison_result",
+          "why_it_matters": "Similar to ns, the variable 'v' in test_var_return is compared with Symbol objects. The fix must preserve correct Symbol-to-Symbol equality while blocking unsafe repr evaluation."
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Catch AttributeError in Expr.__eq__ to prevent repr eval",
+      "approach": "Add AttributeError to the exception tuple in Expr.__eq__ (line 127 in sympy/core/expr.py). This prevents the dangerous eval of arbitrary object reprs during equality comparison. When an object with a malicious repr like 'x.y' is compared to a Symbol, sympify will raise AttributeError during the eval stage (trying to access .y on Symbol), which will now be caught and return False instead of propagating. This fix preserves existing behavior for legitimate SymPy-to-SymPy comparisons (like Symbol('a') == ns['a'] where ns['a'] is also a Symbol) while blocking unsafe repr evaluation.",
+      "edit_targets": [
+        "sympy/core/expr.py::Expr.__eq__"
+      ],
+      "dependency_files": [
+        "sympy/core/sympify.py",
+        "sympy/parsing/sympy_parser.py",
+        "sympy/core/tests/test_var.py"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [],
+      "sufficiency_assessment": "The fix is sufficient because: (1) The primary bug is in Expr.__eq__ which calls sympify on arbitrary objects without catching all possible exceptions. (2) Adding AttributeError to the exception tuple handles the case where eval of repr produces attribute access (e.g., 'x.y'). (3) The test_var tests validate that Symbol-to-Symbol comparisons still work - when ns['a'] is a Symbol, sympify(ns['a']) returns the same Symbol without raising exceptions, so the comparison proceeds correctly. (4) No other locations need modification because the root cause is the narrow exception handling in __eq__.",
+      "risks": [
+        "Could mask legitimate AttributeError bugs in sympify (though unlikely in practice for __eq__ use case)",
+        "Must ensure Symbol-to-Symbol equality still works (covered by test_var tests)"
+      ]
+    },
+    "patch_edit_plan": {
+      "coverage_check": [
+        {
+          "target_file": "sympy/core/expr.py",
+          "action": "modify_region",
+          "justification": "Expr.__eq__ is the entry point that calls sympify on arbitrary objects. The fix adds AttributeError to the exception tuple to catch errors when eval'ing malicious reprs like 'x.y' that try to access attributes on Symbol objects."
+        }
+      ],
+      "edits": [
+        {
+          "target_file": "sympy/core/expr.py",
+          "target_symbol": "Expr.__eq____branch_mid1",
+          "replacement_mode": "replace_span",
+          "covers_obligations": [
+            "test_var::ns",
+            "test_var::ns::comparison_result",
+            "test_var::v::comparison_result"
+          ],
+          "anchor_line_before": "        except (SympifyError, SyntaxError):",
+          "anchor_line_after": "            return False",
+          "replacement_block": "        except (SympifyError, SyntaxError, AttributeError):\n            return False"
+        }
+      ]
+    },
+    "final_patch_attempted": false,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": false,
+    "final_patch_apply_mode": "no_patch",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 3,
+      "PASSED": 98
+    },
+    "final_failed_count": 3,
+    "final_passed_count": 98,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/core/tests/test_expr.py:test_non_string_equality": "FAILED",
+      "sympy/core/tests/test_var.py:test_var": "FAILED",
+      "test_basic": "PASSED",
+      "test_ibasic": "PASSED",
+      "test_relational": "PASSED",
+      "test_relational_assumptions": "PASSED",
+      "test_basic_nostr": "PASSED",
+      "test_series_expansion_for_uniform_order": "PASSED",
+      "test_leadterm": "PASSED",
+      "test_as_leading_term": "PASSED",
+      "test_leadterm2": "PASSED",
+      "test_leadterm3": "PASSED",
+      "test_as_leading_term2": "PASSED",
+      "test_as_leading_term3": "PASSED",
+      "test_as_leading_term4": "PASSED",
+      "test_as_leading_term_stub": "PASSED",
+      "test_as_leading_term_deriv_integral": "PASSED",
+      "test_atoms": "PASSED",
+      "test_is_polynomial": "PASSED",
+      "test_is_rational_function": "PASSED",
+      "test_is_algebraic_expr": "PASSED",
+      "test_SAGE1": "PASSED",
+      "test_SAGE2": "PASSED",
+      "test_SAGE3": "PASSED",
+      "test_len": "PASSED",
+      "test_doit": "PASSED",
+      "test_attribute_error": "PASSED",
+      "test_args": "PASSED",
+      "test_noncommutative_expand_issue_3757": "PASSED",
+      "test_as_numer_denom": "PASSED",
+      "test_trunc": "PASSED",
+      "test_as_independent": "PASSED",
+      "test_replace": "PASSED",
+      "test_find": "PASSED",
+      "test_count": "PASSED",
+      "test_has_basics": "PASSED",
+      "test_has_multiple": "PASSED",
+      "test_has_piecewise": "PASSED",
+      "test_has_iterative": "PASSED",
+      "test_has_integrals": "PASSED",
+      "test_has_tuple": "PASSED",
+      "test_has_units": "PASSED",
+      "test_has_polys": "PASSED",
+      "test_has_physics": "PASSED",
+      "test_as_poly_as_expr": "PASSED",
+      "test_nonzero": "PASSED",
+      "test_is_number": "PASSED",
+      "test_as_coeff_add": "PASSED",
+      "test_as_coeff_mul": "PASSED",
+      "test_as_coeff_exponent": "PASSED",
+      "test_extractions": "PASSED",
+      "test_nan_extractions": "PASSED",
+      "test_coeff": "PASSED",
+      "test_coeff2": "PASSED",
+      "test_coeff2_0": "PASSED",
+      "test_coeff_expand": "PASSED",
+      "test_integrate": "PASSED",
+      "test_as_base_exp": "PASSED",
+      "test_issue_4963": "PASSED",
+      "test_action_verbs": "PASSED",
+      "test_as_powers_dict": "PASSED",
+      "test_as_coefficients_dict": "PASSED",
+      "test_args_cnc": "PASSED",
+      "test_new_rawargs": "PASSED",
+      "test_issue_5226": "PASSED",
+      "test_free_symbols": "PASSED",
+      "test_issue_5300": "PASSED",
+      "test_floordiv": "PASSED",
+      "test_as_coeff_Mul": "PASSED",
+      "test_as_coeff_Add": "PASSED",
+      "test_expr_sorting": "PASSED",
+      "test_as_ordered_factors": "PASSED",
+      "test_as_ordered_terms": "PASSED",
+      "test_sort_key_atomic_expr": "PASSED",
+      "test_eval_interval": "PASSED",
+      "test_eval_interval_zoo": "PASSED",
+      "test_primitive": "PASSED",
+      "test_issue_5843": "PASSED",
+      "test_is_constant": "PASSED",
+      "test_equals": "PASSED",
+      "test_random": "PASSED",
+      "test_round": "PASSED",
+      "test_held_expression_UnevaluatedExpr": "PASSED",
+      "test_round_exception_nostr": "PASSED",
+      "test_extract_branch_factor": "PASSED",
+      "test_identity_removal": "PASSED",
+      "test_float_0": "PASSED",
+      "test_issue_6325": "PASSED",
+      "test_issue_7426": "PASSED",
+      "test_issue_11122": "PASSED",
+      "test_issue_10651": "PASSED",
+      "test_issue_10161": "PASSED",
+      "test_issue_10755": "PASSED",
+      "test_issue_11877": "PASSED",
+      "test_normal": "PASSED",
+      "test_expr": "PASSED",
+      "test_ExprBuilder": "PASSED",
+      "test_var": "FAILED",
+      "test_var_return": "PASSED",
+      "test_var_accepts_comma": "PASSED",
+      "test_var_keywords": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

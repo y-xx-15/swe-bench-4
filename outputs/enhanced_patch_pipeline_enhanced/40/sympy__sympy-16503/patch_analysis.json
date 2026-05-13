@@ -1,0 +1,34 @@
+{
+  "root_cause": "The baseline adjustment calculation in _print_Sum is incorrect. The expression `prettyF.baseline -= d - (prettyF.height()//2 - prettyF.baseline) - adjustment` computes a wrong baseline value, causing misalignment between the summed expression and the '+ 3' when the Sum is added to another expression.",
+  "affected_components": [
+    {
+      "file": "sympy/printing/pretty/pretty.py",
+      "symbol": "_print_Sum",
+      "reason": "Contains the buggy baseline adjustment logic that misaligns the summed expression"
+    },
+    {
+      "file": "sympy/printing/pretty/pretty.py",
+      "symbol": "prettyForm",
+      "reason": "The baseline attribute controls vertical alignment; incorrect baseline causes misalignment"
+    }
+  ],
+  "failing_signal": "test_pretty_sum fails with AssertionError and ValueError: Name node can't be used with 'False' constant. The Sum(x, (x, 1, oo)) + 3 expression shows misaligned 'x' and '+ 3' in the pretty output.",
+  "propagation_path": "The baseline adjustment formula in _print_Sum computes an incorrect baseline value for prettyF. When Sum is added to another expression (like + 3), the misaligned baseline causes the '+ 3' to appear at wrong vertical position relative to the summed expression 'x'.",
+  "repair_constraint": "After the fix, Sum(x, (x, 1, oo)) + 3 must display with 'x' and '+ 3' properly aligned. The baseline calculation must correctly center the summed expression on the sum sign.",
+  "suggested_repair_scope": [
+    "sympy/printing/pretty/pretty.py"
+  ],
+  "suspicious_symbols": [
+    "_print_Sum",
+    "prettyForm.baseline",
+    "baseline adjustment calculation"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_pretty_sum::core::baseline_alignment_computation",
+      "source_symbol": "_print_Sum",
+      "validation_subject": "baseline alignment computation",
+      "why_it_matters": "The baseline must be correctly computed so that when a Sum is added to another expression, the terms align properly vertically. The current formula produces incorrect results."
+    }
+  ]
+}

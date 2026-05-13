@@ -1,0 +1,256 @@
+[
+  {
+    "idea": {
+      "title": "latex_trace_matrix_power_expression",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify LaTeX printer correctly handles trace of matrix power expressions without raising ValueError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_trace_matrix_power"
+      ],
+      "covers_original_tests": [
+        "test_trace"
+      ],
+      "covers_obligations": [
+        "test_trace::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_Trace",
+      "target_validation_subject": "trace(A**2) latex output",
+      "semantic_alignment_tokens": [
+        "trace",
+        "MatrixSymbol",
+        "ValueError",
+        "latex"
+      ],
+      "trigger_shape_tokens": [
+        "trace(A**2)",
+        "MatrixSymbol",
+        "_print_Trace"
+      ],
+      "rationale": "The original test_trace fails with ValueError when printing trace(A**2) because the LaTeX printer lacks a _print_Trace method and fails to properly delegate to the LaTeX printer for the inner matrix power expression. This enhanced test isolates the exact failing case: trace of a MatrixSymbol power expression. It differs from the original by focusing specifically on the matrix power expression path that triggers the ValueError, rather than testing general trace functionality. The test will fail with ValueError on buggy code and pass when _print_Trace is properly implemented to handle matrix expressions."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1870,3 +1870,12 @@ def test_latex_printer_tensor():\n     expr = TensorElement(K(i,j,-k,-l), {i:3})\n     assert latex(expr) == 'K{}^{i=3,j}{}_{kl}'\n \n+\n+def test_sweb_enhanced_trace_matrix_power():\n+    # Issue 15308 - Test LaTeX printing of trace of matrix power expression\n+    # The bug causes ValueError or incorrect output when printing trace(A**2)\n+    # because the LaTeX printer lacks _print_Trace and fails to properly\n+    # delegate to the LaTeX printer for the inner matrix power expression\n+    from sympy import trace\n+    A = MatrixSymbol(\"A\", 2, 2)\n+    # This should produce proper LaTeX with \\mathrm{tr} and A^{2}\n+    assert latex(trace(A**2)) == r\"\\mathrm{tr}\\left (A^{2} \\right )\"\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Tests the same bug as `test_trace` (LaTeX printing for `trace(A**2)`)\n2. Fails on the buggy code (either with ValueError or AssertionError)\n3. Passes when the bug is fixed\n4. Uses a different observation angle than the original test\n\nThe original test tests both `trace(A)` and `trace(A**2)`. I'll create a test focused specifically on the matrix power expression case that triggers the ValueError.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1870,3 +1870,12 @@ def test_latex_printer_tensor():\n     expr = TensorElement(K(i,j,-k,-l), {i:3})\n     assert latex(expr) == 'K{}^{i=3,j}{}_{kl}'\n \n+\n+def test_sweb_enhanced_trace_matrix_power():\n+    # Issue 15308 - Test LaTeX printing of trace of matrix power expression\n+    # The bug causes ValueError or incorrect output when printing trace(A**2)\n+    # because the LaTeX printer lacks _print_Trace and fails to properly\n+    # delegate to the LaTeX printer for the inner matrix power expression\n+    from sympy import trace\n+    A = MatrixSymbol(\"A\", 2, 2)\n+    # This should produce proper LaTeX with \\mathrm{tr} and A^{2}\n+    assert latex(trace(A**2)) == r\"\\mathrm{tr}\\left (A^{2} \\right )\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_trace_matrix_power"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_trace_matrix_power"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "LaTeX printer should recursively convert inner matrix expressions within trace",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Verify that when printing trace(matrix_expr) to LaTeX, the inner matrix expression is also converted to LaTeX format rather than left as plain text",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_trace_inner_expr"
+      ],
+      "covers_original_tests": [
+        "test_trace"
+      ],
+      "covers_obligations": [
+        "test_trace::core"
+      ],
+      "target_source_symbol": "latex",
+      "target_validation_subject": "trace(A**2) output format",
+      "semantic_alignment_tokens": [
+        "trace",
+        "latex",
+        "MatrixSymbol",
+        "ValueError",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "trace(",
+        "latex(",
+        "MatrixSymbol"
+      ],
+      "rationale": "The original test_trace likely checks basic trace printing but may not specifically verify that inner matrix expressions (like A**2) are recursively converted to LaTeX format. The bug manifests as 'Trace(A**2)' where A**2 should be '^2' in LaTeX. This test explicitly validates the recursive conversion behavior by checking that the inner Pow expression is properly printed, which triggers the ValueError on buggy code when the printer fails to handle the inner expression correctly."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -190,0 +190,12 @@\n+def test_sweb_enhanced_trace_inner_expr():\n+    # Issue 15308 - LaTeX printer should recursively convert inner matrix\n+    # expressions within trace. The bug manifests as inner matrix expressions\n+    # not being converted to LaTeX format (e.g., A*B stays as \"A*B\" instead\n+    # of being converted to proper LaTeX with proper multiplication symbol).\n+    from sympy import trace\n+    from sympy.matrices.expressions import MatrixSymbol\n+    A = MatrixSymbol(\"A\", 2, 2)\n+    B = MatrixSymbol(\"B\", 2, 2)\n+    # The inner A*B must be recursively converted to LaTeX format\n+    result = latex(trace(A*B))\n+    assert \"A\" in result and \"B\" in result and \"\\\\\" in result\n",
+    "raw_response": "\n\nLooking at the problem, I need to create an enhanced test that:\n1. Starts with `test_sweb_enhanced_`\n2. Exposes the same bug through a different observation angle\n3. Must FAIL on the buggy code and PASS after the fix\n\nThe original test checks `trace(A**2)` but the bug is that the inner matrix expression (A**2) is not being recursively converted to LaTeX format. I'll create a test that uses a different matrix expression - `trace(A*B)` where both A and B are MatrixSymbols - which should also fail on the buggy code because the inner multiplication won't be properly converted.\n\n```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -190,0 +190,12 @@\n+def test_sweb_enhanced_trace_inner_expr():\n+    # Issue 15308 - LaTeX printer should recursively convert inner matrix\n+    # expressions within trace. The bug manifests as inner matrix expressions\n+    # not being converted to LaTeX format (e.g., A*B stays as \"A*B\" instead\n+    # of being converted to proper LaTeX with proper multiplication symbol).\n+    from sympy import trace\n+    from sympy.matrices.expressions import MatrixSymbol\n+    A = MatrixSymbol(\"A\", 2, 2)\n+    B = MatrixSymbol(\"B\", 2, 2)\n+    # The inner A*B must be recursively converted to LaTeX format\n+    result = latex(trace(A*B))\n+    assert \"A\" in result and \"B\" in result and \"\\\\\" in result\n```",
+    "identifiers": [
+      "test_sweb_enhanced_trace_inner_expr"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_trace_inner_expr"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "LaTeX printing of trace with matrix power expression",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that trace(A**2) produces valid LaTeX with both Trace and inner A**2 properly rendered",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_trace_matrix_power"
+      ],
+      "covers_original_tests": [
+        "test_trace"
+      ],
+      "covers_obligations": [
+        "test_trace::core"
+      ],
+      "target_source_symbol": "latex",
+      "target_validation_subject": "trace(A**2) LaTeX output",
+      "semantic_alignment_tokens": [
+        "valueerror",
+        "assertionerror",
+        "trace",
+        "latex",
+        "MatrixSymbol"
+      ],
+      "trigger_shape_tokens": [
+        "trace(",
+        "MatrixSymbol",
+        "latex("
+      ],
+      "rationale": "This test directly exercises the failing scenario from test_trace: latex(trace(A**2)). The original test fails with ValueError/AssertionError because the LaTeX printer does not properly handle trace of matrix power expressions - it outputs raw 'Trace(A**2)' instead of proper LaTeX. The test verifies that: (1) the output contains proper LaTeX for the trace operation, (2) the inner matrix power A**2 is rendered with LaTeX superscript notation (A^{2}) rather than Python-style **. This is distinct from the original test because it specifically checks for the inner expression's proper LaTeX rendering, which is part of the reported bug about fallback failure."
+    },
+    "patch": "Looking at the bug and the original test, I need to create an enhanced test that:\n1. Tests the same bug (LaTeX printing of trace with matrix power)\n2. Uses a different observation angle (checking inner expression rendering specifically)\n3. Fails on the buggy code\n\nLet me create the patch:\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1889,3 +1889,14 @@ def test_latex_printer_tensor():\n \n     expr = TensorElement(K(i,j,-k,-l), {i:3})\n     assert latex(expr) == 'K{}^{i=3,j}{}_{kl}'\n+\n+\n+def test_sweb_enhanced_trace_matrix_power():\n+    # Enhanced test for issue 15308 - LaTeX printing of trace with matrix power\n+    # This tests a different angle: verifying the inner matrix power expression\n+    # is properly rendered in LaTeX (A^{2}) rather than Python syntax (A**2)\n+    from sympy import trace\n+    A = MatrixSymbol(\"A\", 3, 3)\n+    # The bug: trace(A**2) produces 'Trace(A**2)' without proper LaTeX\n+    # Expected: inner A**2 should render as A^{2} in LaTeX\n+    result = latex(trace(A**2))\n+    assert \"A^{2}\" in result, f\"Expected A^{2} in LaTeX output, got: {result}\"\n+    assert \"**\" not in result, f\"Python ** syntax should not appear in LaTeX, got: {result}\"\n",
+    "raw_response": "\n\nLooking at the bug and the original test, I need to create an enhanced test that:\n1. Tests the same bug (LaTeX printing of trace with matrix power)\n2. Uses a different observation angle (checking inner expression rendering specifically)\n3. Fails on the buggy code\n\nLet me create the patch:\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1889,3 +1889,14 @@ def test_latex_printer_tensor():\n \n     expr = TensorElement(K(i,j,-k,-l), {i:3})\n     assert latex(expr) == 'K{}^{i=3,j}{}_{kl}'\n+\n+\n+def test_sweb_enhanced_trace_matrix_power():\n+    # Enhanced test for issue 15308 - LaTeX printing of trace with matrix power\n+    # This tests a different angle: verifying the inner matrix power expression\n+    # is properly rendered in LaTeX (A^{2}) rather than Python syntax (A**2)\n+    from sympy import trace\n+    A = MatrixSymbol(\"A\", 3, 3)\n+    # The bug: trace(A**2) produces 'Trace(A**2)' without proper LaTeX\n+    # Expected: inner A**2 should render as A^{2} in LaTeX\n+    result = latex(trace(A**2))\n+    assert \"A^{2}\" in result, f\"Expected A^{2} in LaTeX output, got: {result}\"\n+    assert \"**\" not in result, f\"Python ** syntax should not appear in LaTeX, got: {result}\"\n",
+    "identifiers": [
+      "test_sweb_enhanced_trace_matrix_power"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_trace_matrix_power"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "LaTeX printer fallback for trace of matrix power expression",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Verify that when LaTeX printer cannot handle trace, it falls back to printing inner matrix power expression in LaTeX format rather than leaving it as raw Python repr",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "message_specific_failure",
+      "target_tests": [
+        "test_sweb_enhanced_trace_matrix_power"
+      ],
+      "covers_original_tests": [
+        "test_trace"
+      ],
+      "covers_obligations": [
+        "test_trace::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.LatexPrinter._print_trace",
+      "target_validation_subject": "inner expression fallback behavior",
+      "semantic_alignment_tokens": [
+        "trace",
+        "MatrixSymbol",
+        "latex",
+        "ValueError",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "trace(A**2)",
+        "latex(trace(A**2))",
+        "MatrixSymbol"
+      ],
+      "rationale": "The original test_trace checks basic trace printing but does not specifically verify the fallback behavior when trace is not handled - that the inner matrix power expression A**2 should still be printed as A^{2} in LaTeX, not as the raw Python repr. This enhanced test isolates the fallback failure: when _print_trace is missing or fails, the inner A**2 should still be converted to proper LaTeX superscript notation. The test triggers ValueError/AssertionError by asserting the inner expression uses LaTeX formatting (^ instead of **)."
+    },
+    "patch": "Looking at the problem, I need to create an enhanced test that:\n1. Tests the fallback behavior when LaTeX printing for trace is not properly implemented\n2. Specifically verifies that the inner matrix expression `A**2` gets converted to proper LaTeX format (`A^{2}`) rather than failing or using raw Python repr\n3. Must fail on the buggy code and pass on fixed code\n\nLet me create the patch:\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1870,3 +1870,15 @@ def test_latex_printer_tensor():\n     expr = TensorElement(K(i,j,-k,-l), {i:3})\n     assert latex(expr) == 'K{}^{i=3,j}{}_{kl}'\n \n+\n+def test_sweb_enhanced_trace_matrix_power():\n+    # Enhanced test for issue 15308 - LaTeX printer fallback for trace of matrix power\n+    # This tests that when trace printing doesn't handle the inner expression,\n+    # the inner matrix power expression A**2 should still be printed in proper\n+    # LaTeX format (A^{2}) rather than failing or using raw Python repr.\n+    from sympy import trace\n+    from sympy.printing.latex import LatexPrinter\n+    \n+    A = MatrixSymbol(\"A\", 2, 2)\n+    # Test that the inner A**2 gets converted to A^{2} in LaTeX\n+    # The bug causes ValueError or incorrect output when trace doesn't properly\n+    # delegate to the LaTeX printer for the inner matrix power expression\n+    result = latex(trace(A**2))\n+    # Verify inner expression uses LaTeX superscript notation, not ** or raw repr\n+    assert \"^{2}\" in result or \"A^{2}\" in result, \\\n+        f\"Expected LaTeX superscript notation for A**2, got: {result}\"\n+    # Also verify trace is properly handled (not just raw Trace(...) repr)\n+    assert \"Trace\" not in result and \"trace\" not in result.lower() or \"\\\\mathrm{tr}\" in result, \\\n+        f\"Expected trace to be properly formatted in LaTeX, got: {result}\"\n",
+    "raw_response": "\n\nLooking at the problem, I need to create an enhanced test that:\n1. Tests the fallback behavior when LaTeX printing for trace is not properly implemented\n2. Specifically verifies that the inner matrix expression `A**2` gets converted to proper LaTeX format (`A^{2}`) rather than failing or using raw Python repr\n3. Must fail on the buggy code and pass on fixed code\n\nLet me create the patch:\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -1870,3 +1870,15 @@ def test_latex_printer_tensor():\n     expr = TensorElement(K(i,j,-k,-l), {i:3})\n     assert latex(expr) == 'K{}^{i=3,j}{}_{kl}'\n \n+\n+def test_sweb_enhanced_trace_matrix_power():\n+    # Enhanced test for issue 15308 - LaTeX printer fallback for trace of matrix power\n+    # This tests that when trace printing doesn't handle the inner expression,\n+    # the inner matrix power expression A**2 should still be printed in proper\n+    # LaTeX format (A^{2}) rather than failing or using raw Python repr.\n+    from sympy import trace\n+    from sympy.printing.latex import LatexPrinter\n+    \n+    A = MatrixSymbol(\"A\", 2, 2)\n+    # Test that the inner A**2 gets converted to A^{2} in LaTeX\n+    # The bug causes ValueError or incorrect output when trace doesn't properly\n+    # delegate to the LaTeX printer for the inner matrix power expression\n+    result = latex(trace(A**2))\n+    # Verify inner expression uses LaTeX superscript notation, not ** or raw repr\n+    assert \"^{2}\" in result or \"A^{2}\" in result, \\\n+        f\"Expected LaTeX superscript notation for A**2, got: {result}\"\n+    # Also verify trace is properly handled (not just raw Trace(...) repr)\n+    assert \"Trace\" not in result and \"trace\" not in result.lower() or \"\\\\mathrm{tr}\" in result, \\\n+        f\"Expected trace to be properly formatted in LaTeX, got: {result}\"\n",
+    "identifiers": [
+      "test_sweb_enhanced_trace_matrix_power"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_trace_matrix_power"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "LaTeX printing of trace with matrix power fallback",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that trace(A**2) produces valid LaTeX with proper trace operator and inner power formatting",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_trace_matrix_power"
+      ],
+      "covers_original_tests": [
+        "test_trace"
+      ],
+      "covers_obligations": [
+        "test_trace::core"
+      ],
+      "target_source_symbol": "sympy.printing.latex.latex",
+      "target_validation_subject": "trace of matrix power expression",
+      "semantic_alignment_tokens": [
+        "trace",
+        "MatrixSymbol",
+        "latex",
+        "ValueError",
+        "AssertionError"
+      ],
+      "trigger_shape_tokens": [
+        "trace(A**2)",
+        "latex(trace(A**2))",
+        "ValueError"
+      ],
+      "rationale": "The original test_trace fails because the LaTeX printer does not properly handle trace of matrix power expressions - it outputs raw 'Trace(A**2)' instead of valid LaTeX. The inner A**2 should be rendered as A^{2} in LaTeX, and trace should use \\operatorname{Tr} or similar. This test directly exercises the failure by checking that latex(trace(MatrixSymbol('A', n, n)**2)) produces valid LaTeX output with proper formatting, which will fail with ValueError on buggy code and pass on fixed code."
+    },
+    "patch": "diff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -190,3 +190,13 @@ def test_latex_printer_tensor():\n \n     expr = TensorElement(K(i,j,-k,-l), {i:3})\n     assert latex(expr) == 'K{}^{i=3,j}{}_{kl}'\n+\n+\n+def test_sweb_enhanced_trace_matrix_transpose():\n+    # Enhanced test for issue 15308 - LaTeX printing of trace with matrix transpose\n+    # Tests a different code path than test_trace by using matrix transpose (A.T)\n+    # instead of matrix power (A**2)\n+    from sympy import trace, Transpose\n+    A = MatrixSymbol(\"A\", 2, 2)\n+    # The inner A.T should be properly printed as A^{T}, not as raw Transpose(A)\n+    assert latex(trace(Transpose(A))) == r\"\\mathrm{tr}\\left (A^{T} \\right )\"\n",
+    "raw_response": "\n\nLooking at the problem, I need to create an enhanced test that:\n1. Exposes the same bug (LaTeX printing for trace of matrix expressions)\n2. Uses a different observation angle than the original `test_trace`\n3. Fails on the buggy code and passes on fixed code\n\nThe original test checks `trace(A)` and `trace(A**2)`. I'll create a test that checks `trace(A.T)` (trace of matrix transpose) - this is a different expression type that should trigger the same underlying bug but through a different code path.\n\n```diff\ndiff --git a/sympy/printing/tests/test_latex.py b/sympy/printing/tests/test_latex.py\n--- a/sympy/printing/tests/test_latex.py\n+++ b/sympy/printing/tests/test_latex.py\n@@ -190,3 +190,13 @@ def test_latex_printer_tensor():\n \n     expr = TensorElement(K(i,j,-k,-l), {i:3})\n     assert latex(expr) == 'K{}^{i=3,j}{}_{kl}'\n+\n+\n+def test_sweb_enhanced_trace_matrix_transpose():\n+    # Enhanced test for issue 15308 - LaTeX printing of trace with matrix transpose\n+    # Tests a different code path than test_trace by using matrix transpose (A.T)\n+    # instead of matrix power (A**2)\n+    from sympy import trace, Transpose\n+    A = MatrixSymbol(\"A\", 2, 2)\n+    # The inner A.T should be properly printed as A^{T}, not as raw Transpose(A)\n+    assert latex(trace(Transpose(A))) == r\"\\mathrm{tr}\\left (A^{T} \\right )\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_trace_matrix_transpose"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_trace_matrix_transpose"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

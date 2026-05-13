@@ -1,0 +1,16 @@
+{
+  "title": "Extend Domain.preprocess to support RR/CC polynomial rings",
+  "approach": "Modify the Domain.preprocess() method in sympy/polys/polyoptions.py to handle polynomial ring specifications over real (R/RR) and complex (C/CC) fields. This requires two changes: (1) Update the _re_polynomial regex from '^(Z|ZZ|Q|QQ)\\[(.+)\\]$' to '^(Z|ZZ|Q|QQ|R|RR|C|CC)\\[(.+)\\]$' to match R, RR, C, CC as valid ground domains. (2) Extend the polynomial ring handling code to check for R/RR and C/CC ground domains and call the appropriate poly_ring method (RR.poly_ring or CC.poly_ring). The validation subjects to cover are: domain specification string parsing, domain specification parsing for RR[y,z] and CC[y,z], and domain specification string.",
+  "edit_targets": [
+    "sympy/polys/polyoptions.py"
+  ],
+  "dependency_files": [
+    "sympy/polys/tests/test_polyoptions.py (for reference only, not to be modified)"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Editing only sympy/polys/polyoptions.py is sufficient. The fix requires modifying the _re_polynomial regex pattern and the handling code within the Domain.preprocess() classmethod. The RR and CC domain classes already have poly_ring() methods available, so no changes to domain classes are needed. All three validation subjects (domain specification string parsing, domain specification parsing for RR[y,z] and CC[y,z], and domain specification string) are covered by the single edit location in the Domain.preprocess method.",
+  "risks": [
+    "Ensure existing functionality for Z/ZZ/Q/QQ polynomial rings remains unchanged - the ground domain check must still return ZZ.poly_ring or QQ.poly_ring for those cases. Avoid breaking the finite field, fraction field, or algebraic field parsing logic."
+  ]
+}

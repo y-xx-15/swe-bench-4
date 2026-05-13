@@ -1,0 +1,249 @@
+[
+  {
+    "idea": {
+      "title": "BlockDiagMatrix single element to Matrix conversion",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that a BlockDiagMatrix with a single matrix element can be converted to a regular Matrix via sympy.Matrix() constructor",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_blockdiag_single_to_matrix"
+      ],
+      "covers_original_tests": [
+        "test_issue_18618"
+      ],
+      "covers_obligations": [
+        "test_issue_18618::core"
+      ],
+      "target_source_symbol": "BlockDiagMatrix._entry",
+      "target_validation_subject": "blocks property accessor for single-element diagonal",
+      "semantic_alignment_tokens": [
+        "BlockDiagMatrix",
+        "blocks",
+        "_entry",
+        "as_explicit"
+      ],
+      "trigger_shape_tokens": [
+        "BlockDiagMatrix(M)",
+        "Matrix(D)",
+        "blocks[row_block, col_block]"
+      ],
+      "rationale": "This test directly reproduces the exact failure from test_issue_18618: creating a BlockDiagMatrix with one Matrix element and attempting to convert it back to a regular Matrix triggers TypeError: 'One' object is not subscriptable. The original test covers this path, but this enhanced test explicitly validates the conversion contract for single-element diagonal blocks, ensuring the fix properly handles the 1x1 blockshape case where blocks accessor returns the matrix directly rather than wrapped in a structure."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -240,0 +240,8 @@\n+def test_sweb_enhanced_blockdiag_single_to_matrix():\n+    # Test that BlockDiagMatrix with single element can be converted to regular Matrix\n+    # This tests the _entry method directly which is the core of issue 18618\n+    # Different from original test: uses as_explicit() to trigger _entry path\n+    M = Matrix([[1, 2], [3, 4]])\n+    D = BlockDiagMatrix(M)\n+    # as_explicit() internally calls _entry for each element - this is the failing path\n+    assert D.as_explicit() == M\n",
+    "raw_response": "\n\nLooking at the bug, I need to create an enhanced test that:\n1. Triggers the same bug (BlockDiagMatrix with single element cannot be converted to Matrix)\n2. Uses a different observation angle than the original test\n3. Must FAIL on the buggy code and PASS after fix\n\nThe original test uses `Matrix(BlockDiagMatrix(A))`. A different angle would be to directly test the `_entry` method or `as_explicit()` which is what gets called internally and triggers the bug.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -240,0 +240,8 @@\n+def test_sweb_enhanced_blockdiag_single_to_matrix():\n+    # Test that BlockDiagMatrix with single element can be converted to regular Matrix\n+    # This tests the _entry method directly which is the core of issue 18618\n+    # Different from original test: uses as_explicit() to trigger _entry path\n+    M = Matrix([[1, 2], [3, 4]])\n+    D = BlockDiagMatrix(M)\n+    # as_explicit() internally calls _entry for each element - this is the failing path\n+    assert D.as_explicit() == M\n```",
+    "identifiers": [
+      "test_sweb_enhanced_blockdiag_single_to_matrix"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blockdiag_single_to_matrix"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "BlockDiagMatrix single-block to Matrix conversion triggers type error in _entry",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Tests that converting a single-block BlockDiagMatrix to a regular Matrix triggers TypeError due to sympy Integer (One) being used as array index instead of Python int",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "coercion_contract",
+      "target_tests": [
+        "test_sweb_enhanced_blockdiag_single_element_conversion"
+      ],
+      "covers_original_tests": [
+        "test_issue_18618"
+      ],
+      "covers_obligations": [
+        "test_issue_18618::core"
+      ],
+      "target_source_symbol": "BlockMatrix._entry",
+      "target_validation_subject": "block index access in _entry method",
+      "semantic_alignment_tokens": [
+        "BlockDiagMatrix",
+        "BlockMatrix",
+        "_entry",
+        "as_explicit"
+      ],
+      "trigger_shape_tokens": [
+        "BlockDiagMatrix(M)",
+        "Matrix(D)",
+        "self.blocks[row_block, col_block]"
+      ],
+      "rationale": "The original test covers the end-to-end conversion flow. This enhanced test isolates the specific _entry method call path that fails when BlockDiagMatrix has exactly one block. The bug occurs because row_block/col_block become sympy Integer (One) instead of Python int when blockshape is (1,1), causing 'One' object is not subscriptable error when accessing self.blocks[row_block, col_block]. By testing the conversion directly and asserting on the resulting Matrix shape and values, we provide concrete repair guidance: the fix must ensure integer indices are properly coerced in _entry when dealing with single-block matrices."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -237,3 +237,9 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockdiag_single_element_conversion():\n+    # Test single-block BlockDiagMatrix conversion via as_explicit path\n+    M = Matrix([[1, 2], [3, 4]])\n+    D = BlockDiagMatrix(M)\n+    # Force explicit evaluation which triggers _entry with single block indices\n+    assert D.as_explicit() == M\n",
+    "raw_response": "\n\nLooking at the bug, I need to create an enhanced test that:\n1. Triggers the same bug (BlockDiagMatrix with one element conversion fails)\n2. Uses a different observation angle than the original test\n3. Fails on the buggy code\n\nThe original test uses `Matrix(BlockDiagMatrix(A))`. I'll create a test that uses a different approach - testing the `as_explicit()` method directly which is what gets called internally, and also tests the shape of the resulting matrix explicitly.\n\n```diff\ndiff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -237,3 +237,9 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockdiag_single_element_conversion():\n+    # Test single-block BlockDiagMatrix conversion via as_explicit path\n+    M = Matrix([[1, 2], [3, 4]])\n+    D = BlockDiagMatrix(M)\n+    # Force explicit evaluation which triggers _entry with single block indices\n+    assert D.as_explicit() == M\n```",
+    "identifiers": [
+      "test_sweb_enhanced_blockdiag_single_element_conversion"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blockdiag_single_element_conversion"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "BlockDiagMatrix single element Matrix coercion",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that a BlockDiagMatrix with a single matrix element can be converted to a regular Matrix via Matrix() constructor",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "coercion_contract",
+      "target_tests": [
+        "test_sweb_enhanced_blockdiag_single_element_coercion"
+      ],
+      "covers_original_tests": [
+        "test_issue_18618"
+      ],
+      "covers_obligations": [
+        "test_issue_18618::core"
+      ],
+      "target_source_symbol": "BlockDiagMatrix._entry",
+      "target_validation_subject": "blocks property and _entry method for single-element BlockDiagMatrix",
+      "semantic_alignment_tokens": [
+        "BlockDiagMatrix",
+        "Matrix(",
+        "as_explicit"
+      ],
+      "trigger_shape_tokens": [
+        "BlockDiagMatrix(M)",
+        "Matrix(D)",
+        "_entry"
+      ],
+      "rationale": "This test directly reproduces the exact failure path from the original bug report: creating a BlockDiagMatrix with one matrix element and converting it back to a regular Matrix. The original test_issue_18618 already covers this, but this enhanced test uses concrete Matrix objects (not symbols) to ensure the coercion path through as_explicit() is fully exercised. The test will fail with TypeError: 'One' object is not subscriptable on buggy code and pass on fixed code."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -237,3 +237,10 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockdiag_single_element_coercion():\n+    # Test that BlockDiagMatrix with single element can be converted to regular Matrix\n+    # This tests the as_explicit() path which triggers _entry for each element\n+    M = Matrix([[1, 2], [3, 4]])\n+    D = BlockDiagMatrix(M)\n+    # Force explicit evaluation via as_explicit - this triggers _entry for each element\n+    assert D.as_explicit() == M\n",
+    "raw_response": "\n\nLooking at the bug and the original test, I need to create an enhanced test that:\n1. Triggers the same bug (BlockDiagMatrix with one element cannot be converted to regular Matrix)\n2. Uses a different observation angle than the original test\n3. Fails on the buggy code with TypeError\n\nThe original test uses `Matrix(BlockDiagMatrix(A))`. I'll create a test that directly tests the `as_explicit()` method which is the underlying path that fails, and also tests accessing individual elements via `_entry`.\n\n```diff\ndiff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -237,3 +237,10 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockdiag_single_element_coercion():\n+    # Test that BlockDiagMatrix with single element can be converted to regular Matrix\n+    # This tests the as_explicit() path which triggers _entry for each element\n+    M = Matrix([[1, 2], [3, 4]])\n+    D = BlockDiagMatrix(M)\n+    # Force explicit evaluation via as_explicit - this triggers _entry for each element\n+    assert D.as_explicit() == M\n```",
+    "identifiers": [
+      "test_sweb_enhanced_blockdiag_single_element_coercion"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blockdiag_single_element_coercion"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "BlockDiagMatrix single element to Matrix conversion",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that converting a BlockDiagMatrix with a single matrix element to a regular Matrix works correctly",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "boundary_type_input",
+      "target_tests": [
+        "test_sweb_enhanced_blockdiag_single_element"
+      ],
+      "covers_original_tests": [
+        "test_issue_18618"
+      ],
+      "covers_obligations": [
+        "test_issue_18618::core"
+      ],
+      "target_source_symbol": "BlockDiagMatrix._entry",
+      "target_validation_subject": "blocks property with single element",
+      "semantic_alignment_tokens": [
+        "BlockDiagMatrix",
+        "Matrix(",
+        "_entry"
+      ],
+      "trigger_shape_tokens": [
+        "BlockDiagMatrix(M)",
+        "Matrix(D)",
+        "blocks[row_block, col_block]"
+      ],
+      "rationale": "The original test_issue_18618 covers the specific case of converting a BlockDiagMatrix with one element back to a regular Matrix. This enhanced test focuses on the exact code path in the _entry method that causes the TypeError when accessing self.blocks[row_block, col_block] with a single-element BlockDiagMatrix. The test verifies that the blocks property correctly returns a 2D matrix structure even when there's only one diagonal element, rather than returning a scalar One object that cannot be subscripted."
+    },
+    "patch": "Looking at the bug, I need to create an enhanced test that:\n1. Triggers the same bug through a different observation angle\n2. Focuses on the `_entry` method and `blocks` property with a single element\n3. Fails on the buggy code (TypeError: 'One' object is not subscriptable)\n\nLet me create a test that directly accesses the `_entry` method or uses indexing on a BlockDiagMatrix with a single element, which is a different path than the original test that converts the entire BlockDiagMatrix to a Matrix.\n<minimax:tool_call>\n<invoke name=\"apply_patch\">\n<parameter name=\"patch\">diff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -240,3 +240,9 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_transpose(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_inverse(Inverse(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockdiag_single_element():\n+    # Test that BlockDiagMatrix with single element can be indexed\n+    # This tests the _entry method path which is triggered when accessing\n+    # elements directly rather than converting the whole matrix\n+    M = Matrix([[1, 2], [3, 4]])\n+    D = BlockDiagMatrix(M)\n+    # Access individual elements - this triggers _entry which accesses blocks\n+    assert D[0, 0] == 1\n+    assert D[0, 1] == 2\n+    assert D[1, 0] == 3\n+    assert D[1, 1] == 4\n</parameter>\n</invoke>\n</minimax:tool_call>\n",
+    "raw_response": "\n\nLooking at the bug, I need to create an enhanced test that:\n1. Triggers the same bug through a different observation angle\n2. Focuses on the `_entry` method and `blocks` property with a single element\n3. Fails on the buggy code (TypeError: 'One' object is not subscriptable)\n\nLet me create a test that directly accesses the `_entry` method or uses indexing on a BlockDiagMatrix with a single element, which is a different path than the original test that converts the entire BlockDiagMatrix to a Matrix.\n<minimax:tool_call>\n<invoke name=\"apply_patch\">\n<parameter name=\"patch\">diff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -240,3 +240,9 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_transpose(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_inverse(Inverse(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockdiag_single_element():\n+    # Test that BlockDiagMatrix with single element can be indexed\n+    # This tests the _entry method path which is triggered when accessing\n+    # elements directly rather than converting the whole matrix\n+    M = Matrix([[1, 2], [3, 4]])\n+    D = BlockDiagMatrix(M)\n+    # Access individual elements - this triggers _entry which accesses blocks\n+    assert D[0, 0] == 1\n+    assert D[0, 1] == 2\n+    assert D[1, 0] == 3\n+    assert D[1, 1] == 4\n</parameter>\n</invoke>\n</minimax:tool_call>",
+    "identifiers": [
+      "test_sweb_enhanced_blockdiag_single_element"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blockdiag_single_element"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "patch_sanitization_warning: Hunk diff line expected: </parameter>\n",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "BlockDiagMatrix single element _entry access triggers type error",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Tests that converting a BlockDiagMatrix with one element to a regular Matrix triggers the TypeError in _entry method when accessing blocks[row_block, col_block]",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "coercion_contract",
+      "target_tests": [
+        "test_sweb_enhanced_blockdiag_single_element_conversion"
+      ],
+      "covers_original_tests": [
+        "test_issue_18618"
+      ],
+      "covers_obligations": [
+        "test_issue_18618::core"
+      ],
+      "target_source_symbol": "BlockDiagMatrix._entry",
+      "target_validation_subject": "blocks[row_block, col_block] subscript access",
+      "semantic_alignment_tokens": [
+        "BlockDiagMatrix",
+        "Matrix(",
+        "_entry"
+      ],
+      "trigger_shape_tokens": [
+        "BlockDiagMatrix(M)",
+        "Matrix(D)",
+        "self.blocks[row_block, col_block][i, j]"
+      ],
+      "rationale": "This test directly exercises the _entry method's block access path that fails when BlockDiagMatrix has only one element. The original test_issue_18618 covers the end-to-end conversion flow, but this enhanced test isolates the exact _entry method call that produces the TypeError: 'One' object is not subscriptable. By creating a BlockDiagMatrix with a single 2x2 matrix and attempting element access via Matrix() conversion, we trigger the exact code path in _entry where row_block=col_block=0 but self.blocks[0,0] incorrectly returns a One object instead of the matrix, causing the subscript [i,j] to fail."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -237,5 +237,11 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_transpose(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_inverse(Inverse(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockdiag_single_element_as_explicit():\n+    # Test as_explicit() on BlockDiagMatrix with single element - triggers _entry bug\n+    M = Matrix([[1, 2], [3, 4]])\n+    B = BlockDiagMatrix(M)\n+    assert B.as_explicit() == M\n",
+    "raw_response": "\n\nLooking at the bug, I need to create an enhanced test that:\n1. Tests the same underlying bug (BlockDiagMatrix with one element fails)\n2. Uses a different observation angle than the original test\n3. Must fail on the buggy code\n\nThe original test `test_issue_18618` tests the end-to-end conversion `Matrix(BlockDiagMatrix(A))`. A different angle would be to test the `as_explicit()` method directly, which also triggers the `_entry` method that causes the TypeError.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -237,3 +237,8 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_transpose(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_inverse(Inverse(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockdiag_single_element_as_explicit():\n+    # Test as_explicit() on BlockDiagMatrix with single element - triggers _entry bug\n+    M = Matrix([[1, 2], [3, 4]])\n+    B = BlockDiagMatrix(M)\n+    assert B.as_explicit() == M\n```",
+    "identifiers": [
+      "test_sweb_enhanced_blockdiag_single_element_as_explicit"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blockdiag_single_element_as_explicit"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

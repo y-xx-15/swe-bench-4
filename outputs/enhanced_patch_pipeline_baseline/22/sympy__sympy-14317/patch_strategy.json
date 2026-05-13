@@ -1,0 +1,20 @@
+{
+  "title": "Fix LaTeX Poly term ordering to match str/pretty",
+  "approach": "Modify the _print_Poly method in sympy/printing/latex.py to use degree-descending term ordering, similar to how str and pretty printers handle Poly. The fix should call as_ordered_terms() with descending degree order on the polynomial expression before printing, rather than using as_expr() which returns terms in default (non-degree-sorted) order.",
+  "edit_targets": [
+    "sympy/printing/latex.py"
+  ],
+  "dependency_files": [
+    "sympy/printing/pretty/pretty.py",
+    "sympy/printing/str.py",
+    "sympy/polys/polytools.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The primary fix is in the _print_Poly method in latex.py. The method currently uses expr.as_expr() which returns terms in default order. The fix should use expr.as_ordered_terms(order='desc') or similar to get degree-descending order. This matches what the str and pretty printers do. No other files need modification for this specific bug - the Poly class already supports as_ordered_terms(), and the _print_Add method in latex.py already handles ordered terms properly.",
+  "risks": [
+    "Changing term ordering could affect other polynomial-related printing if not carefully scoped to _print_Poly only",
+    "Must ensure domain display and other Poly-specific formatting remains intact",
+    "Should verify the fix doesn't break other polynomial printing edge cases"
+  ]
+}

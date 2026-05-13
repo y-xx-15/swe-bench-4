@@ -1,0 +1,40 @@
+
+
+Looking at the bug, the issue is that `Domain.preprocess()` in `polyoptions.py` only supports polynomial rings over Z/ZZ/Q/QQ, but not over R/RR/C/CC. The regex `_re_polynomial` only matches `Z|ZZ|Q|QQ` as ground domains.
+
+The fix requires:
+1. Updating the `_re_polynomial` regex to include R, RR, C, CC
+2. Updating the handling code to check for R/RR and C/CC ground domains and call the appropriate `poly_ring` method
+
+```diff
+diff --git a/sympy/polys/polyoptions.py b/sympy/polys/polyoptions.py
+--- a/sympy/polys/polyoptions.py
++++ b/sympy/polys/polyoptions.py
+@@ -405,7 +405,7 @@ class Domain(with_metaclass(OptionType, Option)):
+     _re_realfield = re.compile(r"^(R|RR)(_(\d+))?$")
+     _re_complexfield = re.compile(r"^(C|CC)(_(\d+))?$")
+     _re_finitefield = re.compile(r"^(FF|GF)\((\d+)\)$")
+-    _re_polynomial = re.compile(r"^(Z|ZZ|Q|QQ)\[(.+)\]$")
++    _re_polynomial = re.compile(r"^(Z|ZZ|Q|QQ|R|RR|C|CC)\[(.+)\]$")
+     _re_fraction = re.compile(r"^(Z|ZZ|Q|QQ)\((.+)\)$")
+     _re_algebraic = re.compile(r"^(Q|QQ)\<(.+)\>$")
+ 
+@@ -457,9 +457,15 @@ class Domain(with_metaclass(OptionType, Option)):
+ 
+                 gens = list(map(sympify, gens.split(',')))
+ 
+-                if ground in ['Z', 'ZZ']:
++                if ground in ('Z', 'ZZ'):
+                     return sympy.polys.domains.ZZ.poly_ring(*gens)
+-                else:
++                elif ground in ('Q', 'QQ'):
+                     return sympy.polys.domains.QQ.poly_ring(*gens)
++                elif ground in ('R', 'RR'):
++                    return sympy.polys.domains.RR.poly_ring(*gens)
++                elif ground in ('C', 'CC'):
++                    return sympy.polys.domains.CC.poly_ring(*gens)
++                else:
++                    raise OptionError('expected a valid domain specification, got %s' % domain)
+ 
+             r = cls._re_fraction.match(domain)
+```

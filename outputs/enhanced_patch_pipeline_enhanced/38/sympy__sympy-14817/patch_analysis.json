@@ -1,0 +1,35 @@
+{
+  "root_cause": "The _print_MatAdd method incorrectly uses S(item.args[0]).is_negative to check if a term is negative. This assumes args[0] is a sympifiable expression, but when the term is a MatrixSymbol with a name containing special characters like 'y*', sympify tries to parse 'y*' as Python code (multiplication), causing a SyntaxError.",
+  "affected_components": [
+    {
+      "file": "sympy/printing/pretty/pretty.py",
+      "symbol": "_print_MatAdd",
+      "reason": "This method contains the buggy code that calls S(item.args[0]).is_negative, which fails when item.args[0] is a MatrixSymbol with special characters in its name"
+    }
+  ],
+  "failing_signal": "SympifyError: Sympify of expression 'could not parse 'y*'' failed, because of exception being raised: SyntaxError: unexpected EOF while parsing",
+  "propagation_path": "When pretty-printing MatAdd (matrix addition), _print_MatAdd iterates through args and checks if each term's first argument is negative using S(item.args[0]).is_negative. For MatrixSymbol('y*', n, n), the args[0] is the string 'y*', and sympify('y*') fails because '*' is interpreted as Python multiplication operator.",
+  "repair_constraint": "The fix must correctly detect negative matrix terms for pretty-printing without using sympify on potentially non-numeric expressions. The pretty-printing should show ' - ' instead of ' + ' for negative terms.",
+  "suggested_repair_scope": [
+    "sympy/printing/pretty/pretty.py"
+  ],
+  "suspicious_symbols": [
+    "_print_MatAdd",
+    "S(item.args[0]).is_negative",
+    "MatrixSymbol"
+  ],
+  "repair_obligations": [
+    {
+      "id": "RO-1",
+      "source_symbol": "_print_MatAdd",
+      "validation_subject": "item.args[0]",
+      "why_it_matters": "The current code assumes item.args[0] is always a sympifiable numeric expression, but it can be a MatrixSymbol with special characters in its name. The fix must handle this case without calling sympify."
+    },
+    {
+      "id": "RO-2",
+      "source_symbol": "_print_MatAdd",
+      "validation_subject": "negative term detection",
+      "why_it_matters": "The pretty-printer needs to correctly identify negative terms to display ' - ' instead of ' + '. The fix must preserve this behavior for valid negative expressions while avoiding the sympify call for non-numeric expressions."
+    }
+  ]
+}

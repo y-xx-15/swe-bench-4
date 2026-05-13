@@ -1,0 +1,24 @@
+{
+  "original_test_identifiers": [
+    "test_point",
+    "test_point3D"
+  ],
+  "status_map": {
+    "sympy/geometry/tests/test_point.py:test_point": "FAILED",
+    "sympy/geometry/tests/test_point.py:test_point3D": "FAILED",
+    "test_point": "ERROR",
+    "test_point3D": "ERROR",
+    "test_Point2D": "PASSED",
+    "test_issue_9214": "PASSED",
+    "test_issue_11617": "PASSED",
+    "test_transform": "PASSED",
+    "test_concyclic_doctest_bug": "PASSED",
+    "test_arguments": "PASSED",
+    "test_unit": "PASSED",
+    "test_dot": "PASSED",
+    "test__normalize_dimension": "PASSED"
+  },
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/sympy__sympy-17655/test_output.txt",
+  "timed_out": false,
+  "error": null
+}

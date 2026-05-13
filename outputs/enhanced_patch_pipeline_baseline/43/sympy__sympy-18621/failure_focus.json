@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_issue_18618"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_issue_18618"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_18618",
+    "test_issue_18618"
+  ],
+  "failure_mode": "type_error",
+  "dominant_errors": [
+    "TypeError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_issue_18618 E",
+    "____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_18618 _____",
+    "Traceback (most recent call last):"
+  ],
+  "noise_ratio": 0.0057,
+  "target_test_tracebacks": {
+    "test_issue_18618": "TARGET TEST: test_issue_18618\n- snippet: test_issue_18618 E\n- snippet: ____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_18618 _____\n- snippet: Traceback (most recent call last):\n- dominant_errors: TypeError\nWEAK TRACEBACK CONTEXT:\ntest_issue_18618 E\n____ sympy/matrices/expressions/tests/test_blockmatrix.py:test_issue_18618 _____\nTraceback (most recent call last):\n  File \"/testbed/sympy/matrices/expressions/tests/test_blockmatrix.py\", line 115, in test_issue_18618\nTypeError: 'One' object is not subscriptable"
+  }
+}

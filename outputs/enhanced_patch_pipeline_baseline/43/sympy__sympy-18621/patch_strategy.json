@@ -1,0 +1,18 @@
+{
+  "title": "Fix BlockDiagMatrix single-element conversion to Matrix",
+  "approach": "Override the _entry method in BlockDiagMatrix to handle single-block case directly, bypassing the problematic blocks property access that returns sympy.One instead of the matrix when blockshape is (1, 1).",
+  "edit_targets": [
+    "sympy/matrices/expressions/blockmatrix.py::BlockDiagMatrix"
+  ],
+  "dependency_files": [
+    "sympy/matrices/expressions/blockmatrix.py::BlockMatrix._entry",
+    "sympy/matrices/expressions/blockmatrix.py::bc_unpack"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix should be sufficient because BlockDiagMatrix._entry will directly access self.args[0] for single-element case, avoiding the blocks property that creates the problematic ImmutableDenseMatrix. The parent BlockMatrix._entry is used for multi-element cases and works correctly.",
+  "risks": [
+    "Ensure that shape property still returns correct dimensions for single-element case",
+    "Ensure rowblocksizes and colblocksizes still work correctly for single-element case"
+  ]
+}

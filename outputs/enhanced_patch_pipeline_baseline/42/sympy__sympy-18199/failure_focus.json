@@ -1,0 +1,31 @@
+{
+  "original_test_identifiers": [
+    "test_solve_modular"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_solve_modular"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/ntheory/tests/test_residue.py:test_residue",
+    "sympy/solvers/tests/test_solveset.py:test_solve_trig",
+    "sympy/solvers/tests/test_solveset.py:test_solve_hyperbolic",
+    "sympy/solvers/tests/test_solveset.py:test_solve_modular",
+    "test_solve_trig"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "NotImplementedError",
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_solve_trig F",
+    "test_solve_trig_simplified f",
+    "test_solve_modular F"
+  ],
+  "noise_ratio": 0.0043,
+  "target_test_tracebacks": {
+    "test_solve_modular": "TARGET TEST: test_solve_modular\n- snippet: test_solve_trig F\n- snippet: test_solve_trig_simplified f\n- snippet: test_solve_modular F\n- dominant_errors: NotImplementedError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_errorinverses ok\ntest_solve_modular F\ntest_solve_modular_fail f                                                 [FAIL]\nTraceback (most recent call last):\n    raise NotImplementedError(\"Not implemented for composite p\")\nNotImplementedError: Not implemented for composite p\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\n___________ sympy/solvers/tests/test_solveset.py:test_solve_modular ____________\nTraceback (most recent call last):\n  File \"/testbed/sympy/solvers/tests/test_solveset.py\", line 2246, in test_solve_modular\nAssertionError\n tests finished: 113 passed, 3 failed, 3 skipped, 12 expected to fail, "
+  }
+}

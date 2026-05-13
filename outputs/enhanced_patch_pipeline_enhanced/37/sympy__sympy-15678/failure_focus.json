@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_idiff"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_idiff"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/geometry/tests/test_util.py:test_idiff",
+    "test_idiff"
+  ],
+  "failure_mode": "value_error",
+  "dominant_errors": [
+    "ValueError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_idiff E",
+    "test_idiff - Took 15.549 seconds",
+    "_________________ sympy/geometry/tests/test_util.py:test_idiff _________________"
+  ],
+  "noise_ratio": 0.0061,
+  "target_test_tracebacks": {
+    "test_idiff": "TARGET TEST: test_idiff\n- snippet: test_idiff E\n- snippet: test_idiff - Took 15.549 seconds\n- snippet: _________________ sympy/geometry/tests/test_util.py:test_idiff _________________\n- dominant_errors: ValueError\nWEAK TRACEBACK CONTEXT:\ntest_idiff E\ntest_idiff - Took 15.549 seconds\n_________________ sympy/geometry/tests/test_util.py:test_idiff _________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/geometry/tests/test_util.py\", line 24, in test_idiff\n    raise ValueError(\"expecting x-dependent symbol(s) but got: %s\" % y)\nValueError: expecting x-dependent symbol(s) but got: f(x)"
+  }
+}

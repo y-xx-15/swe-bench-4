@@ -1,0 +1,12 @@
+--- a/sympy/geometry/point.py
++++ b/sympy/geometry/point.py
+@@ -104,6 +104,9 @@
+     """
+ 
+     is_Point = True
++
++    def __rmul__(self, factor):
++        return self.__mul__(factor)
+ 
+     def __new__(cls, *args, **kwargs):
+         evaluate = kwargs.get('evaluate', global_evaluate[0])

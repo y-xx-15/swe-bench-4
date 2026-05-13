@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/ntheory/residue_ntheory.py",
+      "action": "modify_region",
+      "justification": "The nthroot_mod function must be modified to handle the case when a % p == 0, returning 0 (or [0] if all_roots=True) as the trivial root."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/ntheory/residue_ntheory.py",
+      "target_symbol": "nthroot_mod__branch",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "RO-1",
+        "RO-2"
+      ],
+      "anchor_line_before": "    if n == 2:",
+      "anchor_line_after": "        return sqrt_mod(a, p, all_roots)",
+      "replacement_block": "    if n == 2:\n        return sqrt_mod(a, p, all_roots)\n    if a % p == 0:\n        if all_roots:\n            return [0]\n        return 0"
+    }
+  ]
+}

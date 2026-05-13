@@ -1,0 +1,312 @@
+[
+  {
+    "instance_id": "sympy__sympy-14317",
+    "repo": "sympy/sympy",
+    "model": "minimax-m2.5",
+    "pipeline_mode": "enhanced_guided",
+    "hide_original_test_patch_in_repair": false,
+    "disable_semantic_bucket_guidance": false,
+    "disable_enhanced_test_filtering": false,
+    "repair_mode": "enhanced_guided",
+    "original_test_identifiers": [
+      "test_latex_Poly",
+      "test_latex_Poly_order"
+    ],
+    "original_status_counts": {
+      "FAILED": 6,
+      "PASSED": 116,
+      "ERROR": 2
+    },
+    "original_failed_count": 8,
+    "original_passed_count": 116,
+    "failure_focus": {
+      "original_test_identifiers": [
+        "test_latex_Poly",
+        "test_latex_Poly_order"
+      ],
+      "active_fail_to_pass_identifiers": [
+        "test_latex_Poly",
+        "test_latex_Poly_order"
+      ],
+      "inactive_fail_to_pass_identifiers": [],
+      "failing_tests_sample": [
+        "sympy/printing/tests/test_latex.py:test_issue_8470",
+        "sympy/printing/tests/test_latex.py:test_issue_13559",
+        "sympy/printing/tests/test_latex.py:test_latex_Poly",
+        "sympy/printing/tests/test_latex.py:test_latex_Poly_order",
+        "test_latex_Poly"
+      ],
+      "failure_mode": "value_error",
+      "dominant_errors": [
+        "ValueError",
+        "AssertionError"
+      ],
+      "assertion_value_mismatches": [],
+      "failure_snippets": [
+        "test_latex_PolyElement ok",
+        "test_latex_Poly F",
+        "test_latex_Poly_order F"
+      ],
+      "noise_ratio": 0.0209,
+      "target_test_tracebacks": {
+        "test_latex_Poly": "TARGET TEST: test_latex_Poly\n- snippet: test_latex_PolyElement ok\n- snippet: test_latex_Poly F\n- snippet: test_latex_Poly_order F\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_latex_PolyElement ok\ntest_latex_Poly F\ntest_latex_Poly_order F\nValueError: Name node can't be used with 'False' constant\nValueError: Name node can't be used with 'False' constant\n______________ sympy/printing/tests/test_latex.py:test_latex_Poly ______________\n  File \"/testbed/sympy/printing/tests/test_latex.py\", line 1145, in test_latex_Poly\nAssertionError\n___________ sympy/printing/tests/test_latex.py:test_latex_Poly_order ___________\n  File \"/testbed/sympy/printing/tests/test_latex.py\", line 1152, in test_latex_Poly_order\nAssertionError\n tests finished: 117 passed, 2 failed, 2 expected to fail, 2 exceptions, ",
+        "test_latex_Poly_order": "TARGET TEST: test_latex_Poly_order\n- snippet: test_latex_PolyElement ok\n- snippet: test_latex_Poly F\n- snippet: test_latex_Poly_order F\n- dominant_errors: ValueError, AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_latex_Poly_order F\nValueError: Name node can't be used with 'False' constant\nValueError: Name node can't be used with 'False' constant\nAssertionError\n___________ sympy/printing/tests/test_latex.py:test_latex_Poly_order ___________\n  File \"/testbed/sympy/printing/tests/test_latex.py\", line 1152, in test_latex_Poly_order\nAssertionError\n tests finished: 117 passed, 2 failed, 2 expected to fail, 2 exceptions, "
+      }
+    },
+    "generation_budget": {
+      "candidate_budget": 5,
+      "keep_top_k": 3,
+      "attempt_budget": 3,
+      "bucket_limit": 5,
+      "template_limit": 4,
+      "failure_mode": "value_error",
+      "noise_ratio": 0.0209,
+      "difficulty": "medium"
+    },
+    "adaptive_num_candidates": 5,
+    "adaptive_keep_top_k": 3,
+    "adaptive_attempt_budget": 3,
+    "enhanced_candidates_total": 5,
+    "kept_enhanced_candidates": 2,
+    "enhanced_candidate_retention_rate": 0.4,
+    "enhanced_generation_attempts_total": 14,
+    "enhanced_generation_attempts_avg": 2.8,
+    "kept_enhanced_test_identifiers": [
+      "test_sweb_enhanced_latex_poly_order",
+      "test_sweb_enhanced_poly_latex_order_consistency"
+    ],
+    "enhanced_failed_test_identifiers": [
+      "test_sweb_enhanced_latex_poly_order",
+      "test_sweb_enhanced_poly_latex_order_consistency"
+    ],
+    "enhanced_failed_count": 2,
+    "generated_patch_nonempty": false,
+    "generated_patch_error": null,
+    "generated_patch_attempts": 8,
+    "generated_patch_accepted": false,
+    "generated_patch_acceptance_reason": "rejected_patch_apply_failed",
+    "generated_patch_feedback": "The previous patch was rejected because it did not satisfy the acceptance gate. Patch apply mode: apply_failed. Baseline passed=116, failed=8. Candidate passed=0, failed=0. Hard failure signal: none. FAIL_TO_PASS tests still failing after patch: test_latex_Poly, test_latex_Poly_order. Your patch must make ALL of these tests pass, not just improve aggregate counts. Semantic oracle failed identifiers: test_sweb_enhanced_latex_poly_order, test_sweb_enhanced_poly_latex_order_consistency. Semantic oracle failure summaries: test_sweb_enhanced_latex_poly_order: patch: **** Only garbage was found in the patch input.\n test_sweb_enhanced_poly_latex_order_consistency: patch: **** Only garbage was found in the patch input.\n.  Target files: unknown. Target symbols: unknown. Generate a new source-only unified diff that is closer to the exact file context and lands inside the target class body.",
+    "semantic_oracle_passed": false,
+    "semantic_oracle_failed_identifiers": [
+      "test_sweb_enhanced_latex_poly_order",
+      "test_sweb_enhanced_poly_latex_order_consistency"
+    ],
+    "patch_analysis": {
+      "root_cause": "The LaTeX printer's _print_Poly method does not apply the same ordering to monomials as the str and pretty printers. It uses the default ordering from expr.args which is not sorted by degree, while str/pretty use explicit degree-based ordering.",
+      "affected_components": [
+        {
+          "file": "sympy/printing/latex.py",
+          "symbol": "LatexPrinter._print_Poly",
+          "reason": "This method handles Poly to LaTeX conversion but doesn't apply degree-based ordering to monomials, causing the output to have terms in wrong order compared to str/pretty"
+        },
+        {
+          "file": "sympy/printing/latex.py",
+          "symbol": "LatexPrinter._print_PolyElement",
+          "reason": "Related to Poly printing, may need consistent ordering approach"
+        }
+      ],
+      "failing_signal": "AssertionError in test_latex_Poly and test_latex_Poly_order - the LaTeX output shows terms in wrong order: 'a x^{5} + b x^{3} + c x + x^{4} + 2 x^{2} + 3' instead of 'a x^{5} + x^{4} + b x^{3} + 2 x^{2} + c x + 3'",
+      "propagation_path": "When Poly is converted to LaTeX, _print_Poly accesses expr.rep.dump() or similar which returns terms in internal order (not degree-sorted). The str and pretty printers explicitly sort by degree using as_poly().terms() or similar, but the LaTeX printer doesn't apply this sorting.",
+      "repair_constraint": "The fix must ensure LaTeX output for Poly follows the same descending-degree order as str/pretty printers, while preserving all other Poly printing behavior (domain, variable, etc.)",
+      "suggested_repair_scope": [
+        "sympy/printing/latex.py"
+      ],
+      "suspicious_symbols": [
+        "_print_Poly",
+        "_print_PolyElement",
+        "Poly",
+        "as_ordered_terms"
+      ],
+      "repair_obligations": [
+        {
+          "id": "test_latex_Poly::core::Poly monomial ordering in LaTeX output",
+          "source_symbol": "test_latex_Poly_order",
+          "validation_subject": "Poly monomial ordering in LaTeX output",
+          "why_it_matters": "The LaTeX output must match the degree-sorted order used by str and pretty printers for consistency across different output formats"
+        },
+        {
+          "id": "test_latex_Poly_order::core::Poly monomial ordering in LaTeX output",
+          "source_symbol": "test_latex_Poly_order",
+          "validation_subject": "Poly monomial ordering in LaTeX output",
+          "why_it_matters": "The test specifically validates that Poly ordering in LaTeX follows the expected degree-based descending order"
+        },
+        {
+          "id": "test_latex_Poly::core::Poly monomial ordering in latex output",
+          "source_symbol": "test_latex_Poly_order",
+          "validation_subject": "Poly monomial ordering in latex output",
+          "why_it_matters": "Ensures latex() function produces correctly ordered monomials matching str(poly) and pretty(poly)"
+        },
+        {
+          "id": "test_latex_Poly_order::core::Poly monomial ordering in latex output",
+          "source_symbol": "test_latex_Poly_order",
+          "validation_subject": "Poly monomial ordering in latex output",
+          "why_it_matters": "Direct validation that latex(poly) output order matches the expected descending degree order"
+        }
+      ]
+    },
+    "patch_strategy": {
+      "title": "Order monomials by degree in LaTeX Poly printing",
+      "approach": "Modify the _print_Poly method in sympy/printing/latex.py to apply degree-based descending order to monomials, matching the behavior of str and pretty printers. The fix should extract terms using expr.as_poly().terms() which returns terms sorted by degree (highest first), then print them in that order rather than using the default expr.args which returns terms in internal order.",
+      "edit_targets": [
+        "sympy/printing/latex.py::_print_Poly"
+      ],
+      "dependency_files": [
+        "sympy/printing/latex.py::_print_PolyElement",
+        "sympy/polys/polytools.py::Poly.terms"
+      ],
+      "structural_rules": [],
+      "forbidden_patterns": [],
+      "sufficiency_assessment": "The primary fix target is _print_Poly in latex.py. This method handles Poly to LaTeX conversion and is the source of the ordering bug. The fix should ensure that when converting a Poly to LaTeX, the terms are ordered by descending degree (highest power first), matching the behavior of str and pretty printers. The _print_PolyElement method may also need inspection for consistency but is not the primary target. The repair addresses both validation subjects: (1) Poly monomial ordering in LaTeX output and (2) Poly monomial ordering in latex output, as both are covered by the test_latex_Poly_order source symbol.",
+      "risks": [
+        "Changing term ordering could affect other Poly-related printing; ensure domain, variable, and other Poly attributes are still printed correctly",
+        "Ensure the fix doesn't break existing tests for other Poly printing scenarios"
+      ]
+    },
+    "patch_edit_plan": null,
+    "final_patch_attempted": false,
+    "final_patch_applied": true,
+    "final_patch_effective_applied": false,
+    "final_patch_apply_mode": "no_patch",
+    "final_patch_cleanly_applied": false,
+    "clean_apply_ratio": 0.0,
+    "resolved": false,
+    "final_resolved": false,
+    "final_status_counts": {
+      "FAILED": 6,
+      "PASSED": 116,
+      "ERROR": 2
+    },
+    "final_failed_count": 8,
+    "final_passed_count": 116,
+    "original_passed_count_improvement": 0,
+    "original_failed_count_reduction": 0,
+    "final_status_map": {
+      "sympy/printing/tests/test_latex.py:test_issue_8470": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_issue_13559": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_Poly": "FAILED",
+      "sympy/printing/tests/test_latex.py:test_latex_Poly_order": "FAILED",
+      "test_printmethod": "PASSED",
+      "test_latex_basic": "PASSED",
+      "test_latex_builtins": "PASSED",
+      "test_latex_SingularityFunction": "PASSED",
+      "test_latex_cycle": "PASSED",
+      "test_latex_permutation": "PASSED",
+      "test_latex_Float": "PASSED",
+      "test_latex_vector_expressions": "PASSED",
+      "test_latex_symbols": "PASSED",
+      "test_latex_functions": "PASSED",
+      "test_function_subclass_different_name": "PASSED",
+      "test_hyper_printing": "PASSED",
+      "test_latex_bessel": "PASSED",
+      "test_latex_fresnel": "PASSED",
+      "test_latex_brackets": "PASSED",
+      "test_latex_indexed": "PASSED",
+      "test_latex_derivatives": "PASSED",
+      "test_latex_subs": "PASSED",
+      "test_latex_integrals": "PASSED",
+      "test_latex_sets": "PASSED",
+      "test_latex_SetExpr": "PASSED",
+      "test_latex_Range": "PASSED",
+      "test_latex_sequences": "PASSED",
+      "test_latex_FourierSeries": "PASSED",
+      "test_latex_FormalPowerSeries": "PASSED",
+      "test_latex_intervals": "PASSED",
+      "test_latex_AccumuBounds": "PASSED",
+      "test_latex_emptyset": "PASSED",
+      "test_latex_commutator": "PASSED",
+      "test_latex_union": "PASSED",
+      "test_latex_symmetric_difference": "PASSED",
+      "test_latex_Complement": "PASSED",
+      "test_latex_Complexes": "PASSED",
+      "test_latex_productset": "PASSED",
+      "test_latex_Naturals": "PASSED",
+      "test_latex_Naturals0": "PASSED",
+      "test_latex_Integers": "PASSED",
+      "test_latex_ImageSet": "PASSED",
+      "test_latex_ConditionSet": "PASSED",
+      "test_latex_ComplexRegion": "PASSED",
+      "test_latex_Contains": "PASSED",
+      "test_latex_sum": "PASSED",
+      "test_latex_product": "PASSED",
+      "test_latex_limits": "PASSED",
+      "test_latex_log": "PASSED",
+      "test_issue_3568": "PASSED",
+      "test_latex": "PASSED",
+      "test_latex_dict": "PASSED",
+      "test_latex_list": "PASSED",
+      "test_latex_rational": "PASSED",
+      "test_latex_inverse": "PASSED",
+      "test_latex_DiracDelta": "PASSED",
+      "test_latex_Heaviside": "PASSED",
+      "test_latex_KroneckerDelta": "PASSED",
+      "test_latex_LeviCivita": "PASSED",
+      "test_mode": "PASSED",
+      "test_latex_Piecewise": "PASSED",
+      "test_latex_Matrix": "PASSED",
+      "test_latex_matrix_with_functions": "PASSED",
+      "test_latex_NDimArray": "PASSED",
+      "test_latex_mul_symbol": "PASSED",
+      "test_latex_issue_4381": "PASSED",
+      "test_latex_issue_4576": "PASSED",
+      "test_latex_pow_fraction": "PASSED",
+      "test_noncommutative": "PASSED",
+      "test_latex_order": "PASSED",
+      "test_latex_Lambda": "PASSED",
+      "test_latex_PolyElement": "PASSED",
+      "test_latex_FracElement": "PASSED",
+      "test_latex_Poly": "FAILED",
+      "test_latex_Poly_order": "FAILED",
+      "test_latex_ComplexRootOf": "PASSED",
+      "test_latex_RootSum": "PASSED",
+      "test_settings": "PASSED",
+      "test_latex_numbers": "PASSED",
+      "test_latex_euler": "PASSED",
+      "test_lamda": "PASSED",
+      "test_custom_symbol_names": "PASSED",
+      "test_matAdd": "PASSED",
+      "test_matMul": "PASSED",
+      "test_latex_MatrixSlice": "PASSED",
+      "test_latex_RandomDomain": "PASSED",
+      "test_PrettyPoly": "PASSED",
+      "test_integral_transforms": "PASSED",
+      "test_PolynomialRingBase": "PASSED",
+      "test_categories": "PASSED",
+      "test_Modules": "PASSED",
+      "test_QuotientRing": "PASSED",
+      "test_Tr": "PASSED",
+      "test_Adjoint": "PASSED",
+      "test_Hadamard": "PASSED",
+      "test_ZeroMatrix": "PASSED",
+      "test_boolean_args_order": "PASSED",
+      "test_imaginary": "PASSED",
+      "test_builtins_without_args": "PASSED",
+      "test_latex_greek_functions": "PASSED",
+      "test_translate": "PASSED",
+      "test_other_symbols": "PASSED",
+      "test_modifiers": "PASSED",
+      "test_greek_symbols": "PASSED",
+      "test_builtin_no_args": "PASSED",
+      "test_issue_6853": "PASSED",
+      "test_Mul": "PASSED",
+      "test_Pow": "PASSED",
+      "test_issue_7180": "PASSED",
+      "test_issue_8409": "PASSED",
+      "test_issue_8470": "ERROR",
+      "test_issue_7117": "PASSED",
+      "test_issue_2934": "PASSED",
+      "test_issue_10489": "PASSED",
+      "test_issue_12886": "PASSED",
+      "test_issue_13559": "ERROR",
+      "test_issue_13651": "PASSED",
+      "test_latex_UnevaluatedExpr": "PASSED",
+      "test_MatrixElement_printing": "PASSED",
+      "test_MatrixSymbol_printing": "PASSED",
+      "test_Quaternion_latex_printing": "PASSED",
+      "test_TensorProduct_printing": "PASSED",
+      "test_WedgeProduct_printing": "PASSED",
+      "test_units": "PASSED"
+    },
+    "final_timed_out": false,
+    "final_error": null
+  }
+]

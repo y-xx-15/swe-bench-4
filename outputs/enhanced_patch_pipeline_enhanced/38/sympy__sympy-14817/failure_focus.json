@@ -1,0 +1,32 @@
+{
+  "original_test_identifiers": [
+    "test_MatrixSymbol_printing"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_MatrixSymbol_printing"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/printing/pretty/tests/test_pretty.py:test_pretty_geometry",
+    "sympy/printing/pretty/tests/test_pretty.py:test_issue_8292",
+    "sympy/printing/pretty/tests/test_pretty.py:test_issue_8344",
+    "sympy/printing/pretty/tests/test_pretty.py:test_MatrixSymbol_printing",
+    "test_pretty_geometry"
+  ],
+  "failure_mode": "value_error",
+  "dominant_errors": [
+    "ValueError",
+    "SympifyError",
+    "SyntaxError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_pretty_geometry E",
+    "test_MatrixSymbol_printing E",
+    "_______ sympy/printing/pretty/tests/test_pretty.py:test_pretty_geometry ________"
+  ],
+  "noise_ratio": 0.0207,
+  "target_test_tracebacks": {
+    "test_MatrixSymbol_printing": "TARGET TEST: test_MatrixSymbol_printing\n- snippet: test_pretty_geometry E\n- snippet: test_MatrixSymbol_printing E\n- snippet: _______ sympy/printing/pretty/tests/test_pretty.py:test_pretty_geometry ________\n- dominant_errors: ValueError, SympifyError, SyntaxError\nWEAK TRACEBACK CONTEXT:\ntest_MatrixSymbol_printing E\nValueError: Name node can't be used with 'False' constant\nValueError: Name node can't be used with 'False' constant\n____ sympy/printing/pretty/tests/test_pretty.py:test_MatrixSymbol_printing _____\n  File \"/testbed/sympy/printing/pretty/tests/test_pretty.py\", line 6126, in test_MatrixSymbol_printing\n    raise SympifyError('could not parse %r' % a, exc)\nsympy.core.sympify.SympifyError: Sympify of expression 'could not parse 'y*'' failed, because of exception being raised:\nSyntaxError: unexpected EOF while parsing (<string>, line 1)"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "original_test_identifiers": [
+    "test_diophantine"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_diophantine"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/solvers/tests/test_diophantine.py:test_diophantine",
+    "test_diophantine"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "+ git checkout 1923822ddf8265199dbd9ef9ce09641d3fd042b9 sympy/solvers/tests/test_diophantine.py",
+    "Checking patch sympy/solvers/tests/test_diophantine.py...",
+    "Applied patch sympy/solvers/tests/test_diophantine.py cleanly."
+  ],
+  "noise_ratio": 0.0056,
+  "target_test_tracebacks": {
+    "test_diophantine": "TARGET TEST: test_diophantine\n- snippet: + git checkout 1923822ddf8265199dbd9ef9ce09641d3fd042b9 sympy/solvers/tests/test_diophantine.py\n- snippet: Checking patch sympy/solvers/tests/test_diophantine.py...\n- snippet: Applied patch sympy/solvers/tests/test_diophantine.py cleanly.\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\n+ git checkout 1923822ddf8265199dbd9ef9ce09641d3fd042b9 sympy/solvers/tests/test_diophantine.py\nChecking patch sympy/solvers/tests/test_diophantine.py...\nApplied patch sympy/solvers/tests/test_diophantine.py cleanly.\n+ bin/test -C --verbose sympy/solvers/tests/test_diophantine.py\nsympy/solvers/tests/test_diophantine.py[46] \ntest_diophantine F\ntest_diophantine_permute_sign ok\n___________ sympy/solvers/tests/test_diophantine.py:test_diophantine ___________\nTraceback (most recent call last):\n  File \"/testbed/sympy/solvers/tests/test_diophantine.py\", line 554, in test_diophantine\nAssertionError\n tests finished: 42 passed, 1 failed, 1 skipped, 2 expected to fail, \n+ git checkout 1923822ddf8265199dbd9ef9ce09641d3fd042b9 sympy/solvers/tests/test_diophantine.py"
+  }
+}

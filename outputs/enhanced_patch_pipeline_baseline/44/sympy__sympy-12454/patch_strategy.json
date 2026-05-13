@@ -1,0 +1,21 @@
+{
+  "title": "Bound matrix triangular checks by dimensions",
+  "approach": "Fix is_upper and _eval_is_upper_hessenberg to bound the inner loop j by min(i, self.cols) instead of just i, since for tall matrices (more rows than columns), j can exceed the column count. Similarly fix _eval_is_lower to bound i by min(j, self.rows) for wide matrices.",
+  "edit_targets": [
+    "sympy/matrices/matrices.py::MatrixProperties._eval_is_upper",
+    "sympy/matrices/matrices.py::MatrixProperties._eval_is_upper_hessenberg",
+    "sympy/matrices/matrices.py::MatrixProperties._eval_is_lower"
+  ],
+  "dependency_files": [
+    "sympy/matrices/matrices.py::MatrixProperties.is_upper",
+    "sympy/matrices/matrices.py::MatrixProperties.is_lower",
+    "sympy/matrices/matrices.py::MatrixProperties.is_upper_hessenberg"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix requires changing three methods in MatrixProperties class: _eval_is_upper, _eval_is_upper_hessenberg, and _eval_is_lower. The public properties is_upper, is_upper_hessenberg, and is_lower call these internal methods, so editing the internal methods is sufficient. The is_lower property itself doesn't need changes as it delegates to _eval_is_lower.",
+  "risks": [
+    "Changing the triangular check logic could affect matrices that were incorrectly returning True/False before - now they should return the correct value or raise IndexError less often",
+    "For non-square matrices, the definition of 'upper triangular' should only apply to the min(rows, cols) square submatrix on the diagonal - this fix implements that correctly"
+  ]
+}

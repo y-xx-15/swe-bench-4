@@ -1,0 +1,18 @@
+{
+  "title": "Fix _dotrig to handle Add expressions with mixed trig functions",
+  "approach": "The bug is in the `_dotrig` helper function which checks if two expressions have the same types of trigonometric functions. It currently compares `a.func == b.func`, which fails for Add expressions containing different trig functions (sin vs cos). For the pattern `c*cos(a)*cos(b) + c*sin(a)*sin(b) + d` against an expression like `sin(r1)*sin(r2) + cos(r1)*cos(r2)`, the pattern's func is Add but the expression's func is also Add, so `a.func == b.func` passes. However, the inner check `a.has(TrigonometricFunction) and b.has(TrigonometricFunction)` returns True for both, but doesn't verify that BOTH sin AND cos are present in the pattern match. The fix should modify `_dotrig` to properly check if the expression contains the necessary trig function types for the pattern to match.",
+  "edit_targets": [
+    "sympy/simplify/trigsimp.py::_dotrig"
+  ],
+  "dependency_files": [
+    "sympy/simplify/trigsimp.py",
+    "sympy/simplify/tests/test_trigsimp.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The primary fix in `_dotrig` should be sufficient because it controls whether pattern matching is even attempted. Once `_dotrig` correctly identifies that an Add containing both sin and cos terms can match a pattern requiring both sin and cos, the existing pattern matching logic in `__trigsimp` should handle the rest. The matchers_add patterns already contain the correct transformations like `c*cos(a)*cos(b) + c*sin(a)*sin(b) + d -> cos(a-b)*c + d`.",
+  "risks": [
+    "Changing _dotrig could affect other trigsimp patterns - need to ensure it doesn't cause false positives that match patterns inappropriately",
+    "The fix must preserve existing behavior for symbolic arguments"
+  ]
+}

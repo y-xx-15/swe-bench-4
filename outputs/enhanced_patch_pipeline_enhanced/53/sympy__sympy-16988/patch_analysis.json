@@ -1,0 +1,30 @@
+{
+  "root_cause": "The Intersection class does not remove duplicate set arguments at instantiation. When Intersection({1},{1},{x}) is called, the duplicate {1} causes incorrect evaluation to EmptySet instead of properly handling the intersection as Intersection({1},{x}) would.",
+  "affected_components": [
+    {
+      "file": "sympy/sets/sets.py",
+      "symbol": "Intersection",
+      "reason": "The Intersection.__new__ method does not deduplicate its args before processing, causing incorrect results when duplicate sets are passed"
+    }
+  ],
+  "failing_signal": "Intersection({1},{1},{x}) returns EmptySet() but Intersection({1},{x}) returns {1}. These should be equivalent since duplicate {1} sets should be removed.",
+  "propagation_path": "When Intersection receives duplicate arguments like {1}, the _new_args_filter or simplify_intersection processes them incorrectly, treating the duplicate as making the intersection empty when combined with other sets. The fix should deduplicate args at the start of __new__ before any processing.",
+  "repair_constraint": "The fix must remove duplicate set arguments from Intersection while preserving the order of unique arguments for deterministic behavior. The semantic meaning of the intersection must remain unchanged.",
+  "suggested_repair_scope": [
+    "sympy/sets/sets.py"
+  ],
+  "suspicious_symbols": [
+    "Intersection",
+    "Intersection.__new__",
+    "simplify_intersection",
+    "_new_args_filter"
+  ],
+  "repair_obligations": [
+    {
+      "id": "deduplicate_args",
+      "source_symbol": "Intersection.__new__",
+      "validation_subject": "args parameter before simplify_intersection call",
+      "why_it_matters": "Intersection({1},{1},{x}) must produce the same result as Intersection({1},{x}) - duplicate sets should be removed at instantiation"
+    }
+  ]
+}

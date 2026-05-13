@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/latex.py",
+      "action": "modify_region",
+      "justification": "The LatexPrinter class is missing a _print_Trace method, causing trace() expressions to fall back to a generic handler that doesn't properly dispatch the inner matrix expression (A**2) to the LaTeX printer. Adding _print_Trace will fix both the trace(A**2) output format and ensure matrix power expressions are properly rendered in LaTeX."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/latex.py",
+      "target_symbol": "LatexPrinter",
+      "replacement_mode": "insert_before_anchor",
+      "covers_obligations": [
+        "test_trace::core::trace(A**2) output format",
+        "test_trace::core::trace of matrix power expression"
+      ],
+      "anchor_line_before": "    def __init__(self, settings=None):",
+      "anchor_line_after": "    def __init__(self, settings=None):",
+      "replacement_block": "    def _print_Trace(self, expr):\n        return r\"\\operatorname{Tr}\\left(%s\\right)\" % self._print(expr.arg)\n\n    def __init__(self, settings=None):"
+    }
+  ]
+}

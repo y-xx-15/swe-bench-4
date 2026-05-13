@@ -1,0 +1,54 @@
+{
+  "root_cause": "The _blockmul method in BlockMatrix converts ZeroMatrix blocks to scalar Zero during multiplication, breaking subsequent block operations that expect MatrixExpr objects with .rows and .cols properties.",
+  "affected_components": [
+    {
+      "file": "sympy/matrices/expressions/blockmatrix.py",
+      "symbol": "BlockMatrix._blockmul",
+      "reason": "Performs block multiplication but incorrectly converts ZeroMatrix results to scalar Zero, losing matrix type information needed for further operations"
+    },
+    {
+      "file": "sympy/matrices/expressions/blockmatrix.py",
+      "symbol": "BlockMatrix.colblocksizes",
+      "reason": "Property that iterates over block columns and accesses .cols attribute, fails when blocks are scalar Zero instead of MatrixExpr"
+    },
+    {
+      "file": "sympy/matrices/expressions/blockmatrix.py",
+      "symbol": "BlockMatrix.rowblocksizes",
+      "reason": "Same as colblocksizes but for rows; will also fail with scalar Zero blocks"
+    }
+  ],
+  "failing_signal": "AttributeError: 'Zero' object has no attribute 'cols' when attempting b._blockmul(b)._blockmul(b) or block_collapse(b * b * b)",
+  "propagation_path": "After first b._blockmul(b), ZeroMatrix blocks become scalar Zero → second _blockmul call triggers colblocksizes property → list comprehension tries .cols on scalar Zero → AttributeError",
+  "repair_constraint": "Zero matrix blocks must remain as ZeroMatrix (or at least MatrixExpr) instances after block multiplication to preserve .rows/.cols interface",
+  "suggested_repair_scope": [
+    "sympy/matrices/expressions/blockmatrix.py"
+  ],
+  "suspicious_symbols": [
+    "BlockMatrix",
+    "_blockmul",
+    "colblocksizes",
+    "rowblocksizes",
+    "ZeroMatrix",
+    "bc_matmul"
+  ],
+  "repair_obligations": [
+    {
+      "id": "1",
+      "source_symbol": "BlockMatrix._blockmul",
+      "validation_subject": "block multiplication result blocks",
+      "why_it_matters": "Zero matrix results must remain as ZeroMatrix instances, not scalar Zero, to maintain the MatrixExpr interface required by colblocksizes/rowblocksizes properties"
+    },
+    {
+      "id": "2",
+      "source_symbol": "BlockMatrix.colblocksizes",
+      "validation_subject": "block element types in first row",
+      "why_it_matters": "Each block must have .cols attribute; currently fails when block is scalar Zero"
+    },
+    {
+      "id": "3",
+      "source_symbol": "BlockMatrix.rowblocksizes",
+      "validation_subject": "block element types in first column",
+      "why_it_matters": "Each block must have .rows attribute; would also fail with scalar Zero blocks"
+    }
+  ]
+}

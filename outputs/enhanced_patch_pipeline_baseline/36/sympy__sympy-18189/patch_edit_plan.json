@@ -1,0 +1,22 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/solvers/diophantine.py",
+      "action": "modify_region",
+      "justification": "The diophantine function has a bug where the permute parameter is not passed to the recursive call when syms order differs from the default sorted variable order. This causes permute=True to have no effect when syms is provided in a different order than alphabetical."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/solvers/diophantine.py",
+      "target_symbol": "diophantine__branch_mid3",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "RO-1"
+      ],
+      "anchor_line_before": "            if syms != var:",
+      "anchor_line_after": "                dict_sym_index = dict(zip(syms, range(len(syms))))",
+      "replacement_block": "            if syms != var:\n                dict_sym_index = dict(zip(syms, range(len(syms))))\n                return {tuple([t[dict_sym_index[i]] for i in var])\n                            for t in diophantine(eq, param, permute=permute)}"
+    }
+  ]
+}

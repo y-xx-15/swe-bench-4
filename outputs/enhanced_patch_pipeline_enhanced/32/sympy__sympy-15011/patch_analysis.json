@@ -1,0 +1,43 @@
+{
+  "root_cause": "The _EvaluatorPrinter._preprocess method in lambdify.py handles Symbol and Function types for dummification but does not handle MatrixSymbol. When a MatrixSymbol with curly braces in its name (e.g., '{v}') is passed, it falls through to the else branch which uses str(arg) directly, producing invalid Python syntax like 'lambda {v}: ({v})'.",
+  "affected_components": [
+    {
+      "file": "sympy/utilities/lambdify.py",
+      "symbol": "_EvaluatorPrinter._preprocess",
+      "reason": "This method processes arguments before generating lambda code. It handles Symbol and Function types for dummification but lacks handling for MatrixSymbol, causing invalid syntax when MatrixSymbol names contain special characters like curly braces."
+    },
+    {
+      "file": "sympy/matrices/expressions/matexpr.py",
+      "symbol": "MatrixSymbol",
+      "reason": "MatrixSymbol is a subclass of Basic that represents a symbolic matrix. It has a 'name' attribute but is not recognized as a Symbol subclass by the lambdify preprocessing logic."
+    }
+  ],
+  "failing_signal": "SyntaxError: invalid syntax when calling lambdify with MatrixSymbol containing curly braces in name, even with dummify=True",
+  "propagation_path": "MatrixSymbol with name '{v}' -> lambdify() -> _EvaluatorPrinter.doprint() -> _preprocess() -> else branch uses str(arg) = '{v}' -> generated code 'lambda {v}: ({v})' -> Python SyntaxError on compile",
+  "repair_constraint": "The fix must ensure MatrixSymbol arguments are either converted to valid Python identifiers (via Dummy replacement when dummify=True or when name is not a safe identifier) or handled appropriately to produce valid lambda syntax.",
+  "suggested_repair_scope": [
+    "sympy/utilities/lambdify.py"
+  ],
+  "suspicious_symbols": [
+    "_EvaluatorPrinter",
+    "_EvaluatorPrinter._preprocess",
+    "MatrixSymbol",
+    "Symbol",
+    "Function",
+    "Dummy"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_curly_matrix_symbol::core::MatrixSymbol_name_handling_with_dummify_True",
+      "source_symbol": "test_curly_matrix_symbol",
+      "validation_subject": "MatrixSymbol name handling with dummify=True",
+      "why_it_matters": "The _preprocess method must handle MatrixSymbol similarly to Symbol - when dummify=True or when the name is not a valid Python identifier, it should substitute a Dummy to avoid generating invalid Python syntax."
+    },
+    {
+      "id": "test_curly_matrix_symbol::core::callable_return_value",
+      "source_symbol": "test_curly_matrix_symbol",
+      "validation_subject": "callable_return_value",
+      "why_it_matters": "After fixing the syntax error, the lambdified function must return the correct value (the MatrixSymbol itself or its equivalent) when called."
+    }
+  ]
+}

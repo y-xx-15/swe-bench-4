@@ -1,0 +1,17 @@
+{
+  "title": "Fix sqrt(sin(x)**2) simplification in Factors class",
+  "approach": "The bug is that sqrt(sin(x)**2) is incorrectly simplified to sin(x) for general complex x in the Factors class. This happens because the code assumes sqrt(z**2) = z unconditionally, when the correct identity is sqrt(z**2) = z only when z is real and nonnegative. The fix should add a check in the Factors.__init__ method to avoid incorrectly combining sqrt(base**2) with base when the base is not known to be real nonnegative. Specifically, when processing expressions via as_powers_dict(), we need to ensure that Pow(base, 2) with a sqrt wrapper is not collapsed to just base without verifying the base is real nonnegative.",
+  "edit_targets": [
+    "sympy/core/exprtools.py::Factors.__init__"
+  ],
+  "dependency_files": [
+    "sympy/core/exprtools.py",
+    "sympy/simplify/fu.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The primary fix is in the Factors class in exprtools.py since that's where the incorrect simplification occurs. However, since trigsimp uses this code path through fu.py, we may need to verify the fix works end-to-end. The Factors class is the root cause - if we fix it there, the trigsimp should automatically produce correct results. We should test both test_exprtools.py and test_fu.py to confirm.",
+  "risks": [
+    "Changing the Factors class could affect other simplification paths that rely on the current behavior. Need to ensure we only skip the incorrect simplification for cases where the base is not known to be real nonnegative, while preserving correct behavior for known real nonnegative cases."
+  ]
+}

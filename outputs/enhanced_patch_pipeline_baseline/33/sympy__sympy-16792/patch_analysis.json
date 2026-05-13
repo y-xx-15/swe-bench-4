@@ -1,0 +1,48 @@
+{
+  "root_cause": "In CodeGen.routine(), the array_symbols dictionary is populated only from symbols that appear in the expression (via expressions.atoms(MatrixSymbol)), so MatrixSymbols that don't appear in the expression are not recognized as arrays. When the routine later creates InputArguments, it checks if a symbol is in array_symbols to determine whether to add dimensions, but since unused MatrixSymbols aren't in array_symbols, they get created without dimensions and are treated as scalars in the generated C code.",
+  "affected_components": [
+    {
+      "file": "sympy/utilities/codegen.py",
+      "symbol": "CodeGen.routine",
+      "reason": "This method builds the array_symbols dictionary only from expression atoms, missing MatrixSymbols that don't appear in the expression but are in argument_sequence"
+    },
+    {
+      "file": "sympy/utilities/codegen.py",
+      "symbol": "CCodeGen.get_prototype",
+      "reason": "This method determines whether to use pointer syntax (*name) based on the dimensions attribute, which is not set for unused array arguments"
+    }
+  ],
+  "failing_signal": "The generated C function has signature 'double autofunc(double x)' instead of 'double autofunc(double *x)', causing TypeError: only size-1 arrays can be converted to Python scalars when called with a numpy array",
+  "propagation_path": "1) CodeGen.routine() creates array_symbols only from expression atoms 2) When argument_sequence contains a MatrixSymbol not in the expression, it's not added to array_symbols 3) The symbol gets created as InputArgument without dimensions 4) CCodeGen.get_prototype() checks arg.dimensions to decide pointer vs value, finds None 5) Generated C code treats array as scalar, causing type mismatch at runtime",
+  "repair_constraint": "MatrixSymbol arguments in argument_sequence must be recognized as arrays regardless of whether they appear in the expression; the fix must preserve existing behavior for symbols that do appear in expressions",
+  "suggested_repair_scope": [
+    "sympy/utilities/codegen.py"
+  ],
+  "suspicious_symbols": [
+    "CodeGen.routine",
+    "array_symbols",
+    "InputArgument",
+    "MatrixSymbol",
+    "CCodeGen.get_prototype"
+  ],
+  "repair_obligations": [
+    {
+      "id": "1",
+      "source_symbol": "CodeGen.routine",
+      "validation_subject": "array_symbols dictionary",
+      "why_it_matters": "Must include MatrixSymbols from argument_sequence that are not in the expression but should still be treated as arrays with dimensions"
+    },
+    {
+      "id": "2",
+      "source_symbol": "CodeGen.routine",
+      "validation_subject": "InputArgument creation for symbols not in expression",
+      "why_it_matters": "When a symbol from argument_sequence is not in the expression but is a MatrixSymbol, it must be created with proper dimensions"
+    },
+    {
+      "id": "3",
+      "source_symbol": "CCodeGen.get_prototype",
+      "validation_subject": "arg.dimensions check",
+      "why_it_matters": "The pointer syntax decision must work correctly for all array arguments including those not appearing in the expression"
+    }
+  ]
+}

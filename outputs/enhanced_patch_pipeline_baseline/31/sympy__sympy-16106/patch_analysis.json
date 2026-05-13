@@ -1,0 +1,59 @@
+{
+  "root_cause": "The MathML printer lacks handlers for `Indexed` and `IndexedBase` classes. When printing an `Indexed` object, the printer falls back to `_print_Basic` which attempts to iterate over the object directly (`for arg in e:`), but `Indexed` objects are not directly iterable, causing a TypeError.",
+  "affected_components": [
+    {
+      "file": "sympy/printing/mathml.py",
+      "symbol": "MathMLContentPrinter",
+      "reason": "Missing _print_Indexed and _print_IndexedBase methods to handle indexed expressions"
+    },
+    {
+      "file": "sympy/printing/mathml.py",
+      "symbol": "MathMLPresentationPrinter",
+      "reason": "Missing _print_Indexed and _print_IndexedBase methods to handle indexed expressions"
+    },
+    {
+      "file": "sympy/printing/mathml.py",
+      "symbol": "_print_Basic",
+      "reason": "Fallback method that incorrectly assumes all objects are iterable via `for arg in e`"
+    }
+  ],
+  "failing_signal": "TypeError: 'Indexed' object is not iterable when calling sympy.printing.mathml(sympy.IndexedBase(a)[b])",
+  "propagation_path": "1. User calls mathml(IndexedBase(a)[b])\n2. Printer._print finds no _print_Indexed method\n3. Falls back to _print_Basic\n4. _print_Basic tries `for arg in e:` which iterates the object directly\n5. Indexed is not iterable, raises TypeError",
+  "repair_constraint": "The fix must add proper handlers for Indexed and IndexedBase that use e.args or e.base/e.indices rather than trying to iterate the object directly. The output must be valid MathML that represents the indexed expression.",
+  "suggested_repair_scope": [
+    "sympy/printing/mathml.py"
+  ],
+  "suspicious_symbols": [
+    "Indexed",
+    "IndexedBase",
+    "_print_Basic",
+    "MathMLContentPrinter",
+    "MathMLPresentationPrinter"
+  ],
+  "repair_obligations": [
+    {
+      "id": "RO-1",
+      "source_symbol": "MathMLContentPrinter",
+      "validation_subject": "_print_Indexed method",
+      "why_it_matters": "Content MathML needs a handler for Indexed expressions to avoid falling back to _print_Basic which tries to iterate the non-iterable Indexed object"
+    },
+    {
+      "id": "RO-2",
+      "source_symbol": "MathMLContentPrinter",
+      "validation_subject": "_print_IndexedBase method",
+      "why_it_matters": "Content MathML needs a handler for IndexedBase to properly print the base symbol of indexed expressions"
+    },
+    {
+      "id": "RO-3",
+      "source_symbol": "MathMLPresentationPrinter",
+      "validation_subject": "_print_Indexed method",
+      "why_it_matters": "Presentation MathML needs a handler for Indexed expressions to avoid falling back to _print_Basic which tries to iterate the non-iterable Indexed object"
+    },
+    {
+      "id": "RO-4",
+      "source_symbol": "MathMLPresentationPrinter",
+      "validation_subject": "_print_IndexedBase method",
+      "why_it_matters": "Presentation MathML needs a handler for IndexedBase to properly print the base symbol of indexed expressions"
+    }
+  ]
+}

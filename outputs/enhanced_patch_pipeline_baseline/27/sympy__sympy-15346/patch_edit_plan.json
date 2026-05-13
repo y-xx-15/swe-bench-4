@@ -1,0 +1,24 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/simplify/trigsimp.py",
+      "action": "modify_region",
+      "justification": "The _dotrig function is the root cause - it incorrectly rejects valid pattern matches when comparing Add expressions with different inner trig function types. The fix must allow pattern matching to proceed when both expression and pattern contain the required trig functions (sin and cos for the cos(a-b) identity)."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/simplify/trigsimp.py",
+      "target_symbol": "_dotrig",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "oblig_1",
+        "oblig_2",
+        "oblig_3"
+      ],
+      "anchor_line_before": "def _dotrig(a, b):",
+      "anchor_line_after": "def _dotrig(a, b):",
+      "replacement_block": "def _dotrig(a, b):\n    \"\"\"Helper to tell whether ``a`` and ``b`` have the same sorts\n    of symbols in them -- no need to test hyperbolic patterns against\n    expressions that have no hyperbolics in them.\"\"\"\n    if a.func == b.func:\n        # For Add expressions, check if both contain the same types of\n        # trig functions (sin/cos or sinh/cosh). This allows patterns like\n        # c*cos(a)*cos(b) + c*sin(a)*sin(b) to match expressions with\n        # Rational arguments.\n        if a.is_Add and b.is_Add:\n            a_trigs = {w.func for w in a.atoms(TrigonometricFunction, HyperbolicFunction)}\n            b_trigs = {w.func for w in b.atoms(TrigonometricFunction, HyperbolicFunction)}\n            return a_trigs and b_trigs and a_trigs == b_trigs\n        return (\n            a.has(TrigonometricFunction) and b.has(TrigonometricFunction) or\n            a.has(HyperbolicFunction) and b.has(HyperbolicFunction))\n    return False\n"
+    }
+  ]
+}

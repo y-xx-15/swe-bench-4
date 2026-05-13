@@ -1,0 +1,16 @@
+{
+  "title": "Replace sympify with _coeff_isneg in _print_MatAdd",
+  "approach": "Replace the buggy `S(item.args[0]).is_negative` check with `_coeff_isneg(item)`, which safely checks if the leading coefficient of an expression is negative without attempting to sympify string arguments. The `_coeff_isneg` function is already imported in the module and is designed to handle various expression types including MatrixSymbol.",
+  "edit_targets": [
+    "sympy/printing/pretty/pretty.py::_print_MatAdd"
+  ],
+  "dependency_files": [
+    "sympy/core/function.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only _print_MatAdd is sufficient. The _coeff_isneg function from sympy.core.function is already imported at the top of pretty.py and properly handles detecting negative coefficients without calling sympify on the arguments.",
+  "risks": [
+    "Potential change in pretty-printing output format for negative matrix terms - should be tested to ensure ' - ' is still correctly shown instead of ' + ' for negative terms"
+  ]
+}

@@ -1,0 +1,478 @@
+[
+  {
+    "idea": {
+      "title": "trigsimp sqrt(sin(x)**2) simplification for complex x",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that trigsimp correctly handles sqrt(sin(x)**2) for complex x without incorrectly simplifying to sin(x)",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_trigsimp_sqrt_sin_squared_complex"
+      ],
+      "covers_original_tests": [
+        "test_Factors",
+        "test_fu"
+      ],
+      "covers_obligations": [
+        "test_Factors::core",
+        "test_fu::core"
+      ],
+      "target_source_symbol": "trigsimp",
+      "target_validation_subject": "sqrt(sin(x)**2) simplification for complex x",
+      "semantic_alignment_tokens": [
+        "trigsimp",
+        "sqrt",
+        "sin",
+        "complex"
+      ],
+      "trigger_shape_tokens": [
+        "trigsimp(cos(x) + sqrt(sin(x)**2))"
+      ],
+      "rationale": "The original tests test_Factors and test_fu fail with AssertionError due to trigsimp incorrectly simplifying cos(x)+sqrt(sin(x)**2) to cos(x)+sin(x) for general complex x. This enhanced test directly exercises the trigsimp function with the problematic expression to expose the incorrect simplification behavior, which is the root cause of the assertion failures in the original tests."
+    },
+    "patch": "diff --git a/sympy/simplify/tests/test_trigsimp.py b/sympy/simplify/tests/test_trigsimp.py\n--- a/sympy/simplify/tests/test_trigsimp.py\n+++ b/sympy/simplify/tests/test_trigsimp.py\n@@ -0,0 +1,10 @@\n+from sympy import sqrt, sin, cos, trigsimp, symbols\n+\n+from sympy.abc import x\n+\n+\n+def test_sweb_enhanced_trigsimp_sqrt_sin_squared_complex():\n+    # Issue #18087: trigsimp incorrectly simplifies cos(x)+sqrt(sin(x)**2)\n+    # as though it were cos(x)+sin(x) for general complex x.\n+    # The sqrt(sin(x)**2) should NOT be simplified to sin(x) for complex x.\n+    expr = cos(x) + sqrt(sin(x)**2)\n+    result = trigsimp(expr)\n+    # The correct result should preserve sqrt(sin(x)**2), not simplify to sin(x)\n+    assert result == cos(x) + sqrt(sin(x)**2)\n",
+    "raw_response": "\n\nLooking at the problem, I need to add an enhanced test that:\n1. Tests `trigsimp` directly with `sqrt(sin(x)**2)` for complex x\n2. Starts with `test_sweb_enhanced_`\n3. Fails on the buggy code (because trigsimp incorrectly simplifies sqrt(sin(x)**2) to sin(x))\n4. Passes after the fix\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/simplify/tests/test_trigsimp.py b/sympy/simplify/tests/test_trigsimp.py\n--- a/sympy/simplify/tests/test_trigsimp.py\n+++ b/sympy/simplify/tests/test_trigsimp.py\n@@ -0,0 +1,10 @@\n+from sympy import sqrt, sin, cos, trigsimp, symbols\n+\n+from sympy.abc import x\n+\n+\n+def test_sweb_enhanced_trigsimp_sqrt_sin_squared_complex():\n+    # Issue #18087: trigsimp incorrectly simplifies cos(x)+sqrt(sin(x)**2)\n+    # as though it were cos(x)+sin(x) for general complex x.\n+    # The sqrt(sin(x)**2) should NOT be simplified to sin(x) for complex x.\n+    expr = cos(x) + sqrt(sin(x)**2)\n+    result = trigsimp(expr)\n+    # The correct result should preserve sqrt(sin(x)**2), not simplify to sin(x)\n+    assert result == cos(x) + sqrt(sin(x)**2)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_trigsimp_sqrt_sin_squared_complex"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_trigsimp_sqrt_sin_squared_complex"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_decompose_power": "PASSED",
+      "test_Factors": "PASSED",
+      "test_Term": "PASSED",
+      "test_gcd_terms": "PASSED",
+      "test_factor_terms": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_factor_nc": "PASSED",
+      "test_issue_6360": "PASSED",
+      "test_issue_7903": "PASSED",
+      "test_issue_8263": "PASSED",
+      "test_monotonic_sign": "PASSED",
+      "test_TR1": "PASSED",
+      "test_TR2": "PASSED",
+      "test_TR2i": "PASSED",
+      "test_TR3": "PASSED",
+      "test__TR56": "PASSED",
+      "test_TR5": "PASSED",
+      "test_TR6": "PASSED",
+      "test_TR7": "PASSED",
+      "test_TR8": "PASSED",
+      "test_TR9": "PASSED",
+      "test_TR10": "PASSED",
+      "test_TR10i": "PASSED",
+      "test_TR11": "PASSED",
+      "test_TR12": "PASSED",
+      "test_TR13": "PASSED",
+      "test_L": "PASSED",
+      "test_fu": "PASSED",
+      "test_objective": "PASSED",
+      "test_process_common_addends": "PASSED",
+      "test_trig_split": "PASSED",
+      "test_TRmorrie": "PASSED",
+      "test_TRpower": "PASSED",
+      "test_hyper_as_trig": "PASSED",
+      "test_TR12i": "PASSED",
+      "test_TR14": "PASSED",
+      "test_TR15_16_17": "PASSED"
+    },
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_Factors",
+      "test_fu"
+    ],
+    "covered_obligations": [
+      "test_Factors::core",
+      "test_fu::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "trigsimp sqrt(sin(x)**2) simplification for complex x",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Verify that trigsimp does not incorrectly simplify sqrt(sin(x)**2) to sin(x) for general complex x",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_trigsimp_sqrt_sin_squared_complex"
+      ],
+      "covers_original_tests": [
+        "test_Factors",
+        "test_fu"
+      ],
+      "covers_obligations": [
+        "test_Factors::core",
+        "test_fu::core"
+      ],
+      "target_source_symbol": "sympy.simplify.simplify.trigsimp",
+      "target_validation_subject": "sqrt(sin(x)**2) simplification for complex x",
+      "semantic_alignment_tokens": [
+        "trigsimp",
+        "sqrt",
+        "sin",
+        "complex"
+      ],
+      "trigger_shape_tokens": [
+        "trigsimp(cos(x) + sqrt(sin(x)**2))"
+      ],
+      "rationale": "This test directly exercises the trigsimp bug where sqrt(sin(x)**2) is incorrectly simplified to sin(x) for complex x. The original test_Factors and test_fu fail with AssertionError because they rely on the buggy trigsimp behavior indirectly. This test isolates the exact problematic simplification and verifies the correct behavior: sqrt(sin(x)**2) should remain as sqrt(sin(x)**2) for general complex x since sqrt(z**2) != z in complex domain."
+    },
+    "patch": "diff --git a/sympy/simplify/tests/test_simplify.py b/sympy/simplify/tests/test_simplify.py\n--- a/sympy/simplify/tests/test_simplify.py\n+++ b/sympy/simplify/tests/test_simplify.py\n@@ -0,0 +0,11 @@\n+def test_sweb_enhanced_trigsimp_sqrt_sin_squared_complex():\n+    from sympy import trigsimp, cos, sin, sqrt, Symbol\n+    from sympy.simplify.simplify import trigsimp as simplify_trigsimp\n+    x = Symbol('x')\n+    # The bug: trigsimp incorrectly simplifies sqrt(sin(x)**2) to sin(x)\n+    # for general complex x. This should NOT happen because sqrt(z**2) != z\n+    # in the complex domain (e.g., sqrt((-1)**2) = sqrt(1) = 1, but -1 != 1)\n+    expr = cos(x) + sqrt(sin(x)**2)\n+    result = simplify_trigsimp(expr)\n+    # The correct result should preserve sqrt(sin(x)**2), not simplify to cos(x) + sin(x)\n+    assert result == cos(x) + sqrt(sin(x)**2)\n",
+    "raw_response": "\n\nLooking at the task, I need to:\n1. Add a new test function starting with `test_sweb_enhanced_`\n2. Use `trigsimp` to directly trigger the bug where `sqrt(sin(x)**2)` is incorrectly simplified to `sin(x)` for complex x\n3. Make sure the test FAILS on the buggy code (asserting correct behavior that buggy code violates)\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/simplify/tests/test_simplify.py b/sympy/simplify/tests/test_simplify.py\n--- a/sympy/simplify/tests/test_simplify.py\n+++ b/sympy/simplify/tests/test_simplify.py\n@@ -0,0 +0,0 @@\n+def test_sweb_enhanced_trigsimp_sqrt_sin_squared_complex():\n+    from sympy import trigsimp, cos, sin, sqrt, Symbol\n+    from sympy.simplify.simplify import trigsimp as simplify_trigsimp\n+    x = Symbol('x')\n+    # The bug: trigsimp incorrectly simplifies sqrt(sin(x)**2) to sin(x)\n+    # for general complex x. This should NOT happen because sqrt(z**2) != z\n+    # in the complex domain (e.g., sqrt((-1)**2) = sqrt(1) = 1, but -1 != 1)\n+    expr = cos(x) + sqrt(sin(x)**2)\n+    result = simplify_trigsimp(expr)\n+    # The correct result should preserve sqrt(sin(x)**2), not simplify to cos(x) + sin(x)\n+    assert result == cos(x) + sqrt(sin(x)**2)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_trigsimp_sqrt_sin_squared_complex"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_trigsimp_sqrt_sin_squared_complex"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_decompose_power": "PASSED",
+      "test_Factors": "PASSED",
+      "test_Term": "PASSED",
+      "test_gcd_terms": "PASSED",
+      "test_factor_terms": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_factor_nc": "PASSED",
+      "test_issue_6360": "PASSED",
+      "test_issue_7903": "PASSED",
+      "test_issue_8263": "PASSED",
+      "test_monotonic_sign": "PASSED",
+      "test_TR1": "PASSED",
+      "test_TR2": "PASSED",
+      "test_TR2i": "PASSED",
+      "test_TR3": "PASSED",
+      "test__TR56": "PASSED",
+      "test_TR5": "PASSED",
+      "test_TR6": "PASSED",
+      "test_TR7": "PASSED",
+      "test_TR8": "PASSED",
+      "test_TR9": "PASSED",
+      "test_TR10": "PASSED",
+      "test_TR10i": "PASSED",
+      "test_TR11": "PASSED",
+      "test_TR12": "PASSED",
+      "test_TR13": "PASSED",
+      "test_L": "PASSED",
+      "test_fu": "PASSED",
+      "test_objective": "PASSED",
+      "test_process_common_addends": "PASSED",
+      "test_trig_split": "PASSED",
+      "test_TRmorrie": "PASSED",
+      "test_TRpower": "PASSED",
+      "test_hyper_as_trig": "PASSED",
+      "test_TR12i": "PASSED",
+      "test_TR14": "PASSED",
+      "test_TR15_16_17": "PASSED"
+    },
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_Factors",
+      "test_fu"
+    ],
+    "covered_obligations": [
+      "test_Factors::core",
+      "test_fu::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "sqrt_sin_squared_complex_domain_assertion",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Expose incorrect simplification of sqrt(sin(x)**2) to sin(x) for complex x through symbolic equality verification",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_sqrt_sin_complex"
+      ],
+      "covers_original_tests": [
+        "test_Factors",
+        "test_fu"
+      ],
+      "covers_obligations": [
+        "test_Factors::core",
+        "test_fu::core"
+      ],
+      "target_source_symbol": "sympy.simplify.simplify.trigsimp",
+      "target_validation_subject": "sqrt_sin_squared_simplification",
+      "semantic_alignment_tokens": [
+        "trigsimp",
+        "sqrt",
+        "sin",
+        "simplify",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "sqrt(sin(x)**2)",
+        "trigsimp",
+        "complex"
+      ],
+      "rationale": "This test directly exercises the core mathematical bug: sqrt(sin(x)**2) being incorrectly simplified to sin(x) for complex x. Unlike the original tests which may test broader functionality, this test specifically verifies the problematic simplification path that triggers the AssertionError in both test_Factors and test_fu. The test uses symbolic equality checking (x vs x) to expose that the simplification produces an incorrect result, which will fail on buggy code (AssertionError) and pass on fixed code."
+    },
+    "patch": "diff --git a/sympy/simplify/tests/test_fu.py b/sympy/simplify/tests/test_fu.py\n--- a/sympy/simplify/tests/test_fu.py\n+++ b/sympy/simplify/tests/test_fu.py\n@@ -277,3 +277,10 @@ def test_fu():\n     expr = Mul(*[cos(2**i) for i in range(10)])\n     assert fu(expr) == sin(1024)/(1024*sin(1))\n \n+\n+def test_sweb_enhanced_sqrt_sin_complex():\n+    from sympy import trigsimp\n+    # Issue #18087: trigsimp incorrectly simplifies sqrt(sin(x)**2) to sin(x)\n+    # for general complex x, but correctly handles real x\n+    expr = cos(x) + sqrt(sin(x)**2)\n+    result = trigsimp(expr)\n+    # The correct result should preserve sqrt(sin(x)**2), not simplify to sin(x)\n+    assert result != cos(x) + sin(x), \"trigsimp incorrectly simplified sqrt(sin(x)**2) to sin(x)\"\n",
+    "raw_response": "\n\nLooking at the problem, I need to add an enhanced test that:\n1. Uses `trigsimp` from `sympy.simplify.simplify`\n2. Tests the specific bug: `sqrt(sin(x)**2)` being incorrectly simplified to `sin(x)` for complex x\n3. Must FAIL on buggy code and PASS on fixed code\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/simplify/tests/test_fu.py b/sympy/simplify/tests/test_fu.py\n--- a/sympy/simplify/tests/test_fu.py\n+++ b/sympy/simplify/tests/test_fu.py\n@@ -277,3 +277,10 @@ def test_fu():\n     expr = Mul(*[cos(2**i) for i in range(10)])\n     assert fu(expr) == sin(1024)/(1024*sin(1))\n \n+\n+def test_sweb_enhanced_sqrt_sin_complex():\n+    from sympy import trigsimp\n+    # Issue #18087: trigsimp incorrectly simplifies sqrt(sin(x)**2) to sin(x)\n+    # for general complex x, but correctly handles real x\n+    expr = cos(x) + sqrt(sin(x)**2)\n+    result = trigsimp(expr)\n+    # The correct result should preserve sqrt(sin(x)**2), not simplify to sin(x)\n+    assert result != cos(x) + sin(x), \"trigsimp incorrectly simplified sqrt(sin(x)**2) to sin(x)\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_sqrt_sin_complex"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_sqrt_sin_complex"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_decompose_power": "PASSED",
+      "test_Factors": "PASSED",
+      "test_Term": "PASSED",
+      "test_gcd_terms": "PASSED",
+      "test_factor_terms": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_factor_nc": "PASSED",
+      "test_issue_6360": "PASSED",
+      "test_issue_7903": "PASSED",
+      "test_issue_8263": "PASSED",
+      "test_monotonic_sign": "PASSED",
+      "test_TR1": "PASSED",
+      "test_TR2": "PASSED",
+      "test_TR2i": "PASSED",
+      "test_TR3": "PASSED",
+      "test__TR56": "PASSED",
+      "test_TR5": "PASSED",
+      "test_TR6": "PASSED",
+      "test_TR7": "PASSED",
+      "test_TR8": "PASSED",
+      "test_TR9": "PASSED",
+      "test_TR10": "PASSED",
+      "test_TR10i": "PASSED",
+      "test_TR11": "PASSED",
+      "test_TR12": "PASSED",
+      "test_TR13": "PASSED",
+      "test_L": "PASSED",
+      "test_fu": "PASSED",
+      "test_objective": "PASSED",
+      "test_process_common_addends": "PASSED",
+      "test_trig_split": "PASSED",
+      "test_TRmorrie": "PASSED",
+      "test_TRpower": "PASSED",
+      "test_hyper_as_trig": "PASSED",
+      "test_TR12i": "PASSED",
+      "test_TR14": "PASSED",
+      "test_TR15_16_17": "PASSED"
+    },
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_Factors",
+      "test_fu"
+    ],
+    "covered_obligations": [
+      "test_Factors::core",
+      "test_fu::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "trigsimp incorrectly simplifies sqrt(sin(x)**2) to sin(x) for complex x",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that trigsimp does not incorrectly simplify sqrt(sin(x)**2) to sin(x) when x is a general (complex) symbol",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_trigsimp_sqrt_sin_squared"
+      ],
+      "covers_original_tests": [
+        "test_Factors",
+        "test_fu"
+      ],
+      "covers_obligations": [
+        "test_Factors::core",
+        "test_fu::core"
+      ],
+      "target_source_symbol": "sympy.simplify.simplify.trigsimp",
+      "target_validation_subject": "cos(x) + sqrt(sin(x)**2) simplification",
+      "semantic_alignment_tokens": [
+        "trigsimp",
+        "sqrt",
+        "sin",
+        "cos",
+        "simplify"
+      ],
+      "trigger_shape_tokens": [
+        "trigsimp(cos(x) + sqrt(sin(x)**2))"
+      ],
+      "rationale": "This test directly exercises the bug described in the problem statement: trigsimp incorrectly simplifies cos(x)+sqrt(sin(x)**2) as cos(x)+sin(x) for general complex x. The original tests test_Factors and test_fu fail with AssertionError, indicating the bug manifests in the Factors and fu modules. This new test isolates the specific trigsimp behavior that causes the failure, creating a minimal reproduction case that will fail on buggy code (incorrectly simplifying to cos(x)+sin(x)) and pass on fixed code (preserving sqrt(sin(x)**2) or correctly accounting for complex sign)."
+    },
+    "patch": "diff --git a/sympy/simplify/tests/test_simplify.py b/sympy/simplify/tests/test_simplify.py\n--- a/sympy/simplify/tests/test_simplify.py\n+++ b/sympy/simplify/tests/test_simplify.py\n@@ -0,0 +1,8 @@\n+from sympy import sqrt, sin, cos, symbols, trigsimp\n+from sympy.abc import x\n+\n+\n+def test_sweb_enhanced_trigsimp_sqrt_sin_squared():\n+    # Issue #18087: trigsimp incorrectly simplifies cos(x)+sqrt(sin(x)**2)\n+    # as though it were cos(x)+sin(x) for general complex x\n+    expr = cos(x) + sqrt(sin(x)**2)\n+    result = trigsimp(expr)\n+    # The expression should NOT simplify to cos(x) + sin(x) for general x\n+    # because sqrt(sin(x)**2) = |sin(x)| for real x, but for complex x\n+    # it cannot be simplified to sin(x)\n+    assert result != cos(x) + sin(x), \"trigsimp incorrectly simplified sqrt(sin(x)**2) to sin(x)\"\n+    # The expression should remain unchanged or be properly handled\n+    assert result == cos(x) + sqrt(sin(x)**2)\n",
+    "raw_response": "\n\nLooking at the problem, I need to add an enhanced test that specifically tests the trigsimp behavior with `cos(x) + sqrt(sin(x)**2)` for general complex x. The bug is that trigsimp incorrectly simplifies this to `cos(x) + sin(x)`.\n\nLet me create a test that will fail on the buggy code (which incorrectly simplifies) and pass on fixed code (which preserves the expression or correctly handles the complex case).\n\n```diff\ndiff --git a/sympy/simplify/tests/test_simplify.py b/sympy/simplify/tests/test_simplify.py\n--- a/sympy/simplify/tests/test_simplify.py\n+++ b/sympy/simplify/tests/test_simplify.py\n@@ -0,0 +1,8 @@\n+from sympy import sqrt, sin, cos, symbols, trigsimp\n+from sympy.abc import x\n+\n+\n+def test_sweb_enhanced_trigsimp_sqrt_sin_squared():\n+    # Issue #18087: trigsimp incorrectly simplifies cos(x)+sqrt(sin(x)**2)\n+    # as though it were cos(x)+sin(x) for general complex x\n+    expr = cos(x) + sqrt(sin(x)**2)\n+    result = trigsimp(expr)\n+    # The expression should NOT simplify to cos(x) + sin(x) for general x\n+    # because sqrt(sin(x)**2) = |sin(x)| for real x, but for complex x\n+    # it cannot be simplified to sin(x)\n+    assert result != cos(x) + sin(x), \"trigsimp incorrectly simplified sqrt(sin(x)**2) to sin(x)\"\n+    # The expression should remain unchanged or be properly handled\n+    assert result == cos(x) + sqrt(sin(x)**2)\n```",
+    "identifiers": [
+      "test_sweb_enhanced_trigsimp_sqrt_sin_squared"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_trigsimp_sqrt_sin_squared"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_decompose_power": "PASSED",
+      "test_Factors": "PASSED",
+      "test_Term": "PASSED",
+      "test_gcd_terms": "PASSED",
+      "test_factor_terms": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_factor_nc": "PASSED",
+      "test_issue_6360": "PASSED",
+      "test_issue_7903": "PASSED",
+      "test_issue_8263": "PASSED",
+      "test_monotonic_sign": "PASSED",
+      "test_TR1": "PASSED",
+      "test_TR2": "PASSED",
+      "test_TR2i": "PASSED",
+      "test_TR3": "PASSED",
+      "test__TR56": "PASSED",
+      "test_TR5": "PASSED",
+      "test_TR6": "PASSED",
+      "test_TR7": "PASSED",
+      "test_TR8": "PASSED",
+      "test_TR9": "PASSED",
+      "test_TR10": "PASSED",
+      "test_TR10i": "PASSED",
+      "test_TR11": "PASSED",
+      "test_TR12": "PASSED",
+      "test_TR13": "PASSED",
+      "test_L": "PASSED",
+      "test_fu": "PASSED",
+      "test_objective": "PASSED",
+      "test_process_common_addends": "PASSED",
+      "test_trig_split": "PASSED",
+      "test_TRmorrie": "PASSED",
+      "test_TRpower": "PASSED",
+      "test_hyper_as_trig": "PASSED",
+      "test_TR12i": "PASSED",
+      "test_TR14": "PASSED",
+      "test_TR15_16_17": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_Factors",
+      "test_fu"
+    ],
+    "covered_obligations": [
+      "test_Factors::core",
+      "test_fu::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "trigsimp sqrt(sin(x)**2) simplification for complex x",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Verify that sqrt(sin(x)**2) is not incorrectly simplified to sin(x) for general complex x - the bug causes trigsimp to make this wrong simplification leading to assertion failures in downstream tests",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_trigsimp_sqrt_sin_complex"
+      ],
+      "covers_original_tests": [
+        "test_Factors",
+        "test_fu"
+      ],
+      "covers_obligations": [
+        "test_Factors::core",
+        "test_fu::core"
+      ],
+      "target_source_symbol": "sympy.simplify.simplify.trigsimp",
+      "target_validation_subject": "sqrt(sin(x)**2) simplification behavior",
+      "semantic_alignment_tokens": [
+        "trigsimp",
+        "sqrt",
+        "sin",
+        "complex",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "trigsimp(cos(x) + sqrt(sin(x)**2))",
+        "sqrt(sin(x)**2)"
+      ],
+      "rationale": "This test directly exercises the trigsimp bug where sqrt(sin(x)**2) is incorrectly simplified to sin(x) for complex x. The original test_Factors and test_fu fail with AssertionError because this incorrect simplification propagates through the Factors class and trig transformation pipeline. By testing the root cause (trigsimp's mishandling of sqrt(sin(x)**2) for complex x), this test exposes the behavioral consequence that causes the downstream assertion failures. The test uses a different semantic angle than direct_symptom by focusing on the downstream behavioral consequence (incorrect simplification result) rather than the direct symptom (the AssertionError in the original tests)."
+    },
+    "patch": "diff --git a/sympy/simplify/tests/test_simplify.py b/sympy/simplify/tests/test_simplify.py\n--- a/sympy/simplify/tests/test_simplify.py\n+++ b/sympy/simplify/tests/test_simplify.py\n@@ -0,0 +1,10 @@\n+from sympy import sqrt, sin, cos, symbols\n+from sympy.simplify.simplify import trigsimp\n+\n+from sympy.abc import x\n+\n+\n+def test_sweb_enhanced_trigsimp_sqrt_sin_complex():\n+    # Issue #18087: trigsimp incorrectly simplifies sqrt(sin(x)**2) to sin(x)\n+    # for general complex x, but correctly handles it when x is real.\n+    # The expression cos(x) + sqrt(sin(x)**2) should NOT simplify to cos(x) + sin(x)\n+    expr = cos(x) + sqrt(sin(x)**2)\n+    result = trigsimp(expr)\n+    # The buggy code incorrectly returns cos(x) + sin(x)\n+    # The correct result should preserve sqrt(sin(x)**2)\n+    assert result != cos(x) + sin(x), \"trigsimp incorrectly simplified sqrt(sin(x)**2) to sin(x)\"\n+    assert result == cos(x) + sqrt(sin(x)**2), \"trigsimp should preserve sqrt(sin(x)**2)\"\n",
+    "raw_response": "\n\nLooking at this task, I need to:\n1. Add a new test function starting with `test_sweb_enhanced_`\n2. Test the trigsimp bug where `sqrt(sin(x)**2)` is incorrectly simplified to `sin(x)` for complex x\n3. The test must FAIL on buggy code and PASS on fixed code\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/simplify/tests/test_simplify.py b/sympy/simplify/tests/test_simplify.py\n--- a/sympy/simplify/tests/test_simplify.py\n+++ b/sympy/simplify/tests/test_simplify.py\n@@ -0,0 +1,10 @@\n+from sympy import sqrt, sin, cos, symbols\n+from sympy.simplify.simplify import trigsimp\n+\n+from sympy.abc import x\n+\n+\n+def test_sweb_enhanced_trigsimp_sqrt_sin_complex():\n+    # Issue #18087: trigsimp incorrectly simplifies sqrt(sin(x)**2) to sin(x)\n+    # for general complex x, but correctly handles it when x is real.\n+    # The expression cos(x) + sqrt(sin(x)**2) should NOT simplify to cos(x) + sin(x)\n+    expr = cos(x) + sqrt(sin(x)**2)\n+    result = trigsimp(expr)\n+    # The buggy code incorrectly returns cos(x) + sin(x)\n+    # The correct result should preserve sqrt(sin(x)**2)\n+    assert result != cos(x) + sin(x), \"trigsimp incorrectly simplified sqrt(sin(x)**2) to sin(x)\"\n+    assert result == cos(x) + sqrt(sin(x)**2), \"trigsimp should preserve sqrt(sin(x)**2)\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_trigsimp_sqrt_sin_complex"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_trigsimp_sqrt_sin_complex"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "enhanced tests were not collected from the evaluation status_map",
+    "failing_identifiers": null,
+    "eval_status_map": {
+      "test_decompose_power": "PASSED",
+      "test_Factors": "PASSED",
+      "test_Term": "PASSED",
+      "test_gcd_terms": "PASSED",
+      "test_factor_terms": "PASSED",
+      "test_xreplace": "PASSED",
+      "test_factor_nc": "PASSED",
+      "test_issue_6360": "PASSED",
+      "test_issue_7903": "PASSED",
+      "test_issue_8263": "PASSED",
+      "test_monotonic_sign": "PASSED",
+      "test_TR1": "PASSED",
+      "test_TR2": "PASSED",
+      "test_TR2i": "PASSED",
+      "test_TR3": "PASSED",
+      "test__TR56": "PASSED",
+      "test_TR5": "PASSED",
+      "test_TR6": "PASSED",
+      "test_TR7": "PASSED",
+      "test_TR8": "PASSED",
+      "test_TR9": "PASSED",
+      "test_TR10": "PASSED",
+      "test_TR10i": "PASSED",
+      "test_TR11": "PASSED",
+      "test_TR12": "PASSED",
+      "test_TR13": "PASSED",
+      "test_L": "PASSED",
+      "test_fu": "PASSED",
+      "test_objective": "PASSED",
+      "test_process_common_addends": "PASSED",
+      "test_trig_split": "PASSED",
+      "test_TRmorrie": "PASSED",
+      "test_TRpower": "PASSED",
+      "test_hyper_as_trig": "PASSED",
+      "test_TR12i": "PASSED",
+      "test_TR14": "PASSED",
+      "test_TR15_16_17": "PASSED"
+    },
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_Factors",
+      "test_fu"
+    ],
+    "covered_obligations": [
+      "test_Factors::core",
+      "test_fu::core"
+    ]
+  }
+]

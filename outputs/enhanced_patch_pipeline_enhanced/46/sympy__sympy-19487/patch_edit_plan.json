@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/functions/elementary/complexes.py",
+      "action": "modify_region",
+      "justification": "The sign class needs the _eval_rewrite_as_Abs method added to enable sign(x).rewrite(Abs) = x/Abs(x) for non-zero x while preserving sign(0)=0 behavior"
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/functions/elementary/complexes.py",
+      "target_symbol": "sign",
+      "replacement_mode": "insert_after_anchor",
+      "covers_obligations": [
+        "1",
+        "2"
+      ],
+      "anchor_line_before": "    def _eval_rewrite_as_Piecewise(self, **kwargs):",
+      "anchor_line_after": "        if arg.is_zero is False:",
+      "replacement_block": "    def _eval_rewrite_as_Piecewise(self, **kwargs):\n        if arg.is_zero is False:"
+    }
+  ]
+}

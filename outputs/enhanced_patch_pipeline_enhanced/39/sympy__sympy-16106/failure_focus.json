@@ -1,0 +1,30 @@
+{
+  "original_test_identifiers": [
+    "test_print_IndexedBase"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_print_IndexedBase"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/printing/tests/test_mathml.py:test_print_intervals",
+    "sympy/printing/tests/test_mathml.py:test_print_Abs",
+    "sympy/printing/tests/test_mathml.py:test_print_Determinant",
+    "sympy/printing/tests/test_mathml.py:test_mat_delim_print",
+    "sympy/printing/tests/test_mathml.py:test_print_set_frozenset"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_print_IndexedBase F",
+    "___________ sympy/printing/tests/test_mathml.py:test_print_intervals ___________",
+    "Traceback (most recent call last):"
+  ],
+  "noise_ratio": 0.0045,
+  "target_test_tracebacks": {
+    "test_print_IndexedBase": "TARGET TEST: test_print_IndexedBase\n- snippet: test_print_IndexedBase F\n- snippet: ___________ sympy/printing/tests/test_mathml.py:test_print_intervals ___________\n- snippet: Traceback (most recent call last):\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_print_IndexedBase F\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\n__________ sympy/printing/tests/test_mathml.py:test_print_IndexedBase __________"
+  }
+}

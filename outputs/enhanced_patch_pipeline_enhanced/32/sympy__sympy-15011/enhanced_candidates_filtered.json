@@ -1,0 +1,234 @@
+[
+  {
+    "idea": {
+      "title": "MatrixSymbol with curly braces fails lambdify even with dummify=True",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that lambdify correctly handles MatrixSymbol names containing curly braces when dummify=True is explicitly specified",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_curly_matrix_symbol_dummify"
+      ],
+      "covers_original_tests": [
+        "test_curly_matrix_symbol"
+      ],
+      "covers_obligations": [
+        "test_curly_matrix_symbol::core"
+      ],
+      "target_source_symbol": "sympy.utilities.lambdify.lambdify",
+      "target_validation_subject": "MatrixSymbol name handling with dummify=True",
+      "semantic_alignment_tokens": [
+        "MatrixSymbol",
+        "lambdify",
+        "dummify"
+      ],
+      "trigger_shape_tokens": [
+        "MatrixSymbol(",
+        "dummify=True",
+        "curly braces in name"
+      ],
+      "rationale": "The original test covers the basic failure case but does not explicitly verify that dummify=True should resolve the issue. This enhanced test specifically validates that when dummify=True is explicitly passed, lambdify should replace the invalid curly-brace name with a valid dummy identifier, making the generated code syntactically correct. The bug is that the current implementation fails to apply dummification to MatrixSymbol names with special characters, causing a SyntaxError in the generated lambda code."
+    },
+    "patch": "diff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +271,13 @@\n+def test_sweb_enhanced_curly_matrix_symbol_dummify():\n+    # Issue #15011 - Enhanced test for MatrixSymbol with curly braces\n+    # Tests that dummify=True properly handles MatrixSymbol names with\n+    # special characters (curly braces) by replacing them with valid\n+    # Python identifiers in the generated lambda code.\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Explicitly test dummify=True with matrix input\n+    # The bug causes SyntaxError because curly braces are not valid in\n+    # Python identifiers and dummification is not applied correctly\n+    lam = lambdify(curlyv, curlyv, dummify=True)\n+    # Verify the function works with matrix input\n+    import numpy as np\n+    assert np.array_equal(lam(np.array([[1], [2]])), np.array([[1], [2]]))\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Has a different observation angle than the original `test_curly_matrix_symbol`\n2. Must FAIL on the buggy code and PASS after the fix\n3. Specifically tests `dummify=True` with MatrixSymbol containing curly braces\n\nThe original test uses `lam(1)==1` (scalar input). I'll create a test that uses a matrix input to verify the behavior from a different angle - specifically testing that the generated lambda can accept a proper matrix argument when dummify=True is explicitly specified.\n\n```diff\ndiff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +271,13 @@\n+def test_sweb_enhanced_curly_matrix_symbol_dummify():\n+    # Issue #15011 - Enhanced test for MatrixSymbol with curly braces\n+    # Tests that dummify=True properly handles MatrixSymbol names with\n+    # special characters (curly braces) by replacing them with valid\n+    # Python identifiers in the generated lambda code.\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Explicitly test dummify=True with matrix input\n+    # The bug causes SyntaxError because curly braces are not valid in\n+    # Python identifiers and dummification is not applied correctly\n+    lam = lambdify(curlyv, curlyv, dummify=True)\n+    # Verify the function works with matrix input\n+    import numpy as np\n+    assert np.array_equal(lam(np.array([[1], [2]])), np.array([[1], [2]]))\n```",
+    "identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_dummify"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_dummify"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_dummify"
+    ],
+    "eval_status_map": {
+      "sympy/utilities/tests/test_lambdify.py:test_sweb_enhanced_curly_matrix_symbol_dummify": "FAILED",
+      "test_no_args": "PASSED",
+      "test_single_arg": "PASSED",
+      "test_list_args": "PASSED",
+      "test_nested_args": "PASSED",
+      "test_str_args": "PASSED",
+      "test_own_namespace_1": "PASSED",
+      "test_own_namespace_2": "PASSED",
+      "test_own_module": "PASSED",
+      "test_bad_args": "PASSED",
+      "test_atoms": "PASSED",
+      "test_sympy_lambda": "PASSED",
+      "test_math_lambda": "PASSED",
+      "test_mpmath_lambda": "PASSED",
+      "test_number_precision": "PASSED",
+      "test_mpmath_precision": "PASSED",
+      "test_math_transl": "PASSED",
+      "test_mpmath_transl": "PASSED",
+      "test_exponentiation": "PASSED",
+      "test_sqrt": "PASSED",
+      "test_trig": "PASSED",
+      "test_vector_simple": "PASSED",
+      "test_vector_discontinuous": "PASSED",
+      "test_trig_symbolic": "PASSED",
+      "test_trig_float": "PASSED",
+      "test_docs": "PASSED",
+      "test_math": "PASSED",
+      "test_sin": "PASSED",
+      "test_matrix": "PASSED",
+      "test_issue9474": "PASSED",
+      "test_integral": "PASSED",
+      "test_sym_single_arg": "PASSED",
+      "test_sym_list_args": "PASSED",
+      "test_sym_integral": "PASSED",
+      "test_namespace_order": "PASSED",
+      "test_namespace_type": "PASSED",
+      "test_imps": "PASSED",
+      "test_imps_errors": "PASSED",
+      "test_imps_wrong_args": "PASSED",
+      "test_lambdify_imps": "PASSED",
+      "test_dummification": "PASSED",
+      "test_python_keywords": "PASSED",
+      "test_lambdify_docstring": "PASSED",
+      "test_special_printers": "PASSED",
+      "test_true_false": "PASSED",
+      "test_issue_2790": "PASSED",
+      "test_issue_12092": "PASSED",
+      "test_ITE": "PASSED",
+      "test_Min_Max": "PASSED",
+      "test_issue_12173": "PASSED",
+      "test_sinc_mpmath": "PASSED",
+      "test_lambdify_dummy_arg": "PASSED",
+      "test_lambdify_mixed_symbol_dummy_args": "PASSED",
+      "test_lambdify_inspect": "PASSED",
+      "test_issue_14941": "PASSED"
+    },
+    "generation_attempts": 1,
+    "quality_score": 1.0,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 1.0,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_curly_matrix_symbol"
+    ],
+    "covered_obligations": [
+      "test_curly_matrix_symbol::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "lambdify with dummify=True should produce callable for curly MatrixSymbol",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "verify that lambdify produces a working callable when MatrixSymbol has curly braces in name, even without explicit dummify=True",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_curly_matrix_symbol_callable"
+      ],
+      "covers_original_tests": [
+        "test_curly_matrix_symbol"
+      ],
+      "covers_obligations": [
+        "test_curly_matrix_symbol::core"
+      ],
+      "target_source_symbol": "sympy.utilities.lambdify.lambdify",
+      "target_validation_subject": "callable_return_value",
+      "semantic_alignment_tokens": [
+        "lambdify",
+        "MatrixSymbol",
+        "dummify"
+      ],
+      "trigger_shape_tokens": [
+        "MatrixSymbol(",
+        "lambdify(",
+        "dummify"
+      ],
+      "rationale": "The original test likely just checks that lambdify doesn't raise SyntaxError. This enhanced test verifies the downstream behavioral consequence: that the returned callable actually works and produces correct output when invoked with proper arguments. This tests the full pipeline from symbol processing through code generation to actual function execution, ensuring the fix is complete rather than just preventing the SyntaxError."
+    },
+    "patch": "diff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +271,13 @@\n+def test_sweb_enhanced_curly_matrix_symbol_callable():\n+    # Enhanced test for issue #15009: Verify that lambdify returns a callable\n+    # that actually works with matrix arguments when MatrixSymbol has curly braces.\n+    # This tests the full pipeline: symbol processing -> code generation -> execution.\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Use dummify=True to ensure proper symbol handling\n+    lam = lambdify(curlyv, curlyv, dummify=True)\n+    # Test with a matrix-like input (list of lists) to verify the callable works\n+    import numpy as np\n+    input_matrix = np.array([[1], [2]])\n+    result = lam(input_matrix)\n+    assert np.allclose(result, input_matrix)\n+\ndiff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +271,13 @@\n+def test_sweb_enhanced_curly_matrix_symbol_callable():\n+    # Enhanced test for issue #15009: Verify that lambdify returns a callable\n+    # that actually works with matrix arguments when MatrixSymbol has curly braces.\n+    # This tests the full pipeline: symbol processing -> code generation -> execution.\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Use dummify=True to ensure proper symbol handling\n+    lam = lambdify(curlyv, curlyv, dummify=True)\n+    # Test with a matrix-like input (list of lists) to verify the callable works\n+    import numpy as np\n+    input_matrix = np.array([[1], [2]])\n+    result = lam(input_matrix)\n+    assert np.allclose(result, input_matrix)\n+\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Fails on the buggy code (triggers SyntaxError)\n2. Passes after the fix\n3. Tests a different angle than the original test\n\nThe original test uses `lam(1)==1` which expects a scalar return. I'll create a test that uses a matrix input and checks the matrix return value - this tests the full pipeline from symbol processing through code generation to actual function execution with proper matrix arguments.\n\nLet me create the patch:\ndiff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +272,14 @@\n+def test_sweb_enhanced_curly_matrix_symbol_callable():\n+    # Enhanced test for issue #15009: Verify that lambdify returns a callable\n+    # that actually works with matrix arguments when MatrixSymbol has curly braces.\n+    # This tests the full pipeline: symbol processing -> code generation -> execution.\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Use dummify=True to ensure proper symbol handling\n+    lam = lambdify(curlyv, curlyv, dummify=True)\n+    # Test with a matrix-like input (list of lists) to verify the callable works\n+    import numpy as np\n+    input_matrix = np.array([[1], [2]])\n+    result = lam(input_matrix)\n+    assert np.allclose(result, input_matrix)\n+\ndiff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py\n--- a/sympy/utilities/tests/test_lambdify.py\n+++ b/sympy/utilities/tests/test_lambdify.py\n@@ -271,0 +271,14 @@\n+def test_sweb_enhanced_curly_matrix_symbol_callable():\n+    # Enhanced test for issue #15009: Verify that lambdify returns a callable\n+    # that actually works with matrix arguments when MatrixSymbol has curly braces.\n+    # This tests the full pipeline: symbol processing -> code generation -> execution.\n+    curlyv = sympy.MatrixSymbol(\"{v}\", 2, 1)\n+    # Use dummify=True to ensure proper symbol handling\n+    lam = lambdify(curlyv, curlyv, dummify=True)\n+    # Test with a matrix-like input (list of lists) to verify the callable works\n+    import numpy as np\n+    input_matrix = np.array([[1], [2]])\n+    result = lam(input_matrix)\n+    assert np.allclose(result, input_matrix)\n+",
+    "identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_callable"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_callable"
+    ],
+    "duplicate_identifiers": [],
+    "kept": true,
+    "reason": "new enhanced tests reproduced the buggy behavior",
+    "failing_identifiers": [
+      "test_sweb_enhanced_curly_matrix_symbol_callable"
+    ],
+    "eval_status_map": {
+      "sympy/utilities/tests/test_lambdify.py:test_sweb_enhanced_curly_matrix_symbol_callable": "FAILED",
+      "test_no_args": "PASSED",
+      "test_single_arg": "PASSED",
+      "test_list_args": "PASSED",
+      "test_nested_args": "PASSED",
+      "test_str_args": "PASSED",
+      "test_own_namespace_1": "PASSED",
+      "test_own_namespace_2": "PASSED",
+      "test_own_module": "PASSED",
+      "test_bad_args": "PASSED",
+      "test_atoms": "PASSED",
+      "test_sympy_lambda": "PASSED",
+      "test_math_lambda": "PASSED",
+      "test_mpmath_lambda": "PASSED",
+      "test_number_precision": "PASSED",
+      "test_mpmath_precision": "PASSED",
+      "test_math_transl": "PASSED",
+      "test_mpmath_transl": "PASSED",
+      "test_exponentiation": "PASSED",
+      "test_sqrt": "PASSED",
+      "test_trig": "PASSED",
+      "test_vector_simple": "PASSED",
+      "test_vector_discontinuous": "PASSED",
+      "test_trig_symbolic": "PASSED",
+      "test_trig_float": "PASSED",
+      "test_docs": "PASSED",
+      "test_math": "PASSED",
+      "test_sin": "PASSED",
+      "test_matrix": "PASSED",
+      "test_issue9474": "PASSED",
+      "test_integral": "PASSED",
+      "test_sym_single_arg": "PASSED",
+      "test_sym_list_args": "PASSED",
+      "test_sym_integral": "PASSED",
+      "test_namespace_order": "PASSED",
+      "test_namespace_type": "PASSED",
+      "test_imps": "PASSED",
+      "test_imps_errors": "PASSED",
+      "test_imps_wrong_args": "PASSED",
+      "test_lambdify_imps": "PASSED",
+      "test_dummification": "PASSED",
+      "test_python_keywords": "PASSED",
+      "test_lambdify_docstring": "PASSED",
+      "test_special_printers": "PASSED",
+      "test_true_false": "PASSED",
+      "test_issue_2790": "PASSED",
+      "test_issue_12092": "PASSED",
+      "test_ITE": "PASSED",
+      "test_Min_Max": "PASSED",
+      "test_issue_12173": "PASSED",
+      "test_sinc_mpmath": "PASSED",
+      "test_lambdify_dummy_arg": "PASSED",
+      "test_lambdify_mixed_symbol_dummy_args": "PASSED",
+      "test_lambdify_inspect": "PASSED",
+      "test_issue_14941": "PASSED"
+    },
+    "generation_attempts": 2,
+    "quality_score": 0.955,
+    "quality_breakdown": {
+      "reproduction": 1.0,
+      "novelty": 1.0,
+      "compactness": 0.7,
+      "parseability": 1.0
+    },
+    "covered_original_tests": [
+      "test_curly_matrix_symbol"
+    ],
+    "covered_obligations": [
+      "test_curly_matrix_symbol::core"
+    ]
+  }
+]

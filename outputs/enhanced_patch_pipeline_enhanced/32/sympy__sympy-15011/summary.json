@@ -1,0 +1,219 @@
+{
+  "instance_id": "sympy__sympy-15011",
+  "repo": "sympy/sympy",
+  "model": "minimax-m2.5",
+  "pipeline_mode": "enhanced_guided",
+  "hide_original_test_patch_in_repair": false,
+  "disable_semantic_bucket_guidance": false,
+  "disable_enhanced_test_filtering": false,
+  "repair_mode": "enhanced_guided",
+  "original_test_identifiers": [
+    "test_curly_matrix_symbol"
+  ],
+  "original_status_counts": {
+    "FAILED": 1,
+    "PASSED": 53,
+    "ERROR": 1
+  },
+  "original_failed_count": 2,
+  "original_passed_count": 53,
+  "failure_focus": {
+    "original_test_identifiers": [
+      "test_curly_matrix_symbol"
+    ],
+    "active_fail_to_pass_identifiers": [
+      "test_curly_matrix_symbol"
+    ],
+    "inactive_fail_to_pass_identifiers": [],
+    "failing_tests_sample": [
+      "sympy/utilities/tests/test_lambdify.py:test_curly_matrix_symbol",
+      "test_curly_matrix_symbol"
+    ],
+    "failure_mode": "generic_failure",
+    "dominant_errors": [
+      "SyntaxError"
+    ],
+    "assertion_value_mismatches": [],
+    "failure_snippets": [
+      "test_curly_matrix_symbol E",
+      "_______ sympy/utilities/tests/test_lambdify.py:test_curly_matrix_symbol ________",
+      "Traceback (most recent call last):"
+    ],
+    "noise_ratio": 0.0049,
+    "target_test_tracebacks": {
+      "test_curly_matrix_symbol": "TARGET TEST: test_curly_matrix_symbol\n- snippet: test_curly_matrix_symbol E\n- snippet: _______ sympy/utilities/tests/test_lambdify.py:test_curly_matrix_symbol ________\n- snippet: Traceback (most recent call last):\n- dominant_errors: SyntaxError\nWEAK TRACEBACK CONTEXT:\ntest_imps_errors ok\ntest_curly_matrix_symbol E\n_______ sympy/utilities/tests/test_lambdify.py:test_curly_matrix_symbol ________\nTraceback (most recent call last):\n  File \"/testbed/sympy/utilities/tests/test_lambdify.py\", line 734, in test_curly_matrix_symbol\nSyntaxError: invalid syntax"
+    }
+  },
+  "generation_budget": {
+    "candidate_budget": 5,
+    "keep_top_k": 3,
+    "attempt_budget": 3,
+    "bucket_limit": 5,
+    "template_limit": 4,
+    "failure_mode": "generic_failure",
+    "noise_ratio": 0.0049,
+    "difficulty": "medium"
+  },
+  "adaptive_num_candidates": 5,
+  "adaptive_keep_top_k": 3,
+  "adaptive_attempt_budget": 3,
+  "enhanced_candidates_total": 5,
+  "kept_enhanced_candidates": 2,
+  "enhanced_candidate_retention_rate": 0.4,
+  "enhanced_generation_attempts_total": 18,
+  "enhanced_generation_attempts_avg": 3.6,
+  "kept_enhanced_test_identifiers": [
+    "test_sweb_enhanced_curly_matrix_symbol_dummify",
+    "test_sweb_enhanced_curly_matrix_symbol_callable"
+  ],
+  "enhanced_failed_test_identifiers": [
+    "test_sweb_enhanced_curly_matrix_symbol_dummify",
+    "test_sweb_enhanced_curly_matrix_symbol_callable"
+  ],
+  "enhanced_failed_count": 2,
+  "generated_patch_nonempty": false,
+  "generated_patch_error": null,
+  "generated_patch_attempts": 6,
+  "generated_patch_accepted": false,
+  "generated_patch_acceptance_reason": "rejected_not_generated",
+  "generated_patch_feedback": null,
+  "semantic_oracle_passed": false,
+  "semantic_oracle_failed_identifiers": [],
+  "patch_analysis": {
+    "root_cause": "The _EvaluatorPrinter._preprocess method in lambdify.py handles Symbol and Function types for dummification but does not handle MatrixSymbol. When a MatrixSymbol with curly braces in its name (e.g., '{v}') is passed, it falls through to the else branch which uses str(arg) directly, producing invalid Python syntax like 'lambda {v}: ({v})'.",
+    "affected_components": [
+      {
+        "file": "sympy/utilities/lambdify.py",
+        "symbol": "_EvaluatorPrinter._preprocess",
+        "reason": "This method processes arguments before generating lambda code. It handles Symbol and Function types for dummification but lacks handling for MatrixSymbol, causing invalid syntax when MatrixSymbol names contain special characters like curly braces."
+      },
+      {
+        "file": "sympy/matrices/expressions/matexpr.py",
+        "symbol": "MatrixSymbol",
+        "reason": "MatrixSymbol is a subclass of Basic that represents a symbolic matrix. It has a 'name' attribute but is not recognized as a Symbol subclass by the lambdify preprocessing logic."
+      }
+    ],
+    "failing_signal": "SyntaxError: invalid syntax when calling lambdify with MatrixSymbol containing curly braces in name, even with dummify=True",
+    "propagation_path": "MatrixSymbol with name '{v}' -> lambdify() -> _EvaluatorPrinter.doprint() -> _preprocess() -> else branch uses str(arg) = '{v}' -> generated code 'lambda {v}: ({v})' -> Python SyntaxError on compile",
+    "repair_constraint": "The fix must ensure MatrixSymbol arguments are either converted to valid Python identifiers (via Dummy replacement when dummify=True or when name is not a safe identifier) or handled appropriately to produce valid lambda syntax.",
+    "suggested_repair_scope": [
+      "sympy/utilities/lambdify.py"
+    ],
+    "suspicious_symbols": [
+      "_EvaluatorPrinter",
+      "_EvaluatorPrinter._preprocess",
+      "MatrixSymbol",
+      "Symbol",
+      "Function",
+      "Dummy"
+    ],
+    "repair_obligations": [
+      {
+        "id": "test_curly_matrix_symbol::core::MatrixSymbol_name_handling_with_dummify_True",
+        "source_symbol": "test_curly_matrix_symbol",
+        "validation_subject": "MatrixSymbol name handling with dummify=True",
+        "why_it_matters": "The _preprocess method must handle MatrixSymbol similarly to Symbol - when dummify=True or when the name is not a valid Python identifier, it should substitute a Dummy to avoid generating invalid Python syntax."
+      },
+      {
+        "id": "test_curly_matrix_symbol::core::callable_return_value",
+        "source_symbol": "test_curly_matrix_symbol",
+        "validation_subject": "callable_return_value",
+        "why_it_matters": "After fixing the syntax error, the lambdified function must return the correct value (the MatrixSymbol itself or its equivalent) when called."
+      }
+    ]
+  },
+  "patch_strategy": {
+    "title": "Add MatrixSymbol handling to _EvaluatorPrinter._preprocess",
+    "approach": "Modify the _preprocess method in _EvaluatorPrinter class (sympy/utilities/lambdify.py) to handle MatrixSymbol similarly to Symbol. Add an isinstance check for MatrixSymbol that applies the same dummification logic: when dummify=True or when the MatrixSymbol's name is not a valid Python identifier, replace it with a Dummy symbol and update the expression accordingly. This ensures that MatrixSymbol arguments with curly braces in their names (e.g., '{v}') are properly converted to valid Python identifiers in the generated lambda code.",
+    "edit_targets": [
+      "sympy/utilities/lambdify.py::_EvaluatorPrinter::_preprocess"
+    ],
+    "dependency_files": [
+      "sympy/matrices/expressions/matexpr.py::MatrixSymbol"
+    ],
+    "structural_rules": [],
+    "forbidden_patterns": [],
+    "sufficiency_assessment": "Editing only the _preprocess method in sympy/utilities/lambdify.py is sufficient to fix both repair obligations: (1) test_curly_matrix_symbol::core::MatrixSymbol name handling with dummify=True - the fix adds proper handling for MatrixSymbol similar to Symbol, applying dummification when needed; (2) test_curly_matrix_symbol::core::callable_return_value - once the syntax error is fixed by proper dummification, the lambdified function will return the correct matrix value. No changes to MatrixSymbol itself are needed since it already has a 'name' attribute that can be checked via _argrepr.",
+    "risks": [
+      "Potential name collision if a Dummy is used but the expression still references the original MatrixSymbol - mitigated by using _subexpr to replace the original in the expression",
+      "Breaking existing behavior for MatrixSymbol with valid identifiers - mitigated by only applying dummification when dummify=True or when the identifier is not safe"
+    ]
+  },
+  "patch_edit_plan": null,
+  "final_patch_attempted": false,
+  "final_patch_applied": true,
+  "final_patch_effective_applied": false,
+  "final_patch_apply_mode": "no_patch",
+  "final_patch_cleanly_applied": false,
+  "clean_apply_ratio": 0.0,
+  "resolved": false,
+  "final_resolved": false,
+  "final_status_counts": {
+    "FAILED": 1,
+    "PASSED": 53,
+    "ERROR": 1
+  },
+  "final_failed_count": 2,
+  "final_passed_count": 53,
+  "original_passed_count_improvement": 0,
+  "original_failed_count_reduction": 0,
+  "final_status_map": {
+    "sympy/utilities/tests/test_lambdify.py:test_curly_matrix_symbol": "FAILED",
+    "test_no_args": "PASSED",
+    "test_single_arg": "PASSED",
+    "test_list_args": "PASSED",
+    "test_nested_args": "PASSED",
+    "test_str_args": "PASSED",
+    "test_own_namespace_1": "PASSED",
+    "test_own_namespace_2": "PASSED",
+    "test_own_module": "PASSED",
+    "test_bad_args": "PASSED",
+    "test_atoms": "PASSED",
+    "test_sympy_lambda": "PASSED",
+    "test_math_lambda": "PASSED",
+    "test_mpmath_lambda": "PASSED",
+    "test_number_precision": "PASSED",
+    "test_mpmath_precision": "PASSED",
+    "test_math_transl": "PASSED",
+    "test_mpmath_transl": "PASSED",
+    "test_exponentiation": "PASSED",
+    "test_sqrt": "PASSED",
+    "test_trig": "PASSED",
+    "test_vector_simple": "PASSED",
+    "test_vector_discontinuous": "PASSED",
+    "test_trig_symbolic": "PASSED",
+    "test_trig_float": "PASSED",
+    "test_docs": "PASSED",
+    "test_math": "PASSED",
+    "test_sin": "PASSED",
+    "test_matrix": "PASSED",
+    "test_issue9474": "PASSED",
+    "test_integral": "PASSED",
+    "test_sym_single_arg": "PASSED",
+    "test_sym_list_args": "PASSED",
+    "test_sym_integral": "PASSED",
+    "test_namespace_order": "PASSED",
+    "test_namespace_type": "PASSED",
+    "test_imps": "PASSED",
+    "test_imps_errors": "PASSED",
+    "test_imps_wrong_args": "PASSED",
+    "test_lambdify_imps": "PASSED",
+    "test_dummification": "PASSED",
+    "test_curly_matrix_symbol": "ERROR",
+    "test_python_keywords": "PASSED",
+    "test_lambdify_docstring": "PASSED",
+    "test_special_printers": "PASSED",
+    "test_true_false": "PASSED",
+    "test_issue_2790": "PASSED",
+    "test_issue_12092": "PASSED",
+    "test_ITE": "PASSED",
+    "test_Min_Max": "PASSED",
+    "test_issue_12173": "PASSED",
+    "test_sinc_mpmath": "PASSED",
+    "test_lambdify_dummy_arg": "PASSED",
+    "test_lambdify_mixed_symbol_dummy_args": "PASSED",
+    "test_lambdify_inspect": "PASSED"
+  },
+  "final_timed_out": false,
+  "final_error": null
+}

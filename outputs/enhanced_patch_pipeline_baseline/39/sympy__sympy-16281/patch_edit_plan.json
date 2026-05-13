@@ -1,0 +1,24 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/printing/pretty/pretty.py",
+      "action": "modify_region",
+      "justification": "The PrettyPrinter class is missing the _print_Equality method, which is required because _print_Product and _print_Sum both use Equality(lim[0], lim[1]) to create lower bound strings. Without this method, the printer fails with ValueError when trying to print Equality objects."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/printing/pretty/pretty.py",
+      "target_symbol": "PrettyPrinter",
+      "replacement_mode": "insert_before_anchor",
+      "covers_obligations": [
+        "1",
+        "2",
+        "3"
+      ],
+      "anchor_line_before": "    }",
+      "anchor_line_after": "    def __init__(self, settings=None):",
+      "replacement_block": "    }\n\n    def _print_Equality(self, e):\n        from sympy.core.relational import Equality\n        return self._print_Relational(e)\n\n    def __init__(self, settings=None):"
+    }
+  ]
+}

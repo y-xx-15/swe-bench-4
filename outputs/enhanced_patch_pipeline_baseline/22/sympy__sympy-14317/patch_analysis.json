@@ -1,0 +1,52 @@
+{
+  "root_cause": "The LaTeX printer's _print_Poly method does not apply the same term ordering as str/pretty printers. It uses the default ordering from Add.args which is not sorted by degree descending, while str and pretty explicitly use degree-descending order.",
+  "affected_components": [
+    {
+      "file": "sympy/printing/latex.py",
+      "symbol": "_print_Poly",
+      "reason": "This method handles Poly printing but does not apply proper term ordering - it uses expr.as_expr() which returns terms in default order rather than degree-descending order"
+    },
+    {
+      "file": "sympy/printing/pretty/pretty.py",
+      "symbol": "_print_Poly",
+      "reason": "Reference implementation that correctly orders terms by degree descending"
+    },
+    {
+      "file": "sympy/printing/str.py",
+      "symbol": "_print_Poly",
+      "reason": "Reference implementation that correctly orders terms by degree descending"
+    }
+  ],
+  "failing_signal": "AssertionError in test_latex_Poly and test_latex_Poly_order - the LaTeX output shows terms in wrong order: 'a x^{5} + b x^{3} + c x + x^{4} + 2 x^{2} + 3' instead of 'a x^{5} + x^{4} + b x^{3} + 2 x^{2} + c x + 3'",
+  "propagation_path": "_print_Poly calls expr.as_expr() which returns the polynomial terms in default order (lexicographic or arbitrary), not sorted by degree. The str and pretty printers override this to use as_ordered_terms() with descending degree, but latex printer does not.",
+  "repair_constraint": "The fix must ensure LaTeX output matches str/pretty ordering (degree descending) while preserving all other Poly printing behavior including domain display",
+  "suggested_repair_scope": [
+    "sympy/printing/latex.py"
+  ],
+  "suspicious_symbols": [
+    "_print_Poly",
+    "as_expr",
+    "as_ordered_terms",
+    "Poly"
+  ],
+  "repair_obligations": [
+    {
+      "id": "poly_order_001",
+      "source_symbol": "_print_Poly",
+      "validation_subject": "LaTeX output term order",
+      "why_it_matters": "Must match str/pretty output which uses degree-descending order"
+    },
+    {
+      "id": "poly_order_002",
+      "source_symbol": "_print_Poly",
+      "validation_subject": "Polynomial expression inside Poly()",
+      "why_it_matters": "The inner polynomial expression must be ordered by degree descending, same as other printers"
+    },
+    {
+      "id": "poly_order_003",
+      "source_symbol": "_print_Poly",
+      "validation_subject": "Add term ordering",
+      "why_it_matters": "The _print_Add method respects the 'order' setting - Poly should use degree-descending order"
+    }
+  ]
+}

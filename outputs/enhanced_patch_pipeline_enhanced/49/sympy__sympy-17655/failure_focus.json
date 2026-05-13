@@ -1,0 +1,32 @@
+{
+  "original_test_identifiers": [
+    "test_point",
+    "test_point3D"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_point",
+    "test_point3D"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/geometry/tests/test_point.py:test_point",
+    "sympy/geometry/tests/test_point.py:test_point3D",
+    "test_point",
+    "test_point3D"
+  ],
+  "failure_mode": "type_error",
+  "dominant_errors": [
+    "TypeError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "+ git checkout f5e965947af2410ded92cfad987aaf45262ea434 sympy/geometry/tests/test_point.py",
+    "Checking patch sympy/geometry/tests/test_point.py...",
+    "Applied patch sympy/geometry/tests/test_point.py cleanly."
+  ],
+  "noise_ratio": 0.0061,
+  "target_test_tracebacks": {
+    "test_point": "TARGET TEST: test_point\n- snippet: + git checkout f5e965947af2410ded92cfad987aaf45262ea434 sympy/geometry/tests/test_point.py\n- snippet: Checking patch sympy/geometry/tests/test_point.py...\n- snippet: Applied patch sympy/geometry/tests/test_point.py cleanly.\n- dominant_errors: TypeError\nWEAK TRACEBACK CONTEXT:\n+ git checkout f5e965947af2410ded92cfad987aaf45262ea434 sympy/geometry/tests/test_point.py\nChecking patch sympy/geometry/tests/test_point.py...\nApplied patch sympy/geometry/tests/test_point.py cleanly.\n+ bin/test -C --verbose sympy/geometry/tests/test_point.py\nsympy/geometry/tests/test_point.py[12] \ntest_point E\ntest_point3D E\ntest_Point2D ok\ntest_point - Took 26.028 seconds\n________________ sympy/geometry/tests/test_point.py:test_point _________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/geometry/tests/test_point.py\", line 94, in test_point\nTypeError: unsupported operand type(s) for *: 'int' and 'Point2D'\n_______________ sympy/geometry/tests/test_point.py:test_point3D ________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/geometry/tests/test_point.py\", line 171, in test_point3D\nTypeError: unsupported operand type(s) for *: 'int' and 'Point3D'\n+ git checkout f5e965947af2410ded92cfad987aaf45262ea434 sympy/geometry/tests/test_point.py",
+    "test_point3D": "TARGET TEST: test_point3D\n- snippet: + git checkout f5e965947af2410ded92cfad987aaf45262ea434 sympy/geometry/tests/test_point.py\n- snippet: Checking patch sympy/geometry/tests/test_point.py...\n- snippet: Applied patch sympy/geometry/tests/test_point.py cleanly.\n- dominant_errors: TypeError\nWEAK TRACEBACK CONTEXT:\ntest_point3D E\nTraceback (most recent call last):\nTypeError: unsupported operand type(s) for *: 'int' and 'Point2D'\n_______________ sympy/geometry/tests/test_point.py:test_point3D ________________\nTraceback (most recent call last):\n  File \"/testbed/sympy/geometry/tests/test_point.py\", line 171, in test_point3D\nTypeError: unsupported operand type(s) for *: 'int' and 'Point3D'"
+  }
+}

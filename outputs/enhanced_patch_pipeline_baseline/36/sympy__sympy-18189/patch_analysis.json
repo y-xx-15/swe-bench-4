@@ -1,0 +1,30 @@
+{
+  "root_cause": "When syms is provided and differs from the default sorted variable order, the diophantine function makes a recursive call to handle the reordered symbols, but it fails to pass the permute parameter to this recursive call. This causes the recursive call to use permute=False (the default), resulting in only base solutions being computed before reordering, losing all permuted variants.",
+  "affected_components": [
+    {
+      "file": "sympy/solvers/diophantine.py",
+      "symbol": "diophantine",
+      "reason": "The main diophantine solver function that handles the syms parameter and permute flag. The bug occurs when syms order differs from default - the recursive call at line ~206 omits the permute parameter."
+    }
+  ],
+  "failing_signal": "AssertionError in test_diophantine - the test expects all permuted solutions but gets only one when syms=(n,m) is used instead of syms=(m,n). The result set differs based on symbol ordering, which should not happen.",
+  "propagation_path": "1) User calls diophantine(eq, syms=(n,m), permute=True). 2) Function detects syms != var (sorted variables). 3) Recursive call diophantine(eq, param) is made WITHOUT permute parameter. 4) Internal call uses permute=False, returning only base solution (3,2). 5) Results are reordered to match syms order but only contain the single base solution. 6) User sees incomplete results {(3,2)} instead of all 8 permutations.",
+  "repair_constraint": "The fix must preserve the permute flag when making the recursive call for reordered symbols. The output when permute=True should contain all sign permutations and value permutations regardless of syms order.",
+  "suggested_repair_scope": [
+    "sympy/solvers/diophantine.py"
+  ],
+  "suspicious_symbols": [
+    "diophantine",
+    "permute",
+    "syms",
+    "var"
+  ],
+  "repair_obligations": [
+    {
+      "id": "RO-1",
+      "source_symbol": "diophantine",
+      "validation_subject": "recursive call at line where syms != var",
+      "why_it_matters": "The permute parameter must be passed through to preserve solution completeness when symbols are reordered. Without this, permute=True has no effect when syms order differs from default alphabetical order."
+    }
+  ]
+}

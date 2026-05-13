@@ -1,0 +1,17 @@
+{
+  "title": "Fix idiff to handle Eq and Function inputs",
+  "approach": "Two bugs need fixing in idiff: (1) For Eq inputs, convert Eq to expression form (lhs - rhs) at the start before any processing. (2) For Function inputs like f(x), accept them as valid dependent variables by checking for Function type and extracting the function's first argument as the dependent variable. The fix should add an import for Eq from sympy and modify the type checking logic to handle both Symbol and Function cases.",
+  "edit_targets": [
+    "sympy/geometry/util.py"
+  ],
+  "dependency_files": [
+    "sympy/geometry/tests/test_util.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix is sufficient because both bugs are in the idiff function in sympy/geometry/util.py. Bug 1 requires converting Eq to expression at the start. Bug 2 requires modifying the isinstance check to also accept Function objects. No other files need modification.",
+  "risks": [
+    "Breaking existing Symbol-based idiff usage - the fix maintains backward compatibility by keeping Symbol handling",
+    "Potential edge case where solve returns empty list for non-Eq inputs - the fix doesn't change that behavior"
+  ]
+}

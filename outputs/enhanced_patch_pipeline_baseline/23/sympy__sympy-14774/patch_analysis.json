@@ -1,0 +1,40 @@
+{
+  "root_cause": "The inv_trig_table list in the _print_Function method of LatexPrinter is missing 'acsc' and 'asec'. When inv_trig_style='full' is used, only functions in this table get the 'arc' prefix applied (e.g., 'asin' becomes 'arcsin'). Since 'acsc' and 'asec' are not in the table, they fall through to the generic function handling which uses \\operatorname{} instead of the proper 'arccsc' and 'arcsec' names.",
+  "affected_components": [
+    {
+      "file": "sympy/printing/latex.py",
+      "symbol": "LatexPrinter._print_Function",
+      "reason": "This method contains the inv_trig_table that determines which inverse trig functions get special 'arc' prefix handling. It's missing acsc and asec."
+    }
+  ],
+  "failing_signal": "latex(acsc(x), inv_trig_style='full') returns '\\operatorname{acsc}{\\left (x \\right )}' instead of '\\operatorname{arccsc}{\\left (x \\right )}'. Similarly for asec. The test_latex_functions test fails with AssertionError.",
+  "propagation_path": "When latex() is called with an inverse trig function and inv_trig_style='full', the _print_Function method checks if the function name is in inv_trig_table. Since 'acsc' and 'asec' are not in the list, the code skips the 'arc' prefix transformation and falls through to generic function printing which uses \\operatorname{} wrapper.",
+  "repair_constraint": "The fix must add 'acsc' and 'asec' to the inv_trig_table list while preserving the existing behavior for asin, acos, atan, and acot. The transformation logic 'arc' + func[1:] must correctly produce 'arccsc' from 'acsc' and 'arcsec' from 'asec'.",
+  "suggested_repair_scope": [
+    "sympy/printing/latex.py"
+  ],
+  "suspicious_symbols": [
+    "inv_trig_table",
+    "_print_Function",
+    "acsc",
+    "asec",
+    "asin",
+    "acos",
+    "atan",
+    "acot"
+  ],
+  "repair_obligations": [
+    {
+      "id": "1",
+      "source_symbol": "inv_trig_table",
+      "validation_subject": "List containing inverse trig function names",
+      "why_it_matters": "This table controls which functions get the 'arc' prefix transformation when inv_trig_style='full'. Missing 'acsc' and 'asec' causes them to be printed as generic functions instead of proper LaTeX inverse trig functions."
+    },
+    {
+      "id": "2",
+      "source_symbol": "_print_Function",
+      "validation_subject": "Function that handles inverse trig style transformation",
+      "why_it_matters": "This method applies the 'arc' prefix transformation. The fix must ensure it correctly transforms 'acsc' to 'arccsc' and 'asec' to 'arcsec' using the existing logic 'arc' + func[1:]."
+    }
+  ]
+}

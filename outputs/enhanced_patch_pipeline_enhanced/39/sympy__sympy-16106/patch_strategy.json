@@ -1,0 +1,18 @@
+{
+  "title": "Add MathML printer methods for Indexed and IndexedBase",
+  "approach": "Add _print_IndexedBase and _print_Indexed methods to both MathMLContentPrinter and MathMLPresentationPrinter classes. For content MathML, use <ci> for the base and <apply><selector/>...</apply> structure. For presentation MathML, use <msub> element for subscript notation.",
+  "edit_targets": [
+    "sympy/printing/mathml.py::MathMLContentPrinter",
+    "sympy/printing/mathml.py::MathMLPresentationPrinter"
+  ],
+  "dependency_files": [
+    "sympy/tensor/indexed.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only sympy/printing/mathml.py is sufficient. The fix requires adding print methods for Indexed and IndexedBase classes to both MathMLContentPrinter and MathMLPresentationPrinter. No other files need modification.",
+  "risks": [
+    "The Indexed class may have multiple indices which need proper handling with mmultiscripts in presentation MathML",
+    "Need to ensure backward compatibility with existing MathML output for other expression types"
+  ]
+}

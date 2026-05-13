@@ -1,0 +1,23 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/core/expr.py",
+      "action": "modify_region",
+      "justification": "The bug is in Expr.__eq__ which calls sympify() on arbitrary objects without first checking if they are already SymPy objects. This causes eval of arbitrary repr strings. The fix requires modifying this method to check isinstance(other, Expr) before calling sympify."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/core/expr.py",
+      "target_symbol": "Expr.__eq__",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "prevent_arbitrary_repr_eval",
+        "preserve_sympy_equality"
+      ],
+      "anchor_line_before": "    def __eq__(self, other):\n        try:",
+      "anchor_line_after": "            other = sympify(other)\n            if not isinstance(other, Expr):\n                return False\n        except (SympifyError, SyntaxError):\n            return False",
+      "replacement_block": "    def __eq__(self, other):\n        if isinstance(other, Expr):\n            # Already a SymPy expression, skip sympify to avoid eval of arbitrary repr\n            pass\n        else:\n            try:\n                other = sympify(other)\n            except (SympifyError, SyntaxError):\n                return False\n            if not isinstance(other, Expr):\n                return False\n        # remaining comparison logic continues below"
+    }
+  ]
+}

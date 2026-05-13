@@ -1,0 +1,14 @@
+{
+  "title": "Add acsc and asec to inv_trig_table",
+  "approach": "Add 'acsc' and 'asec' to the inv_trig_table list in the _print_Function method of LatexPrinter. This list controls which inverse trig functions get the 'arc' prefix transformation when inv_trig_style='full'. The existing transformation logic 'arc' + func[1:] will correctly produce 'arccsc' from 'acsc' and 'arcsec' from 'asec'.",
+  "edit_targets": [
+    "sympy/printing/latex.py::LatexPrinter._print_Function"
+  ],
+  "dependency_files": [],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "Yes, editing only the primary target is sufficient. The fix only requires adding two strings to a list. The existing transformation logic 'arc' + func[1:] already works correctly for these function names (acsc -> arccsc, asec -> arcsec). No other changes are needed.",
+  "risks": [
+    "Low risk: This is a simple list extension that only adds missing entries. Existing behavior for asin, acos, atan, and acot is preserved."
+  ]
+}

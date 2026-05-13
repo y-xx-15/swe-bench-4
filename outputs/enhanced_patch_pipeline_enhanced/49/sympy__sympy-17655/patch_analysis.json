@@ -1,0 +1,59 @@
+{
+  "root_cause": "The Point class is missing the __rmul__ method, so when Python evaluates `scalar * Point`, it first tries scalar.__mul__(Point) which returns NotImplemented, then tries Point.__rmul__(scalar) which doesn't exist, so Python falls back to creating a Mul expression (e.g., 2.0*Point2D(1,1)) instead of performing the multiplication. This Mul object then cannot be added to another Point.",
+  "affected_components": [
+    {
+      "file": "sympy/geometry/point.py",
+      "symbol": "Point",
+      "reason": "Missing __rmul__ method causes reverse multiplication (scalar * Point) to fail, creating a Mul expression that cannot be added to Points"
+    }
+  ],
+  "failing_signal": "TypeError: unsupported operand type(s) for *: 'int' and 'Point2D' and GeometryError: Don't know how to add 2.0*Point2D(1, 1) and a Point object",
+  "propagation_path": "When scalar * Point is evaluated, Point.__rmul__ is not found, so Python creates a Mul(scalar, Point) expression. This Mul object is then passed to Point.__add__ which tries to convert it to a Point, fails with TypeError, and raises GeometryError.",
+  "repair_constraint": "The fix must preserve the existing __mul__ behavior and ensure scalar * Point produces the same result as Point * scalar",
+  "suggested_repair_scope": [
+    "sympy/geometry/point.py"
+  ],
+  "suspicious_symbols": [
+    "Point.__mul__",
+    "Point.__rmul__",
+    "Point.__add__"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_point::core::scalar * Point operation",
+      "source_symbol": "test_point",
+      "validation_subject": "scalar * Point operation",
+      "why_it_matters": "The expression 2 * point2 must work the same as point2 * 2, enabling expressions like point1 + 2 * point2"
+    },
+    {
+      "id": "test_point::core::scalar multiplication operator",
+      "source_symbol": "test_point",
+      "validation_subject": "scalar multiplication operator",
+      "why_it_matters": "Both 2 * point and S(2) * point must produce valid Point objects, not Mul expressions"
+    },
+    {
+      "id": "test_point::core::reverse_multiplication_operation",
+      "source_symbol": "test_point",
+      "validation_subject": "reverse_multiplication_operation",
+      "why_it_matters": "sympify(2.0) * point2, 2 * point2, and S(2) * point2 must all work identically to point2 * scalar"
+    },
+    {
+      "id": "test_point3D::core::scalar * Point operation",
+      "source_symbol": "test_point3D",
+      "validation_subject": "scalar * Point operation",
+      "why_it_matters": "3D points must also support reverse multiplication: 2 * Point3D(1,1,1)"
+    },
+    {
+      "id": "test_point3D::core::scalar multiplication operator",
+      "source_symbol": "test_point3D",
+      "validation_subject": "scalar multiplication operator",
+      "why_it_matters": "S(2) * Point3D(1,1,1) must work the same as Point3D(1,1,1) * S(2)"
+    },
+    {
+      "id": "test_point3D::core::reverse_multiplication_operation",
+      "source_symbol": "test_point3D",
+      "validation_subject": "reverse_multiplication_operation",
+      "why_it_matters": "All scalar * Point3D variations must produce valid Point3D objects"
+    }
+  ]
+}

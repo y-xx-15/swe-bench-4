@@ -1,0 +1,9 @@
+
+
+Looking at the bug, I need to fix the `is_upper` property and related methods in `sympy/matrices/matrices.py` to bound the iteration by the matrix dimensions. Let me find the exact line numbers.
+<minimax:tool_call>
+<invoke name="grep">
+<parameter name="pattern">def is_upper|is_upper.*property|_eval_is_upper</parameter>
+<parameter name="path">/testbed/sympy/matrices/matrices.py</parameter>
+</invoke>
+</minimax:tool_call>

@@ -1,0 +1,18 @@
+{
+  "title": "Preserve MatrixSymbol dimensions for unused args",
+  "approach": "In the CodeGen.routine method, when creating InputArgument for symbols in argument_sequence that are not found in name_arg_dict (i.e., not appearing in the expression), check if the symbol is a MatrixSymbol and preserve its shape information as dimensions. Currently it creates a plain InputArgument without dimensions, causing array arguments to be treated as scalars in the generated C code.",
+  "edit_targets": [
+    "sympy/utilities/codegen.py::CodeGen.routine"
+  ],
+  "dependency_files": [
+    "sympy/utilities/autowrap.py",
+    "sympy/utilities/tests/test_codegen.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix should be sufficient because the root cause is in the routine method where InputArgument is created without dimensions for symbols not in the expression. The CCodeGen.get_prototype method already correctly handles dimensions to generate pointer types (double* vs double), so we just need to ensure dimensions are preserved when creating the InputArgument. No other files need modification.",
+  "risks": [
+    "Potential regression for non-MatrixSymbol arguments that legitimately should be scalars",
+    "Edge case: IndexedBase arguments in argument_sequence may also need similar handling"
+  ]
+}

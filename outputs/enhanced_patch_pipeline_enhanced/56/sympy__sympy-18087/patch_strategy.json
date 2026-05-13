@@ -1,0 +1,19 @@
+{
+  "title": "Prevent sqrt(x**2) from incorrectly simplifying to x for complex x",
+  "approach": "The bug occurs because the Factors class in exprtools.py incorrectly simplifies sqrt(sin(x)**2) to sin(x) via as_powers_dict(). For complex numbers, sqrt(z**2) != z in general - it equals z only when z is real and non-negative. The fix should add a check in the Factors.__init__ method to avoid simplifying sqrt(Pow(base, 2)) to base unless we can verify the base is real and non-negative. This can be done by checking if the base has the is_extended_real and is_nonnegative properties before performing the simplification.",
+  "edit_targets": [
+    "sympy/core/exprtools.py"
+  ],
+  "dependency_files": [
+    "sympy/simplify/fu.py",
+    "sympy/core/mul.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The primary fix should be in the Factors class in exprtools.py where the incorrect simplification happens. However, since the issue may also involve how Mul.as_powers_dict() handles these expressions, we may need to inspect mul.py as well. The fu.py file contains TRpower which triggers the transformation, but the root fix should be in exprtools.py to prevent the incorrect mathematical simplification. If the fix in exprtools.py is insufficient, we may need to add guards in fu.py as well.",
+  "risks": [
+    "Breaking legitimate simplifications for real, non-negative arguments - the fix must preserve correct behavior when x is known to be real",
+    "Potential performance impact if we add too many checks",
+    "Risk of breaking other parts of sympy that rely on the current (incorrect) behavior"
+  ]
+}

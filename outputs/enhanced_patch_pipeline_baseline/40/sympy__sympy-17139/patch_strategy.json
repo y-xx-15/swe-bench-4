@@ -1,0 +1,16 @@
+{
+  "title": "Guard exponent comparison with real check in _TR56",
+  "approach": "In the _TR56 function's inner _f function, before attempting to compare rv.exp with 0 or max using < or > operators, add a check to verify that rv.exp.is_real is True. If the exponent is not real (e.g., is the imaginary unit I), skip the transformation and return the expression unchanged. This prevents the TypeError when comparing complex numbers.",
+  "edit_targets": [
+    "sympy/simplify/fu.py"
+  ],
+  "dependency_files": [
+    "sympy/simplify/trigsimp.py"
+  ],
+  "structural_rules": [],
+  "forbidden_patterns": [],
+  "sufficiency_assessment": "The fix is sufficient in a single location. The bug occurs in _TR56._f when it tries to compare rv.exp < 0 without checking if the exponent is real. Adding a guard to skip transformation for non-real exponents will prevent the TypeError. The propagation path shows the error originates from TR6 -> _TR56, so fixing _TR56 addresses the root cause. No changes needed in trigsimp.py as it merely calls the buggy function.",
+  "risks": [
+    "Potential regression: expressions with symbolic real exponents that cannot be determined may skip transformation unnecessarily, but this is safer than raising an error"
+  ]
+}

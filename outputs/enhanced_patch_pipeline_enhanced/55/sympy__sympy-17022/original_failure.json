@@ -1,0 +1,20 @@
+{
+  "original_test_identifiers": [
+    "test_NumPyPrinter"
+  ],
+  "status_map": {
+    "sympy/printing/tests/test_pycode.py:test_NumPyPrinter": "FAILED",
+    "test_numpy_piecewise_regression": "PASSED",
+    "test_PythonCodePrinter": "PASSED",
+    "test_MpmathPrinter": "PASSED",
+    "test_NumPyPrinter": "FAILED",
+    "test_SciPyPrinter": "PASSED",
+    "test_pycode_reserved_words": "PASSED",
+    "test_printmethod": "PASSED",
+    "test_codegen_ast_nodes": "PASSED",
+    "test_issue_14283": "PASSED"
+  },
+  "log_path": "logs/enhanced_patch_pipeline/original-tests/sympy__sympy-17022/test_output.txt",
+  "timed_out": false,
+  "error": null
+}

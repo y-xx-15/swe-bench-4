@@ -1,0 +1,49 @@
+{
+  "root_cause": "The inv_trig_table list in the _print_Function method of LatexPrinter is missing 'acsc' and 'asec'. When inv_trig_style='full' is used, only functions in inv_trig_table get the 'arc' prefix applied. Since acsc and asec are not in the table, they are not recognized as inverse trig functions and print as '\\operatorname{acsc}' and '\\operatorname{asec}' instead of '\\operatorname{arccsc}' and '\\operatorname{arcsec}'.",
+  "affected_components": [
+    {
+      "file": "sympy/printing/latex.py",
+      "symbol": "LatexPrinter._print_Function",
+      "reason": "This method contains the inv_trig_table and handles inverse trig function formatting based on inv_trig_style setting"
+    },
+    {
+      "file": "sympy/printing/latex.py",
+      "symbol": "inv_trig_table",
+      "reason": "This list defines which function names are recognized as inverse trig functions and should receive special formatting. Missing 'acsc' and 'asec' causes the bug."
+    }
+  ],
+  "failing_signal": "AssertionError in test_latex_functions: latex(acsc(x), inv_trig_style='full') returns '\\operatorname{acsc}{\\left (x \\right )}' instead of expected '\\operatorname{arccsc}{\\left (x \\right )}'. Same issue with asec producing 'asec' instead of 'arcsec'.",
+  "propagation_path": "When latex() is called with inv_trig_style='full', _print_Function checks if the function name is in inv_trig_table. Since 'acsc' and 'asec' are not in the list, the style transformation is skipped, and the function falls through to default printing which uses \\operatorname{func} without the 'arc' prefix.",
+  "repair_constraint": "After the fix, inv_trig_table must contain all six inverse trig functions: asin, acos, atan, acsc, asec, acot. The transformation 'arc' + func[1:] must work correctly for all these functions when inv_trig_style='full'. Existing behavior for asin, acos, atan, acot must remain unchanged.",
+  "suggested_repair_scope": [
+    "sympy/printing/latex.py"
+  ],
+  "suspicious_symbols": [
+    "inv_trig_table",
+    "_print_Function",
+    "acsc",
+    "asec",
+    "acot",
+    "inv_trig_style"
+  ],
+  "repair_obligations": [
+    {
+      "id": "test_latex_functions::core::inv_trig_table",
+      "source_symbol": "test_latex_functions",
+      "validation_subject": "inv_trig_table",
+      "why_it_matters": "The inv_trig_table list must include 'acsc' and 'asec' to enable proper inverse trig function handling. Without this, these functions are not recognized and don't receive the 'arc' prefix when inv_trig_style='full'."
+    },
+    {
+      "id": "test_latex_functions::core::inv_trig_style=full for acsc and asec",
+      "source_symbol": "test_latex_functions",
+      "validation_subject": "inv_trig_style=full for acsc and asec",
+      "why_it_matters": "When inv_trig_style='full', latex(acsc(x)) must return '\\operatorname{arccsc}{\\left (x \\right )}' and latex(asec(x)) must return '\\operatorname{arcsec}{\\left (x \\right )}'. This is the core functionality being fixed."
+    },
+    {
+      "id": "test_latex_functions::core::inv_trig_table list completeness",
+      "source_symbol": "test_latex_functions",
+      "validation_subject": "inv_trig_table list completeness",
+      "why_it_matters": "The inv_trig_table must contain all six standard inverse trig functions: asin, acos, atan, acsc, asec, acot. This ensures consistent behavior across all inverse trig functions."
+    }
+  ]
+}

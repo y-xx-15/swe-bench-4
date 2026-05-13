@@ -1,0 +1,27 @@
+{
+  "coverage_check": [
+    {
+      "target_file": "sympy/simplify/fu.py",
+      "action": "modify_region",
+      "justification": "The _TR56 function contains the buggy _f inner function that compares rv.exp < 0 and rv.exp > max without checking if the exponent is real. When the exponent is complex (like I), Python raises TypeError. This edit adds a guard to check if rv.exp.is_real is False before performing comparisons."
+    }
+  ],
+  "edits": [
+    {
+      "target_file": "sympy/simplify/fu.py",
+      "target_symbol": "_TR56__branch",
+      "replacement_mode": "replace_span",
+      "covers_obligations": [
+        "test__TR56::core::rv.exp comparison with 0 in _f function",
+        "test__TR56::core::rv.exp comparison with 0",
+        "test__TR56::core::rv.exp comparison in _TR56 inner function",
+        "test_issue_17137::core::rv.exp comparison with 0 in _f function",
+        "test_issue_17137::core::rv.exp comparison with 0",
+        "test_issue_17137::core::rv.exp comparison in _TR56 inner function"
+      ],
+      "anchor_line_before": "        if not (rv.is_Pow and rv.base.func == f):",
+      "anchor_line_after": "            return rv",
+      "replacement_block": "        if not (rv.is_Pow and rv.base.func == f):\n            return rv\n\n        if rv.exp.is_real is False:\n            return rv"
+    }
+  ]
+}

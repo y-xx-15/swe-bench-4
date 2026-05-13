@@ -1,0 +1,158 @@
+[
+  {
+    "idea": {
+      "title": "trigsimp fails to simplify sin/cos with Rational arguments using angle difference identity",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that trigsimp correctly applies cos(a-b) = cos(a)cos(b) + sin(a)sin(b) identity when arguments are Rational numbers",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_trigsimp_rational_angle_difference"
+      ],
+      "covers_original_tests": [
+        "test_issue_15129_trigsimp_methods"
+      ],
+      "covers_obligations": [
+        "test_issue_15129_trigsimp_methods::core"
+      ],
+      "target_source_symbol": "trigsimp",
+      "target_validation_subject": "cos(a-b) identity simplification with Rational arguments",
+      "semantic_alignment_tokens": [
+        "trigsimp",
+        "sin",
+        "cos",
+        "Rational",
+        "simplify"
+      ],
+      "trigger_shape_tokens": [
+        "sin(Rational",
+        "cos(Rational",
+        "trigsimp("
+      ],
+      "rationale": "The original test checks the core bug: sin(Rational)*sin(Rational) + cos(Rational)*cos(Rational) should simplify to cos(Rational-Rational). This enhanced test isolates the angle-difference identity path with explicit Rational arguments, verifying the exact simplification that fails - converting sin(a)*sin(b) + cos(a)*cos(b) to cos(a-b) when a and b are Rational. The test will fail with AssertionError on buggy code (expression unchanged) and pass on fixed code (expression simplifies to cos(Rational(1, 50) - Rational(1, 25)))."
+    },
+    "patch": "diff --git a/sympy/simplify/tests/test_trigsimp.py b/sympy/simplify/tests/test_trigsimp.py\n--- a/sympy/simplify/tests/test_trigsimp.py\n+++ b/sympy/simplify/tests/test_trigsimp.py\n@@ -4,8 +4,8 @@ from sympy import (\n     Symbol, coth, pi, log, count_ops, sqrt, E, expand, Piecewise)\n \n from sympy.core.compatibility import long\n from sympy.utilities.pytest import XFAIL\n-\n+from sympy import Rational\n from sympy.abc import x, y, z, t, a, b, c, d, e, f, g, h, i, k\n \n \n@@ -361,3 +361,10 @@ def test_issue_2827_trigsimp_methods():\n     eq = 1/sqrt(E) + E\n     assert exptrigsimp(eq) == eq\n \n+\n+def test_sweb_enhanced_trigsimp_rational_angle_difference():\n+    # Test that trigsimp applies cos(a-b) = cos(a)cos(b) + sin(a)sin(b)\n+    # identity when arguments are Rational numbers\n+    r = sin(Rational(1, 50))*sin(Rational(1, 25)) + cos(Rational(1, 50))*cos(Rational(1, 25))\n+    # Should simplify to cos(1/50 - 1/25) = cos(-1/50) = cos(1/50)\n+    assert trigsimp(r) == cos(Rational(1, 50))\n",
+    "raw_response": "\n\nLooking at the bug, the issue is that `trigsimp` fails to simplify `sin(a)*sin(b) + cos(a)*cos(b)` to `cos(a-b)` when `a` and `b` are Rational numbers. The original test uses Matrix.dot() to trigger this, but I can trigger it more directly with a plain expression.\n\nLet me create an enhanced test that exposes the same bug through a different observation angle - directly calling `trigsimp` on the expression without Matrix:\n\n```diff\ndiff --git a/sympy/simplify/tests/test_trigsimp.py b/sympy/simplify/tests/test_trigsimp.py\n--- a/sympy/simplify/tests/test_trigsimp.py\n+++ b/sympy/simplify/tests/test_trigsimp.py\n@@ -4,7 +4,7 @@ from sympy import (\n     Symbol, coth, pi, log, count_ops, sqrt, E, expand, Piecewise)\n \n from sympy.core.compatibility import long\n from sympy.utilities.pytest import XFAIL\n-\n+from sympy import Rational\n from sympy.abc import x, y, z, t, a, b, c, d, e, f, g, h, i, k\n \n \n@@ -361,3 +361,10 @@ def test_issue_2827_trigsimp_methods():\n     eq = 1/sqrt(E) + E\n     assert exptrigsimp(eq) == eq\n \n+\n+def test_sweb_enhanced_trigsimp_rational_angle_difference():\n+    # Test that trigsimp applies cos(a-b) = cos(a)cos(b) + sin(a)sin(b)\n+    # identity when arguments are Rational numbers\n+    r = sin(Rational(1, 50))*sin(Rational(1, 25)) + cos(Rational(1, 50))*cos(Rational(1, 25))\n+    # Should simplify to cos(1/50 - 1/25) = cos(-1/50) = cos(1/50)\n+    assert trigsimp(r) == cos(Rational(1, 50))\n```",
+    "identifiers": [
+      "test_sweb_enhanced_trigsimp_rational_angle_difference"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_trigsimp_rational_angle_difference"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "trigsimp with Rational arguments fails to apply cosine difference identity",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that trigsimp correctly applies the cosine difference identity sin(a)*sin(b) + cos(a)*cos(b) -> cos(a-b) when arguments are Rational numbers",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_trigsimp_rational_cosine_identity"
+      ],
+      "covers_original_tests": [
+        "test_issue_15129_trigsimp_methods"
+      ],
+      "covers_obligations": [
+        "test_issue_15129_trigsimp_methods::core"
+      ],
+      "target_source_symbol": "sympy.simplify.trigsimp.trigsimp",
+      "target_validation_subject": "cosine difference identity simplification with Rational arguments",
+      "semantic_alignment_tokens": [
+        "trigsimp",
+        "cos",
+        "sin",
+        "Rational",
+        "simplify"
+      ],
+      "trigger_shape_tokens": [
+        "sin(Rational",
+        "cos(Rational",
+        "trigsimp(",
+        "AssertionError"
+      ],
+      "rationale": "The original test_issue_15129_trigsimp_methods fails with AssertionError because trigsimp does not apply the cosine difference identity sin(a)*sin(b) + cos(a)*cos(b) -> cos(a-b) when a and b are Rational numbers. This enhanced test directly exercises the same failure by asserting that sin(Rational(1,50))*sin(Rational(1,25)) + cos(Rational(1,50))*cos(Rational(1,25)) should simplify to cos(Rational(1,50) - Rational(1,25)), which is the expected behavior that the bug prevents."
+    },
+    "patch": "diff --git a/sympy/simplify/tests/test_trigsimp.py b/sympy/simplify/tests/test_trigsimp.py\n--- a/sympy/simplify/tests/test_trigsimp.py\n+++ b/sympy/simplify/tests/test_trigsimp.py\n@@ -1,7 +1,8 @@\n from sympy import (\n     symbols, sin, simplify, cos, trigsimp, rad, tan, exptrigsimp,sinh,\n     cosh, diff, cot, Subs, exp, tanh, exp, S, integrate, I,Matrix,\n-    Symbol, coth, pi, log, count_ops, sqrt, E, expand, Piecewise)\n+    Symbol, coth, pi, log, count_ops, sqrt, E, expand, Piecewise,\n+    Rational)\n \n from sympy.core.compatibility import long\n from sympy.utilities.pytest import XFAIL\n@@ -358,6 +359,14 @@ def test_issue_2827_trigsimp_methods():\n     eq = 1/sqrt(E) + E\n     assert exptrigsimp(eq) == eq\n \n+def test_sweb_enhanced_trigsimp_rational_cosine_identity():\n+    # Test cosine difference identity: sin(a)*sin(b) + cos(a)*cos(b) = cos(a-b)\n+    # This should simplify with Rational arguments but fails due to the bug\n+    a = Rational(1, 50)\n+    b = Rational(1, 25)\n+    expr = sin(a)*sin(b) + cos(a)*cos(b)\n+    # The cosine difference identity should reduce this to cos(a - b)\n+    assert trigsimp(expr) == cos(a - b)\n \n def test_exptrigsimp():\n     def valid(a, b):\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Starts with `test_sweb_enhanced_`\n2. Exposes the same bug as `test_issue_15129_trigsimp_methods` (trigsimp failing to apply cosine difference identity with Rational arguments)\n3. Uses a different observation angle than the original test\n\nThe original test uses Matrix.dot(). I'll create a test that directly tests the cosine difference identity `sin(a)*sin(b) + cos(a)*cos(b) -> cos(a-b)` with Rational arguments.\n\n```diff\ndiff --git a/sympy/simplify/tests/test_trigsimp.py b/sympy/simplify/tests/test_trigsimp.py\n--- a/sympy/simplify/tests/test_trigsimp.py\n+++ b/sympy/simplify/tests/test_trigsimp.py\n@@ -1,7 +1,8 @@\n from sympy import (\n     symbols, sin, simplify, cos, trigsimp, rad, tan, exptrigsimp,sinh,\n     cosh, diff, cot, Subs, exp, tanh, exp, S, integrate, I,Matrix,\n-    Symbol, coth, pi, log, count_ops, sqrt, E, expand, Piecewise)\n+    Symbol, coth, pi, log, count_ops, sqrt, E, expand, Piecewise,\n+    Rational)\n \n from sympy.core.compatibility import long\n from sympy.utilities.pytest import XFAIL\n@@ -358,6 +359,14 @@ def test_issue_2827_trigsimp_methods():\n     eq = 1/sqrt(E) + E\n     assert exptrigsimp(eq) == eq\n \n+def test_sweb_enhanced_trigsimp_rational_cosine_identity():\n+    # Test cosine difference identity: sin(a)*sin(b) + cos(a)*cos(b) = cos(a-b)\n+    # This should simplify with Rational arguments but fails due to the bug\n+    a = Rational(1, 50)\n+    b = Rational(1, 25)\n+    expr = sin(a)*sin(b) + cos(a)*cos(b)\n+    # The cosine difference identity should reduce this to cos(a - b)\n+    assert trigsimp(expr) == cos(a - b)\n \n def test_exptrigsimp():\n     def valid(a, b):\n```",
+    "identifiers": [
+      "test_sweb_enhanced_trigsimp_rational_cosine_identity"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_trigsimp_rational_cosine_identity"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "trigsimp fails to simplify sin/cos with Rational arguments using angle difference identity",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that trigsimp correctly applies cos(a-b) = cos(a)cos(b) + sin(a)sin(b) identity when arguments are Rational numbers",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_trigsimp_rational_angle_diff"
+      ],
+      "covers_original_tests": [
+        "test_issue_15129_trigsimp_methods"
+      ],
+      "covers_obligations": [
+        "test_issue_15129_trigsimp_methods::core"
+      ],
+      "target_source_symbol": "sympy.simplify.trigsimp.trigsimp",
+      "target_validation_subject": "trigsimp result for sin/cos product sum with Rational arguments",
+      "semantic_alignment_tokens": [
+        "trigsimp",
+        "sin",
+        "cos",
+        "Rational",
+        "simplify",
+        "assertionerror"
+      ],
+      "trigger_shape_tokens": [
+        "trigsimp(",
+        "sin(Rational",
+        "cos(Rational",
+        "assert"
+      ],
+      "rationale": "This test directly exercises the same failure path as the original test_issue_15129_trigsimp_methods by constructing the exact expression pattern that triggers the bug: sin(Rational)*sin(Rational) + cos(Rational)*cos(Rational). The test verifies that trigsimp correctly applies the cosine angle-difference identity cos(a-b) = cos(a)cos(b) + sin(a)sin(b) when both arguments are Rational numbers. The original test likely asserts the simplified result equals cos(Rational(1,50) - Rational(1,25)), which fails with AssertionError on buggy code because the simplification doesn't occur. This enhanced test makes the assertion explicit and tests the core mathematical identity that should be applied."
+    },
+    "patch": "diff --git a/sympy/simplify/tests/test_trigsimp.py b/sympy/simplify/tests/test_trigsimp.py\n--- a/sympy/simplify/tests/test_trigsimp.py\n+++ b/sympy/simplify/tests/test_trigsimp.py\n@@ -224,2 +224,10 @@ def test_Piecewise():\n     assert trigsimp(Piecewise((e1, e3 < e2), (e3, True))) == \\\n         Piecewise((e1, e3 < s2), (e3, True))\n+\n+def test_sweb_enhanced_trigsimp_rational_angle_diff():\n+    # Test that trigsimp correctly applies cos(a-b) = cos(a)cos(b) + sin(a)sin(b)\n+    # identity when arguments are Rational numbers (issue 15129)\n+    # This is a direct expression test without Matrix.dot() wrapper\n+    r = sin(Rational(1, 50))*sin(Rational(1, 25)) + cos(Rational(1, 50))*cos(Rational(1, 25))\n+    # The expression should simplify to cos(1/50 - 1/25) = cos(-1/50) = cos(1/50)\n+    assert trigsimp(r) == cos(Rational(1, 50))\n",
+    "raw_response": "\n\nLooking at the task, I need to:\n1. Add a new test function starting with `test_sweb_enhanced_` \n2. The test must trigger the same bug (trigsimp failing to simplify sin/cos with Rational arguments)\n3. Use a different observation angle than the original test\n\nThe original test uses Matrix.dot() to create the expression. I'll create a direct test that uses the angle-difference identity directly with Rational arguments.\n\nLet me first check the exact end of the test file to know where to append:\n```bash\ntail -20 sympy/simplify/tests/test_trigsimp.py\n```\n\nNow I'll create the patch:\n```diff\ndiff --git a/sympy/simplify/tests/test_trigsimp.py b/sympy/simplify/tests/test_trigsimp.py\n--- a/sympy/simplify/tests/test_trigsimp.py\n+++ b/sympy/simplify/tests/test_trigsimp.py\n@@ -224,0 +225,11 @@ def test_Piecewise():\n     assert trigsimp(Piecewise((e1, e3 < e2), (e3, True))) == \\\n         Piecewise((e1, e3 < s2), (e3, True))\n+\n+def test_sweb_enhanced_trigsimp_rational_angle_diff():\n+    # Test that trigsimp correctly applies cos(a-b) = cos(a)cos(b) + sin(a)sin(b)\n+    # identity when arguments are Rational numbers (issue 15129)\n+    # This is a direct expression test without Matrix.dot() wrapper\n+    r = sin(Rational(1, 50))*sin(Rational(1, 25)) + cos(Rational(1, 50))*cos(Rational(1, 25))\n+    # The expression should simplify to cos(1/50 - 1/25) = cos(-1/50) = cos(1/50)\n+    assert trigsimp(r) == cos(Rational(1, 50))\n```",
+    "identifiers": [
+      "test_sweb_enhanced_trigsimp_rational_angle_diff"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_trigsimp_rational_angle_diff"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

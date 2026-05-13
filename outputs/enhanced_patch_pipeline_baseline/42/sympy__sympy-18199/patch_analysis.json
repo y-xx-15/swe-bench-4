@@ -1,0 +1,46 @@
+{
+  "root_cause": "The nthroot_mod function does not handle the special case when a % p == 0. In this case, x = 0 is always a valid root (since 0**n = 0 ≡ a mod p when a ≡ 0 mod p), but the algorithm proceeds to compute roots using the general case which fails to return 0.",
+  "affected_components": [
+    {
+      "file": "sympy/ntheory/residue_ntheory.py",
+      "symbol": "nthroot_mod",
+      "reason": "Main function that computes nth roots modulo p. It fails to check for the trivial root x=0 when a % p == 0."
+    },
+    {
+      "file": "sympy/ntheory/residue_ntheory.py",
+      "symbol": "_nthroot_mod1",
+      "reason": "Helper function that computes roots when (p-1) % n == 0. Does not handle a % p == 0 case."
+    },
+    {
+      "file": "sympy/ntheory/residue_ntheory.py",
+      "symbol": "is_nthpow_residue",
+      "reason": "Correctly returns True when a % p == 0, but nthroot_mod doesn't leverage this to return 0 as a root."
+    }
+  ],
+  "failing_signal": "nthroot_mod(17*17, 5, 17) returns None instead of returning 0 (or [0] with all_roots=True). The test expects 0 to be recognized as a valid root when a % p == 0.",
+  "propagation_path": "When a % p == 0, the function calls is_nthpow_residue which correctly returns True, but then the algorithm proceeds to compute roots using _nthroot_mod1 or the extended Euclidean approach. Neither handles the case where a ≡ 0 mod p, so the trivial root x ≡ 0 mod p is never returned.",
+  "repair_constraint": "After the fix, nthroot_mod(a, n, p) must return 0 when a % p == 0, and return [0] when all_roots=True. The fix must preserve existing behavior for all other cases where a % p != 0.",
+  "suggested_repair_scope": [
+    "sympy/ntheory/residue_ntheory.py"
+  ],
+  "suspicious_symbols": [
+    "nthroot_mod",
+    "_nthroot_mod1",
+    "is_nthpow_residue",
+    "_is_nthpow_residue_bign"
+  ],
+  "repair_obligations": [
+    {
+      "id": "RO-1",
+      "source_symbol": "nthroot_mod",
+      "validation_subject": "return value when a % p == 0",
+      "why_it_matters": "When a ≡ 0 (mod p), x ≡ 0 (mod p) is always a solution to x**n ≡ a (mod p) for any n > 0. The function must return 0 (or [0] if all_roots=True) in this case."
+    },
+    {
+      "id": "RO-2",
+      "source_symbol": "nthroot_mod",
+      "validation_subject": "existing behavior for a % p != 0",
+      "why_it_matters": "The fix must not break any existing functionality for cases where a % p != 0."
+    }
+  ]
+}

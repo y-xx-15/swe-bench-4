@@ -1,0 +1,242 @@
+[
+  {
+    "idea": {
+      "title": "nthroot_mod returns None when a % p == 0",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that nthroot_mod correctly returns 0 as a root when a is divisible by p",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_nthroot_mod_zero_root"
+      ],
+      "covers_original_tests": [
+        "test_solve_modular"
+      ],
+      "covers_obligations": [
+        "test_solve_modular::core"
+      ],
+      "target_source_symbol": "nthroot_mod",
+      "target_validation_subject": "return value when a % p == 0",
+      "semantic_alignment_tokens": [
+        "nthroot_mod",
+        "assertionerror",
+        "0 mod p"
+      ],
+      "trigger_shape_tokens": [
+        "nthroot_mod(17*17, 5, 17)",
+        "a % p == 0"
+      ],
+      "rationale": "The original test_solve_modular fails with AssertionError because solveset uses nthroot_mod which does not return 0 as a root when a % p == 0. This test directly exercises the buggy code path in nthroot_mod with the exact case from the problem statement: nthroot_mod(17*17, 5, 17) should return 0 since (0**5) % 17 == 0. The test will fail with AssertionError on the buggy code (returns None) and pass on fixed code (returns 0)."
+    },
+    "patch": "diff --git a/sympy/ntheory/tests/test_residue.py b/sympy/ntheory/tests/test_residue.py\n--- a/sympy/ntheory/tests/test_residue.py\n+++ b/sympy/ntheory/tests/test_residue.py\n@@ -208,2 +208,10 @@ def test_residue():\n     assert discrete_log(*Tuple(*args)) == 687\n     assert discrete_log(*args) == 687\n+\n+\n+def test_sweb_enhanced_nthroot_mod_zero_root():\n+    # Bug: nthroot_mod misses root x = 0 mod p when a % p == 0\n+    # nthroot_mod(17*17, 5, 17) should return 0 since 0**5 % 17 == 0\n+    # The buggy code returns None instead of finding 0 as a root\n+    result = nthroot_mod(17*17, 5, 17)\n+    assert result == 0, f\"Expected 0 as root when a % p == 0, got {result}\"\n",
+    "raw_response": "\n\nLooking at the problem, I need to create an enhanced test that:\n1. Calls `nthroot_mod` with a case where `a % p == 0` (specifically the example from the problem: `nthroot_mod(17*17, 5, 17)`)\n2. The test should FAIL on the buggy code (which returns None) and PASS on fixed code (which should return 0)\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/ntheory/tests/test_residue.py b/sympy/ntheory/tests/test_residue.py\n--- a/sympy/ntheory/tests/test_residue.py\n+++ b/sympy/ntheory/tests/test_residue.py\n@@ -208,0 +209,10 @@ def test_residue():\n     assert discrete_log(*Tuple(*args)) == 687\n     assert discrete_log(*args) == 687\n+\n+\n+def test_sweb_enhanced_nthroot_mod_zero_root():\n+    # Bug: nthroot_mod misses root x = 0 mod p when a % p == 0\n+    # nthroot_mod(17*17, 5, 17) should return 0 since 0**5 % 17 == 0\n+    # The buggy code returns None instead of finding 0 as a root\n+    result = nthroot_mod(17*17, 5, 17)\n+    assert result == 0, f\"Expected 0 as root when a % p == 0, got {result}\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_nthroot_mod_zero_root"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_nthroot_mod_zero_root"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "nthroot_mod missing zero root when a % p == 0",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Verify that nthroot_mod returns 0 as a root when a is divisible by p",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_nthroot_mod_zero_root"
+      ],
+      "covers_original_tests": [
+        "test_solve_modular"
+      ],
+      "covers_obligations": [
+        "test_solve_modular::core"
+      ],
+      "target_source_symbol": "nthroot_mod",
+      "target_validation_subject": "zero root return value",
+      "semantic_alignment_tokens": [
+        "nthroot_mod",
+        "assertionerror",
+        "0 mod p"
+      ],
+      "trigger_shape_tokens": [
+        "nthroot_mod(17*17, 5, 17)",
+        "a % p == 0"
+      ],
+      "rationale": "The original test_solve_modular fails with AssertionError but the specific bug is that nthroot_mod does not return 0 as a root when a % p == 0. This test directly exercises the buggy code path by calling nthroot_mod(17*17, 5, 17) where 17*17 % 17 == 0, expecting 0 to be included in the roots. On buggy code this will fail with AssertionError because 0 is not returned; on fixed code it will pass."
+    },
+    "patch": "diff --git a/sympy/ntheory/tests/test_residue.py b/sympy/ntheory/tests/test_residue.py\n--- a/sympy/ntheory/tests/test_residue.py\n+++ b/sympy/ntheory/tests/test_residue.py\n@@ -208,3 +208,11 @@ def test_residue():\n     args = 5779, 3528, 6215\n     assert discrete_log(*args) == 687\n     assert discrete_log(*Tuple(*args)) == 687\n+\n+\n+def test_sweb_enhanced_nthroot_mod_zero_root():\n+    # Bug: nthroot_mod misses root x = 0 when a % p == 0\n+    # When a is divisible by p, x = 0 is always a root of x**n = a (mod p)\n+    # nthroot_mod(17*17, 5, 17) should include 0 in roots since 17*17 % 17 == 0\n+    result = nthroot_mod(17*17, 5, 17, True)\n+    assert 0 in result, \"nthroot_mod should return 0 as a root when a % p == 0\"\n",
+    "raw_response": "\n\nLooking at the bug description and the original test patch, I need to create an enhanced test that specifically exposes the bug where `nthroot_mod` fails to return 0 as a root when `a % p == 0`.\n\nThe bug is: `nthroot_mod(17*17, 5, 17)` should return 0 as a root since 17*17 % 17 == 0, but it doesn't.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/ntheory/tests/test_residue.py b/sympy/ntheory/tests/test_residue.py\n--- a/sympy/ntheory/tests/test_residue.py\n+++ b/sympy/ntheory/tests/test_residue.py\n@@ -208,0 +209,8 @@ def test_residue():\n     args = 5779, 3528, 6215\n     assert discrete_log(*args) == 687\n     assert discrete_log(*Tuple(*args)) == 687\n+\n+\n+def test_sweb_enhanced_nthroot_mod_zero_root():\n+    # Bug: nthroot_mod misses root x = 0 when a % p == 0\n+    # When a is divisible by p, x = 0 is always a root of x**n = a (mod p)\n+    # nthroot_mod(17*17, 5, 17) should include 0 in roots since 17*17 % 17 == 0\n+    result = nthroot_mod(17*17, 5, 17, True)\n+    assert 0 in result, \"nthroot_mod should return 0 as a root when a % p == 0\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_nthroot_mod_zero_root"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_nthroot_mod_zero_root"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "nthroot_mod returns missing zero root when a % p == 0",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Verify that nthroot_mod correctly returns 0 as a root when a is divisible by p",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_nthroot_mod_zero_root"
+      ],
+      "covers_original_tests": [
+        "test_solve_modular"
+      ],
+      "covers_obligations": [
+        "test_solve_modular::core"
+      ],
+      "target_source_symbol": "nthroot_mod",
+      "target_validation_subject": "zero_root_return",
+      "semantic_alignment_tokens": [
+        "nthroot_mod",
+        "assertionerror",
+        "0 mod p"
+      ],
+      "trigger_shape_tokens": [
+        "nthroot_mod(a, n, p)",
+        "a % p == 0"
+      ],
+      "rationale": "The original test_solve_modular fails with AssertionError because nthroot_mod does not return 0 as a root when a % p == 0. This test directly exercises the buggy code path in nthroot_mod where it should check if a % p == 0 and return 0 as a valid root. The test uses the exact example from the bug report: nthroot_mod(17*17, 5, 17) should return 0 (or include 0 in all_roots) since (17*17) % 17 == 0, making 0 a valid nth root modulo 17."
+    },
+    "patch": "diff --git a/sympy/ntheory/tests/test_residue.py b/sympy/ntheory/tests/test_residue.py\n--- a/sympy/ntheory/tests/test_residue.py\n+++ b/sympy/ntheory/tests/test_residue.py\n@@ -208,0 +209,8 @@\n+def test_sweb_enhanced_nthroot_mod_zero_root():\n+    # Bug: nthroot_mod misses root x = 0 mod p when a % p == 0\n+    # When a % p == 0, then x = 0 is a valid nth root modulo p\n+    # Example from bug report: nthroot_mod(17*17, 5, 17) should have root 0 mod 17\n+    # since (17*17) % 17 == 0, and 0**5 % 17 == 0\n+    result = nthroot_mod(17*17, 5, 17)\n+    assert result == 0 or (isinstance(result, list) and 0 in result), \\\n+        \"nthroot_mod should return 0 as a root when a % p == 0\"\n",
+    "raw_response": "\n\nLooking at the task, I need to create an enhanced test that:\n1. Tests the bug where `nthroot_mod` misses the zero root when `a % p == 0`\n2. Must FAIL on the buggy code (AssertionError)\n3. Must PASS after the fix is applied\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/ntheory/tests/test_residue.py b/sympy/ntheory/tests/test_residue.py\n--- a/sympy/ntheory/tests/test_residue.py\n+++ b/sympy/ntheory/tests/test_residue.py\n@@ -208,0 +209,8 @@\n+def test_sweb_enhanced_nthroot_mod_zero_root():\n+    # Bug: nthroot_mod misses root x = 0 mod p when a % p == 0\n+    # When a % p == 0, then x = 0 is a valid nth root modulo p\n+    # Example from bug report: nthroot_mod(17*17, 5, 17) should have root 0 mod 17\n+    # since (17*17) % 17 == 0, and 0**5 % 17 == 0\n+    result = nthroot_mod(17*17, 5, 17)\n+    assert result == 0 or (isinstance(result, list) and 0 in result), \\\n+        \"nthroot_mod should return 0 as a root when a % p == 0\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_nthroot_mod_zero_root"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_nthroot_mod_zero_root"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "nthroot_mod missing zero root when a % p == 0",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Test that nthroot_mod returns 0 as a root when a is divisible by p, exposing the missing zero-root check",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_nthroot_mod_zero_root"
+      ],
+      "covers_original_tests": [
+        "test_solve_modular"
+      ],
+      "covers_obligations": [
+        "test_solve_modular::core"
+      ],
+      "target_source_symbol": "nthroot_mod",
+      "target_validation_subject": "zero root detection when a % p == 0",
+      "semantic_alignment_tokens": [
+        "nthroot_mod",
+        "assertionerror",
+        "0 mod p"
+      ],
+      "trigger_shape_tokens": [
+        "nthroot_mod(17*17, 5, 17)",
+        "a % p == 0"
+      ],
+      "rationale": "The original test_solve_modular tests solveset which internally calls nthroot_mod. This enhanced test directly exercises nthroot_mod with the specific case where a % p == 0 (i.e., 289 % 17 = 0), which should return 0 as a root since 0^5 = 0 mod 17. The current buggy code fails with AssertionError because it doesn't check for this condition, whereas the fix should return 0 as one of the valid roots."
+    },
+    "patch": "diff --git a/sympy/ntheory/tests/test_residue.py b/sympy/ntheory/tests/test_residue.py\n--- a/sympy/ntheory/tests/test_residue.py\n+++ b/sympy/ntheory/tests/test_residue.py\n@@ -208,2 +208,11 @@ def test_residue():\n     assert discrete_log(*Tuple(*args)) == 687\n     assert discrete_log(*Tuple(*args))\n+\n+\n+def test_sweb_enhanced_nthroot_mod_zero_root():\n+    # Bug: nthroot_mod misses root x = 0 when a % p == 0\n+    # When a is divisible by p, x = 0 is always a root since 0^n = 0 mod p\n+    # nthroot_mod(17*17, 5, 17) should return 0 as one of the roots\n+    # since (17*17) % 17 == 0 and 0^5 % 17 == 0\n+    result = nthroot_mod(17*17, 5, 17, True)\n+    assert 0 in result, \"nthroot_mod should include 0 as a root when a % p == 0\"\n",
+    "raw_response": "\n\nLooking at the bug description and the original test patch, I need to add an enhanced test that specifically tests the case where `a % p == 0` (i.e., when `a` is divisible by `p`), which should return 0 as a root.\n\nThe bug is that `nthroot_mod` doesn't check for the case when `a % p == 0`, which means `x = 0` is a valid root. The example given is `nthroot_mod(17*17, 5, 17)` which should have root `0 mod 17`.\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/ntheory/tests/test_residue.py b/sympy/ntheory/tests/test_residue.py\n--- a/sympy/ntheory/tests/test_residue.py\n+++ b/sympy/ntheory/tests/test_residue.py\n@@ -208,0 +209,8 @@ def test_residue():\n     assert discrete_log(*Tuple(*args)) == 687\n     assert discrete_log(*Tuple(*args))\n+\n+\n+def test_sweb_enhanced_nthroot_mod_zero_root():\n+    # Bug: nthroot_mod misses root x = 0 when a % p == 0\n+    # When a is divisible by p, x = 0 is always a root since 0^n = 0 mod p\n+    # nthroot_mod(17*17, 5, 17) should return 0 as one of the roots\n+    # since (17*17) % 17 == 0 and 0^5 % 17 == 0\n+    result = nthroot_mod(17*17, 5, 17, True)\n+    assert 0 in result, \"nthroot_mod should include 0 as a root when a % p == 0\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_nthroot_mod_zero_root"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_nthroot_mod_zero_root"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "nthroot_mod missing zero root when a % p == 0",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Verify that nthroot_mod returns 0 as a root when a is divisible by p",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_nthroot_mod_zero_root"
+      ],
+      "covers_original_tests": [
+        "test_solve_modular"
+      ],
+      "covers_obligations": [
+        "test_solve_modular::core"
+      ],
+      "target_source_symbol": "nthroot_mod",
+      "target_validation_subject": "zero root when a % p == 0",
+      "semantic_alignment_tokens": [
+        "nthroot_mod",
+        "assertionerror",
+        "0**n == 0 mod p"
+      ],
+      "trigger_shape_tokens": [
+        "nthroot_mod(17*17, 5, 17)",
+        "a % p == 0"
+      ],
+      "rationale": "The original test_solve_modular fails with AssertionError because nthroot_mod does not return 0 as a root when a is divisible by p. This test directly exercises the buggy code path in nthroot_mod where a % p == 0, verifying that 0 should be included in the roots. The test will fail on buggy code (AssertionError) and pass on fixed code."
+    },
+    "patch": "diff --git a/sympy/ntheory/tests/test_residue.py b/sympy/ntheory/tests/test_residue.py\n--- a/sympy/ntheory/tests/test_residue.py\n+++ b/sympy/ntheory/tests/test_residue.py\n@@ -207,3 +207,9 @@ def test_residue():\n     args = 5779, 3528, 6215\n     assert discrete_log(*args) == 687\n     assert discrete_log(*Tuple(*args)) == 687\n+\n+\n+def test_sweb_enhanced_nthroot_mod_zero_root():\n+    # Bug: nthroot_mod misses root 0 when a % p == 0\n+    # nthroot_mod(17*17, 5, 17) should include 0 as a root since 0**5 = 0 mod 17\n+    result = nthroot_mod(17*17, 5, 17, True)\n+    assert 0 in result, \"nthroot_mod should return 0 as a root when a % p == 0\"\n",
+    "raw_response": "\n\nLooking at the problem, I need to create a test that:\n1. Calls `nthroot_mod` with a case where `a % p == 0`\n2. Expects 0 to be included in the roots\n3. This will FAIL on the buggy code (AssertionError) and PASS after the fix\n\nLet me create the unified diff patch:\n```diff\ndiff --git a/sympy/ntheory/tests/test_residue.py b/sympy/ntheory/tests/test_residue.py\n--- a/sympy/ntheory/tests/test_residue.py\n+++ b/sympy/ntheory/tests/test_residue.py\n@@ -207,3 +207,9 @@ def test_residue():\n     args = 5779, 3528, 6215\n     assert discrete_log(*args) == 687\n     assert discrete_log(*Tuple(*args)) == 687\n+\n+\n+def test_sweb_enhanced_nthroot_mod_zero_root():\n+    # Bug: nthroot_mod misses root 0 when a % p == 0\n+    # nthroot_mod(17*17, 5, 17) should include 0 as a root since 0**5 = 0 mod 17\n+    result = nthroot_mod(17*17, 5, 17, True)\n+    assert 0 in result, \"nthroot_mod should return 0 as a root when a % p == 0\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_nthroot_mod_zero_root"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_nthroot_mod_zero_root"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

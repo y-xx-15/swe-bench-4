@@ -1,0 +1,174 @@
+[
+  {
+    "idea": {
+      "title": "BlockMatrix with ZeroMatrix blocks should preserve ZeroMatrix type after multiplication",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Verify that ZeroMatrix blocks in a BlockMatrix remain ZeroMatrix type after _blockmul operations, not converted to scalar Zero",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_blockmul_zeromatrix_preservation"
+      ],
+      "covers_original_tests": [
+        "test_zero_matrix_add"
+      ],
+      "covers_obligations": [
+        "test_zero_matrix_add::core"
+      ],
+      "target_source_symbol": "sympy.matrices.expressions.matadd.MatAdd",
+      "target_validation_subject": "ZeroMatrix type preservation in MatAdd result",
+      "semantic_alignment_tokens": [
+        "MatAdd",
+        "ZeroMatrix",
+        "MatAdd.doit",
+        "is_ZeroMatrix"
+      ],
+      "trigger_shape_tokens": [
+        "MatAdd(",
+        "ZeroMatrix",
+        ".doit()",
+        "is_ZeroMatrix"
+      ],
+      "rationale": "The original test_zero_matrix_add tests MatAdd with ZeroMatrix but may not explicitly verify that the result preserves ZeroMatrix type. This enhanced test explicitly checks that after MatAdd(ZeroMatrix, other_matrix).doit(), the resulting blocks remain ZeroMatrix instances with proper shape attributes (.rows, .cols), not scalar Zero objects. This directly exposes the bug where ZeroMatrix gets converted to Zero scalar, which lacks the .cols attribute needed for block dimension calculations."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_matadd.py b/sympy/matrices/expressions/tests/test_matadd.py\n--- a/sympy/matrices/expressions/tests/test_matadd.py\n+++ b/sympy/matrices/expressions/tests/test_matadd.py\n@@ -1,7 +1,8 @@\n from sympy.matrices.expressions import MatrixSymbol, MatAdd, MatPow, MatMul\n-from sympy.matrices.expressions.matexpr import GenericZeroMatrix\n+from sympy.matrices.expressions.matexpr import GenericZeroMatrix, ZeroMatrix\n from sympy.matrices import eye, ImmutableMatrix\n-from sympy.core import Basic, S\n+from sympy.core import Add, Basic, S\n+from sympy.utilities.pytest import raises\n \n X = MatrixSymbol('X', 2, 2)\n Y = MatrixSymbol('Y', 2, 2)\n@@ -31,4 +32,22 @@ def test_doit_args():\n \n def test_generic_identity():\n     assert MatAdd.identity == GenericZeroMatrix()\n     assert MatAdd.identity != S.Zero\n+\n+\n+def test_sweb_enhanced_zeromatrix_type_preservation():\n+    # Test that ZeroMatrix type is preserved after MatAdd.doit()\n+    # This exposes the bug where ZeroMatrix gets converted to scalar Zero\n+    # which lacks .rows and .cols attributes needed for block calculations\n+    z = ZeroMatrix(2, 2)\n+    result = MatAdd(z, z).doit()\n+    # The result must be a ZeroMatrix, not scalar Zero\n+    assert hasattr(result, 'rows'), \"Result should have 'rows' attribute\"\n+    assert hasattr(result, 'cols'), \"Result should have 'cols' attribute\"\n+    assert result.rows == 2\n+    assert result.cols == 2\n+    assert result.is_ZeroMatrix is True\n+    # Verify direct Add also preserves ZeroMatrix type\n+    direct_add = Add(z, z)\n+    assert hasattr(direct_add, 'is_ZeroMatrix')\n+    raises(TypeError, lambda: Add(0, ZeroMatrix(2, 2)))\ndiff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -3,7 +3,7 @@\n     BlockMatrix, bc_dist, bc_matadd, bc_transpose, bc_inverse,\n     blockcut, reblock_2x2, deblock)\n from sympy.matrices.expressions import (MatrixSymbol, Identity,\n-        Inverse, trace, Transpose, det)\n+        Inverse, trace, Transpose, det, ZeroMatrix)\n from sympy.matrices import (\n     Matrix, ImmutableMatrix, ImmutableSparseMatrix)\n from sympy.core import Tuple, symbols, Expr\n@@ -241,5 +241,24 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_transpose(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_inverse(Inverse(bm1)).__class__ == BlockDiagMatrix\n+\n+\n+def test_sweb_enhanced_blockmul_zeromatrix_preservation():\n+    # Test that ZeroMatrix blocks remain ZeroMatrix type after _blockmul\n+    # The bug converts ZeroMatrix to scalar Zero which lacks .cols attribute\n+    a = MatrixSymbol(\"a\", 2, 2)\n+    z = ZeroMatrix(2, 2)\n+    b = BlockMatrix([[a, z], [z, z]])\n+    # First multiplication should work\n+    b2 = b._blockmul(b)\n+    # Verify the zero blocks preserve ZeroMatrix type (not scalar Zero)\n+    assert b2.blocks[0, 1].is_ZeroMatrix is not False\n+    assert hasattr(b2.blocks[0, 1], 'cols'), \"Zero block should have 'cols' attribute\"\n+    # Second multiplication exposes the bug\n+    b3 = b2._blockmul(b)\n+    assert b3.blocks[0, 1].is_ZeroMatrix is not False\n+    assert hasattr(b3.blocks[0, 1], 'cols'), \"Zero block should have 'cols' attribute after second mul\"\n+    assert b3.blocks[0, 1].cols == 2\n+    assert b3.blocks[0, 1].rows == 2\n",
+    "raw_response": "\n\nLooking at the problem, I need to create an enhanced test that:\n1. Triggers the bug via the `.doit()` attribute path as specified\n2. Explicitly verifies ZeroMatrix type preservation after MatAdd operations\n3. Fails on the buggy code (where ZeroMatrix gets converted to scalar Zero)\n\nLet me create the patch:\ndiff --git a/sympy/matrices/expressions/tests/test_matadd.py b/sympy/matrices/expressions/tests/test_matadd.py\n--- a/sympy/matrices/expressions/tests/test_matadd.py\n+++ b/sympy/matrices/expressions/tests/test_matadd.py\n@@ -1,7 +1,8 @@\n from sympy.matrices.expressions import MatrixSymbol, MatAdd, MatPow, MatMul\n-from sympy.matrices.expressions.matexpr import GenericZeroMatrix\n+from sympy.matrices.expressions.matexpr import GenericZeroMatrix, ZeroMatrix\n from sympy.matrices import eye, ImmutableMatrix\n-from sympy.core import Basic, S\n+from sympy.core import Add, Basic, S\n+from sympy.utilities.pytest import raises\n \n X = MatrixSymbol('X', 2, 2)\n Y = MatrixSymbol('Y', 2, 2)\n@@ -31,3 +32,17 @@ def test_doit_args():\n \n def test_generic_identity():\n     assert MatAdd.identity == GenericZeroMatrix()\n     assert MatAdd.identity != S.Zero\n+\n+\n+def test_sweb_enhanced_zeromatrix_type_preservation():\n+    # Test that ZeroMatrix type is preserved after MatAdd.doit()\n+    # This exposes the bug where ZeroMatrix gets converted to scalar Zero\n+    # which lacks .rows and .cols attributes needed for block calculations\n+    z = ZeroMatrix(2, 2)\n+    result = MatAdd(z, z).doit()\n+    # The result must be a ZeroMatrix, not scalar Zero\n+    assert hasattr(result, 'rows'), \"Result should have 'rows' attribute\"\n+    assert hasattr(result, 'cols'), \"Result should have 'cols' attribute\"\n+    assert result.rows == 2\n+    assert result.cols == 2\n+    assert result.is_ZeroMatrix is True\n+    # Verify direct Add also preserves ZeroMatrix type\n+    direct_add = Add(z, z)\n+    assert hasattr(direct_add, 'is_ZeroMatrix')\n+    raises(TypeError, lambda: Add(0, ZeroMatrix(2, 2)))\ndiff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -3,7 +3,7 @@\n     BlockMatrix, bc_dist, bc_matadd, bc_transpose, bc_inverse,\n     blockcut, reblock_2x2, deblock)\n from sympy.matrices.expressions import (MatrixSymbol, Identity,\n-        Inverse, trace, Transpose, det)\n+        Inverse, trace, Transpose, det, ZeroMatrix)\n from sympy.matrices import (\n     Matrix, ImmutableMatrix, ImmutableSparseMatrix)\n from sympy.core import Tuple, symbols, Expr\n@@ -241,3 +241,14 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_transpose(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_inverse(Inverse(bm1)).__class__ == BlockDiagMatrix\n+\n+\n+def test_sweb_enhanced_blockmul_zeromatrix_preservation():\n+    # Test that ZeroMatrix blocks remain ZeroMatrix type after _blockmul\n+    # The bug converts ZeroMatrix to scalar Zero which lacks .cols attribute\n+    a = MatrixSymbol(\"a\", 2, 2)\n+    z = ZeroMatrix(2, 2)\n+    b = BlockMatrix([[a, z], [z, z]])\n+    # First multiplication should work\n+    b2 = b._blockmul(b)\n+    # Verify the zero blocks preserve ZeroMatrix type (not scalar Zero)\n+    assert b2.blocks[0, 1].is_ZeroMatrix is not False\n+    assert hasattr(b2.blocks[0, 1], 'cols'), \"Zero block should have 'cols' attribute\"\n+    # Second multiplication exposes the bug\n+    b3 = b2._blockmul(b)\n+    assert b3.blocks[0, 1].is_ZeroMatrix is not False\n+    assert hasattr(b3.blocks[0, 1], 'cols'), \"Zero block should have 'cols' attribute after second mul\"\n+    assert b3.blocks[0, 1].cols == 2\n+    assert b3.blocks[0, 1].rows == 2\n",
+    "identifiers": [
+      "test_sweb_enhanced_zeromatrix_type_preservation",
+      "test_sweb_enhanced_blockmul_zeromatrix_preservation"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_zeromatrix_type_preservation",
+      "test_sweb_enhanced_blockmul_zeromatrix_preservation"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_zero_matrix_add is not semantically aligned with its original failure path. Expected source symbol 'test_zero_matrix_add' and alignment tokens ['valueerror', 'assertionerror'], but the current content targets 'sympy.matrices.expressions.matadd.MatAdd' with tokens ['MatAdd', 'ZeroMatrix', 'MatAdd.doit', 'is_ZeroMatrix']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_zero_matrix_add"
+    ],
+    "covered_obligations": [
+      "test_zero_matrix_add::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "BlockMatrix multiplication preserves ZeroMatrix type in result blocks",
+      "semantic_bucket": "structural_invariant",
+      "goal": "Verify that after block multiplication, ZeroMatrix blocks remain ZeroMatrix type rather than becoming scalar Zero",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "invalid_value_boundary",
+      "target_tests": [
+        "test_sweb_enhanced_blockmatrix_zeromatrix_preservation"
+      ],
+      "covers_original_tests": [
+        "test_issue_17624",
+        "test_zero_matrix_add"
+      ],
+      "covers_obligations": [
+        "test_issue_17624::core",
+        "test_zero_matrix_add::core"
+      ],
+      "target_source_symbol": "BlockMatrix._blockmul",
+      "target_validation_subject": "block type after multiplication",
+      "semantic_alignment_tokens": [
+        "ZeroMatrix",
+        "BlockMatrix",
+        "_blockmul",
+        "colblocksizes",
+        "blocks"
+      ],
+      "trigger_shape_tokens": [
+        "blocks[0, i].cols",
+        "ZeroMatrix(2, 2)",
+        "block_collapse(b * b * b)"
+      ],
+      "rationale": "The original tests trigger the bug through block_collapse and _blockmul. This enhanced test explicitly validates the structural invariant that ZeroMatrix blocks must remain ZeroMatrix type after block multiplication operations, not degrade to scalar Zero. The test checks the type of individual blocks in the result matrix to ensure they preserve ZeroMatrix rather than becoming Zero scalars which lack the .cols attribute needed by colblocksizes."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -4,7 +4,7 @@\n     BlockMatrix, bc_dist, bc_matadd, bc_transpose, bc_inverse,\n     blockcut, reblock_2x2, deblock)\n from sympy.matrices.expressions import (MatrixSymbol, Identity,\n-        Inverse, trace, Transpose, det)\n+        Inverse, trace, Transpose, det, ZeroMatrix)\n from sympy.matrices import (\n     Matrix, ImmutableMatrix, ImmutableSparseMatrix)\n from sympy.core import Tuple, symbols, Expr\n@@ -241,5 +241,27 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_transpose(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_inverse(Inverse(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockmatrix_zeromatrix_preservation():\n+    # Test that BlockMatrix multiplication preserves ZeroMatrix type in result blocks\n+    # rather than degrading to scalar Zero (which lacks .cols attribute).\n+    # This is a different observation angle: explicitly check block types.\n+    a = MatrixSymbol(\"a\", 2, 2)\n+    z = ZeroMatrix(2, 2)\n+    b = BlockMatrix([[a, z], [z, z]])\n+    \n+    # First multiplication - should work\n+    b2 = b._blockmul(b)\n+    \n+    # Verify that zero blocks remain ZeroMatrix type, not scalar Zero\n+    # The bug causes them to become sympy.core.numbers.Zero which lacks .cols\n+    assert b2.blocks[0, 1].is_ZeroMatrix, \"Block at [0,1] should be ZeroMatrix, not scalar Zero\"\n+    assert b2.blocks[1, 0].is_ZeroMatrix, \"Block at [1,0] should be ZeroMatrix, not scalar Zero\"\n+    assert b2.blocks[1, 1].is_ZeroMatrix, \"Block at [1,1] should be ZeroMatrix, not scalar Zero\"\n+    \n+    # This is the critical test: accessing colblocksizes should work\n+    # because ZeroMatrix has .cols but scalar Zero does not\n+    col_sizes = b2.colblocksizes\n+    assert col_sizes == [2, 2], \"Column block sizes should be preserved\"\n",
+    "raw_response": "\n\nLooking at this task, I need to create an enhanced test that:\n1. Exposes the same bug (BlockMatrix multiplication with ZeroMatrix blocks)\n2. Uses a different observation angle (explicitly checking block types after multiplication)\n3. Fails on the buggy code but would pass after the fix\n\nThe bug is that after `_blockmul`, ZeroMatrix blocks become scalar Zero (which lacks `.cols` attribute), causing the AttributeError when `colblocksizes` tries to access them.\n\nLet me create the enhanced test:\n```diff\ndiff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -4,7 +4,7 @@\n     BlockMatrix, bc_dist, bc_matadd, bc_transpose, bc_inverse,\n     blockcut, reblock_2x2, deblock)\n from sympy.matrices.expressions import (MatrixSymbol, Identity,\n-        Inverse, trace, Transpose, det)\n+        Inverse, trace, Transpose, det, ZeroMatrix)\n from sympy.matrices import (\n     Matrix, ImmutableMatrix, ImmutableSparseMatrix)\n from sympy.core import Tuple, symbols, Expr\n@@ -241,3 +241,17 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_transpose(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_inverse(Inverse(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockmatrix_zeromatrix_preservation():\n+    # Test that BlockMatrix multiplication preserves ZeroMatrix type in result blocks\n+    # rather than degrading to scalar Zero (which lacks .cols attribute).\n+    # This is a different observation angle: explicitly check block types.\n+    a = MatrixSymbol(\"a\", 2, 2)\n+    z = ZeroMatrix(2, 2)\n+    b = BlockMatrix([[a, z], [z, z]])\n+    \n+    # First multiplication - should work\n+    b2 = b._blockmul(b)\n+    \n+    # Verify that zero blocks remain ZeroMatrix type, not scalar Zero\n+    # The bug causes them to become sympy.core.numbers.Zero which lacks .cols\n+    assert b2.blocks[0, 1].is_ZeroMatrix, \"Block at [0,1] should be ZeroMatrix, not scalar Zero\"\n+    assert b2.blocks[1, 0].is_ZeroMatrix, \"Block at [1,0] should be ZeroMatrix, not scalar Zero\"\n+    assert b2.blocks[1, 1].is_ZeroMatrix, \"Block at [1,1] should be ZeroMatrix, not scalar Zero\"\n+    \n+    # This is the critical test: accessing colblocksizes should work\n+    # because ZeroMatrix has .cols but scalar Zero does not\n+    col_sizes = b2.colblocksizes\n+    assert col_sizes == [2, 2], \"Column block sizes should be preserved\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_blockmatrix_zeromatrix_preservation"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blockmatrix_zeromatrix_preservation"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_issue_17624 is not semantically aligned with its original failure path. Expected source symbol 'test_issue_17624' and alignment tokens ['valueerror', 'assertionerror'], but the current content targets 'BlockMatrix._blockmul' with tokens ['ZeroMatrix', 'BlockMatrix', '_blockmul', 'colblocksizes', 'blocks']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_issue_17624",
+      "test_zero_matrix_add"
+    ],
+    "covered_obligations": [
+      "test_issue_17624::core",
+      "test_zero_matrix_add::core"
+    ]
+  },
+  {
+    "idea": {
+      "title": "BlockMatrix multiplication preserves ZeroMatrix block types after repeated operations",
+      "semantic_bucket": "structural_invariant",
+      "goal": "Verify that ZeroMatrix blocks in BlockMatrix remain ZeroMatrix type (not scalar Zero) after block multiplication, preventing AttributeError on subsequent operations",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "normalization_contract",
+      "target_tests": [
+        "test_sweb_enhanced_blockmul_zeromatrix_preservation"
+      ],
+      "covers_original_tests": [
+        "test_issue_17624"
+      ],
+      "covers_obligations": [
+        "test_issue_17624::core"
+      ],
+      "target_source_symbol": "BlockMatrix._blockmul",
+      "target_validation_subject": "block type preservation in multiplication result",
+      "semantic_alignment_tokens": [
+        "ZeroMatrix",
+        "BlockMatrix",
+        "_blockmul",
+        "colblocksizes",
+        "AttributeError"
+      ],
+      "trigger_shape_tokens": [
+        "ZeroMatrix",
+        "blocks[",
+        ".cols",
+        "_blockmul"
+      ],
+      "rationale": "The original test_issue_17624 triggers the bug through block_collapse(b*b*b). This idea directly tests the structural invariant that block matrix multiplication must preserve ZeroMatrix type for zero blocks, not convert them to scalar Zero. The bug manifests when colblocksizes property tries to access .cols on a scalar Zero object. This test explicitly checks the type of resulting blocks after _blockmul to ensure ZeroMatrix is preserved, which is the core structural invariant that must hold."
+    },
+    "patch": "diff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -3,7 +3,7 @@\n     BlockMatrix, bc_dist, bc_matadd, bc_transpose, bc_inverse,\n     blockcut, reblock_2x2, deblock)\n from sympy.matrices.expressions import (MatrixSymbol, Identity,\n-        Inverse, trace, Transpose, det)\n+        Inverse, trace, Transpose, det, ZeroMatrix)\n from sympy.matrices import (\n     Matrix, ImmutableMatrix, ImmutableSparseMatrix)\n from sympy.core import Tuple, symbols, Expr\n@@ -241,5 +241,20 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_transpose(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_inverse(Inverse(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockmul_zeromatrix_preservation():\n+    # Test that _blockmul preserves ZeroMatrix type for zero blocks\n+    # The bug causes ZeroMatrix blocks to become scalar Zero after first mul,\n+    # which triggers AttributeError when colblocksizes accesses .cols\n+    a = MatrixSymbol(\"a\", 2, 2)\n+    z = ZeroMatrix(2, 2)\n+    b = BlockMatrix([[a, z], [z, z]])\n+    \n+    # First multiplication - verify block types are preserved\n+    b_mul = b._blockmul(b)\n+    # The zero blocks must remain ZeroMatrix, not become scalar Zero\n+    assert b_mul.blocks[0, 1].is_ZeroMatrix, \"Zero block became scalar Zero after first _blockmul\"\n+    assert b_mul.blocks[1, 0].is_ZeroMatrix, \"Zero block became scalar Zero after first _blockmul\"\n+    assert b_mul.blocks[1, 1].is_ZeroMatrix, \"Zero block became scalar Zero after first _blockmul\"\n",
+    "raw_response": "\n\nLooking at the bug and the original tests, I need to create an enhanced test that:\n1. Tests the same bug from a different angle (directly checking block types after `_blockmul`)\n2. Fails on the buggy code (because ZeroMatrix becomes scalar Zero)\n3. Passes on the fixed code\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/matrices/expressions/tests/test_blockmatrix.py b/sympy/matrices/expressions/tests/test_blockmatrix.py\n--- a/sympy/matrices/expressions/tests/test_blockmatrix.py\n+++ b/sympy/matrices/expressions/tests/test_blockmatrix.py\n@@ -3,7 +3,7 @@\n     BlockMatrix, bc_dist, bc_matadd, bc_transpose, bc_inverse,\n     blockcut, reblock_2x2, deblock)\n from sympy.matrices.expressions import (MatrixSymbol, Identity,\n-        Inverse, trace, Transpose, det)\n+        Inverse, trace, Transpose, det, ZeroMatrix)\n from sympy.matrices import (\n     Matrix, ImmutableMatrix, ImmutableSparseMatrix)\n from sympy.core import Tuple, symbols, Expr\n@@ -241,3 +241,18 @@ def test_block_collapse_type():\n     assert block_collapse(bm1 - bm2).__class__ == BlockDiagMatrix\n     assert block_collapse(Inverse(bm1)).__class__ == BlockDiagMatrix\n     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_transpose(Transpose(bm1)).__class__ == BlockDiagMatrix\n     assert bc_inverse(Inverse(bm1)).__class__ == BlockDiagMatrix\n+\n+def test_sweb_enhanced_blockmul_zeromatrix_preservation():\n+    # Test that _blockmul preserves ZeroMatrix type for zero blocks\n+    # The bug causes ZeroMatrix blocks to become scalar Zero after first mul,\n+    # which triggers AttributeError when colblocksizes accesses .cols\n+    a = MatrixSymbol(\"a\", 2, 2)\n+    z = ZeroMatrix(2, 2)\n+    b = BlockMatrix([[a, z], [z, z]])\n+    \n+    # First multiplication - verify block types are preserved\n+    b_mul = b._blockmul(b)\n+    # The zero blocks must remain ZeroMatrix, not become scalar Zero\n+    assert b_mul.blocks[0, 1].is_ZeroMatrix, \"Zero block became scalar Zero after first _blockmul\"\n+    assert b_mul.blocks[1, 0].is_ZeroMatrix, \"Zero block became scalar Zero after first _blockmul\"\n+    assert b_mul.blocks[1, 1].is_ZeroMatrix, \"Zero block became scalar Zero after first _blockmul\"\n```",
+    "identifiers": [
+      "test_sweb_enhanced_blockmul_zeromatrix_preservation"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_blockmul_zeromatrix_preservation"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "The claimed coverage for test_issue_17624 is not semantically aligned with its original failure path. Expected source symbol 'test_issue_17624' and alignment tokens ['valueerror', 'assertionerror'], but the current content targets 'BlockMatrix._blockmul' with tokens ['ZeroMatrix', 'BlockMatrix', '_blockmul', 'colblocksizes', 'AttributeError']. Revise the idea so it exercises the same API path and exception semantics as the original failure.",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": [
+      "test_issue_17624"
+    ],
+    "covered_obligations": [
+      "test_issue_17624::core"
+    ]
+  }
+]

@@ -1,0 +1,246 @@
+[
+  {
+    "idea": {
+      "title": "RR/CC polynomial ring domain preprocessing",
+      "semantic_bucket": "direct_symptom",
+      "goal": "test that polynomial ring domains with RR/CC ground domains are correctly parsed",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_Domain_preprocess_rr_cc_polynomial"
+      ],
+      "covers_original_tests": [
+        "test_Domain_preprocess"
+      ],
+      "covers_obligations": [
+        "test_Domain_preprocess::core"
+      ],
+      "target_source_symbol": "Domain.preprocess",
+      "target_validation_subject": "domain specification string parsing",
+      "semantic_alignment_tokens": [
+        "Domain.preprocess",
+        "OptionError",
+        "domain="
+      ],
+      "trigger_shape_tokens": [
+        "Domain.preprocess",
+        "RR[y,z]",
+        "CC[x]"
+      ],
+      "rationale": "The original test_Domain_preprocess tests polynomial ring domains like 'Z[x]' and 'Q[x,y]' but only with Z/ZZ/Q/QQ ground domains. The bug is that RR/CC as ground domains (e.g., 'RR[y,z]') are not recognized, causing OptionError. This enhanced test directly exercises the missing case by testing RR and CC polynomial ring domains, which should work but currently fail with OptionError. The test will fail on buggy code (OptionError raised) and pass on fixed code (domain correctly parsed to RR[y,z] or CC[x] domain object)."
+    },
+    "patch": "diff --git a/sympy/polys/tests/test_polyoptions.py b/sympy/polys/tests/test_polyoptions.py\n--- a/sympy/polys/tests/test_polyoptions.py\n+++ b/sympy/polys/tests/test_polyoptions.py\n@@ -6,7 +6,7 @@\n     Frac, Formal, Polys, Include, All, Gen, Symbols, Method)\n \n from sympy.polys.orderings import lex\n-from sympy.polys.domains import FF, GF, ZZ, QQ, EX\n+from sympy.polys.domains import FF, GF, ZZ, QQ, RR, CC, EX\n \n from sympy.polys.polyerrors import OptionError, GeneratorsError\n \n@@ -269,4 +269,13 @@ def test_Method_postprocess():\n     opt = {'method': 'f5b'}\n     Method.postprocess(opt)\n \n     assert opt == {'method': 'f5b'}\n+\n+\n+def test_sweb_enhanced_Domain_preprocess_rr_cc_polynomial():\n+    # Test RR and CC polynomial ring domains - these should work but currently fail\n+    # This is the bug: Poly(domain='RR[y,z]') raises OptionError\n+    assert Domain.preprocess('RR[x]') == RR[x]\n+    assert Domain.preprocess('CC[x]') == CC[x]\n+    assert Domain.preprocess('RR[y,z]') == RR[y, z]\n+    assert Domain.preprocess('CC[x,y]') == CC[x, y]\n",
+    "raw_response": "\n\nLooking at the bug and the test file, I need to create an enhanced test that:\n1. Tests RR and CC polynomial ring domains (e.g., 'RR[y,z]', 'CC[x]')\n2. Uses the `Domain.preprocess` attribute path as specified\n3. Will FAIL on buggy code (raise OptionError) and PASS on fixed code\n\nThe bug is that the regex `_re_polynomial = re.compile(r\"^(Z|ZZ|Q|QQ)\\[(.+)\\]$\")` only handles Z/ZZ/Q/QQ, not RR/CC.\n\n```diff\ndiff --git a/sympy/polys/tests/test_polyoptions.py b/sympy/polys/tests/test_polyoptions.py\n--- a/sympy/polys/tests/test_polyoptions.py\n+++ b/sympy/polys/tests/test_polyoptions.py\n@@ -6,7 +6,7 @@\n     Frac, Formal, Polys, Include, All, Gen, Symbols, Method)\n \n from sympy.polys.orderings import lex\n-from sympy.polys.domains import FF, GF, ZZ, QQ, EX\n+from sympy.polys.domains import FF, GF, ZZ, QQ, RR, CC, EX\n \n from sympy.polys.polyerrors import OptionError, GeneratorsError\n \n@@ -269,3 +269,13 @@ def test_Method_postprocess():\n     opt = {'method': 'f5b'}\n     Method.postprocess(opt)\n \n     assert opt == {'method': 'f5b'}\n+\n+\n+def test_sweb_enhanced_Domain_preprocess_rr_cc_polynomial():\n+    # Test RR and CC polynomial ring domains - these should work but currently fail\n+    # This is the bug: Poly(domain='RR[y,z]') raises OptionError\n+    assert Domain.preprocess('RR[x]') == RR[x]\n+    assert Domain.preprocess('CC[x]') == CC[x]\n+    assert Domain.preprocess('RR[y,z]') == RR[y, z]\n+    assert Domain.preprocess('CC[x,y]') == CC[x, y]\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Domain_preprocess_rr_cc_polynomial"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Domain_preprocess_rr_cc_polynomial"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 1,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Domain preprocessing for polynomial rings over real/complex fields",
+      "semantic_bucket": "behavioral_consequence",
+      "goal": "Test that Domain.preprocess accepts polynomial ring specifications over RR and CC domains like 'RR[y,z]' and 'CC[x]'",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_Domain_preprocess_rr_cc_polynomial"
+      ],
+      "covers_original_tests": [
+        "test_Domain_preprocess"
+      ],
+      "covers_obligations": [
+        "test_Domain_preprocess::core"
+      ],
+      "target_source_symbol": "Domain.preprocess",
+      "target_validation_subject": "domain specification string parsing",
+      "semantic_alignment_tokens": [
+        "Domain.preprocess",
+        "OptionError",
+        "RR[",
+        "CC["
+      ],
+      "trigger_shape_tokens": [
+        "Domain.preprocess",
+        "RR[y,z]",
+        "domain="
+      ],
+      "rationale": "The original test covers polynomial rings over Z/ZZ and Q/QQ but not over real (RR) or complex (CC) fields. The bug is that 'RR[y,z]' raises OptionError because the regex _re_polynomial only matches 'Z', 'ZZ', 'Q', 'QQ' as ground domains. This test adds coverage for the missing RR[x,y] and CC[x,y] domain specifications, which is a distinct repair obligation from the already-covered Z/Q polynomial rings."
+    },
+    "patch": "diff --git a/sympy/polys/tests/test_polyoptions.py b/sympy/polys/tests/test_polyoptions.py\n--- a/sympy/polys/tests/test_polyoptions.py\n+++ b/sympy/polys/tests/test_polyoptions.py\n@@ -6,7 +6,7 @@\n     Frac, Formal, Polys, Include, All, Gen, Symbols, Method)\n \n from sympy.polys.orderings import lex\n-from sympy.polys.domains import FF, GF, ZZ, QQ, EX\n+from sympy.polys.domains import FF, GF, ZZ, QQ, RR, CC, EX\n \n from sympy.polys.polyerrors import OptionError, GeneratorsError\n \n@@ -276,0 +277,12 @@\n+def test_sweb_enhanced_Domain_preprocess_rr_cc_polynomial():\n+    # Test polynomial ring specifications over real (RR) and complex (CC) fields\n+    # This is a different angle from the original test - testing multi-variable\n+    # polynomial rings over RR/CC, which is needed for cases like:\n+    # Poly(1.2*x*y*z, x, domain='RR[y,z]')\n+    # The bug is that _re_polynomial only matches Z/ZZ/Q/QQ as ground domains\n+    assert Domain.preprocess('RR[x,y]') == RR[x, y]\n+    assert Domain.preprocess('CC[x,y]') == CC[x, y]\n+    assert Domain.preprocess('RR[y,z]') == RR[y, z]\n+    assert Domain.preprocess('CC[x,y,z]') == CC[x, y, z]\n+\n+\n",
+    "raw_response": "\n\nLooking at the bug, the issue is that `Domain.preprocess` doesn't handle polynomial ring specifications over RR (real) and CC (complex) domains like 'RR[y,z]' or 'CC[x]'. The regex `_re_polynomial` only matches 'Z', 'ZZ', 'Q', 'QQ' as ground domains.\n\nThe original test patch adds tests for single-variable polynomial rings over RR and CC. I'll create an enhanced test that tests multi-variable polynomial rings over RR and CC, which is a different angle - testing the boundary condition with multiple generators.\n\n```diff\ndiff --git a/sympy/polys/tests/test_polyoptions.py b/sympy/polys/tests/test_polyoptions.py\n--- a/sympy/polys/tests/test_polyoptions.py\n+++ b/sympy/polys/tests/test_polyoptions.py\n@@ -6,7 +6,7 @@\n     Frac, Formal, Polys, Include, All, Gen, Symbols, Method)\n \n from sympy.polys.orderings import lex\n-from sympy.polys.domains import FF, GF, ZZ, QQ, EX\n+from sympy.polys.domains import FF, GF, ZZ, QQ, RR, CC, EX\n \n from sympy.polys.polyerrors import OptionError, GeneratorsError\n \n@@ -276,0 +277,12 @@\n+def test_sweb_enhanced_Domain_preprocess_rr_cc_polynomial():\n+    # Test polynomial ring specifications over real (RR) and complex (CC) fields\n+    # This is a different angle from the original test - testing multi-variable\n+    # polynomial rings over RR/CC, which is needed for cases like:\n+    # Poly(1.2*x*y*z, x, domain='RR[y,z]')\n+    # The bug is that _re_polynomial only matches Z/ZZ/Q/QQ as ground domains\n+    assert Domain.preprocess('RR[x,y]') == RR[x, y]\n+    assert Domain.preprocess('CC[x,y]') == CC[x, y]\n+    assert Domain.preprocess('RR[y,z]') == RR[y, z]\n+    assert Domain.preprocess('CC[x,y,z]') == CC[x, y, z]\n+\n+\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Domain_preprocess_rr_cc_polynomial"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Domain_preprocess_rr_cc_polynomial"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 4,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Poly should accept RR[y,z] as domain specification",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Tests that the domain option accepts polynomial ring over real field (RR[y,z]) format which currently raises OptionError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_domain_rr_polynomial"
+      ],
+      "covers_original_tests": [
+        "test_Domain_preprocess"
+      ],
+      "covers_obligations": [
+        "test_Domain_preprocess::core"
+      ],
+      "target_source_symbol": "Domain.preprocess",
+      "target_validation_subject": "domain specification string 'RR[y,z]'",
+      "semantic_alignment_tokens": [
+        "Domain.preprocess",
+        "OptionError",
+        "domain="
+      ],
+      "trigger_shape_tokens": [
+        "domain='RR[y,z]'",
+        "Domain.preprocess"
+      ],
+      "rationale": "The original test tests various domain specifications but does not test polynomial rings over real/complex fields (RR[y,z], CC[x,y]). The bug is that Domain.preprocess lacks regex patterns to match these formats. This test directly triggers the assertion_error (OptionError) by passing 'RR[y,z]' which should create a polynomial ring over RR but currently fails. After fix, it should return the appropriate domain object."
+    },
+    "patch": "diff --git a/sympy/polys/tests/test_polyoptions.py b/sympy/polys/tests/test_polyoptions.py\n--- a/sympy/polys/tests/test_polyoptions.py\n+++ b/sympy/polys/tests/test_polyoptions.py\n@@ -6,7 +6,7 @@\n     Frac, Formal, Polys, Include, All, Gen, Symbols, Method)\n \n from sympy.polys.orderings import lex\n-from sympy.polys.domains import FF, GF, ZZ, QQ, EX\n+from sympy.polys.domains import FF, GF, ZZ, QQ, RR, CC, EX\n \n from sympy.polys.polyerrors import OptionError, GeneratorsError\n \n@@ -14,6 +14,8 @@\n from sympy.utilities.pytest import raises\n from sympy.abc import x, y, z\n \n+from sympy import Poly\n+\n \n def test_Options_clone():\n     opt = Options((x, y, z), {'domain': 'ZZ'})\n@@ -272,4 +274,12 @@ def test_Method_postprocess():\n     opt = {'method': 'f5b'}\n     Method.postprocess(opt)\n \n     assert opt == {'method': 'f5b'}\n+\n+\n+def test_sweb_enhanced_domain_rr_polynomial():\n+    # Test that Poly accepts domain='RR[y,z]' - polynomial ring over real field\n+    # This is the actual user-facing API that fails with OptionError on buggy code\n+    # See: https://github.com/sympy/sympy/issues/14396\n+    p = Poly(1.2*x*y*z, x, domain='RR[y,z]')\n+    assert p.domain == RR[y, z]\n",
+    "raw_response": "\n\nLooking at the bug, the issue is that `Domain.preprocess` doesn't recognize 'RR[y,z]' or 'CC[x,y]' as valid domain specifications. The original test tests `Domain.preprocess` directly, but the bug manifests when using `Poly` with `domain='RR[y,z]'`.\n\nI'll create an enhanced test that tests the actual user-facing API (`Poly` with `domain='RR[y,z]'`) which is a different observation angle than the original test that directly tests `Domain.preprocess`.\n\n```diff\ndiff --git a/sympy/polys/tests/test_polyoptions.py b/sympy/polys/tests/test_polyoptions.py\n--- a/sympy/polys/tests/test_polyoptions.py\n+++ b/sympy/polys/tests/test_polyoptions.py\n@@ -6,7 +6,7 @@\n     Frac, Formal, Polys, Include, All, Gen, Symbols, Method)\n \n from sympy.polys.orderings import lex\n-from sympy.polys.domains import FF, GF, ZZ, QQ, EX\n+from sympy.polys.domains import FF, GF, ZZ, QQ, RR, CC, EX\n \n from sympy.polys.polyerrors import OptionError, GeneratorsError\n \n@@ -14,6 +14,8 @@\n from sympy.utilities.pytest import raises\n from sympy.abc import x, y, z\n \n+from sympy import Poly\n+\n \n def test_Options_clone():\n     opt = Options((x, y, z), {'domain': 'ZZ'})\n@@ -272,3 +274,12 @@ def test_Method_postprocess():\n     opt = {'method': 'f5b'}\n     Method.postprocess(opt)\n \n     assert opt == {'method': 'f5b'}\n+\n+\n+def test_sweb_enhanced_domain_rr_polynomial():\n+    # Test that Poly accepts domain='RR[y,z]' - polynomial ring over real field\n+    # This is the actual user-facing API that fails with OptionError on buggy code\n+    # See: https://github.com/sympy/sympy/issues/14396\n+    p = Poly(1.2*x*y*z, x, domain='RR[y,z]')\n+    assert p.domain == RR[y, z]\n```",
+    "identifiers": [
+      "test_sweb_enhanced_domain_rr_polynomial"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_domain_rr_polynomial"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 3,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Domain parser should accept RR and CC as polynomial ring ground domains",
+      "semantic_bucket": "structural_invariant",
+      "goal": "The Domain.preprocess method must recognize 'RR[y,z]' and 'CC[y,z]' as valid polynomial ring domains, not reject them with OptionError",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "semantic_invariant_check",
+      "target_tests": [
+        "test_sweb_enhanced_Domain_preprocess_RR_CC_polynomial"
+      ],
+      "covers_original_tests": [
+        "test_Domain_preprocess"
+      ],
+      "covers_obligations": [
+        "test_Domain_preprocess::core"
+      ],
+      "target_source_symbol": "Domain.preprocess",
+      "target_validation_subject": "domain specification parsing for RR[y,z] and CC[y,z]",
+      "semantic_alignment_tokens": [
+        "Domain.preprocess",
+        "OptionError",
+        "domain specification"
+      ],
+      "trigger_shape_tokens": [
+        "Domain.preprocess('RR[y,z]')",
+        "Domain.preprocess('CC[y,z]')"
+      ],
+      "rationale": "The original test_Domain_preprocess tests polynomial rings over Z/ZZ and Q/QQ (e.g., 'Z[x]', 'Q[x]') but does not test polynomial rings over real (RR) or complex (CC) fields. The bug is that the regex _re_polynomial only matches 'Z|ZZ|Q|QQ' as ground domains, not 'R|RR|C|CC'. This enhanced test adds the missing invariant: that RR and CC should also be valid ground domains for polynomial rings, following the same pattern as ZZ and QQ. The test will fail on buggy code with OptionError and pass after the fix adds RR and CC support to the regex pattern."
+    },
+    "patch": "diff --git a/sympy/polys/tests/test_polyoptions.py b/sympy/polys/tests/test_polyoptions.py\n--- a/sympy/polys/tests/test_polyoptions.py\n+++ b/sympy/polys/tests/test_polyoptions.py\n@@ -6,7 +6,7 @@\n     Frac, Formal, Polys, Include, All, Gen, Symbols, Method)\n \n from sympy.polys.orderings import lex\n-from sympy.polys.domains import FF, GF, ZZ, QQ, EX\n+from sympy.polys.domains import FF, GF, ZZ, QQ, RR, CC, EX\n \n from sympy.polys.polyerrors import OptionError, GeneratorsError\n \n@@ -273,4 +273,14 @@ def test_Method_postprocess():\n     opt = {'method': 'f5b'}\n     Method.postprocess(opt)\n \n     assert opt == {'method': 'f5b'}\n+\n+\n+def test_sweb_enhanced_Domain_preprocess_RR_CC_polynomial():\n+    # Test polynomial rings over real (RR) and complex (CC) fields with multiple generators\n+    # This tests the bug where Poly(domain='RR[y,z]') fails with OptionError\n+    # The regex _re_polynomial only matches Z|ZZ|Q|QQ as ground domains, not R|RR|C|CC\n+    assert Domain.preprocess('RR[y,z]') == RR[y, z]\n+    assert Domain.preprocess('CC[y,z]') == CC[y, z]\n+    assert Domain.preprocess('R[y,z]') == RR[y, z]\n+    assert Domain.preprocess('C[y,z]') == CC[y, z]\n",
+    "raw_response": "\n\nLooking at the bug, the issue is that `Domain.preprocess` doesn't recognize 'RR[y,z]' or 'CC[y,z]' as valid polynomial ring domains because the regex `_re_polynomial` only matches 'Z|ZZ|Q|QQ' as ground domains.\n\nThe enhanced test should test the exact same bug trigger path (`Domain.preprocess('RR[y,z]')`) but from a different angle - specifically testing polynomial rings with multiple generators (y,z) rather than single generator (x).\n\nLet me create the patch:\n```diff\ndiff --git a/sympy/polys/tests/test_polyoptions.py b/sympy/polys/tests/test_polyoptions.py\n--- a/sympy/polys/tests/test_polyoptions.py\n+++ b/sympy/polys/tests/test_polyoptions.py\n@@ -6,7 +6,7 @@\n     Frac, Formal, Polys, Include, All, Gen, Symbols, Method)\n \n from sympy.polys.orderings import lex\n-from sympy.polys.domains import FF, GF, ZZ, QQ, EX\n+from sympy.polys.domains import FF, GF, ZZ, QQ, RR, CC, EX\n \n from sympy.polys.polyerrors import OptionError, GeneratorsError\n \n@@ -273,3 +273,12 @@ def test_Method_postprocess():\n     opt = {'method': 'f5b'}\n     Method.postprocess(opt)\n \n     assert opt == {'method': 'f5b'}\n+\n+\n+def test_sweb_enhanced_Domain_preprocess_RR_CC_polynomial():\n+    # Test polynomial rings over real (RR) and complex (CC) fields with multiple generators\n+    # This tests the bug where Poly(domain='RR[y,z]') fails with OptionError\n+    # The regex _re_polynomial only matches Z|ZZ|Q|QQ as ground domains, not R|RR|C|CC\n+    assert Domain.preprocess('RR[y,z]') == RR[y, z]\n+    assert Domain.preprocess('CC[y,z]') == CC[y, z]\n+    assert Domain.preprocess('R[y,z]') == RR[y, z]\n+    assert Domain.preprocess('C[y,z]') == CC[y, z]\n```",
+    "identifiers": [
+      "test_sweb_enhanced_Domain_preprocess_RR_CC_polynomial"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_Domain_preprocess_RR_CC_polynomial"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 2,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  },
+  {
+    "idea": {
+      "title": "Domain.preprocess should accept RR[x,y] and CC[x,y] polynomial ring domains",
+      "semantic_bucket": "direct_symptom",
+      "goal": "Test that Domain.preprocess accepts polynomial ring domains over real (RR) and complex (CC) fields, which currently raises OptionError incorrectly",
+      "oracle": "regression_should_fail_on_buggy_and_pass_on_fixed",
+      "template": "regression_example",
+      "target_tests": [
+        "test_sweb_enhanced_domain_rr_polynomial"
+      ],
+      "covers_original_tests": [
+        "test_Domain_preprocess"
+      ],
+      "covers_obligations": [
+        "test_Domain_preprocess::core"
+      ],
+      "target_source_symbol": "Domain.preprocess",
+      "target_validation_subject": "domain specification string",
+      "semantic_alignment_tokens": [
+        "Domain.preprocess",
+        "OptionError",
+        "domain"
+      ],
+      "trigger_shape_tokens": [
+        "Domain.preprocess",
+        "RR[x,y]",
+        "CC[x,y]"
+      ],
+      "rationale": "The original test_Domain_preprocess tests polynomial rings over Z/ZZ/Q/QQ but not over R/RR/C/CC. The bug is that 'RR[y,z]' raises OptionError even though it's a valid polynomial ring domain specification. This test directly exercises the same preprocess method with RR[x,y] and CC[x,y] to expose the missing regex pattern and preprocessing logic for real/complex polynomial rings."
+    },
+    "patch": "diff --git a/sympy/polys/tests/test_polyoptions.py b/sympy/polys/tests/test_polyoptions.py\n--- a/sympy/polys/tests/test_polyoptions.py\n+++ b/sympy/polys/tests/test_polyoptions.py\n@@ -4,10 +4,10 @@\n from sympy.polys.polyoptions import (\n     Options, Expand, Gens, Wrt, Sort, Order, Field, Greedy, Domain,\n     Split, Gaussian, Extension, Modulus, Symmetric, Strict, Auto,\n     Frac, Formal, Polys, Include, All, Gen, Symbols, Method)\n \n from sympy.polys.orderings import lex\n-from sympy.polys.domains import FF, GF, ZZ, QQ, EX\n+from sympy.polys.domains import FF, GF, ZZ, QQ, RR, CC, EX\n \n from sympy.polys.polyerrors import OptionError, GeneratorsError\n \n@@ -273,4 +273,15 @@ def test_Method_postprocess():\n     opt = {'method': 'f5b'}\n     Method.postprocess(opt)\n \n     assert opt == {'method': 'f5b'}\n+\n+\n+def test_sweb_enhanced_domain_rr_polynomial():\n+    # Test that RR and CC can be used as polynomial ring ground domains\n+    # This is the core bug: Poly(domain='RR[y,z]') should work but raises OptionError\n+    # Test single variable polynomial ring over RR and CC\n+    assert Domain.preprocess('RR[x]') == RR[x]\n+    assert Domain.preprocess('CC[x]') == CC[x]\n+    # Test the specific case from the bug report: RR[y,z] and CC[y,z]\n+    assert Domain.preprocess('RR[y,z]') == RR[y, z]\n+    assert Domain.preprocess('CC[y,z]') == CC[y, z]\n",
+    "raw_response": "\n\nLooking at the bug, the issue is that `Domain.preprocess` doesn't recognize `RR[x,y]` or `CC[x,y]` as valid polynomial ring domain specifications. The regex `_re_polynomial` only matches `Z|ZZ|Q|QQ` but not `R|RR|C|CC`.\n\nThe original test patch adds tests for `R[x]`, `RR[x]`, `C[x]`, `CC[x]` and their multivariate variants. I need to create a different test that exposes the same bug through a different observation angle.\n\nLet me create an enhanced test that tests the actual use case from the problem statement - using `Poly` with `domain='RR[y,z]'`:\n```diff\ndiff --git a/sympy/polys/tests/test_polyoptions.py b/sympy/polys/tests/test_polyoptions.py\n--- a/sympy/polys/tests/test_polyoptions.py\n+++ b/sympy/polys/tests/test_polyoptions.py\n@@ -4,7 +4,7 @@\n from sympy.polys.polyoptions import (\n     Options, Expand, Gens, Wrt, Sort, Order, Field, Greedy, Domain,\n     Split, Gaussian, Extension, Modulus, Symmetric, Strict, Auto,\n     Frac, Formal, Polys, Include, All, Gen, Symbols, Method)\n \n from sympy.polys.orderings import lex\n-from sympy.polys.domains import FF, GF, ZZ, QQ, EX\n+from sympy.polys.domains import FF, GF, ZZ, QQ, RR, CC, EX\n \n from sympy.polys.polyerrors import OptionError, GeneratorsError\n \n@@ -273,3 +273,13 @@ def test_Method_postprocess():\n     opt = {'method': 'f5b'}\n     Method.postprocess(opt)\n \n     assert opt == {'method': 'f5b'}\n+\n+\n+def test_sweb_enhanced_domain_rr_polynomial():\n+    # Test that RR and CC can be used as polynomial ring ground domains\n+    # This is the core bug: Poly(domain='RR[y,z]') should work but raises OptionError\n+    # Test single variable polynomial ring over RR and CC\n+    assert Domain.preprocess('RR[x]') == RR[x]\n+    assert Domain.preprocess('CC[x]') == CC[x]\n+    # Test the specific case from the bug report: RR[y,z] and CC[y,z]\n+    assert Domain.preprocess('RR[y,z]') == RR[y, z]\n+    assert Domain.preprocess('CC[y,z]') == CC[y, z]\n```",
+    "identifiers": [
+      "test_sweb_enhanced_domain_rr_polynomial"
+    ],
+    "enhanced_identifiers": [
+      "test_sweb_enhanced_domain_rr_polynomial"
+    ],
+    "duplicate_identifiers": [],
+    "kept": false,
+    "reason": "",
+    "failing_identifiers": null,
+    "eval_status_map": null,
+    "generation_attempts": 5,
+    "quality_score": 0.0,
+    "quality_breakdown": null,
+    "covered_original_tests": null,
+    "covered_obligations": null
+  }
+]

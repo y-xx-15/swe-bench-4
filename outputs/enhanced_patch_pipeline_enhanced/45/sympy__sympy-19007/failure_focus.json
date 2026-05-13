@@ -1,0 +1,36 @@
+{
+  "original_test_identifiers": [
+    "test_block_index_symbolic",
+    "test_block_index_symbolic_nonzero",
+    "test_block_index_large"
+  ],
+  "active_fail_to_pass_identifiers": [
+    "test_block_index_symbolic",
+    "test_block_index_symbolic_nonzero",
+    "test_block_index_large"
+  ],
+  "inactive_fail_to_pass_identifiers": [],
+  "failing_tests_sample": [
+    "sympy/matrices/expressions/tests/test_indexing.py:test_block_index_symbolic",
+    "sympy/matrices/expressions/tests/test_indexing.py:test_block_index_symbolic_nonzero",
+    "sympy/matrices/expressions/tests/test_indexing.py:test_block_index_large",
+    "test_block_index_symbolic",
+    "test_block_index_symbolic_nonzero"
+  ],
+  "failure_mode": "assertion_error",
+  "dominant_errors": [
+    "AssertionError"
+  ],
+  "assertion_value_mismatches": [],
+  "failure_snippets": [
+    "test_block_index_symbolic F",
+    "test_block_index_symbolic_nonzero F",
+    "test_block_index_large F"
+  ],
+  "noise_ratio": 0.0055,
+  "target_test_tracebacks": {
+    "test_block_index_symbolic": "TARGET TEST: test_block_index_symbolic\n- snippet: test_block_index_symbolic F\n- snippet: test_block_index_symbolic_nonzero F\n- snippet: test_block_index_large F\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_block_index_symbolic F\ntest_block_index_symbolic_nonzero F\ntest_block_index_symbolic_fail f\ntest_errors ok\n_ sympy/matrices/expressions/tests/test_indexing.py:test_block_index_symbolic __\nTraceback (most recent call last):\n  File \"/testbed/sympy/matrices/expressions/tests/test_indexing.py\", line 94, in test_block_index_symbolic\nAssertionError\n sympy/matrices/expressions/tests/test_indexing.py:test_block_index_symbolic_nonzero \nTraceback (most recent call last):\n  File \"/testbed/sympy/matrices/expressions/tests/test_indexing.py\", line 119, in test_block_index_symbolic_nonzero\nAssertionError\nTraceback (most recent call last):\nAssertionError\n=== tests finished: 28 passed, 3 failed, 1 expected to fail, in 1.47 seconds ===",
+    "test_block_index_symbolic_nonzero": "TARGET TEST: test_block_index_symbolic_nonzero\n- snippet: test_block_index_symbolic F\n- snippet: test_block_index_symbolic_nonzero F\n- snippet: test_block_index_large F\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_block_index_symbolic_nonzero F\ntest_errors ok\nTraceback (most recent call last):\nAssertionError\n sympy/matrices/expressions/tests/test_indexing.py:test_block_index_symbolic_nonzero \nTraceback (most recent call last):\n  File \"/testbed/sympy/matrices/expressions/tests/test_indexing.py\", line 119, in test_block_index_symbolic_nonzero\nAssertionError\nTraceback (most recent call last):\nAssertionError\n=== tests finished: 28 passed, 3 failed, 1 expected to fail, in 1.47 seconds ===",
+    "test_block_index_large": "TARGET TEST: test_block_index_large\n- snippet: test_block_index_symbolic F\n- snippet: test_block_index_symbolic_nonzero F\n- snippet: test_block_index_large F\n- dominant_errors: AssertionError\nWEAK TRACEBACK CONTEXT:\ntest_block_index_large F\ntest_errors ok\nTraceback (most recent call last):\nAssertionError\nTraceback (most recent call last):\nAssertionError\n___ sympy/matrices/expressions/tests/test_indexing.py:test_block_index_large ___\nTraceback (most recent call last):\n  File \"/testbed/sympy/matrices/expressions/tests/test_indexing.py\", line 138, in test_block_index_large\nAssertionError\n=== tests finished: 28 passed, 3 failed, 1 expected to fail, in 1.47 seconds ==="
+  }
+}

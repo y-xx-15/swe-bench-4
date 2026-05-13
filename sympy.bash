@@ -2,52 +2,25 @@
 set -e
 
 # ========================= 环境配置 =========================
-export OPENAI_API_KEY="sk-V09Av97hiMfatQyzRUhpjrvovwLStSHLrSn0NE5tQHYACjiN"
-export OPENAI_API_BASE="https://api.key77qiqi.cn/v1"
+export OPENAI_API_KEY="ks_Yvy6jo-zLTjoBt3M9MwpUZAB_YIMeU_eZejnhna8"
+export OPENAI_API_BASE="http://zhenze-huhehaote.cmecloud.cn/api/coding/v1"
 
 PROJECT_DIR="/home/xxy/SWE-bench-4"
 OUTPUT_ENHANCED="$PROJECT_DIR/outputs/enhanced_patch_pipeline_enhanced"
 OUTPUT_BASELINE="$PROJECT_DIR/outputs/enhanced_patch_pipeline_baseline"
 LOG_DIR="$PROJECT_DIR/experiment_logs"
 
-MODEL="gpt-4o"
+MODEL="minimax-m2.5"
 
 mkdir -p "$LOG_DIR" "$OUTPUT_ENHANCED" "$OUTPUT_BASELINE"
 
 # ========================= 77 个 SymPy 实例 =========================
 INSTANCE_IDS=(
-    sympy__sympy-14317
-    sympy__sympy-12454
     sympy__sympy-12481
-    sympy__sympy-14396
-    sympy__sympy-14774
-    sympy__sympy-14817
-    sympy__sympy-15011
-    sympy__sympy-15308
-    sympy__sympy-15345
-    sympy__sympy-15346
-    sympy__sympy-15609
-    sympy__sympy-15678
-    sympy__sympy-16106
-    sympy__sympy-16281
-    sympy__sympy-16503
-    sympy__sympy-16792
-    sympy__sympy-16988
-    sympy__sympy-17022
-    sympy__sympy-17139
-    sympy__sympy-17630
-    sympy__sympy-17655
-    sympy__sympy-18057
-    sympy__sympy-18087
-    sympy__sympy-18189
-    sympy__sympy-18199
+    sympy__sympy-14024
     sympy__sympy-18532
-    sympy__sympy-18621
-    sympy__sympy-18698
     sympy__sympy-18835
-    sympy__sympy-19007
     sympy__sympy-19254
-    sympy__sympy-19487
     sympy__sympy-20049
     sympy__sympy-20154
     sympy__sympy-20212
@@ -72,6 +45,8 @@ INSTANCE_IDS=(
     sympy__sympy-24152
     sympy__sympy-24213
     sympy__sympy-24909
+    django__django-10924
+    django__django-11001
 )
 
 
